@@ -1,1 +1,46 @@
+import React, { useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+export default function Cartes() {
+  const [cards, setCards] = useState([]);
+
+  useEffect(() => {
+    async function fetchCards() {
+      const { data, error } = await supabase.from('test_table').select('*');
+      if (error) {
+        console.error('Erreur de récupération:', error.message);
+      } else {
+        setCards(data);
+      }
+    }
+    fetchCards();
+  }, []);
+
+  return (
+    <div className="p-4">
+      <h1 className="text-2xl font-bold text-center mb-4">Liste des Cartes</h1>
+      {cards.length === 0 ? (
+        <p className="text-center text-gray-500">Aucune carte disponible.</p>
+      ) : (
+        <div className="grid grid-cols-3 gap-4">
+          {cards.map((card) => (
+            <div key={card.id} className="border rounded-lg p-4 shadow-md bg-white">
+              {card.image_url && (
+                <img src={card.image_url} alt={card.name} className="w-full h-40 object-cover mb-2 rounded" />
+              )}
+              <h3 className="text-xl font-bold">{card.name}</h3>
+              <p className="text-gray-600">{card.description || "Pas de description"}</p>
+              {card.rarity && (
+                <p className="mt-2 text-sm font-semibold text-blue-600">Rareté : {card.rarity}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
