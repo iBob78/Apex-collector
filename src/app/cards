@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function Cartes() {
-  const [cards, setCards] = useState([]);
+  const [cards, setCards] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchCards() {
       const { data, error } = await supabase.from('test_table').select('*');
+
       if (error) {
         console.error('Erreur de récupération:', error.message);
+        setError("Impossible de charger les cartes. Veuillez réessayer.");
       } else {
-        setCards(data);
+        setCards(data || []);
       }
+      setLoading(false);
     }
     fetchCards();
   }, []);
@@ -23,7 +28,11 @@ export default function Cartes() {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold text-center mb-4">Liste des Cartes</h1>
-      {cards.length === 0 ? (
+
+      {loading && <p className="text-center text-gray-500">Chargement en cours...</p>}
+      {error && <p className="text-center text-red-500">{error}</p>}
+
+      {!loading && !error && cards.length === 0 ? (
         <p className="text-center text-gray-500">Aucune carte disponible.</p>
       ) : (
         <div className="grid grid-cols-3 gap-4">
