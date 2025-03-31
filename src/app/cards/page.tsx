@@ -1,31 +1,6 @@
-import React from "react";
-
-interface CardProps {
-  name: string;
-  description?: string;
-  imageUrl?: string;
-  rarity?: string;
-}
-
-const Card: React.FC<CardProps> = ({ name, description, imageUrl, rarity }) => {
-  return (
-    <div className="border rounded-lg p-4 shadow-md bg-white transition-transform transform hover:scale-105">
-      {imageUrl && (
-        <img src={imageUrl} alt={name} className="w-full h-40 object-cover mb-2 rounded" />
-      )}
-      <h3 className="text-xl font-bold text-gray-900">{name}</h3>
-      <p className="text-gray-600">{description || "Pas de description"}</p>
-      {rarity && (
-        <p className="mt-2 text-sm font-semibold text-blue-600">Rareté : {rarity}</p>
-      )}
-    </div>
-  );
-};
-
-
-import React, { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import Card from '@/components/Card';
+import React, { useEffect, useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+import Card from "@/components/Card";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -38,10 +13,10 @@ export default function Cartes() {
 
   useEffect(() => {
     async function fetchCards() {
-      const { data, error } = await supabase.from('test_table').select('*');
+      const { data, error } = await supabase.from("test_table").select("*");
 
       if (error) {
-        console.error('Erreur de récupération:', error.message);
+        console.error("Erreur de récupération:", error.message);
         setError("Impossible de charger les cartes. Veuillez réessayer.");
       } else {
         setCards(data || []);
@@ -63,14 +38,16 @@ export default function Cartes() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {cards.map((card) => (
-            <Card key={card.id} name={card.name} imageUrl={card.image_url} description={card.description} rarity={card.rarity} />
+            <Card
+              key={card.id}
+              name={card.name}
+              imageUrl={card.image_url}
+              description={card.description}
+              rarity={card.rarity}
+            />
           ))}
         </div>
       )}
     </div>
   );
 }
-
-
-
-export default Card;
