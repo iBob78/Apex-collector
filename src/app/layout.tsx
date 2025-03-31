@@ -3,8 +3,8 @@ import Link from "next/link";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
     return (
-        <html lang="fr">
-            <body>
+        <html lang="fr" className="h-full">
+            <body className="bg-black text-white min-h-screen">
                 <header className="bg-gray-800 text-white p-4 flex justify-between">
                     <h1 className="text-xl font-bold">Apex Collector</h1>
                     <nav>
@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                                 <Link href="/" className="hover:underline">Accueil</Link>
                             </li>
                             <li>
-                                <Link href="/card" className="hover:underline">Cartes</Link>
+                                <Link href="/cards" className="hover:underline">Cartes</Link>
                             </li>
                         </ul>
                     </nav>
