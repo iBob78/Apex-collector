@@ -1,25 +1,18 @@
 import { ReactNode } from "react";
-import Link from "next/link";
+import "../style/globals.css";  // ✅ Importe Tailwind et les styles globaux
+import Menu from "../components/Menu";  // ✅ Menu est un composant séparé
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-    return (
-        <html lang="fr" className="h-full">
-            <body className="bg-black text-white min-h-screen">
-                <header className="bg-gray-800 text-white p-4 flex justify-between">
-                    <h1 className="text-xl font-bold">Apex Collector</h1>
-                    <nav>
-                        <ul className="flex gap-4">
-                            <li>
-                                <Link href="/" className="hover:underline">Accueil</Link>
-                            </li>
-                            <li>
-                                <Link href="/cards" className="hover:underline">Cartes</Link>
-                            </li>
-                        </ul>
-                    </nav>
-                </header>
-                <main className="p-4">{children}</main>
-            </body>
-        </html>
-    );
+  return (
+    <html lang="fr" className="h-full">
+      <head>
+        <title>Apex Collector</title>
+        <meta name="description" content="Le jeu de cartes ultime pour les passionnés d'automobile !" />
+      </head>
+      <body className="bg-black text-white h-full flex flex-col">
+        <Menu /> {/* ✅ Le menu sera affiché sur toutes les pages */}
+        <main className="p-4 flex-grow">{children}</main> {/* ✅ flex-grow pour remplir l'espace */}
+      </body>
+    </html>
+  );
 }
