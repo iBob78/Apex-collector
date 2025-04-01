@@ -1,3 +1,5 @@
+"use client";  // <--- Ajout obligatoire
+
 import React, { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Card from "@/components/Card";
@@ -13,17 +15,15 @@ export default function Cartes() {
 
   useEffect(() => {
     async function fetchCards() {
-      try {
-        const { data, error } = await supabase.from("test_table").select("*");
+      const { data, error } = await supabase.from("test_table").select("*");
 
-        if (error) throw error;
-        setCards(data || []);
-      } catch (err: any) {
-        console.error("Erreur de récupération:", err.message);
+      if (error) {
+        console.error("Erreur de récupération:", error.message);
         setError("Impossible de charger les cartes. Veuillez réessayer.");
-      } finally {
-        setLoading(false);
+      } else {
+        setCards(data || []);
       }
+      setLoading(false);
     }
     fetchCards();
   }, []);
@@ -32,17 +32,13 @@ export default function Cartes() {
     <div className="p-4">
       <h1 className="text-2xl font-bold text-center mb-4">Liste des Cartes</h1>
 
-      {/* ✅ Affichage dynamique des messages */}
       {loading && <p className="text-center text-gray-500">Chargement en cours...</p>}
       {error && <p className="text-center text-red-500">{error}</p>}
 
-      {!loading && !error && cards.length === 0 && (
+      {!loading && !error && cards.length === 0 ? (
         <p className="text-center text-gray-500">Aucune carte disponible.</p>
-      )}
-
-      {/* ✅ Affichage des cartes si elles existent */}
-      {!loading && !error && cards.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {cards.map((card) => (
             <Card
               key={card.id}
