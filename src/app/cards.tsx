@@ -7,6 +7,13 @@ interface CardProps {
   rarity?: string;
 }
 
+const rarityColors: Record<string, string> = {
+  common: "text-gray-500",
+  rare: "text-blue-500",
+  epic: "text-purple-500",
+  legendary: "text-orange-500",
+};
+
 const Card: React.FC<CardProps> = ({ name, description, imageUrl, rarity }) => {
   return (
     <div className="border rounded-lg p-4 shadow-md bg-white transition-transform transform hover:scale-105">
@@ -16,7 +23,9 @@ const Card: React.FC<CardProps> = ({ name, description, imageUrl, rarity }) => {
       <h3 className="text-xl font-bold text-gray-900">{name}</h3>
       <p className="text-gray-600">{description || "Pas de description"}</p>
       {rarity && (
-        <p className="mt-2 text-sm font-semibold text-blue-600">Rareté : {rarity}</p>
+        <p className={`mt-2 text-sm font-semibold ${rarityColors[rarity.toLowerCase()] || "text-gray-600"}`}>
+          Rareté : {rarity}
+        </p>
       )}
     </div>
   );
