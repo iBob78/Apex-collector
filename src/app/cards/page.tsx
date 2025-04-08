@@ -1,15 +1,24 @@
-"use client";  // <--- Ajout obligatoire
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Card from "@/components/Card";
+
+// Définir une interface pour le type de carte
+interface CardData {
+  id: number;
+  name: string;
+  image_url: string;
+  description: string;
+  rarity: string;
+}
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function Cartes() {
-  const [cards, setCards] = useState<any[]>([]);
+  const [cards, setCards] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,7 +30,7 @@ export default function Cartes() {
         console.error("Erreur de récupération:", error.message);
         setError("Impossible de charger les cartes. Veuillez réessayer.");
       } else {
-        setCards(data || []);
+        setCards((data as CardData[]) || []);
       }
       setLoading(false);
     }
