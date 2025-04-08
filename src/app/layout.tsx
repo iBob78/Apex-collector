@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import Link from "next/link";
-import Menu from "../components/Menu";
-import "../app/globals.css";
+import Menu from "@/components/Menu";
+import "@/app/globals.css";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
     return (
