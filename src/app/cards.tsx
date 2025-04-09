@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image"; // 👈 import du composant optimisé
 
 interface CardProps {
   name: string;
@@ -18,7 +19,15 @@ const Card: React.FC<CardProps> = ({ name, description, imageUrl, rarity }) => {
   return (
     <div className="border rounded-lg p-4 shadow-md bg-white transition-transform transform hover:scale-105">
       {imageUrl && (
-        <img src={imageUrl} alt={name} className="w-full h-40 object-cover mb-2 rounded" />
+        <div className="w-full h-40 relative mb-2 rounded overflow-hidden">
+          <Image
+            src={imageUrl}
+            alt={name}
+            fill // 👈 rend l'image responsive à son conteneur
+            className="object-cover rounded"
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
+        </div>
       )}
       <h3 className="text-xl font-bold text-gray-900">{name}</h3>
       <p className="text-gray-600">{description || "Pas de description"}</p>
