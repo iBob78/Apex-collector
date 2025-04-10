@@ -1,65 +1,46 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-import Card from "@/components/Card";
-import Menu from "@/components/Menu";
+import React from "react";
+import { useRouter } from "next/navigation";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-interface CardData {
-  id: number;
-  name: string;
-  description?: string;
-  image_url?: string;
-  rarity?: string;
-}
-
-export default function Cartes() {
-  const [cards, setCards] = useState<CardData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchCards() {
-      const { data, error } = await supabase.from("test_table").select("*");
-
-      if (error) {
-        console.error("Erreur de récupération:", error.message);
-        setError("Impossible de charger les cartes. Veuillez réessayer.");
-      } else {
-        setCards(data || []);
-      }
-      setLoading(false);
-    }
-    fetchCards();
-  }, []);
+export default function Home() {
+  const router = useRouter();
 
   return (
-    <div className="p-4">
-      <Menu />
-      <h1 className="text-2xl font-bold text-center mb-4">Liste des Cartes</h1>
-
-      {loading && <p className="text-center text-gray-500">Chargement en cours...</p>}
-      {error && <p className="text-center text-red-500">{error}</p>}
-
-      {!loading && !error && cards.length === 0 ? (
-        <p className="text-center text-gray-500">Aucune carte disponible.</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {cards.map((card) => (
-            <Card
-              key={card.id}
-              name={card.name}
-              imageUrl={card.image_url}
-              description={card.description}
-              rarity={card.rarity}
-            />
-          ))}
+    <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white p-4 min-h-screen">
+      {/* Header */}
+      <div className="flex justify-between items-center border-b border-gray-700 pb-2">
+        <h1 className="text-2xl font-bold tracking-wide">APEX COLLECTOR</h1>
+        <div className="flex items-center space-x-4">
+          <span className="text-sm">🏎️ Ford Mustang GT</span>
+          <span className="text-sm">💰 165,296</span>
+          <span className="text-sm">🔰 Niveau 35</span>
         </div>
-      )}
+      </div>
+
+      {/* Menu Buttons */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-center">
+        <button onClick={() => router.push("/collection")} className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg">
+          📖 Collection
+        </button>
+        <button className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg">🎴 Boosters</button>
+        <button onClick={() => router.push("/marche")} className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg">
+          💲 Marché
+        </button>
+        <button className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg">🏆 Succès</button>
+        <button className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg">🔧 Paramètres</button>
+        <button className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg">🏁 Événements</button>
+        <button className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg">🛒 Boutique</button>
+        <button className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg">👤 Profil</button>
+      </div>
+
+      {/* Footer */}
+      <div className="flex justify-between mt-6 text-sm text-gray-400">
+        <button className="hover:text-white">🎯 GPS</button>
+        <button className="hover:text-white">🎥 Caméra</button>
+        <button className="hover:text-white">🔍 Zoom</button>
+        <button className="hover:text-red-400">❌ Quitter</button>
+      </div>
     </div>
   );
 }
