@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Card from "@/components/Card";
+import Menu from "@/components/Menu";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Typage propre pour les données de carte
 interface CardData {
   id: number;
   name: string;
@@ -39,6 +39,7 @@ export default function Cartes() {
 
   return (
     <div className="p-4">
+      <Menu />
       <h1 className="text-2xl font-bold text-center mb-4">Liste des Cartes</h1>
 
       {loading && <p className="text-center text-gray-500">Chargement en cours...</p>}
