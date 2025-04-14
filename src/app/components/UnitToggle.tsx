@@ -10,7 +10,6 @@ export default function UnitToggle() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Récupère la préférence actuelle à la connexion
     const fetchPreference = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       const user = session?.user;
@@ -34,6 +33,7 @@ export default function UnitToggle() {
   }, []);
 
   const toggleUnit = async () => {
+    if (loading) return;
     setLoading(true);
     const newUnit = unit === 'metric' ? 'imperial' : 'metric';
 
@@ -54,12 +54,22 @@ export default function UnitToggle() {
   };
 
   return (
-    <button
-      onClick={toggleUnit}
-      disabled={loading}
-      className="px-4 py-2 rounded bg-gray-800 text-white hover:bg-gray-700 transition"
-    >
-      {loading ? 'Chargement...' : `Unité : ${unit === 'metric' ? 'km/h' : 'mph'}`}
-    </button>
+    <div className="flex items-center gap-4">
+      <span className="text-sm text-gray-500">km/h</span>
+
+      <button
+        onClick={toggleUnit}
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 
+        ${unit === 'imperial' ? 'bg-blue-600' : 'bg-gray-400'} disabled:opacity-50`}
+        disabled={loading}
+      >
+        <span
+          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300
+          ${unit === 'imperial' ? 'translate-x-6' : 'translate-x-1'}`}
+        />
+      </button>
+
+      <span className="text-sm text-gray-500">mph</span>
+    </div>
   );
 }
