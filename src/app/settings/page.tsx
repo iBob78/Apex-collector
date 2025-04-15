@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation'; // ✅ bonne version pour App Router
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import UnitToggle from '../components/UnitToggle';
 
@@ -11,13 +11,12 @@ export default function SettingsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
-  // Vérification si l'utilisateur est connecté
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
-        router.push('/login'); // Redirection vers la page de connexion si non connecté
+        router.push('/login'); // Redirige si l'utilisateur n'est pas connecté
       } else {
         setLoading(false);
       }
