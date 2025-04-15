@@ -1,10 +1,10 @@
-"use client";
+"use client"; // ✅ OBLIGATOIRE tout en haut pour utiliser les hooks dans l'App Router
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // ✅ version App Router
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import UnitToggle from '../components/UnitToggle';
-import TachometerLoader from '../components/TachometerLoader'; // ✅ Import du loader
+import TachometerLoader from '../components/TachometerLoader';
 
 const supabase = createClientComponentClient();
 
