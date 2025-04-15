@@ -1,7 +1,21 @@
 /* ✅ Importation correcte de Tailwind */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes spin-slow {
+  0% { transform: rotate(-90deg); }
+  25% { transform: rotate(0deg); }
+  50% { transform: rotate(90deg); }
+  75% { transform: rotate(180deg); }
+  100% { transform: rotate(270deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 2s linear infinite;
+}
+
 
 /* ✅ Variables CSS pour la gestion des couleurs */
 :root {
