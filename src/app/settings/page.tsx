@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // ✅ bonne version pour App Router
+import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import UnitToggle from '../components/UnitToggle';
+import TachometerLoader from '../components/TachometerLoader'; // ✅ Import du loader
 
 const supabase = createClientComponentClient();
 
@@ -16,7 +17,7 @@ export default function SettingsPage() {
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
-        router.push('/login'); // Redirige si l'utilisateur n'est pas connecté
+        router.push('/login');
       } else {
         setLoading(false);
       }
@@ -25,7 +26,7 @@ export default function SettingsPage() {
     checkUser();
   }, []);
 
-  if (loading) return <div>Chargement...</div>;
+  if (loading) return <TachometerLoader />;
 
   return (
     <main className="p-6 max-w-xl mx-auto space-y-6">
