@@ -13,6 +13,7 @@ export default function Menu() {
           { label: "🎴 Boosters", href: "/boosters" },
           { label: "💲 Marché", href: "/market" },
           { label: "🏆 Succès", href: "/success" },
+          { label: "⚙️ Paramètres", href: "/settings" },  {/* Ajout du lien vers les paramètres */}
         ].map(({ label, href }, index) => (
           <Link key={index} href={href} className="block p-2 hover:bg-gray-700 rounded">
             {label}
