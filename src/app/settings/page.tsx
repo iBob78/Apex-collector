@@ -1,7 +1,7 @@
-"use client"; // ✅ OBLIGATOIRE tout en haut pour utiliser les hooks dans l'App Router
+"use client";
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // ✅ version App Router
+import { useRouter } from 'next/navigation'; // ✅ CORRECT (pas next/router)
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import UnitToggle from '../components/UnitToggle';
 import TachometerLoader from '../components/TachometerLoader';
