@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // ✅ CORRECT (pas next/router)
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import UnitToggle from '../../components/UnitToggle';
-import TachometerLoader from '../../components/TachometerLoader';
+import UnitToggle from '../../components/UnitToggle.tsx';
+import TachometerLoader from '../../components/TachometerLoader.tsx';
 
 const supabase = createClientComponentClient();
 
