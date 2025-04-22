@@ -3,6 +3,8 @@ import Link from "next/link";
 import Menu from "@/components/Menu";
 import "./globals.css";
 
+// Force update for Vercel
+
 export default function RootLayout({ children }: { children: ReactNode }) {
     return (
         <html lang="fr">
