@@ -3,7 +3,7 @@ import Link from "next/link";
 import Menu from "@/components/Menu";
 import "./globals.css";
 
-// Force update for Vercel
+// Force update
 
 export default function RootLayout({ children }: { children: ReactNode }) {
     return (
