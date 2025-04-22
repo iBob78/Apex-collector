@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // ✅ CORRECT
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-
 import UnitToggle from '../components/UnitToggle';
 import TachometerLoader from '../components/TachometerLoader';
+import { Button } from '../components/ui/button';
+import { Select } from '../components/ui/select';
 
 const supabase = createClientComponentClient();
 
