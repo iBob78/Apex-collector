@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import Link from "next/link";
-import Menu from "@/components/Menu";
+import Menu from "../components/Menu";
 import "./globals.css";
 
 // Force update
