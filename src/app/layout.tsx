@@ -1,9 +1,7 @@
 import { ReactNode } from "react";
 import Link from "next/link";
-import Menu from "../components/Menu";
+import Menu from "@/components/Menu"; // Utilisation de l'alias @ corrigé
 import "./globals.css";
-
-// Force update
 
 export default function RootLayout({ children }: { children: ReactNode }) {
     return (
