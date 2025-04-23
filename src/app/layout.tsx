@@ -1,26 +1,25 @@
-import { ReactNode } from "react";
-import Link from "next/link";
-import Menu from "@/components/Menu";
-import "./globals.css";
+import { Inter } from 'next/font/google'
+import './globals.css'
+import Menu from '@/components/Menu'
+
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'Apex Collector',
-  description: 'Jeu de cartes à collectionner automobile',
-};
+  description: 'Collect and analyze your data',
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <html lang="fr">
-      <body className="min-h-screen bg-gray-100">
+    <html lang="en">
+      <body className={inter.className}>
         <Menu />
-        <main className="container mx-auto px-4 py-8">
-          {children}
-        </main>
+        <main>{children}</main>
       </body>
     </html>
-  );
+  )
 }
