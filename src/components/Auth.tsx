@@ -3,50 +3,60 @@
 import { useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
-
 export default function Auth() {
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
-    try {
-      setLoading(true)
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-      if (error) throw error
-    } catch (error) {
-      alert(error.message)
-    } finally {
-      setLoading(false)
-    }
-  }
+    setLoading(true)
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
     try {
-      setLoading(true)
-      const { error } = await supabase.auth.signUp({
+      // TODO: Implement actual Supabase client configuration
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+      )
+
+      const { error } = await supabase.auth.signInWithOtp({
         email,
-        password,
       })
-      if (error) throw error
-      alert('Vérifiez votre email pour le lien de confirmation!')
+
+      if (error) {
+        throw new Error(error.message)
+      }
+
+      alert('Check your email for the login link!')
     } catch (error) {
-      alert(error.message)
+      // Properly type the error
+      if (error instanceof Error) {
+        alert(error.message)
+      } else {
+        alert('An unexpected error occurred')
+      }
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    // ... le reste du composant reste inchangé
+    <div className="p-4">
+      <form onSubmit={handleSignIn}>
+        <input
+          type="email"
+          placeholder="Your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="p-2 border rounded"
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className="ml-2 p-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+        >
+          {loading ? 'Loading...' : 'Send magic link'}
+        </button>
+      </form>
+    </div>
   )
 }
