@@ -1,0 +1,37 @@
+name: Update Changelog
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  update-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Generate Changelog
+        id: changelog
+        uses: github-changelog-generator/github-changelog-generator@v1
+        with:
+          user: iBob78
+          project: Apex-collector
+          token: ${{ secrets.GITHUB_TOKEN }}
+          future-release: ${{ github.ref_name }}
+
+      - name: Update CHANGELOG.md
+        run: |
+          cat .github_changelog_generator > CHANGELOG.md
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add CHANGELOG.md
+          git commit -m "docs: update CHANGELOG for ${{ github.ref_name }}"
+          git push
+
+      - name: Update Release Notes
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: .github_changelog_generator
