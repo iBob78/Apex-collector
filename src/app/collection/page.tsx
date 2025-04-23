@@ -2,13 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-import Card from "@/components/Card"; // Utilisation de l'alias @ corrigé
+import Card from "@/components/Card"; // Correct alias
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Typage des données d'une carte
 interface CardData {
   id: number;
   name: string;
@@ -24,15 +23,21 @@ export default function CollectionPage() {
 
   useEffect(() => {
     async function fetchCards() {
-      const { data, error } = await supabase.from("test_table").select("*");
+      try {
+        const { data, error } = await supabase.from("test_table").select("*");
 
-      if (error) {
-        console.error("Erreur de récupération:", error.message);
-        setError("Impossible de charger les cartes. Veuillez réessayer.");
-      } else {
-        setCards(data || []);
+        if (error) {
+          console.error("Erreur de récupération:", error.message);
+          setError("Impossible de charger les cartes. Veuillez réessayer.");
+        } else {
+          setCards(data || []);
+        }
+      } catch (err) {
+        console.error("Erreur inconnue:", err);
+        setError("Une erreur inattendue est survenue.");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     fetchCards();
   }, []);
