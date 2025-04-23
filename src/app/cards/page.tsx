@@ -2,9 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-import Card from "@/components/Card"; // Utilisation de l'alias @ corrigé
+import Card from "@/components/Card"; // Correct alias
 
-// Définir une interface pour le type de carte
 interface CardData {
   id: number;
   name: string;
@@ -13,14 +12,8 @@ interface CardData {
   rarity: string;
 }
 
-// Vérifier que les variables d'environnement sont définies
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Les variables d'environnement NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY sont requises.");
-}
-
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function Cartes() {
@@ -37,7 +30,7 @@ export default function Cartes() {
           console.error("Erreur de récupération:", error.message);
           setError("Impossible de charger les cartes. Veuillez réessayer.");
         } else {
-          setCards((data as CardData[]) || []); // Conversion avec une vérification de type
+          setCards((data as CardData[]) || []);
         }
       } catch (err) {
         console.error("Erreur inconnue:", err);
