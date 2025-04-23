@@ -1,17 +1,13 @@
-import type { NextConfig } from "next";
+import { NextConfig } from 'next'
 
-const nextConfig: NextConfig = {
-  // Ajout de la configuration pour Supabase
-  env: {
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  },
-  // Configuration pour le mode strict TypeScript
-  typescript: {
-    strict: true,
-  },
+const config: NextConfig = {
   // Configuration pour le mode de rendu
   reactStrictMode: true,
-};
+  
+  // Configuration expérimentale
+  experimental: {
+    optimizeCss: true
+  }
+}
 
-export default nextConfig;
+export default config
