@@ -18,6 +18,16 @@ export default function CollectionGrid({
   const [filter, setFilter] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'rarity' | 'price'>('name')
 
+  const getRarityValue = (rarity: CardType['rarity']): number => {
+    switch (rarity) {
+      case 'Legendary': return 4
+      case 'Epic': return 3
+      case 'Rare': return 2
+      case 'Common': return 1
+      default: return 0
+    }
+  }
+
   const filteredCards = cards
     .filter(card => 
       card.name.toLowerCase().includes(filter.toLowerCase()) ||
@@ -68,14 +78,4 @@ export default function CollectionGrid({
       </div>
     </div>
   )
-}
-
-function getRarityValue(rarity: CardType['rarity']): number {
-  switch (rarity) {
-    case 'Legendary': return 4
-    case 'Epic': return 3
-    case 'Rare': return 2
-    case 'Common': return 1
-    default: return 0
-  }
 }

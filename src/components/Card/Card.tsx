@@ -13,6 +13,21 @@ interface CardProps {
 export default function Card({ card, onClick, className = '' }: CardProps) {
   const [isLoading, setIsLoading] = useState(true)
 
+  const getRarityColor = (rarity: CardType['rarity']) => {
+    switch (rarity) {
+      case 'Common':
+        return 'bg-gray-500 text-white'
+      case 'Rare':
+        return 'bg-blue-500 text-white'
+      case 'Epic':
+        return 'bg-purple-500 text-white'
+      case 'Legendary':
+        return 'bg-yellow-500 text-black'
+      default:
+        return 'bg-gray-500 text-white'
+    }
+  }
+
   return (
     <div 
       className={`relative rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105 ${className}`}
@@ -56,19 +71,4 @@ export default function Card({ card, onClick, className = '' }: CardProps) {
       )}
     </div>
   )
-}
-
-function getRarityColor(rarity: CardType['rarity']) {
-  switch (rarity) {
-    case 'Common':
-      return 'bg-gray-500 text-white'
-    case 'Rare':
-      return 'bg-blue-500 text-white'
-    case 'Epic':
-      return 'bg-purple-500 text-white'
-    case 'Legendary':
-      return 'bg-yellow-500 text-black'
-    default:
-      return 'bg-gray-500 text-white'
-  }
 }
