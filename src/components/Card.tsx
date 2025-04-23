@@ -1,6 +1,5 @@
 import React from "react";
-import Image from "next/image"; // Import du composant Image de Next.js
-import Card from '@/components/Card'; // Chemin correct
+import Image from "next/image"; // Utilisation de Image de Next.js
 
 interface CardProps {
   name: string;
@@ -14,13 +13,12 @@ const Card: React.FC<CardProps> = ({ name, description, imageUrl, rarity }) => {
     <div className="border rounded-lg p-4 shadow-md bg-white transition-transform transform hover:scale-105">
       {imageUrl && (
         <div className="w-full h-40 mb-2 relative rounded overflow-hidden">
-          {/* Utilisation de <Image /> pour optimiser les images */}
           <Image
             src={imageUrl}
             alt={name}
+            layout="fill" // Remplit le conteneur
             className="object-cover"
-            layout="fill" // Ajuste l'image pour remplir le conteneur
-            sizes="(max-width: 768px) 100vw, 33vw" // Indique à Next.js comment gérer les tailles
+            sizes="(max-width: 768px) 100vw, 33vw" // Optimisation pour différentes tailles d'écran
           />
         </div>
       )}
