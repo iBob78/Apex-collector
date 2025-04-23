@@ -1,4 +1,5 @@
-import Menu from "./Menu";
+
+import Menu from '@/components/Menu'; // Chemin correct
 
 export default function Layout({ children }) {
   return (
