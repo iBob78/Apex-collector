@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase'
 
 export default function Auth() {
   const [loading, setLoading] = useState(false)
@@ -12,15 +12,8 @@ export default function Auth() {
     setLoading(true)
 
     try {
-      // TODO: Implement actual Supabase client configuration
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-      )
-
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-      })
+      const supabase = createClient()
+      const { error } = await supabase.auth.signInWithOtp({ email })
 
       if (error) {
         throw new Error(error.message)
@@ -28,7 +21,6 @@ export default function Auth() {
 
       alert('Check your email for the login link!')
     } catch (error) {
-      // Properly type the error
       if (error instanceof Error) {
         alert(error.message)
       } else {
