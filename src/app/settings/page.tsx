@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation'; // ✅ CORRECT
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import UnitToggle from '@/components/UnitToggle';
 import TachometerLoader from '@/components/TachometerLoader';
-import { Button } from '@/components/ui/button';
-import { Select } from '@/components/ui/select';
 
 const supabase = createClientComponentClient();
 
@@ -26,7 +24,7 @@ export default function SettingsPage() {
     };
 
     checkUser();
-  }, []);
+  }, [router]); // ✅ Ajout de router dans les dépendances
 
   if (loading) return <TachometerLoader />;
 
