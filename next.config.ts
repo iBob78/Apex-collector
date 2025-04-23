@@ -1,12 +1,10 @@
 import { NextConfig } from 'next'
 
 const config: NextConfig = {
-  // Configuration pour le mode de rendu
   reactStrictMode: true,
-  
-  // Configuration expérimentale
+  // Désactiver temporairement l'optimisation CSS expérimentale
   experimental: {
-    optimizeCss: true
+    optimizeCss: false // Changement ici
   }
 }
 
