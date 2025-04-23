@@ -1,6 +1,6 @@
 'use client'
 
-import { createClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 import UnitToggle from '@/components/UnitToggle'
 import TachometerLoader from '@/components/TachometerLoader'
 

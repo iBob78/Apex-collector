@@ -1,6 +1,6 @@
 'use client'
 
-import { createClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 
 export default function UnitToggle() {
   return (
