@@ -1,13 +1,15 @@
+# Créer le fichier vercel.json
+cat > vercel.json << EOL
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
   "env": {
-    "NEXT_PUBLIC_SUPABASE_URL": "@next_public_supabase_url",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@next_public_supabase_anon_key"
+    "NEXT_PUBLIC_SUPABASE_URL": "https://jkrmpvkfgbkewwtuekxm.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imprcm1wdmtmZ2JrZXd3dHVla3htIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIyNzcwMzUsImV4cCI6MjA1Nzg1MzAzNX0.NeMXRFHPKXOiBgtfvhBBuwzEDJrgwM8AMyBwVNu_q1w"
   }
 }
+EOL
+
+# Vérifier le contenu
+cat vercel.json
+
+# Maintenant, essayons de déployer
+vercel --prod
