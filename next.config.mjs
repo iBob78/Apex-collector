@@ -2,11 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
-    optimizeCss: true,
-    serverActions: true,
+    optimizeCss: true
+    // Suppression de serverActions car c'est maintenant activé par défaut
   },
   typescript: {
-    ignoreBuildErrors: false,
+    ignoreBuildErrors: false
   }
 }
 
