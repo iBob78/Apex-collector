@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import Link from "next/link";
-import Menu from "@/components/Menu"; // Correct alias
+import Menu from "@/components/Menu"; // Alias corrigé
 import "./globals.css";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
