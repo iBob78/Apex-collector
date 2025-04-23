@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-import Card from "../components/Card"; // Import corrigé
+import Card from "@/components/Card"; // Utilisation de l'alias @ corrigé
 
 // Définir une interface pour le type de carte
 interface CardData {
