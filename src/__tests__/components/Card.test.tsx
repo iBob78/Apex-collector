@@ -15,8 +15,10 @@ describe('Card Component', () => {
     render(<Card card={mockCard} />)
     expect(screen.getByText('Test Card')).toBeInTheDocument()
     expect(screen.getByText('Legendary')).toBeInTheDocument()
-    // Utiliser data-testid pour le prix
-    expect(screen.getByTestId('card-price')).toHaveTextContent('9.99')
+    expect(screen.getByText((content, element) => {
+      return element?.tagName.toLowerCase() === 'span' && 
+             content.includes('99.99')
+    })).toBeInTheDocument()
     expect(screen.getByText('Owned')).toBeInTheDocument()
   })
 
@@ -26,5 +28,10 @@ describe('Card Component', () => {
     const cardElement = screen.getByTestId('card')
     fireEvent.click(cardElement)
     expect(mockClick).toHaveBeenCalledWith(mockCard)
+  })
+
+  it('shows loading state', () => {
+    render(<Card card={mockCard} />)
+    expect(screen.getByTestId('loading-placeholder')).toBeInTheDocument()
   })
 })

@@ -35,7 +35,7 @@ export default function Card({ card, onClick }: CardProps) {
           onLoad={() => setLoading(false)}
         />
         {isLoading && (
-          <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+          <div data-testid="loading-placeholder" className="absolute inset-0 bg-gray-200 animate-pulse" />
         )}
       </div>
       <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4">
@@ -44,7 +44,7 @@ export default function Card({ card, onClick }: CardProps) {
           <span className="px-2 py-1 rounded text-xs bg-yellow-500 text-black">
             {card.rarity}
           </span>
-          <span data-testid="card-price" className="text-white text-sm">
+          <span className="text-white text-sm">
             ${card.price.toFixed(2)}
           </span>
         </div>
