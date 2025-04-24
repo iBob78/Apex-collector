@@ -8,11 +8,12 @@ type CardType = {
 }
 
 interface CollectionGridProps {
-  items: CardType[]
+  items?: CardType[] | null
   onCardClick?: (card: CardType) => void
 }
 
-export default function CollectionGrid({ items = [], onCardClick }: CollectionGridProps) {
+export default function CollectionGrid({ items, onCardClick }: CollectionGridProps) {
+  // Gestion explicite des cas null/undefined
   if (!items || items.length === 0) {
     return <div className="text-center p-4">No items in collection</div>
   }
@@ -26,6 +27,7 @@ export default function CollectionGrid({ items = [], onCardClick }: CollectionGr
           rarity={card.rarity}
           price={card.price}
           onClick={() => onCardClick?.(card)}
+          data-testid="card"
         />
       ))}
     </div>

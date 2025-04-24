@@ -23,10 +23,20 @@ describe('CollectionGrid', () => {
     const onCardClick = jest.fn()
     render(<CollectionGrid items={mockItems} onCardClick={onCardClick} />)
     
-    // Cliquer sur le premier card
     const firstCard = screen.getByText(mockItems[0].name).closest('[data-testid="card"]')
     fireEvent.click(firstCard)
     
     expect(onCardClick).toHaveBeenCalledWith(mockItems[0])
+  })
+
+  it('handles undefined items prop', () => {
+    render(<CollectionGrid items={undefined} />)
+    expect(screen.getByText(/no items in collection/i)).toBeInTheDocument()
+  })
+
+  it('handles null items prop', () => {
+    // @ts-ignore - Testing invalid prop
+    render(<CollectionGrid items={null} />)
+    expect(screen.getByText(/no items in collection/i)).toBeInTheDocument()
   })
 })
