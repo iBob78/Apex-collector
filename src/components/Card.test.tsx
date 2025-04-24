@@ -6,12 +6,19 @@ describe('Card', () => {
     const cardProps = {
       name: 'Test Card',
       rarity: 'Rare',
-      price: '100',
+      price: '100'
     };
 
     render(<Card {...cardProps} />);
-    expect(screen.getByText('Test Card')).toBeInTheDocument();
-    expect(screen.getByText('Rare')).toBeInTheDocument();
-    expect(screen.getByText('100')).toBeInTheDocument();
+    
+    const elements = [
+      screen.getByText('Test Card'),
+      screen.getByText('Rare'),
+      screen.getByText('100')
+    ];
+    
+    elements.forEach(element => {
+      expect(element).toBeInTheDocument();
+    });
   });
 });
