@@ -10,9 +10,32 @@ jest.mock('@supabase/supabase-js', () => ({
 }))
 
 describe('Supabase Client', () => {
-  it('creates a supabase client', () => {
+  const originalEnv = process.env
+
+  beforeEach(() => {
+    process.env = {
+      ...originalEnv,
+      NEXT_PUBLIC_SUPABASE_URL: 'http://test.com',
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: 'test-key'
+    }
+    Object.defineProperty(window, 'location', {
+      value: { origin: 'http://localhost:3000' }
+    })
+  })
+
+  afterEach(() => {
+    process.env = originalEnv
+  })
+
+  it('creates a supabase client with environment variables', () => {
     expect(supabase).toBeDefined()
     expect(supabase.auth).toBeDefined()
+  })
+
+  it('throws error when environment variables are missing', () => {
+    jest.resetModules()
+    process.env.NEXT_PUBLIC_SUPABASE_URL = undefined
+    expect(() => require('@/lib/supabase')).toThrow()
   })
 
   describe('signInWithEmail', () => {
@@ -22,7 +45,7 @@ describe('Supabase Client', () => {
       expect(supabase.auth.signInWithOtp).toHaveBeenCalledWith({
         email: 'test@example.com',
         options: {
-          emailRedirectTo: 'http://localhost/auth/callback'
+          emailRedirectTo: 'http://localhost:3000/auth/callback'
         }
       })
     })
