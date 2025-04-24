@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import Button from '../ui/button'
 
@@ -32,11 +34,11 @@ export default function MarketListing({ id, card, seller, price, onBuy }: Market
     <div className="border rounded p-4" data-testid="market-listing">
       <h3 className="text-lg font-bold">{card.name}</h3>
       <p className="text-sm text-gray-600">Seller: {seller}</p>
-      <p className="text-sm text-blue-600">Price: </p>
+      <p className="text-sm text-blue-600">Price: ${price}</p>
       <Button
         onClick={handleBuy}
         disabled={isLoading}
-        className={}
+        className={`mt-2 ${isLoading ? 'opacity-50' : ''}`}
       >
         {isLoading ? 'Processing...' : 'Buy Now'}
       </Button>
