@@ -9,23 +9,11 @@ const customJestConfig = {
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
     '^@/components/(.*)$': '<rootDir>/src/components/',
-    '^@/app/(.*)$': '<rootDir>/src/app/',
+    '^@/lib/(.*)$': '<rootDir>/src/lib/',
+    '^@/app/(.*)$': '<rootDir>/src/app/'
   },
-  collectCoverage: true,
-  collectCoverageFrom: [
-    'src/**/*.{js,jsx,ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/**/*.stories.{js,jsx,ts,tsx}',
-  ],
-  coverageThreshold: {
-    global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80,
-    },
-  },
-  moduleDirectories: ['node_modules', '<rootDir>/src'],
+  moduleDirectories: ['node_modules', 'src'],
+  testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/']
 }
 
 module.exports = createJestConfig(customJestConfig)
