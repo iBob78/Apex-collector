@@ -22,7 +22,7 @@ describe('Card Component', () => {
   it('handles click events', () => {
     const mockClick = jest.fn()
     render(<Card card={mockCard} onClick={mockClick} />)
-    fireEvent.click(screen.getByText('Test Card'))
+    fireEvent.click(screen.getByRole('button', { name: /test card/i }))
     expect(mockClick).toHaveBeenCalledWith(mockCard)
   })
 })
