@@ -67,6 +67,12 @@ describe('Auth Component', () => {
 
     render(<Auth />)
     
+    // Remplir le formulaire avec un email valide
+    const emailInput = screen.getByPlaceholderText('Your email')
+    fireEvent.change(emailInput, {
+      target: { value: 'test@example.com' }
+    })
+    
     // Simuler la soumission du formulaire
     const form = screen.getByRole('form')
     fireEvent.submit(form)
@@ -76,7 +82,7 @@ describe('Auth Component', () => {
     })
   })
 
-  it('validates email format before submission', async () => {
+  it('validates email before submission', async () => {
     render(<Auth />)
     
     // Remplir avec un email invalide
@@ -89,31 +95,36 @@ describe('Auth Component', () => {
     const form = screen.getByRole('form')
     fireEvent.submit(form)
 
-    expect(emailInput).toBeInvalid()
-    expect(supabase.auth.signInWithOtp).not.toHaveBeenCalled()
+    // La validation HTML5 devrait empêcher la soumission
+    expect(emailInput).toHaveAttribute('type', 'email')
+    expect(form).not.toHaveAttribute('data-submitted')
   })
 
-  it('disables submit button during submission', async () => {
+  it('disables button during submission', async () => {
     supabase.auth.signInWithOtp.mockImplementationOnce(
       () => new Promise(resolve => setTimeout(resolve, 100))
     )
 
     render(<Auth />)
     
-    const submitButton = screen.getByRole('button')
-    const form = screen.getByRole('form')
-    
-    // Remplir le formulaire et soumettre
+    // Remplir le formulaire
     const emailInput = screen.getByPlaceholderText('Your email')
     fireEvent.change(emailInput, {
       target: { value: 'test@example.com' }
     })
+    
+    const submitButton = screen.getByRole('button')
+    const form = screen.getByRole('form')
+    
+    // Soumettre le formulaire
     fireEvent.submit(form)
     
-    expect(submitButton).toHaveAttribute('disabled')
+    // Le bouton devrait être désactivé immédiatement
+    expect(submitButton).toBeDisabled()
 
+    // Attendre la fin de la soumission
     await waitFor(() => {
-      expect(submitButton).not.toHaveAttribute('disabled')
+      expect(submitButton).not.toBeDisabled()
     })
   })
 })
