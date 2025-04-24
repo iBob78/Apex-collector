@@ -1,36 +1,29 @@
-'use client'
-
-import { FormEvent, useState } from 'react'
+import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState('')
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
-    if (!email) {
-      alert('Please enter your email')
-      return
-    }
-
     try {
       setIsLoading(true)
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+          emailRedirectTo: 'http://localhost/auth/callback'
         }
       })
-
+      
       if (error) {
         alert(error.message)
       } else {
         alert('Check your email for the login link!')
         setEmail('')
       }
-    } catch (error) {
+    } catch (error: any) {
       alert('An error occurred. Please try again.')
     } finally {
       setIsLoading(false)
@@ -38,24 +31,17 @@ export default function Auth() {
   }
 
   return (
-    <div className="p-4">
-      <form onSubmit={handleSubmit} aria-label="Authentication form">
-        <input
-          type="email"
-          placeholder="Your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="p-2 border rounded"
-          required
-        />
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="ml-2 p-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
-        >
-          Send magic link
-        </button>
-      </form>
-    </div>
+    <form onSubmit={handleLogin}>
+      <input
+        type="email"
+        placeholder="Your email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+      />
+      <button type="submit" disabled={isLoading}>
+        {isLoading ? 'Loading...' : 'Send magic link'}
+      </button>
+    </form>
   )
 }

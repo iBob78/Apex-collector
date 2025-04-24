@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
+import './src/lib/__mocks__/windowMock';
 
-// Reset all mocks after each test
-afterEach(() => {
+beforeEach(() => {
   jest.clearAllMocks();
 });
