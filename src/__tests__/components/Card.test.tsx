@@ -18,8 +18,13 @@ describe('Card Component', () => {
     expect(screen.getByText('Test Card')).toBeInTheDocument()
     expect(screen.getByText('Legendary')).toBeInTheDocument()
     
-    // Test du prix avec une regex
-    expect(screen.getByText(/$99\.99/)).toBeInTheDocument()
+    // Test du prix avec une fonction de test
+    const priceElement = screen.getByText((content, element) => {
+      return element?.tagName.toLowerCase() === 'span' && 
+             content.includes('$') && 
+             content.includes('99.99')
+    })
+    expect(priceElement).toBeInTheDocument()
     
     // Test du badge "owned"
     expect(screen.getByText('Owned')).toBeInTheDocument()
@@ -35,7 +40,7 @@ describe('Card Component', () => {
     expect(mockClick).toHaveBeenCalledWith(mockCard)
   })
 
-  it('handles image load completion', () => {
+  it('hides loading placeholder after image load', () => {
     render(<Card card={mockCard} />)
     const img = screen.getByAltText('Test Card')
     fireEvent.load(img)

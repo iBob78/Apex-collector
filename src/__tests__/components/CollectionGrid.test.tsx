@@ -28,9 +28,13 @@ describe('CollectionGrid Component', () => {
     expect(screen.getByText('Card One')).toBeInTheDocument()
     expect(screen.getByText('Card Two')).toBeInTheDocument()
     
-    // Test des prix avec regex
-    expect(screen.getByText(/$9\.99/)).toBeInTheDocument()
-    expect(screen.getByText(/$19\.99/)).toBeInTheDocument()
+    // Test des prix avec une fonction de test
+    const priceElements = screen.getAllByText((content, element) => {
+      return element?.tagName.toLowerCase() === 'span' && 
+             content.includes('$') &&
+             (content.includes('9.99') || content.includes('19.99'))
+    })
+    expect(priceElements).toHaveLength(2)
     
     // Test des raretés
     expect(screen.getByText('Common')).toBeInTheDocument()
@@ -47,6 +51,6 @@ describe('CollectionGrid Component', () => {
 
   it('renders empty state when no cards', () => {
     render(<CollectionGrid cards={[]} />)
-    expect(screen.getByTestId('empty-grid')).toBeInTheDocument()
+    expect(screen.getByText('Aucune carte à afficher')).toBeInTheDocument()
   })
 })
