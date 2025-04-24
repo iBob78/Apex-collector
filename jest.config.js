@@ -12,19 +12,18 @@ const customJestConfig = {
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
   moduleDirectories: ['node_modules', '<rootDir>'],
   collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
+    'src/components/**/*.{ts,tsx}',
+    'src/lib/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
     '!src/**/index.{ts,tsx}',
-    '!src/**/*.stories.{ts,tsx}',
-    '!src/pages/_*.{ts,tsx}',
-    '!src/app/**/*.{ts,tsx}'
+    '!src/**/*.stories.{ts,tsx}'
   ],
   coverageThreshold: {
     global: {
-      statements: 50,
-      branches: 50,
-      functions: 50,
-      lines: 50
+      statements: 80,
+      branches: 80,
+      functions: 80,
+      lines: 80
     }
   }
 }
