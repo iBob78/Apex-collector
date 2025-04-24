@@ -19,7 +19,8 @@ describe('Card', () => {
     const handleClick = jest.fn()
     render(<Card {...mockCard} onClick={handleClick} />)
     
-    fireEvent.click(screen.getByText(mockCard.name))
-    expect(handleClick).toHaveBeenCalled()
+    // Utiliser data-testid pour cibler l'élément
+    fireEvent.click(screen.getByTestId('card'))
+    expect(handleClick).toHaveBeenCalledTimes(1)
   })
 })

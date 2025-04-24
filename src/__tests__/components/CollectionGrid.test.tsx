@@ -23,7 +23,10 @@ describe('CollectionGrid', () => {
     const onCardClick = jest.fn()
     render(<CollectionGrid items={mockItems} onCardClick={onCardClick} />)
     
-    fireEvent.click(screen.getByText(mockItems[0].name))
+    // Cliquer sur le premier card
+    const firstCard = screen.getByText(mockItems[0].name).closest('[data-testid="card"]')
+    fireEvent.click(firstCard)
+    
     expect(onCardClick).toHaveBeenCalledWith(mockItems[0])
   })
 })

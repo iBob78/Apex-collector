@@ -1,5 +1,9 @@
 export const supabase = {
   auth: {
-    signInWithOtp: jest.fn().mockResolvedValue({ error: null })
+    signInWithOtp: jest.fn(),
+    getSession: jest.fn(),
+    onAuthStateChange: jest.fn()
   }
-};
+}
+
+export default supabase

@@ -1,17 +1,20 @@
 interface CardProps {
-  name: string;
-  rarity: string;
-  price: string;
+  name: string
+  rarity?: string
+  price?: string
+  onClick?: () => void
 }
 
-const Card = ({ name, rarity, price }: CardProps) => {
+export default function Card({ name, rarity, price, onClick }: CardProps) {
   return (
-    <div className="card">
-      <h3>{name}</h3>
-      <p>{rarity}</p>
-      <p>{price}</p>
+    <div 
+      className="border rounded p-4 cursor-pointer hover:shadow-lg"
+      onClick={onClick}
+      data-testid="card"
+    >
+      <h3 className="text-lg font-bold">{name}</h3>
+      {rarity && <p className="text-sm text-gray-600">{rarity}</p>}
+      {price && <p className="text-sm text-blue-600">{price}</p>}
     </div>
-  );
-};
-
-export default Card;
+  )
+}
