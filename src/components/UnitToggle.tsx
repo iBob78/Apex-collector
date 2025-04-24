@@ -1,12 +1,13 @@
 'use client'
 
-import { createClient } from '@supabase/supabase-js'
+import { useState } from 'react'
 
 export default function UnitToggle() {
+  const [unit, setUnit] = useState('metric')
+
   return (
-    <div className="p-4">
-      <h2>Unit Toggle Component</h2>
-      {/* Implement toggle logic here */}
-    </div>
+    <button onClick={() => setUnit(unit === 'metric' ? 'imperial' : 'metric')}>
+      Toggle to {unit === 'metric' ? 'Imperial' : 'Metric'}
+    </button>
   )
 }

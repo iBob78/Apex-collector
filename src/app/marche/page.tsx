@@ -1,8 +1,8 @@
-export default function MarchePage() {
+export default function Page() {
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Marché</h1>
-      <p>Achetez et vendez des cartes avec d'autres joueurs.</p>
+    <div>
+      <h1>Le march&eacute;</h1>
+      <p>Bienvenue sur la page du march&eacute;</p>
     </div>
   )
 }

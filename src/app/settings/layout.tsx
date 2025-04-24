@@ -1,9 +1,9 @@
-'use client';
-import Menu from '@/components/Menu';
-export default function SettingsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+import type { ReactNode } from 'react'
+
+export default function Layout({ children }: { children: ReactNode }) {
+  return (
+    <div className="settings-layout">
+      {children}
+    </div>
+  )
 }

@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
     
     steps:
@@ -21,34 +21,18 @@ jobs:
         
     - name: Install dependencies
       run: npm ci
-      
-    - name: Run tests
-      run: npm test
       
     - name: Run lint
       run: npm run lint
       
+    - name: Run tests
+      run: npm test
+      
     - name: Build project
       run: npm run build
-
-  coverage:
-    needs: test
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
+      
+    - name: Upload test coverage
+      uses: actions/upload-artifact@v3
       with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Run coverage
-      run: npm run test:coverage
-      
-    - name: Upload coverage reports
-      uses: codecov/codecov-action@v3
+        name: coverage
+        path: coverage/

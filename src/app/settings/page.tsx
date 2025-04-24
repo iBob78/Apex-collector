@@ -1,15 +1,9 @@
 'use client'
 
-import { createClient } from '@supabase/supabase-js'
-import UnitToggle from '@/components/UnitToggle'
-import TachometerLoader from '@/components/TachometerLoader'
-
-export default function SettingsPage() {
+export default function Settings() {
   return (
-    <div className="p-4">
+    <div>
       <h1>Settings</h1>
-      <UnitToggle />
-      <TachometerLoader />
     </div>
   )
 }
