@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import Card from '@/components/Card'
 
 describe('Card Component', () => {
@@ -18,13 +18,11 @@ describe('Card Component', () => {
     expect(screen.getByText('Test Card')).toBeInTheDocument()
     expect(screen.getByText('Legendary')).toBeInTheDocument()
     
-    // Test du prix avec une fonction de test
-    const priceElement = screen.getByText((content, element) => {
-      return element?.tagName.toLowerCase() === 'span' && 
-             content.includes('$') && 
-             content.includes('99.99')
-    })
-    expect(priceElement).toBeInTheDocument()
+    // Test du prix en utilisant une fonction de test plus précise
+    const priceText = screen.getByText((content) => 
+      content.includes('99.99') && content.includes('$')
+    )
+    expect(priceText).toBeInTheDocument()
     
     // Test du badge "owned"
     expect(screen.getByText('Owned')).toBeInTheDocument()
@@ -33,17 +31,24 @@ describe('Card Component', () => {
     expect(screen.getByTestId('loading-placeholder')).toBeInTheDocument()
   })
 
-  it('handles click events', () => {
-    const mockClick = jest.fn()
-    render(<Card card={mockCard} onClick={mockClick} />)
-    fireEvent.click(screen.getByTestId('card'))
-    expect(mockClick).toHaveBeenCalledWith(mockCard)
+  it('renders without owned badge for non-owned cards', () => {
+    const nonOwnedCard = { ...mockCard, owned: false }
+    render(<Card card={nonOwnedCard} />)
+    expect(screen.queryByText('Owned')).not.toBeInTheDocument()
   })
 
-  it('hides loading placeholder after image load', () => {
+  it('handles image loading', () => {
     render(<Card card={mockCard} />)
     const img = screen.getByAltText('Test Card')
+    expect(screen.getByTestId('loading-placeholder')).toBeInTheDocument()
     fireEvent.load(img)
     expect(screen.queryByTestId('loading-placeholder')).not.toBeInTheDocument()
+  })
+
+  it('handles click events', () => {
+    const handleClick = jest.fn()
+    render(<Card card={mockCard} onClick={handleClick} />)
+    fireEvent.click(screen.getByTestId('card'))
+    expect(handleClick).toHaveBeenCalledWith(mockCard)
   })
 })
