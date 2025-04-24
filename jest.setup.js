@@ -1,25 +1,18 @@
 import '@testing-library/jest-dom'
 
-// Mock Next.js Image component
-jest.mock('next/image', () => ({
-  __esModule: true,
-  default: (props) => {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img {...props} />
-  },
-}))
-
-// Supprimer les avertissements console pour les tests
+// Fix for console error/warn mock
 const originalError = console.error
 const originalWarn = console.warn
 
 beforeAll(() => {
   console.error = (...args) => {
-    if (args[0].includes('Warning:')) return
+    const message = typeof args[0] === 'string' ? args[0] : ''
+    if (message.includes('Warning:')) return
     originalError.call(console, ...args)
   }
   console.warn = (...args) => {
-    if (args[0].includes('onLoadingComplete')) return
+    const message = typeof args[0] === 'string' ? args[0] : ''
+    if (message.includes('Warning:')) return
     originalWarn.call(console, ...args)
   }
 })

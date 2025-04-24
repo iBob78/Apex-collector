@@ -2,39 +2,50 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import Auth from '@/components/Auth'
 
 // Mock du module supabase
-jest.mock('../../lib/supabase')
+jest.mock('../../lib/supabase', () => ({
+  supabase: {
+    auth: {
+      signInWithOtp: jest.fn()
+    }
+  }
+}))
+
+// Mock de window.alert
+const mockAlert = jest.fn()
+global.alert = mockAlert
 
 describe('Auth Component', () => {
   const { supabase } = require('../../lib/supabase')
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockAlert.mockClear()
   })
 
   it('renders magic link form', () => {
     render(<Auth />)
     
-    // Vérifier les éléments du formulaire
     expect(screen.getByPlaceholderText('Your email')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Send magic link' })).toBeInTheDocument()
   })
 
   it('handles email submission', async () => {
-    supabase.auth.signInWithOtp = jest.fn().mockResolvedValueOnce({
+    supabase.auth.signInWithOtp.mockResolvedValueOnce({
       data: {},
       error: null
     })
 
     render(<Auth />)
     
-    // Remplir et soumettre le formulaire
+    // Remplir le formulaire
     const emailInput = screen.getByPlaceholderText('Your email')
     fireEvent.change(emailInput, {
       target: { value: 'test@example.com' }
     })
     
-    const submitButton = screen.getByRole('button', { name: 'Send magic link' })
-    fireEvent.click(submitButton)
+    // Simuler la soumission du formulaire
+    const form = screen.getByRole('form')
+    fireEvent.submit(form)
 
     await waitFor(() => {
       expect(supabase.auth.signInWithOtp).toHaveBeenCalledWith({
@@ -43,77 +54,66 @@ describe('Auth Component', () => {
           emailRedirectTo: expect.any(String)
         }
       })
+      expect(mockAlert).toHaveBeenCalledWith('Check your email for the login link!')
     })
   })
 
-  it('displays error message on submission failure', async () => {
+  it('handles submission errors', async () => {
     const errorMessage = 'Invalid email format'
-    supabase.auth.signInWithOtp = jest.fn().mockResolvedValueOnce({
+    supabase.auth.signInWithOtp.mockResolvedValueOnce({
       data: null,
       error: { message: errorMessage }
     })
 
     render(<Auth />)
     
-    // Soumettre le formulaire avec un email invalide
-    const submitButton = screen.getByRole('button', { name: 'Send magic link' })
-    fireEvent.click(submitButton)
+    // Simuler la soumission du formulaire
+    const form = screen.getByRole('form')
+    fireEvent.submit(form)
 
-    // Vérifier que le message d'erreur s'affiche
-    expect(await screen.findByText(errorMessage)).toBeInTheDocument()
-  })
-
-  it('shows success message after successful submission', async () => {
-    supabase.auth.signInWithOtp = jest.fn().mockResolvedValueOnce({
-      data: {},
-      error: null
-    })
-
-    render(<Auth />)
-    
-    // Remplir et soumettre le formulaire
-    const emailInput = screen.getByPlaceholderText('Your email')
-    fireEvent.change(emailInput, {
-      target: { value: 'test@example.com' }
-    })
-    
-    const submitButton = screen.getByRole('button', { name: 'Send magic link' })
-    fireEvent.click(submitButton)
-
-    // Vérifier le message de succès
     await waitFor(() => {
-      expect(screen.getByText(/check your email/i)).toBeInTheDocument()
+      expect(mockAlert).toHaveBeenCalledWith(errorMessage)
     })
   })
 
-  it('handles loading state during submission', async () => {
-    supabase.auth.signInWithOtp = jest.fn().mockImplementationOnce(
-      () => new Promise(resolve => setTimeout(resolve, 100))
-    )
-
+  it('validates email format before submission', async () => {
     render(<Auth />)
     
-    // Soumettre le formulaire
-    const submitButton = screen.getByRole('button', { name: 'Send magic link' })
-    fireEvent.click(submitButton)
-    
-    // Vérifier que le bouton est désactivé
-    expect(submitButton).toBeDisabled()
-  })
-
-  it('validates email format', async () => {
-    render(<Auth />)
-    
-    // Soumettre le formulaire avec un email invalide
+    // Remplir avec un email invalide
     const emailInput = screen.getByPlaceholderText('Your email')
     fireEvent.change(emailInput, {
       target: { value: 'invalid-email' }
     })
     
-    const submitButton = screen.getByRole('button', { name: 'Send magic link' })
-    fireEvent.click(submitButton)
+    // Simuler la soumission du formulaire
+    const form = screen.getByRole('form')
+    fireEvent.submit(form)
 
-    // Vérifier le message de validation
-    expect(await screen.findByText(/invalid email format/i)).toBeInTheDocument()
+    expect(emailInput).toBeInvalid()
+    expect(supabase.auth.signInWithOtp).not.toHaveBeenCalled()
+  })
+
+  it('disables submit button during submission', async () => {
+    supabase.auth.signInWithOtp.mockImplementationOnce(
+      () => new Promise(resolve => setTimeout(resolve, 100))
+    )
+
+    render(<Auth />)
+    
+    const submitButton = screen.getByRole('button')
+    const form = screen.getByRole('form')
+    
+    // Remplir le formulaire et soumettre
+    const emailInput = screen.getByPlaceholderText('Your email')
+    fireEvent.change(emailInput, {
+      target: { value: 'test@example.com' }
+    })
+    fireEvent.submit(form)
+    
+    expect(submitButton).toHaveAttribute('disabled')
+
+    await waitFor(() => {
+      expect(submitButton).not.toHaveAttribute('disabled')
+    })
   })
 })

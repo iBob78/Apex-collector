@@ -1,52 +1,59 @@
 'use client'
 
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase'
+import { FormEvent, useState } from 'react'
+import { supabase } from '@/lib/supabase'
 
 export default function Auth() {
-  const [loading, setLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState('')
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    setLoading(true)
+    
+    if (!email) {
+      alert('Please enter your email')
+      return
+    }
 
     try {
-      const supabase = createClient()
-      const { error } = await supabase.auth.signInWithOtp({ email })
+      setIsLoading(true)
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        }
+      })
 
       if (error) {
-        throw new Error(error.message)
-      }
-
-      alert('Check your email for the login link!')
-    } catch (error) {
-      if (error instanceof Error) {
         alert(error.message)
       } else {
-        alert('An unexpected error occurred')
+        alert('Check your email for the login link!')
+        setEmail('')
       }
+    } catch (error) {
+      alert('An error occurred. Please try again.')
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
   return (
     <div className="p-4">
-      <form onSubmit={handleSignIn}>
+      <form onSubmit={handleSubmit} aria-label="Authentication form">
         <input
           type="email"
           placeholder="Your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="p-2 border rounded"
+          required
         />
         <button
           type="submit"
-          disabled={loading}
+          disabled={isLoading}
           className="ml-2 p-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
         >
-          {loading ? 'Loading...' : 'Send magic link'}
+          Send magic link
         </button>
       </form>
     </div>
