@@ -1,4 +1,1 @@
-#!/usr/bin/env sh
-
-# Check commit message format
-npx --no -- commitlint --edit "$1" || exit 1
+npx --no -- commitlint --edit 
