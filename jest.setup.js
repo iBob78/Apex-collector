@@ -1,19 +1,25 @@
 import '@testing-library/jest-dom'
 
-// Mock de window.alert et console pour éviter les avertissements inutiles
+// Supprimer les warnings inutiles pour les tests
 const originalError = console.error
 const originalWarn = console.warn
 
 beforeAll(() => {
   console.error = (...args) => {
-    const message = typeof args[0] === 'string' ? args[0] : ''
-    if (message.includes('Warning:') || message.includes('Invalid value for prop')) return
-    originalError.call(console, ...args)
+    if (typeof args[0] === 'string' && 
+        (args[0].includes('Warning:') || 
+         args[0].includes('Invalid value for prop') ||
+         args[0].includes('Failed prop type'))) {
+      return
+    }
+    originalError.apply(console, args)
   }
+
   console.warn = (...args) => {
-    const message = typeof args[0] === 'string' ? args[0] : ''
-    if (message.includes('Warning:')) return
-    originalWarn.call(console, ...args)
+    if (typeof args[0] === 'string' && args[0].includes('Warning:')) {
+      return
+    }
+    originalWarn.apply(console, args)
   }
 })
 
