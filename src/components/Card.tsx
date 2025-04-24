@@ -44,7 +44,9 @@ export default function Card({ card, onClick }: CardProps) {
           <span className="px-2 py-1 rounded text-xs bg-yellow-500 text-black">
             {card.rarity}
           </span>
-          <span className="text-white text-sm">${card.price.toFixed(2)}</span>
+          <span data-testid="card-price" className="text-white text-sm">
+            ${card.price.toFixed(2)}
+          </span>
         </div>
       </div>
       {card.owned && (

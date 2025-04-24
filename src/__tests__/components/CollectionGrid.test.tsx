@@ -23,11 +23,19 @@ describe('CollectionGrid Component', () => {
 
   it('renders all cards', () => {
     render(<CollectionGrid cards={mockCards} />)
+    
+    // Vérifier les noms des cartes
     expect(screen.getByText('Card One')).toBeInTheDocument()
     expect(screen.getByText('Card Two')).toBeInTheDocument()
-    // Utiliser une fonction de test pour les prix avec le $ et le point décimal
-    expect(screen.getByText((content) => content.includes('9.99'))).toBeInTheDocument()
-    expect(screen.getByText((content) => content.includes('19.99'))).toBeInTheDocument()
+    
+    // Vérifier les prix avec data-testid
+    const prices = screen.getAllByTestId('card-price')
+    expect(prices[0]).toHaveTextContent('.99')
+    expect(prices[1]).toHaveTextContent('9.99')
+    
+    // Vérifier les raretés
+    expect(screen.getByText('Common')).toBeInTheDocument()
+    expect(screen.getByText('Rare')).toBeInTheDocument()
   })
 
   it('handles card clicks', () => {
