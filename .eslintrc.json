@@ -1,15 +1,20 @@
 {
   "extends": [
-    "next/core-web-vitals"
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended"
   ],
-  "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
   "rules": {
-    "@typescript-eslint/no-unused-vars": "error",
-    "@typescript-eslint/no-explicit-any": "error"
+    "@typescript-eslint/no-explicit-any": "error",
+    "@next/next/no-img-element": "warn",
+    "jsx-a11y/alt-text": "error"
   },
-  "parserOptions": {
-    "ecmaVersion": 2022,
-    "sourceType": "module"
-  }
+  "overrides": [
+    {
+      "files": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "warn",
+        "@next/next/no-img-element": "off"
+      }
+    }
+  ]
 }

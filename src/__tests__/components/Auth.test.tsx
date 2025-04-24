@@ -1,8 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import Auth from '@/components/Auth'
+import { Auth } from '@/components'
+import { supabase } from '@/lib/supabase'
 
 // Mock du module supabase
-jest.mock('../../lib/supabase', () => ({
+jest.mock('@/lib/supabase', () => ({
   supabase: {
     auth: {
       signInWithOtp: jest.fn()
@@ -15,11 +16,10 @@ const mockAlert = jest.fn()
 global.alert = mockAlert
 
 describe('Auth Component', () => {
-  const { supabase } = require('../../lib/supabase')
-
   beforeEach(() => {
     jest.clearAllMocks()
     mockAlert.mockClear()
+    jest.mocked(supabase.auth.signInWithOtp).mockReset()
   })
 
   it('renders magic link form', () => {
@@ -30,7 +30,7 @@ describe('Auth Component', () => {
   })
 
   it('handles email submission', async () => {
-    supabase.auth.signInWithOtp.mockResolvedValueOnce({
+    jest.mocked(supabase.auth.signInWithOtp).mockResolvedValueOnce({
       data: {},
       error: null
     })
@@ -60,7 +60,7 @@ describe('Auth Component', () => {
 
   it('handles submission errors', async () => {
     const errorMessage = 'Invalid email format'
-    supabase.auth.signInWithOtp.mockResolvedValueOnce({
+    jest.mocked(supabase.auth.signInWithOtp).mockResolvedValueOnce({
       data: null,
       error: { message: errorMessage }
     })
@@ -97,11 +97,11 @@ describe('Auth Component', () => {
 
     // La validation HTML5 devrait empêcher la soumission
     expect(emailInput).toHaveAttribute('type', 'email')
-    expect(form).not.toHaveAttribute('data-submitted')
+    expect(supabase.auth.signInWithOtp).not.toHaveBeenCalled()
   })
 
   it('disables button during submission', async () => {
-    supabase.auth.signInWithOtp.mockImplementationOnce(
+    jest.mocked(supabase.auth.signInWithOtp).mockImplementationOnce(
       () => new Promise(resolve => setTimeout(resolve, 100))
     )
 
