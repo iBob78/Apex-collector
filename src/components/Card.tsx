@@ -20,7 +20,8 @@ export default function Card({ card, onClick }: CardProps) {
 
   return (
     <div 
-      className="relative rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105"
+      data-testid="card"
+      className="relative rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105 cursor-pointer"
       onClick={() => onClick?.(card)}
     >
       <div className="relative aspect-[3/4] w-full">

@@ -25,14 +25,16 @@ describe('CollectionGrid Component', () => {
     render(<CollectionGrid cards={mockCards} />)
     expect(screen.getByText('Card One')).toBeInTheDocument()
     expect(screen.getByText('Card Two')).toBeInTheDocument()
-    expect(screen.getByText('.99')).toBeInTheDocument()
-    expect(screen.getByText('9.99')).toBeInTheDocument()
+    // Utiliser une fonction de test pour les prix avec le $ et le point décimal
+    expect(screen.getByText((content) => content.includes('9.99'))).toBeInTheDocument()
+    expect(screen.getByText((content) => content.includes('19.99'))).toBeInTheDocument()
   })
 
   it('handles card clicks', () => {
     const mockClick = jest.fn()
     render(<CollectionGrid cards={mockCards} onCardClick={mockClick} />)
-    fireEvent.click(screen.getByText('Card One'))
+    const cards = screen.getAllByTestId('card')
+    fireEvent.click(cards[0])
     expect(mockClick).toHaveBeenCalledWith(mockCards[0])
   })
 })
