@@ -13,25 +13,32 @@ describe('Card Component', () => {
 
   it('renders correctly', () => {
     render(<Card card={mockCard} />)
+    
+    // Test du nom et de la rareté
     expect(screen.getByText('Test Card')).toBeInTheDocument()
     expect(screen.getByText('Legendary')).toBeInTheDocument()
-    expect(screen.getByText((content, element) => {
-      return element?.tagName.toLowerCase() === 'span' && 
-             content.includes('99.99')
-    })).toBeInTheDocument()
+    
+    // Test du prix avec une regex
+    expect(screen.getByText(/$99\.99/)).toBeInTheDocument()
+    
+    // Test du badge "owned"
     expect(screen.getByText('Owned')).toBeInTheDocument()
+    
+    // Test du placeholder de chargement
+    expect(screen.getByTestId('loading-placeholder')).toBeInTheDocument()
   })
 
   it('handles click events', () => {
     const mockClick = jest.fn()
     render(<Card card={mockCard} onClick={mockClick} />)
-    const cardElement = screen.getByTestId('card')
-    fireEvent.click(cardElement)
+    fireEvent.click(screen.getByTestId('card'))
     expect(mockClick).toHaveBeenCalledWith(mockCard)
   })
 
-  it('shows loading state', () => {
+  it('handles image load completion', () => {
     render(<Card card={mockCard} />)
-    expect(screen.getByTestId('loading-placeholder')).toBeInTheDocument()
+    const img = screen.getByAltText('Test Card')
+    fireEvent.load(img)
+    expect(screen.queryByTestId('loading-placeholder')).not.toBeInTheDocument()
   })
 })

@@ -24,16 +24,15 @@ describe('CollectionGrid Component', () => {
   it('renders all cards', () => {
     render(<CollectionGrid cards={mockCards} />)
     
-    // Vérifier les noms des cartes
+    // Test des noms de cartes
     expect(screen.getByText('Card One')).toBeInTheDocument()
     expect(screen.getByText('Card Two')).toBeInTheDocument()
     
-    // Vérifier les prix avec data-testid
-    const prices = screen.getAllByTestId('card-price')
-    expect(prices[0]).toHaveTextContent('.99')
-    expect(prices[1]).toHaveTextContent('9.99')
+    // Test des prix avec regex
+    expect(screen.getByText(/$9\.99/)).toBeInTheDocument()
+    expect(screen.getByText(/$19\.99/)).toBeInTheDocument()
     
-    // Vérifier les raretés
+    // Test des raretés
     expect(screen.getByText('Common')).toBeInTheDocument()
     expect(screen.getByText('Rare')).toBeInTheDocument()
   })
@@ -44,5 +43,10 @@ describe('CollectionGrid Component', () => {
     const cards = screen.getAllByTestId('card')
     fireEvent.click(cards[0])
     expect(mockClick).toHaveBeenCalledWith(mockCards[0])
+  })
+
+  it('renders empty state when no cards', () => {
+    render(<CollectionGrid cards={[]} />)
+    expect(screen.getByTestId('empty-grid')).toBeInTheDocument()
   })
 })
