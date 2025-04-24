@@ -1,34 +1,58 @@
-import React from "react";
-import Image from "next/image"; // Utilisation de Image de Next.js
+'use client'
+
+import Image from 'next/image'
+import { useState } from 'react'
 
 interface CardProps {
-  name: string;
-  description?: string;
-  imageUrl?: string;
-  rarity?: string;
+  card: {
+    id: string
+    name: string
+    imageUrl: string
+    rarity: string
+    price: number
+    owned: boolean
+  }
+  onClick?: (card: CardProps['card']) => void
 }
 
-const Card: React.FC<CardProps> = ({ name, description, imageUrl, rarity }) => {
+export default function Card({ card, onClick }: CardProps) {
+  const [isLoading, setLoading] = useState(true)
+
   return (
-    <div className="border rounded-lg p-4 shadow-md bg-white transition-transform transform hover:scale-105">
-      {imageUrl && (
-        <div className="w-full h-40 mb-2 relative rounded overflow-hidden">
-          <Image
-            src={imageUrl}
-            alt={name}
-            layout="fill" // Remplit le conteneur
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 33vw" // Optimisation pour différentes tailles d'écran
-          />
+    <div 
+      className="relative rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105"
+      onClick={() => onClick?.(card)}
+    >
+      <div className="relative aspect-[3/4] w-full">
+        <Image
+          src={card.imageUrl}
+          alt={card.name}
+          fill
+          className={`object-cover transition-opacity duration-300 ${
+            isLoading ? 'opacity-0' : 'opacity-100'
+          }`}
+          onLoad={() => setLoading(false)}
+        />
+        {isLoading && (
+          <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+        )}
+      </div>
+      <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4">
+        <h3 className="text-white font-semibold">{card.name}</h3>
+        <div className="flex items-center justify-between">
+          <span className="px-2 py-1 rounded text-xs bg-yellow-500 text-black">
+            {card.rarity}
+          </span>
+          <span className="text-white text-sm">${card.price.toFixed(2)}</span>
+        </div>
+      </div>
+      {card.owned && (
+        <div className="absolute top-2 right-2">
+          <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+            Owned
+          </span>
         </div>
       )}
-      <h3 className="text-xl font-bold text-gray-900">{name}</h3>
-      <p className="text-gray-600">{description || "Pas de description"}</p>
-      {rarity && (
-        <p className="mt-2 text-sm font-semibold text-blue-600">Rareté : {rarity}</p>
-      )}
     </div>
-  );
-};
-
-export default Card;
+  )
+}
