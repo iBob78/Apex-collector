@@ -1,20 +1,23 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { supabase } from '@/lib/supabase';
 import Auth from '@/components/Auth';
 
-// Configure le mock avant l'import du composant
-const mockSignInWithOtp = jest.fn().mockResolvedValue({ error: null });
-
+// Mock the entire supabase module
 jest.mock('@/lib/supabase', () => ({
   supabase: {
     auth: {
-      signInWithOtp: mockSignInWithOtp
+      signInWithOtp: jest.fn()
     }
   }
 }));
 
 describe('Auth', () => {
+  const mockSignInWithOtp = jest.mocked(supabase.auth.signInWithOtp);
+
   beforeEach(() => {
-    mockSignInWithOtp.mockClear();
+    // Reset mocks before each test
+    jest.clearAllMocks();
+    mockSignInWithOtp.mockResolvedValue({ error: null });
   });
 
   it('renders login form', () => {
@@ -28,7 +31,6 @@ describe('Auth', () => {
     const emailInput = screen.getByPlaceholderText(/email/i) as HTMLInputElement;
     const submitButton = screen.getByRole('button');
 
-    // Utiliser fireEvent au lieu de setAttribute
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
     fireEvent.click(submitButton);
 
