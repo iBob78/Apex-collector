@@ -1,24 +1,25 @@
-import { render, screen } from '@testing-library/react';
-import Card from './Card';
+import { render, screen, fireEvent } from '@testing-library/react'
+import Card from './Card'
 
 describe('Card', () => {
-  it('renders card information', () => {
-    const cardProps = {
-      name: 'Test Card',
-      rarity: 'Rare',
-      price: '100'
-    };
+  const mockCard = {
+    name: 'Test Card',
+    rarity: 'Rare',
+    price: '100',
+  }
 
-    render(<Card {...cardProps} />);
+  it('renders card information', () => {
+    render(<Card {...mockCard} />)
+    expect(screen.getByText(mockCard.name)).toBeInTheDocument()
+    expect(screen.getByText(mockCard.rarity)).toBeInTheDocument()
+    expect(screen.getByText(mockCard.price)).toBeInTheDocument()
+  })
+
+  it('handles click events', () => {
+    const handleClick = jest.fn()
+    render(<Card {...mockCard} onClick={handleClick} />)
     
-    const elements = [
-      screen.getByText('Test Card'),
-      screen.getByText('Rare'),
-      screen.getByText('100')
-    ];
-    
-    elements.forEach(element => {
-      expect(element).toBeInTheDocument();
-    });
-  });
-});
+    fireEvent.click(screen.getByText(mockCard.name))
+    expect(handleClick).toHaveBeenCalled()
+  })
+})

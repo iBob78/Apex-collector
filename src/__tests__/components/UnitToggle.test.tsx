@@ -1,26 +1,18 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import UnitToggle from '@/components/UnitToggle'
+import { render, screen, fireEvent } from '@testing-library/react';
+import UnitToggle from '@/components/UnitToggle';
 
 describe('UnitToggle', () => {
   it('renders toggle button', () => {
-    render(<UnitToggle />)
-    const button = screen.getByRole('button')
-    expect(button).toBeInTheDocument()
-  })
+    const onToggle = jest.fn();
+    render(<UnitToggle isMetric={true} onToggle={onToggle} />);
+    expect(screen.getByRole('button')).toBeInTheDocument();
+  });
 
   it('toggles between metric and imperial', () => {
-    render(<UnitToggle />)
-    const button = screen.getByRole('button')
-    
-    // Initial state
-    expect(button).toHaveTextContent(/Toggle to Imperial/)
-    
-    // Click to toggle
-    fireEvent.click(button)
-    expect(button).toHaveTextContent(/Toggle to Metric/)
-    
-    // Click again to toggle back
-    fireEvent.click(button)
-    expect(button).toHaveTextContent(/Toggle to Imperial/)
-  })
-})
+    const onToggle = jest.fn();
+    render(<UnitToggle isMetric={true} onToggle={onToggle} />);
+    const button = screen.getByRole('button');
+    fireEvent.click(button);
+    expect(onToggle).toHaveBeenCalled();
+  });
+});

@@ -1,27 +1,34 @@
-'use client'
-
+import { useState } from 'react'
 import Card from './Card'
 
-interface CollectionGridProps {
-  cards: Array<{
-    id: string
-    name: string
-    imageUrl: string
-    rarity: string
-    price: number
-    owned: boolean
-  }>
-  onCardClick?: (card: CollectionGridProps['cards'][0]) => void
+type CardType = {
+  id: number
+  name: string
+  rarity?: string
+  price?: string
 }
 
-const CollectionGrid = ({ cards, onCardClick }: CollectionGridProps) => {
+interface CollectionGridProps {
+  items: CardType[]
+  onCardClick?: (card: CardType) => void
+}
+
+export default function CollectionGrid({ items = [], onCardClick }: CollectionGridProps) {
+  if (!items || items.length === 0) {
+    return <div className="text-center p-4">No items in collection</div>
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-      {cards.map((card) => (
-        <Card key={card.id} card={card} onClick={onCardClick} />
+      {items.map((card) => (
+        <Card 
+          key={card.id} 
+          name={card.name}
+          rarity={card.rarity}
+          price={card.price}
+          onClick={() => onCardClick?.(card)}
+        />
       ))}
     </div>
   )
 }
-
-export default CollectionGrid

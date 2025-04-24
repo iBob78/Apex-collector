@@ -1,13 +1,15 @@
-'use client'
+interface UnitToggleProps {
+  isMetric: boolean
+  onToggle: (isMetric: boolean) => void
+}
 
-import { useState } from 'react'
-
-export default function UnitToggle() {
-  const [unit, setUnit] = useState('metric')
-
+export default function UnitToggle({ isMetric, onToggle }: UnitToggleProps) {
   return (
-    <button onClick={() => setUnit(unit === 'metric' ? 'imperial' : 'metric')}>
-      Toggle to {unit === 'metric' ? 'Imperial' : 'Metric'}
+    <button
+      className="px-4 py-2 bg-blue-500 text-white rounded"
+      onClick={() => onToggle(!isMetric)}
+    >
+      {isMetric ? 'Switch to Imperial' : 'Switch to Metric'}
     </button>
   )
 }
