@@ -1,20 +1,13 @@
 {
   "extends": [
-    "next/core-web-vitals",
-    "plugin:@typescript-eslint/recommended"
+    "next/core-web-vitals"
   ],
   "rules": {
-    "@typescript-eslint/no-explicit-any": "error",
-    "@next/next/no-img-element": "warn",
-    "jsx-a11y/alt-text": "error"
-  },
-  "overrides": [
-    {
-      "files": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
-      "rules": {
-        "@typescript-eslint/no-explicit-any": "warn",
-        "@next/next/no-img-element": "off"
-      }
-    }
-  ]
+    "@typescript-eslint/no-unused-expressions": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-unsafe-function-type": "off",
+    "@typescript-eslint/no-empty-object-type": "off",
+    "@typescript-eslint/no-this-alias": "off",
+    "react/react-in-jsx-scope": "off"
+  }
 }

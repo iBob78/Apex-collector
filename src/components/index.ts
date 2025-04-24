@@ -1,3 +1,1 @@
-export * from './Card'
-export * from './Collection'
-export * from './Auth'
+export { default as Card } from './Card'
