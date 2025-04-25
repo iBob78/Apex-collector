@@ -1,0 +1,202 @@
+.albumContainer {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: #f5f5f5;
+  border-radius: 16px;
+}
+
+.header {
+  margin-bottom: 24px;
+}
+
+.header h2 {
+  font-size: 2em;
+  margin: 0 0 16px 0;
+  color: #333;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mainStats {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #333;
+}
+
+.rarityStats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.rarityStats span {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.9em;
+  color: white;
+}
+
+.common {
+  background: linear-gradient(135deg, #b8b8b8, #e8e8e8);
+  color: #333 !important;
+}
+
+.uncommon {
+  background: linear-gradient(135deg, #00796b, #009688);
+}
+
+.rare {
+  background: linear-gradient(135deg, #1565c0, #2196f3);
+}
+
+.epic {
+  background: linear-gradient(135deg, #7b1fa2, #9c27b0);
+}
+
+.legendary {
+  background: linear-gradient(135deg, #ffa000, #ffc107);
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+  transition: all 0.3s ease;
+}
+
+.searchInput:focus {
+  border-color: #2196f3;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.filterSelect {
+  min-width: 150px;
+  padding: 8px 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filterSelect:focus {
+  border-color: #2196f3;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cardSlot {
+  display: flex;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.cardSlot:hover {
+  transform: translateY(-4px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .albumContainer {
+    padding: 16px;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .searchInput,
+  .filterSelect {
+    width: 100%;
+  }
+
+  .cardsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    padding: 12px;
+  }
+
+  .rarityStats {
+    gap: 8px;
+  }
+
+  .rarityStats span {
+    font-size: 0.8em;
+    padding: 4px 8px;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cardSlot {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Loading State */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  font-size: 1.2em;
+  color: #666;
+}
+
+/* Empty State */
+.empty {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 1.2em;
+}
+
+.empty p {
+  margin: 8px 0 0;
+  font-size: 0.9em;
+  opacity: 0.7;
+}
