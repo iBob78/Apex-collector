@@ -2,128 +2,7 @@ import React from "react";
 import Image from "next/image";
 import styles from "./BoosterOpeningAnimation.module.css";
 
-enum CardRarity {
-  COMMON = "common",
-  UNCOMMON = "uncommon",
-  RARE = "rare",
-  EPIC = "epic",
-  LEGENDARY = "legendary"
-}
-
-interface Card {
-  id: string;
-  imageUrl: string;
-  rarity: CardRarity;
-}
-
-interface Particle {
-  x: number;
-  y: number;
-  speed: number;
-  angle: number;
-  size: number;
-  color: string;
-  opacity: number;
-  lifetime: number;
-  currentLife: number;
-}
-
-interface RarityEffect {
-  particles: {
-    count: number;
-    colors: string[];
-    size: number;
-    speed: number;
-    lifetime: number;
-  };
-  visual: {
-    glow: string;
-    intensity: number;
-    rotation: number;
-  };
-}
-
-const RARITY_EFFECTS: Record<CardRarity, RarityEffect> = {
-  [CardRarity.COMMON]: {
-    particles: {
-      count: 20,
-      colors: ["#ffffff", "#e0e0e0"],
-      size: 3,
-      speed: 2,
-      lifetime: 1
-    },
-    visual: {
-      glow: "#ffffff",
-      intensity: 0.2,
-      rotation: 5
-    }
-  },
-  [CardRarity.UNCOMMON]: {
-    particles: {
-      count: 30,
-      colors: ["#00ff00", "#ffffff"],
-      size: 4,
-      speed: 3,
-      lifetime: 1.5
-    },
-    visual: {
-      glow: "#00ff00",
-      intensity: 0.4,
-      rotation: 10
-    }
-  },
-  [CardRarity.RARE]: {
-    particles: {
-      count: 50,
-      colors: ["#0000ff", "#ffffff", "#00ffff"],
-      size: 5,
-      speed: 4,
-      lifetime: 2
-    },
-    visual: {
-      glow: "#0000ff",
-      intensity: 0.6,
-      rotation: 15
-    }
-  },
-  [CardRarity.EPIC]: {
-    particles: {
-      count: 80,
-      colors: ["#ff00ff", "#ff69b4", "#ffffff"],
-      size: 6,
-      speed: 5,
-      lifetime: 2.5
-    },
-    visual: {
-      glow: "#ff00ff",
-      intensity: 0.8,
-      rotation: 20
-    }
-  },
-  [CardRarity.LEGENDARY]: {
-    particles: {
-      count: 120,
-      colors: ["#ffd700", "#ff4500", "#ffffff", "#ff0000"],
-      size: 8,
-      speed: 6,
-      lifetime: 3
-    },
-    visual: {
-      glow: "#ffd700",
-      intensity: 1,
-      rotation: 25
-    }
-  }
-};
-
-interface BoosterOpeningAnimationProps {
-  booster: {
-    imageUrl: string;
-    cards: Card[];
-  };
-  isOpen: boolean;
-  onAnimationComplete: (cards: Card[]) => void;
-}
+// ... (interfaces et configurations précédentes)
 
 const BoosterOpeningAnimation: React.FC<BoosterOpeningAnimationProps> = ({
   booster,
@@ -136,39 +15,87 @@ const BoosterOpeningAnimation: React.FC<BoosterOpeningAnimationProps> = ({
   
   const containerRef = React.useRef<HTMLDivElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  const animationFrameRef = React.useRef<number>();
 
-  // Optimisation des particules avec useCallback
-  const createParticlesForRarity = React.useCallback((x: number, y: number, rarity: CardRarity) => {
-    const effect = RARITY_EFFECTS[rarity].particles;
-    const newParticles: Particle[] = Array.from({ length: effect.count }, () => {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * effect.speed + effect.speed / 2;
-      return {
-        x,
-        y,
-        speed,
-        angle,
-        size: Math.random() * effect.size + effect.size / 2,
-        color: effect.colors[Math.floor(Math.random() * effect.colors.length)],
-        opacity: 1,
-        lifetime: effect.lifetime,
-        currentLife: 0
-      };
-    });
-
-    setParticles(prev => [...prev, ...newParticles]);
-  }, []);
-
-  // Animation optimisée des particules
+  // Animation principale
   React.useEffect(() => {
-    if (particles.length === 0) return;
+    if (!isOpen) {
+      setAnimationState("initial");
+      setRevealedCards([]);
+      setParticles([]);
+      return;
+    }
 
+    let mounted = true;
+
+    const animate = async () => {
+      if (!mounted) return;
+
+      // Phase de secousse
+      setAnimationState("shaking");
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (!mounted) return;
+      
+      // Phase d'ouverture
+      setAnimationState("opening");
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (!mounted) return;
+      
+      // Phase de révélation
+      setAnimationState("revealing");
+      await new Promise(resolve => setTimeout(resolve, 500));
+      if (!mounted) return;
+      
+      // Révélation des cartes une par une
+      for (const card of booster.cards) {
+        if (!mounted) return;
+
+        // Création des particules pour la carte
+        if (containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const effect = RARITY_EFFECTS[card.rarity].particles;
+          const newParticles: Particle[] = Array.from({ length: effect.count }, () => ({
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2,
+            speed: Math.random() * effect.speed + effect.speed / 2,
+            angle: Math.random() * Math.PI * 2,
+            size: Math.random() * effect.size + effect.size / 2,
+            color: effect.colors[Math.floor(Math.random() * effect.colors.length)],
+            opacity: 1,
+            lifetime: effect.lifetime,
+            currentLife: 0
+          }));
+          setParticles(prev => [...prev, ...newParticles]);
+        }
+
+        setRevealedCards(prev => [...prev, card.id]);
+        await new Promise(resolve => setTimeout(resolve, 800));
+      }
+      
+      if (!mounted) return;
+      
+      // Animation terminée
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (mounted) {
+        onAnimationComplete(booster.cards);
+      }
+    };
+
+    animate();
+
+    return () => {
+      mounted = false;
+    };
+  }, [isOpen, booster.cards, onAnimationComplete]);
+
+  // Animation des particules
+  React.useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx) return;
+    if (!canvas || particles.length === 0) return;
 
-    // Ajustement de la taille du canvas
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Ajuster la taille du canvas
     const updateCanvasSize = () => {
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width * window.devicePixelRatio;
@@ -177,11 +104,13 @@ const BoosterOpeningAnimation: React.FC<BoosterOpeningAnimationProps> = ({
     };
 
     updateCanvasSize();
-    window.addEventListener("resize", updateCanvasSize);
+    window.addEventListener('resize', updateCanvasSize);
 
+    // Animation des particules
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // Mettre à jour et dessiner les particules
       setParticles(prev => 
         prev
           .map(particle => ({
@@ -202,51 +131,16 @@ const BoosterOpeningAnimation: React.FC<BoosterOpeningAnimationProps> = ({
         ctx.fill();
       });
 
-      animationFrameRef.current = requestAnimationFrame(animate);
+      requestAnimationFrame(animate);
     };
 
-    animationFrameRef.current = requestAnimationFrame(animate);
+    const animationId = requestAnimationFrame(animate);
 
     return () => {
-      window.removeEventListener("resize", updateCanvasSize);
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
+      window.removeEventListener('resize', updateCanvasSize);
+      cancelAnimationFrame(animationId);
     };
   }, [particles]);
-
-  React.useEffect(() => {
-    if (!isOpen) return;
-
-    const animate = async () => {
-      setAnimationState("shaking");
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setAnimationState("opening");
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setAnimationState("revealing");
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      for (const card of booster.cards) {
-        if (containerRef.current) {
-          const rect = containerRef.current.getBoundingClientRect();
-          createParticlesForRarity(
-            rect.left + rect.width / 2,
-            rect.top + rect.height / 2,
-            card.rarity
-          );
-        }
-        setRevealedCards(prev => [...prev, card.id]);
-        await new Promise(resolve => setTimeout(resolve, 800));
-      }
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      onAnimationComplete(booster.cards);
-    };
-
-    animate();
-  }, [isOpen, booster.cards, onAnimationComplete, createParticlesForRarity]);
 
   if (!isOpen) return null;
 
@@ -257,6 +151,7 @@ const BoosterOpeningAnimation: React.FC<BoosterOpeningAnimationProps> = ({
         ref={canvasRef}
       />
       
+      {/* Booster pack initial */}
       {animationState === "initial" && (
         <div className={styles.boosterPackage}>
           <Image
@@ -269,6 +164,7 @@ const BoosterOpeningAnimation: React.FC<BoosterOpeningAnimationProps> = ({
         </div>
       )}
       
+      {/* Booster pack shaking */}
       {animationState === "shaking" && (
         <div className={`${styles.boosterPackage} ${styles.shake}`}>
           <Image
@@ -281,6 +177,7 @@ const BoosterOpeningAnimation: React.FC<BoosterOpeningAnimationProps> = ({
         </div>
       )}
       
+      {/* Booster pack opening */}
       {animationState === "opening" && (
         <div className={`${styles.boosterPackage} ${styles.open}`}>
           <Image
@@ -293,24 +190,33 @@ const BoosterOpeningAnimation: React.FC<BoosterOpeningAnimationProps> = ({
         </div>
       )}
       
+      {/* Cards reveal */}
       {animationState === "revealing" && (
         <div className={styles.cardsReveal}>
           {booster.cards.map((card, index) => {
             const rarityEffect = RARITY_EFFECTS[card.rarity];
+            const holographicEffect = HOLOGRAPHIC_EFFECTS[card.rarity];
+            
             return (
               <div
                 key={card.id}
                 className={`
                   ${styles.card}
                   ${revealedCards.includes(card.id) ? styles.revealed : ""}
+                  ${styles.holographic}
                 `}
+                data-rarity={card.rarity}
                 style={{
                   transitionDelay: `${index * 0.8}s`,
                   "--glow-color": rarityEffect.visual.glow,
                   "--glow-intensity": rarityEffect.visual.intensity,
-                  "--rotation-amount": `${rarityEffect.visual.rotation}deg`
+                  "--rotation-amount": `${rarityEffect.visual.rotation}deg`,
+                  "--holographic-gradient": holographicEffect.gradient,
+                  "--holographic-colors": holographicEffect.colors.join(", "),
+                  "--holographic-intensity": holographicEffect.intensity
                 } as React.CSSProperties}
               >
+                <div className={styles.holographicOverlay} />
                 <Image
                   src={card.imageUrl}
                   alt={`Card ${index + 1}`}

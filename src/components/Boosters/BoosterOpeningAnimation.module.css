@@ -1,85 +1,82 @@
-.animationContainer {
+/* ... (styles précédents) */
+
+.card.holographic {
   position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  perspective: 1000px;
+  overflow: hidden;
 }
 
-.particleCanvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1000;
-}
-
-.boosterPackage {
-  position: relative;
-  transition: transform 0.5s ease-in-out;
-  transform-style: preserve-3d;
-}
-
-.shake {
-  animation: shake 0.5s ease-in-out infinite;
-}
-
-.open {
-  animation: open 1.5s ease-in-out forwards;
-}
-
-.cardsReveal {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.card {
-  position: relative;
-  transform: scale(0) rotateY(180deg);
-  transition: all 0.8s ease-in-out;
-  transform-style: preserve-3d;
-}
-
-.card.revealed {
-  transform: scale(1) rotateY(0) rotate(var(--rotation-amount, 0deg));
-}
-
-.card::after {
-  content: "";
+.holographicOverlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  border-radius: 10px;
-  box-shadow: 
-    0 0 10px calc(var(--glow-intensity, 0.2) * 10px) var(--glow-color, #ffffff),
-    0 0 20px calc(var(--glow-intensity, 0.2) * 20px) var(--glow-color, #ffffff),
-    0 0 30px calc(var(--glow-intensity, 0.2) * 30px) var(--glow-color, #ffffff);
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
+  background: var(--holographic-gradient,
+    linear-gradient(
+      var(--holographic-angle, 0deg),
+      var(--holographic-colors)
+    )
+  );
+  mix-blend-mode: overlay;
+  opacity: var(--holographic-intensity, 0.2);
   pointer-events: none;
+  transform: rotate(var(--holographic-angle, 0deg));
+  transition: transform calc(var(--holographic-speed, 1) * 0.2s) ease-out;
 }
 
-.card.revealed::after {
-  opacity: 1;
+.card.revealed .holographicOverlay {
+  animation: holographic-shine calc(var(--holographic-speed, 1) * 5s) linear infinite;
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  75% { transform: translateX(10px); }
+@keyframes holographic-shine {
+  0% {
+    opacity: var(--holographic-intensity);
+    transform: rotate(0deg) translateY(-100%);
+  }
+  25% {
+    opacity: calc(var(--holographic-intensity) * 1.5);
+  }
+  50% {
+    opacity: var(--holographic-intensity);
+    transform: rotate(180deg) translateY(100%);
+  }
+  75% {
+    opacity: calc(var(--holographic-intensity) * 0.5);
+  }
+  100% {
+    opacity: var(--holographic-intensity);
+    transform: rotate(360deg) translateY(-100%);
+  }
 }
 
-@keyframes open {
-  0% { transform: scale(1) rotateY(0); }
-  50% { transform: scale(1.2) rotateY(90deg); }
-  100% { transform: scale(0) rotateY(180deg); }
+@keyframes card-flip {
+  0% {
+    transform: perspective(1000px) rotateY(180deg) scale(0);
+    filter: brightness(0.5);
+  }
+  50% {
+    transform: perspective(1000px) rotateY(90deg) scale(0.8);
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: perspective(1000px) rotateY(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+/* Optimisations de performance */
+.card {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.holographicOverlay {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+.particleCanvas {
+  will-change: transform;
+  transform: translateZ(0);
 }
