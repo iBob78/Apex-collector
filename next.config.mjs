@@ -1,13 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
   experimental: {
-    optimizeCss: true
-    // Suppression de serverActions car c'est maintenant activé par défaut
+    optimizeCss: false // Désactivé temporairement
   },
-  typescript: {
-    ignoreBuildErrors: false
+  images: {
+    domains: ['images.unsplash.com'], // Pour permettre le chargement des images depuis unsplash
   }
 }
 
-export default nextConfig
+export default nextConfig;

@@ -1,71 +1,69 @@
 'use client';
 
 import { useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';
 import { Database } from '@/types/supabase';
 
 type AuthError = {
   message: string;
-  status?: number;
 };
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [authError, setAuthError] = useState<AuthError | null>(null);
-  
-  const supabase = createClientComponentClient<Database>();
+  const [error, setError] = useState<AuthError | null>(null);
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const supabase = createBrowserClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    
+    setError(null);
+
     try {
-      const { error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signInWithOtp({
         email,
-        password,
         options: {
-          emailRedirectTo: `${location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
-      if (error) {
-        setAuthError(error);
-      }
-    } catch (err) {
-      setAuthError({ message: 'An unexpected error occurred' });
+      if (error) throw error;
+      alert('Check your email for the login link!');
+    } catch (error) {
+      setError(error as AuthError);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSignUp} className="flex flex-col gap-4">
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="p-2 border rounded"
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="p-2 border rounded"
-      />
-      <button
-        type="submit"
-        disabled={loading}
-        className="p-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
+      <form
+        className="flex-1 flex flex-col w-full justify-center gap-2"
+        onSubmit={handleLogin}
       >
-        {loading ? 'Loading...' : 'Sign Up'}
-      </button>
-      {authError && (
-        <p className="text-red-500">{authError.message}</p>
-      )}
-    </form>
+        <label className="text-md" htmlFor="email">
+          Email
+        </label>
+        <input
+          className="rounded-md px-4 py-2 bg-inherit border mb-6"
+          name="email"
+          onChange={(e) => setEmail(e.target.value)}
+          value={email}
+          placeholder="you@example.com"
+        />
+        <button
+          className="bg-green-700 rounded px-4 py-2 text-white mb-6"
+          disabled={loading}
+        >
+          {loading ? 'Loading...' : 'Send magic link'}
+        </button>
+        {error && <p className="text-red-600">{error.message}</p>}
+      </form>
+    </div>
   );
 }

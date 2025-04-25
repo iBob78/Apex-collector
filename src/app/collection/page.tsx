@@ -26,7 +26,6 @@ const DEMO_CAR: CarCard = {
 };
 
 export default function CollectionPage() {
-  // Pour le moment, nous utilisons une seule voiture de démonstration
   const cars = [DEMO_CAR];
   const collectedCars = new Set([DEMO_CAR.id]);
 
