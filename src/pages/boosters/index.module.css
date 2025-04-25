@@ -13,6 +13,20 @@
   letter-spacing: 2px;
 }
 
+.userInfo {
+  text-align: right;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #1a1a1a;
+  border-radius: 5px;
+}
+
+.coins {
+  color: #ffd700;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
@@ -20,5 +34,9 @@
 
   .title {
     font-size: 2rem;
+  }
+
+  .userInfo {
+    margin-bottom: 1rem;
   }
 }

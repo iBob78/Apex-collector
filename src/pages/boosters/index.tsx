@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { BoosterType } from "@/types/boosters";
 import BoosterGrid from "@/components/Boosters/BoosterGrid";
+import BoosterPurchaseModal from "@/components/Boosters/BoosterPurchaseModal";
 import styles from "./index.module.css";
 
 // Exemple de données de test
@@ -60,18 +61,42 @@ const mockBoosters: BoosterType[] = [
 ];
 
 const BoostersPage: React.FC = () => {
+  const [selectedBooster, setSelectedBooster] = useState<BoosterType | null>(null);
+  const [userCoins] = useState(1000); // À remplacer plus tard par un vrai système de devise
+
   const handleBoosterClick = (booster: BoosterType) => {
-    console.log("Selected booster:", booster);
-    // Ici nous ajouterons plus tard la logique d'achat ou d'ouverture
+    setSelectedBooster(booster);
+  };
+
+  const handlePurchase = async (booster: BoosterType) => {
+    // Simulation d'achat - à remplacer par une vraie API call
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log("Booster purchased:", booster);
+        resolve();
+      }, 1000);
+    });
   };
 
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Available Boosters</h1>
+      <div className={styles.userInfo}>
+        <span className={styles.coins}>{userCoins} coins</span>
+      </div>
       <BoosterGrid 
         boosters={mockBoosters} 
         onBoosterClick={handleBoosterClick}
       />
+      {selectedBooster && (
+        <BoosterPurchaseModal
+          booster={selectedBooster}
+          isOpen={true}
+          onClose={() => setSelectedBooster(null)}
+          onPurchase={handlePurchase}
+          userCoins={userCoins}
+        />
+      )}
     </div>
   );
 };
