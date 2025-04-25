@@ -1,13 +1,14 @@
 import VehicleCard from '@/components/Card/VehicleCard'
+import { VehicleCard as VehicleCardType } from '@/types/cards'
 
 export default function CardsPage() {
-  const exampleCards = [
+  const exampleCards: VehicleCardType[] = [
     {
       id: '1',
       name: 'Ferrari F40',
       description: 'Une supercar légendaire produite de 1987 à 1992',
       image_url: '/F40.jpg',
-      rarity: 'legendary',
+      rarity: 'legendary' as const, // Spécifier le type exact
       serial_number: '001/100',
       stats: {
         speed: 95,
