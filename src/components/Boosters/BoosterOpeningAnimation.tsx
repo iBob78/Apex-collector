@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import styles from "./BoosterOpeningAnimation.module.css";
 
@@ -14,6 +14,14 @@ interface CardEffect {
   type: "normal" | "holographic" | "shiny" | "ultra";
   colors: string[];
   intensity: number;
+}
+
+interface BoosterOpeningAnimationProps {
+  booster: {
+    imageUrl: string;
+  };
+  isOpen: boolean;
+  onAnimationComplete: (cards: string[]) => void;
 }
 
 const CARD_EFFECTS: Record<string, CardEffect> = {
@@ -42,14 +50,6 @@ const CARD_EFFECTS: Record<string, CardEffect> = {
   }
 };
 
-interface BoosterOpeningAnimationProps {
-  booster: {
-    imageUrl: string;
-  };
-  isOpen: boolean;
-  onAnimationComplete: (cards: string[]) => void;
-}
-
 const BoosterOpeningAnimation: React.FC<BoosterOpeningAnimationProps> = ({
   booster,
   isOpen,
@@ -61,17 +61,17 @@ const BoosterOpeningAnimation: React.FC<BoosterOpeningAnimationProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Mémoriser le tableau mockCards
-  const mockCards = [
+  const mockCards = useMemo(() => [
     "/images/cards/card1.jpg",
     "/images/cards/card2.jpg",
     "/images/cards/card3.jpg",
     "/images/cards/card4.jpg",
     "/images/cards/card5.jpg"
-  ];
+  ], []);
 
-  // Fonction pour calculer la position 3D de la carte
+  // Calculer la position 3D de la carte
   const calculateCardPosition = useCallback((e: MouseEvent, cardElement: HTMLElement) => {
-    if (!containerRef.current) return;
+    if (!containerRef.current) return null;
 
     const rect = cardElement.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
@@ -109,7 +109,7 @@ const BoosterOpeningAnimation: React.FC<BoosterOpeningAnimationProps> = ({
     setCardPositions(newPositions);
   }, [calculateCardPosition]);
 
-  // Effet pour gérer les événements de souris
+  // Gérer les événements de souris
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -121,7 +121,33 @@ const BoosterOpeningAnimation: React.FC<BoosterOpeningAnimationProps> = ({
     };
   }, [handleMouseMove]);
 
-  // Fonction pour appliquer l'effet à une carte
+  // Animation initiale
+  useEffect(() => {
+    if (isOpen) {
+      const startAnimation = async () => {
+        setAnimationState("shaking");
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        setAnimationState("opening");
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        setAnimationState("revealing");
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        for (const card of mockCards) {
+          setRevealedCards(prev => [...prev, card]);
+          await new Promise(resolve => setTimeout(resolve, 800));
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        onAnimationComplete(mockCards);
+      };
+
+      startAnimation();
+    }
+  }, [isOpen, mockCards, onAnimationComplete]);
+
+  // Style des cartes avec effets
   const getCardStyle = (index: number, effect: CardEffect) => {
     const position = cardPositions[index] || {
       rotateX: 0,
@@ -173,31 +199,6 @@ const BoosterOpeningAnimation: React.FC<BoosterOpeningAnimationProps> = ({
 
     return baseStyle;
   };
-
-  useEffect(() => {
-    if (isOpen) {
-      const startAnimation = async () => {
-        setAnimationState("shaking");
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        setAnimationState("opening");
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        setAnimationState("revealing");
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        for (let i = 0; i < mockCards.length; i++) {
-          setRevealedCards(prev => [...prev, mockCards[i]]);
-          await new Promise(resolve => setTimeout(resolve, 800));
-        }
-        
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        onAnimationComplete(mockCards);
-      };
-
-      startAnimation();
-    }
-  }, [isOpen, mockCards, onAnimationComplete]);
 
   if (!isOpen) return null;
 
