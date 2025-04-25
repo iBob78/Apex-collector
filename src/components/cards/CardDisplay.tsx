@@ -1,100 +1,108 @@
-'use client';
+import Image from 'next/image'
+import { useState } from 'react'
+import { VehicleCard, CardVisualVariant } from '@/types/cards'
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { VehicleCard } from '@/types/cards';
-import { motion } from 'framer-motion';
-
-interface CardDisplayProps {
-  card: VehicleCard;
-  isRevealing?: boolean;
-  onClick?: () => void;
+interface Props {
+  card: VehicleCard
+  isRevealing?: boolean
 }
 
-const StatBar = ({ value, maxValue = 100, label }: { value: number; maxValue?: number; label: string }) => {
-  return (
-    <div className="mb-1">
-      <div className="flex justify-between text-xs mb-1">
-        <span>{label}</span>
-        <span>{value}/{maxValue}</span>
-      </div>
-      <div className="w-full bg-gray-200 rounded-full h-2">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${(value / maxValue) * 100}%` }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="h-2 rounded-full bg-blue-600"
-        />
-      </div>
-    </div>
-  );
-};
+export default function CardDisplay({ card, isRevealing = false }: Props) {
+  const [isHovered, setIsHovered] = useState(false);
 
-const CardDisplay = ({ card, isRevealing, onClick }: CardDisplayProps): JSX.Element => {
-  const [isFlipped, setIsFlipped] = useState(false);
-
-  const rarityColors = {
-    'Common': 'bg-gray-500',
-    'Rare': 'bg-blue-500',
-    'Ultra Rare': 'bg-purple-500',
-    'Legendary': 'bg-yellow-500',
-    'Prototype': 'bg-red-500'
+  const variantEffects: Record<CardVisualVariant, string> = {
+    normal: 'hover:shadow-xl',
+    holographic: 'hover:shadow-xl hover:shadow-blue-500/50 hover:scale-105',
+    rainbow: 'hover:shadow-xl hover:shadow-rainbow hover:scale-105',
+    gold: 'hover:shadow-xl hover:shadow-yellow-500/50 hover:scale-105',
+    platinum: 'hover:shadow-xl hover:shadow-slate-400/50 hover:scale-105'
   };
 
-  const variantEffects = {
-    'Holographic': 'hover:shadow-rainbow',
-    'Carbon': 'hover:shadow-carbon',
-    'Kevlar': 'hover:shadow-kevlar',
-    'Brushed Titanium': 'hover:shadow-titanium'
-  };
-
-  const baseClassName = [
-    'relative w-64 h-96 rounded-lg cursor-pointer',
+  const cardClasses = [
+    'relative w-[250px] h-[333px] rounded-lg overflow-hidden',
+    'bg-gradient-to-b from-gray-800 to-black border border-gray-700',
     'transform transition-all duration-300 ease-in-out',
     card.visualVariant ? variantEffects[card.visualVariant] : 'hover:shadow-xl',
     isRevealing ? 'animate-reveal' : ''
   ].join(' ');
 
   return (
-    <motion.div
-      className={baseClassName}
-      onClick={() => {
-        setIsFlipped(!isFlipped);
-        onClick?.();
-      }}
-      whileHover={{ scale: 1.05 }}
-      animate={{ rotateY: isFlipped ? 180 : 0 }}
+    <div 
+      className={cardClasses}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <div className={`absolute inset-0 ${rarityColors[card.rarity]} rounded-lg p-4`}>
-        <div className="relative h-40 mb-4">
-          <Image
-            src={card.imageUrl}
-            alt={card.name}
-            fill
-            className="object-cover rounded"
-            priority={isRevealing}
-          />
-          {card.isLimited && (
-            <span className="absolute top-2 right-2 bg-black text-white px-2 py-1 rounded text-xs">
-              #{card.serialNumber}
-            </span>
-          )}
+      {/* Rareté - Ruban en haut à gauche */}
+      <div className={`absolute top-3 left-[-25px] rotate-[-45deg] px-6 py-1 text-[10px] font-bold z-10
+        ${card.rarity === 'common' ? 'bg-gray-500' : ''}
+        ${card.rarity === 'rare' ? 'bg-blue-500' : ''}
+        ${card.rarity === 'epic' ? 'bg-purple-500' : ''}
+        ${card.rarity === 'legendary' ? 'bg-yellow-500' : ''}
+      `}>
+        {card.rarity.toUpperCase()}
+      </div>
+
+      {/* Image du véhicule */}
+      <div className="relative w-full h-[125px]">
+        <Image
+          src={card.image_url}
+          alt={card.name}
+          fill
+          className="object-cover"
+          priority
+        />
+      </div>
+
+      {/* Informations du véhicule */}
+      <div className="p-3">
+        <h3 className="text-base font-bold mb-1">{card.name}</h3>
+        <p className="text-xs text-gray-300 mb-3 h-[32px] overflow-hidden">{card.description}</p>
+        
+        {/* Statistiques */}
+        <div className="grid grid-cols-2 gap-1.5 text-xs">
+          <div>
+            <span className="text-gray-400">Vitesse:</span>
+            <div className="w-full bg-gray-700 rounded-full h-1.5">
+              <div 
+                className="bg-blue-500 h-1.5 rounded-full" 
+                style={{ width: `${card.stats.speed}%` }}
+              />
+            </div>
+          </div>
+          <div>
+            <span className="text-gray-400">Accélération:</span>
+            <div className="w-full bg-gray-700 rounded-full h-1.5">
+              <div 
+                className="bg-green-500 h-1.5 rounded-full" 
+                style={{ width: `${card.stats.acceleration}%` }}
+              />
+            </div>
+          </div>
+          <div>
+            <span className="text-gray-400">Maniabilité:</span>
+            <div className="w-full bg-gray-700 rounded-full h-1.5">
+              <div 
+                className="bg-yellow-500 h-1.5 rounded-full" 
+                style={{ width: `${card.stats.handling}%` }}
+              />
+            </div>
+          </div>
+          <div>
+            <span className="text-gray-400">Freinage:</span>
+            <div className="w-full bg-gray-700 rounded-full h-1.5">
+              <div 
+                className="bg-red-500 h-1.5 rounded-full" 
+                style={{ width: `${card.stats.braking}%` }}
+              />
+            </div>
+          </div>
         </div>
 
-        <h3 className="text-xl font-bold text-white mb-2">{card.name}</h3>
-        <div className="text-sm text-white mb-4">
-          <p>{card.manufacturer} - {card.year}</p>
-        </div>
-
-        <div className="space-y-2">
-          <StatBar value={card.stats.speed} label="Speed" />
-          <StatBar value={card.stats.handling} label="Handling" />
-          <StatBar value={card.stats.endurance} label="Endurance" />
-          <StatBar value={card.stats.tech} label="Tech" />
+        {/* Numéro de série */}
+        <div className="absolute bottom-1.5 right-3 text-[10px] text-gray-500">
+          #{card.serial_number}
         </div>
       </div>
-    </motion.div>
-  );
-};
-
-export default CardDisplay;
+    </div>
+  )
+}
