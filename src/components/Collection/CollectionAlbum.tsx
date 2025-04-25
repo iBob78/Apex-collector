@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card } from '../Cards/CardDisplay';
+import { Card, CardDisplay, CardType, CardRarity } from '../Cards/CardDisplay';
 import styles from './CollectionAlbum.module.css';
 
 interface CollectionAlbumProps {
@@ -32,6 +32,9 @@ const CollectionAlbum: React.FC<CollectionAlbumProps> = ({
     percentage: Math.round((collectedCards.size / cards.length) * 100)
   };
 
+  const cardTypes: CardType[] = ['Sport', 'Luxury', 'Classic', 'Concept'];
+  const cardRarities: CardRarity[] = ['Common', 'Rare', 'Epic', 'Legendary'];
+
   return (
     <div className={styles.albumContainer}>
       <div className={styles.header}>
@@ -58,7 +61,9 @@ const CollectionAlbum: React.FC<CollectionAlbumProps> = ({
           className={styles.filterSelect}
         >
           <option value="">All Types</option>
-          {/* Add options based on CardType enum */}
+          {cardTypes.map(type => (
+            <option key={type} value={type}>{type}</option>
+          ))}
         </select>
         <select
           value={filter.rarity}
@@ -66,23 +71,20 @@ const CollectionAlbum: React.FC<CollectionAlbumProps> = ({
           className={styles.filterSelect}
         >
           <option value="">All Rarities</option>
-          {/* Add options based on CardRarity enum */}
+          {cardRarities.map(rarity => (
+            <option key={rarity} value={rarity}>{rarity}</option>
+          ))}
         </select>
       </div>
 
       <div className={styles.cardsGrid}>
         {filteredCards.map(card => (
           <div key={card.id} className={styles.cardSlot}>
-            {/* Placeholder for CardDisplay component */}
-            <div
-              className={`
-                ${styles.cardPlaceholder}
-                ${collectedCards.has(card.id) ? styles.collected : styles.missing}
-              `}
-              onClick={() => onCardClick?.(card)}
-            >
-              {card.name}
-            </div>
+            <CardDisplay
+              card={card}
+              isCollected={collectedCards.has(card.id)}
+              onClick={onCardClick}
+            />
           </div>
         ))}
       </div>
