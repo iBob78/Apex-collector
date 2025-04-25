@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { BoosterType } from "@/types/boosters";
 import Image from "next/image";
 import styles from "./BoosterOpeningAnimation.module.css";
@@ -17,14 +17,14 @@ const BoosterOpeningAnimation: React.FC<BoosterOpeningAnimationProps> = ({
   const [animationState, setAnimationState] = useState<"initial" | "shaking" | "opening" | "revealing">("initial");
   const [revealedCards, setRevealedCards] = useState<string[]>([]);
 
-  // Simuler l'obtention des cartes - à remplacer par une vraie API call
-  const mockCards = [
+  // Mémoriser le tableau mockCards pour éviter les re-rendus inutiles
+  const mockCards = useMemo(() => [
     "/images/cards/card1.jpg",
     "/images/cards/card2.jpg",
     "/images/cards/card3.jpg",
     "/images/cards/card4.jpg",
     "/images/cards/card5.jpg"
-  ];
+  ], []);
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
