@@ -1,12 +1,17 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import CardDisplay from '@/components/cards/CardDisplay'
+import { render, screen, fireEvent } from '@testing-library/react';
+import CardDisplay from '@/components/cards/CardDisplay';
 
+// Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: (props: any) => {
-    return <img {...props} />
-  },
-}))
+  default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img 
+      {...props} 
+      alt={props.alt || 'Card image'}
+    />
+  ),
+}));
 
 describe('CardDisplay', () => {
   const mockCard = {
@@ -26,32 +31,32 @@ describe('CardDisplay', () => {
       endurance: 95,
       tech: 88
     }
-  }
+  };
 
   it('renders card information correctly', () => {
-    render(<CardDisplay card={mockCard} />)
-    expect(screen.getByText(mockCard.name)).toBeInTheDocument()
-    expect(screen.getByText(`${mockCard.manufacturer} - ${mockCard.year}`)).toBeInTheDocument()
-    expect(screen.getByText('#42')).toBeInTheDocument()
-  })
+    render(<CardDisplay card={mockCard} />);
+    expect(screen.getByText(mockCard.name)).toBeInTheDocument();
+    expect(screen.getByText(`${mockCard.manufacturer} - ${mockCard.year}`)).toBeInTheDocument();
+    expect(screen.getByText('#42')).toBeInTheDocument();
+  });
 
   it('handles click events', () => {
-    const onClick = jest.fn()
-    render(<CardDisplay card={mockCard} onClick={onClick} />)
-    fireEvent.click(screen.getByText(mockCard.name))
-    expect(onClick).toHaveBeenCalled()
-  })
+    const onClick = jest.fn();
+    render(<CardDisplay card={mockCard} onClick={onClick} />);
+    fireEvent.click(screen.getByText(mockCard.name));
+    expect(onClick).toHaveBeenCalled();
+  });
 
   it('renders stats bars', () => {
-    render(<CardDisplay card={mockCard} />)
-    expect(screen.getByText('Speed')).toBeInTheDocument()
-    expect(screen.getByText('Handling')).toBeInTheDocument()
-    expect(screen.getByText('Endurance')).toBeInTheDocument()
-    expect(screen.getByText('Tech')).toBeInTheDocument()
-  })
+    render(<CardDisplay card={mockCard} />);
+    expect(screen.getByText('Speed')).toBeInTheDocument();
+    expect(screen.getByText('Handling')).toBeInTheDocument();
+    expect(screen.getByText('Endurance')).toBeInTheDocument();
+    expect(screen.getByText('Tech')).toBeInTheDocument();
+  });
 
   it('applies correct rarity styling', () => {
-    const { container } = render(<CardDisplay card={mockCard} />)
-    expect(container.firstChild).toHaveClass('bg-yellow-500')
-  })
-})
+    const { container } = render(<CardDisplay card={mockCard} />);
+    expect(container.firstChild).toHaveClass('bg-yellow-500');
+  });
+});

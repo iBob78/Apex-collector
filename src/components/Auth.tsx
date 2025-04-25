@@ -1,47 +1,71 @@
-import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+'use client';
+
+import { useState } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { Database } from '@/types/supabase';
+
+type AuthError = {
+  message: string;
+  status?: number;
+};
 
 export default function Auth() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState<AuthError | null>(null);
+  
+  const supabase = createClientComponentClient<Database>();
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
     
     try {
-      setIsLoading(true)
-      const { error } = await supabase.auth.signInWithOtp({
+      const { error } = await supabase.auth.signUp({
         email,
+        password,
         options: {
-          emailRedirectTo: 'http://localhost/auth/callback'
-        }
-      })
-      
+          emailRedirectTo: `${location.origin}/auth/callback`,
+        },
+      });
+
       if (error) {
-        alert(error.message)
-      } else {
-        alert('Check your email for the login link!')
-        setEmail('')
+        setAuthError(error);
       }
-    } catch (error: any) {
-      alert('An error occurred. Please try again.')
+    } catch (err) {
+      setAuthError({ message: 'An unexpected error occurred' });
     } finally {
-      setIsLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <form onSubmit={handleLogin}>
+    <form onSubmit={handleSignUp} className="flex flex-col gap-4">
       <input
         type="email"
-        placeholder="Your email"
+        placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        required
+        className="p-2 border rounded"
       />
-      <button type="submit" disabled={isLoading}>
-        {isLoading ? 'Loading...' : 'Send magic link'}
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="p-2 border rounded"
+      />
+      <button
+        type="submit"
+        disabled={loading}
+        className="p-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+      >
+        {loading ? 'Loading...' : 'Sign Up'}
       </button>
+      {authError && (
+        <p className="text-red-500">{authError.message}</p>
+      )}
     </form>
-  )
+  );
 }

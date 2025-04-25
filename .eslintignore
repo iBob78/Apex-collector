@@ -1,27 +1,11 @@
-# Build output
-.next/**
-out/**
-dist/**
-build/**
-
-# Dependencies
-node_modules/**
-
-# Cache
-.cache/**
-
-# Config files
+node_modules/
+.next/
+build/
+dist/
+coverage/
 *.config.js
 next.config.js
 next.config.mjs
-
-# Generated types
+postcss.config.js
+tailwind.config.js
 *.d.ts
-.next/types/**
-
-# Temporary files
-.temp/**
-.tmp/**
-
-# Test coverage
-coverage/**

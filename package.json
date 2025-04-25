@@ -6,32 +6,58 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --ext .ts,.tsx --fix",
+    "lint": "next lint",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:watch": "jest --watch",
+    "prepare": "husky install",
+    "security-audit": "npm audit fix --force"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.49.4",
-    "next": "^15.3.1",
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.39.3",
+    "cookie": "^0.7.0",
+    "framer-motion": "^11.0.3",
+    "lru-cache": "^10.1.0",
+    "next": "14.2.28",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.4.2",
-    "@testing-library/react": "^14.2.1",
-    "@types/jest": "^29.5.12",
-    "@types/node": "^20.11.30",
-    "@types/react": "^18.2.67",
-    "@types/react-dom": "^18.2.22",
-    "@typescript-eslint/eslint-plugin": "^8.31.0",
-    "@typescript-eslint/parser": "^8.31.0",
-    "eslint": "^9.25.1",
-    "eslint-config-next": "^15.3.1",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^5.2.0",
+    "@commitlint/cli": "19.8.0",
+    "@commitlint/config-conventional": "19.8.0",
+    "@testing-library/jest-dom": "^6.3.0",
+    "@testing-library/react": "^14.1.2",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.11.5",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@typescript-eslint/eslint-plugin": "^6.19.1",
+    "@typescript-eslint/parser": "^6.19.1",
+    "autoprefixer": "^10.4.17",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "14.2.28",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.3",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "ts-jest": "^29.3.2",
-    "typescript": "^5.4.2"
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1",
+    "typescript": "5.3.3"
+  },
+  "overrides": {
+    "cookie": "^0.7.0",
+    "next": "14.2.28",
+    "@supabase/ssr": "^0.6.1"
+  },
+  "resolutions": {
+    "cookie": "^0.7.0",
+    "next": "14.2.28",
+    "@supabase/ssr": "^0.6.1",
+    "@typescript-eslint/typescript-estree": "^6.19.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }
