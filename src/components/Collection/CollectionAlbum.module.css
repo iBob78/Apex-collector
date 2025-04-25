@@ -1,0 +1,134 @@
+.albumContainer {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.stats {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9em;
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+  transition: border-color 0.3s ease;
+}
+
+.searchInput:focus {
+  border-color: #0066cc;
+  outline: none;
+}
+
+.filterSelect {
+  min-width: 150px;
+  padding: 8px 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+  background: white;
+  cursor: pointer;
+}
+
+.filterSelect:focus {
+  border-color: #0066cc;
+  outline: none;
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.cardSlot {
+  aspect-ratio: 3/4;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.cardSlot:hover {
+  transform: translateY(-5px);
+}
+
+.cardPlaceholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.collected {
+  background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.missing {
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+  border: 2px dashed #ccc;
+}
+
+.collected:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.missing:hover {
+  border-color: #999;
+  color: #333;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .searchInput,
+  .filterSelect {
+    width: 100%;
+  }
+
+  .cardsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+}
