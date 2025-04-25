@@ -1,19 +1,27 @@
-export interface Card {
-  id: string
-  name: string
-  rarity: 'Common' | 'Rare' | 'Epic' | 'Legendary'
-  type: 'Weapon' | 'Legend' | 'Skin'
-  collection: string
-  image_url: string
-  owned: boolean
-  market_price?: number
+export type Rarity = 'Common' | 'Rare' | 'Ultra Rare' | 'Legendary' | 'Prototype';
+
+export type VisualVariant = 'Holographic' | 'Carbon' | 'Kevlar' | 'Brushed Titanium';
+
+export interface BaseCard {
+  id: string;
+  name: string;
+  rarity: Rarity;
+  visualVariant?: VisualVariant;
+  imageUrl: string;
+  releaseSet: string;
+  isLimited: boolean;
+  serialNumber?: number;
 }
 
-export interface Collection {
-  id: string
-  name: string
-  cards: Card[]
-  completion: number
-  created_at: Date
-  last_updated: Date
+export interface VehicleCard extends BaseCard {
+  type: 'Vehicle';
+  stats: {
+    speed: number;
+    handling: number;
+    endurance: number;
+    tech: number;
+  };
+  manufacturer: string;
+  year: number;
+  variants?: string[];
 }

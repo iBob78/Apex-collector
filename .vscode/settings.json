@@ -1,0 +1,16 @@
+{
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.workingDirectories": [
+    {
+      "mode": "location"
+    }
+  ],
+  "eslint.options": {
+    "ignorePath": ".eslintignore"
+  }
+}
