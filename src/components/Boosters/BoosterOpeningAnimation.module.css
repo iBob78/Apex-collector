@@ -1,157 +1,114 @@
 .animationContainer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.9);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1100;
-  overflow: hidden;
-}
-
-.particleCanvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1200;
-}
-
-.boosterPackage {
-  width: 300px;
-  height: 450px;
-  position: relative;
+  /* ... styles existants ... */
   perspective: 1000px;
-  z-index: 1101;
 }
 
-.boosterPackage img {
+.card {
+  /* ... styles existants ... */
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease-out;
+}
+
+.cardEffect {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  position: relative;
-  z-index: 1;
+  border-radius: 10px;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 2;
 }
 
-.shine {
+.card.revealed {
+  /* ... styles existants ... */
+  transform-style: preserve-3d;
+}
+
+.card:hover {
+  /* ... styles existants ... */
+  transform-style: preserve-3d;
+}
+
+.card::before {
+  content: "";
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(
-    45deg,
+    135deg,
     transparent 0%,
     rgba(255, 255, 255, 0.1) 45%,
     rgba(255, 255, 255, 0.5) 50%,
     rgba(255, 255, 255, 0.1) 55%,
     transparent 100%
   );
-  transform: translateX(-100%) translateY(-100%) rotate(45deg);
-  animation: shine 2s infinite;
-  z-index: 2;
+  z-index: 3;
+  transform: translateZ(1px);
   pointer-events: none;
-}
-
-@keyframes shine {
-  0% {
-    transform: translateX(-100%) translateY(-100%) rotate(45deg);
-  }
-  100% {
-    transform: translateX(100%) translateY(100%) rotate(45deg);
-  }
-}
-
-.shake {
-  animation: shakeAnimation 0.5s cubic-bezier(.36,.07,.19,.97) infinite;
-}
-
-.open {
-  animation: openAnimation 1.5s ease-out forwards;
-}
-
-.cardsReveal {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  max-width: 90vw;
-  z-index: 1101;
-}
-
-.card {
-  width: 200px;
-  height: 280px;
-  position: relative;
-  transform: scale(0) rotateY(180deg);
+  mix-blend-mode: screen;
   opacity: 0;
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
+  transition: opacity 0.3s ease-in-out;
 }
 
-.card img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 10px;
-  box-shadow: 
-    0 0 20px rgba(255, 255, 255, 0.2),
-    0 0 40px rgba(255, 215, 0, 0.1);
-}
-
-.card.revealed {
-  transform: scale(1) rotateY(0);
+.card.revealed::before {
   opacity: 1;
 }
 
-.card:hover {
-  transform: scale(1.1) rotateY(0);
-  z-index: 2;
+.holographicEffect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    #ff0000,
+    #ff7f00,
+    #ffff00,
+    #00ff00,
+    #0000ff,
+    #4b0082,
+    #8f00ff
+  );
+  mix-blend-mode: color-dodge;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
 }
 
-.card:hover .shine {
-  animation: shine 1s;
+.shinyEffect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 215, 0, 0.8) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
 }
 
-@keyframes shakeAnimation {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-5px) rotate(-5deg);
-  }
-  75% {
-    transform: translateX(5px) rotate(5deg);
-  }
+.card.revealed .holographicEffect,
+.card.revealed .shinyEffect {
+  opacity: 1;
 }
 
-@keyframes openAnimation {
-  0% {
-    transform: rotateY(0);
-  }
-  50% {
-    transform: rotateY(180deg) scale(1.2);
-    filter: brightness(1.5);
-  }
-  100% {
-    transform: rotateY(180deg) scale(0);
-    filter: brightness(2);
+@media (hover: hover) {
+  .card:hover::before {
+    opacity: 1;
   }
 }
 
 @media (max-width: 768px) {
-  .cardsReveal {
-    gap: 10px;
-  }
-
   .card {
-    width: 150px;
-    height: 210px;
+    transform: none !important;
   }
 }
