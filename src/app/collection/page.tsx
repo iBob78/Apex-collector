@@ -1,40 +1,59 @@
-import React from 'react';
-import CarCollectionAlbum from '@/components/Collection/CarCollectionAlbum';
-import { CarCard } from '@/lib/supabase/types';
+'use client';
 
-const DEMO_CAR: CarCard = {
-  id: "1",
-  created_at: "2025-04-25T10:11:07Z",
-  card_id: "FERRARI-F40-1987",
-  name: "Ferrari F40",
-  rarity: "legendary",
-  image_url: "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?q=80&w=1000",
-  description: "A legendary supercar that marked Ferrari's 40th anniversary. The last car personally approved by Enzo Ferrari.",
-  power_hp: 478,
-  torque_nm: 577,
-  max_speed_kmh: 324,
-  weight_t: 1.1,
-  make: "Ferrari",
-  model: "F40",
-  year: 1987,
-  acceleration: "3.8",
-  popularity: 95,
-  is_holographic: true,
-  price_eur: 1400000,
-  collection_number: 1,
-  total_in_collection: 100
-};
+import { useEffect, useState } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import CarCollectionAlbum from '@/components/Collection/CarCollectionAlbum';
+import { Car } from '@/types/cars';
 
 export default function CollectionPage() {
-  const cars = [DEMO_CAR];
-  const collectedCars = new Set([DEMO_CAR.id]);
+  const [cars, setCars] = useState<Car[]>([]);
+  const [collectedCars, setCollectedCars] = useState<string[]>([]);
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    const fetchCars = async () => {
+      try {
+        // Récupérer toutes les voitures
+        const { data: carsData, error: carsError } = await supabase
+          .from('cars')
+          .select('*');
+
+        if (carsError) throw carsError;
+
+        // Récupérer les voitures collectées par l'utilisateur
+        const { data: userCars, error: userCarsError } = await supabase
+          .from('user_cars')
+          .select('car_id')
+          .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
+
+        if (userCarsError) throw userCarsError;
+
+        setCars(carsData as Car[]);
+        setCollectedCars(userCars.map(uc => uc.car_id));
+      } catch (error) {
+        console.error('Erreur lors de la récupération des données:', error);
+      }
+    };
+
+    fetchCars();
+  }, [supabase]);
+
+  const handleCardClick = async (car: Car) => {
+    if (collectedCars.includes(car.id)) {
+      // Afficher les détails de la voiture
+      console.log('Détails de la voiture:', car);
+    } else {
+      // La voiture n'est pas encore collectée
+      console.log('Voiture non collectée:', car.name);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gray-100 py-8">
       <CarCollectionAlbum
         cars={cars}
         collectedCars={collectedCars}
-        onCardClick={(car) => console.log('Clicked car:', car)}
+        onCardClick={handleCardClick}
       />
     </main>
   );

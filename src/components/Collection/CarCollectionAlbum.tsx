@@ -1,13 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
+import { Car } from '@/types/cars';
 import styles from './CarCollectionAlbum.module.css';
-
-interface Car {
-  id: string;
-  name: string;
-  imageUrl: string;
-  rarity: string;
-}
 
 interface CarCollectionAlbumProps {
   cars: Car[];
