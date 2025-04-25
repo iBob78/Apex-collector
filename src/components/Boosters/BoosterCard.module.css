@@ -5,6 +5,7 @@
   transition: transform 0.2s;
   background: white;
   max-width: 300px;
+  cursor: pointer;
 }
 
 .boosterCard:hover {

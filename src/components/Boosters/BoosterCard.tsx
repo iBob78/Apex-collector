@@ -1,19 +1,22 @@
 import Image from 'next/image';
 import styles from './BoosterCard.module.css';
 
-interface BoosterCardProps {
-  booster: {
-    id: string;
-    name: string;
-    imageUrl: string;
-    price: number;
-    description: string;
-  };
+export interface BoosterType {
+  id: string;
+  name: string;
+  imageUrl: string;
+  price: number;
+  description: string;
 }
 
-export default function BoosterCard({ booster }: BoosterCardProps) {
+export interface BoosterCardProps {
+  booster: BoosterType;
+  onClick?: () => void;
+}
+
+export default function BoosterCard({ booster, onClick }: BoosterCardProps) {
   return (
-    <div className={styles.boosterCard}>
+    <div className={styles.boosterCard} onClick={onClick} role="button" tabIndex={0}>
       <div className={styles.imageContainer}>
         <Image
           src={booster.imageUrl}
