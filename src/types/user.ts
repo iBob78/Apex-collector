@@ -1,4 +1,6 @@
-export interface UserProfile {
+import { Collection } from './collection'
+
+export interface User {
   id: string
   username: string
   email: string
@@ -7,8 +9,8 @@ export interface UserProfile {
   reputation: number
   joined_at: Date
   statistics: {
-    cards_owned: number
-    collections_completed: number
-    successful_trades: number
+    cards_collected: number
+    trades_completed: number
+    collections_created: number
   }
 }
