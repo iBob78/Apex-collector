@@ -20,9 +20,6 @@ export default function BoosterCard({ booster }: BoosterCardProps) {
           alt={booster.name}
           sizes="200px"
           fill
-          style={{
-            objectFit: 'cover'
-          }}
           className={styles.boosterImage}
           priority={false}
         />
