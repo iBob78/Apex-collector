@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { BoosterType } from "@/types/boosters";
 import styles from "./BoosterPurchaseModal.module.css";
+import BoosterOpeningAnimation from "./BoosterOpeningAnimation";
 
 interface BoosterPurchaseModalProps {
   booster: BoosterType;
@@ -18,22 +19,39 @@ const BoosterPurchaseModal: React.FC<BoosterPurchaseModalProps> = ({
   userCoins,
 }) => {
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [isOpening, setIsOpening] = useState(false);
   const canPurchase = userCoins >= booster.price;
 
   const handlePurchase = async () => {
     try {
       setIsPurchasing(true);
       await onPurchase(booster);
-      onClose();
+      setIsOpening(true);
     } catch (error) {
       console.error("Purchase failed:", error);
-      // Ici nous ajouterons plus tard la gestion des erreurs avec un toast
     } finally {
       setIsPurchasing(false);
     }
   };
 
+  const handleAnimationComplete = (cards: string[]) => {
+    console.log("Cards revealed:", cards);
+    setIsOpening(false);
+    onClose();
+  };
+
   if (!isOpen) return null;
+
+  if (isOpening) {
+    return (
+      <BoosterOpeningAnimation
+        booster={booster}
+        isOpen={true}
+        onClose={onClose}
+        onAnimationComplete={handleAnimationComplete}
+      />
+    );
+  }
 
   return (
     <div className={styles.modalOverlay}>
