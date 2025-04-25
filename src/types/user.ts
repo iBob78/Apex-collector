@@ -1,4 +1,6 @@
 import { Collection } from './collection'
+cat << 'EOF' > src/types/user.ts
+import { Collection } from './collection'
 
 export interface User {
   id: string
