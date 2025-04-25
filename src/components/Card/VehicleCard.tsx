@@ -9,7 +9,7 @@ export default function VehicleCard({ card }: Props) {
   return (
     <div className="relative w-[300px] h-[420px] rounded-lg overflow-hidden bg-gradient-to-b from-gray-800 to-black border border-gray-700">
       {/* Rareté - Ruban en haut à gauche */}
-      <div className={`absolute top-4 left-[-30px] rotate-[-45deg] px-8 py-1 text-xs font-bold
+      <div className={`absolute top-4 left-[-30px] rotate-[-45deg] px-8 py-1 text-xs font-bold z-10
         ${card.rarity === 'common' ? 'bg-gray-500' : ''}
         ${card.rarity === 'rare' ? 'bg-blue-500' : ''}
         ${card.rarity === 'epic' ? 'bg-purple-500' : ''}
@@ -19,13 +19,14 @@ export default function VehicleCard({ card }: Props) {
       </div>
 
       {/* Image du véhicule */}
-      <div className="relative w-full h-48 bg-black">
+      <div className="relative w-full h-48">
         <Image
           src={card.image_url}
           alt={card.name}
-          fill
+          width={300}
+          height={192}
           className="object-cover"
-          sizes="300px"
+          priority
         />
       </div>
 

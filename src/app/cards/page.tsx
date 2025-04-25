@@ -5,7 +5,7 @@ export default function CardsPage() {
     id: '1',
     name: 'Ferrari F40',
     description: 'Une supercar légendaire produite de 1987 à 1992',
-    image_url: '/F40.jpg', // Chemin corrigé pour correspondre à l'image dans public/
+    image_url: '/F40.jpg',
     rarity: 'legendary',
     serial_number: '001/100',
     stats: {
@@ -17,8 +17,11 @@ export default function CardsPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-8">
-      <VehicleCard card={exampleCard} />
-    </div>
+    <main className="container mx-auto p-8">
+      <h1 className="title text-3xl mb-8">Cartes</h1>
+      <div className="flex items-center justify-center">
+        <VehicleCard card={exampleCard} />
+      </div>
+    </main>
   )
 }
