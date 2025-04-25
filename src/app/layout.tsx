@@ -1,25 +1,22 @@
-import { Inter } from 'next/font/google'
-import './globals.css'
-import Menu from '@/components/Menu'
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
-  title: 'Apex Collector',
-  description: 'Collect and analyze your data',
-}
+export const metadata: Metadata = {
+  title: "Apex Collector",
+  description: "Collectible Car Card Game",
+};
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode
-}) {
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Menu />
-        <main>{children}</main>
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
-  )
+  );
 }
