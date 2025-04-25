@@ -1,46 +1,37 @@
-import React from "react";
-import { BoosterType } from "@/types/boosters";
-import Image from "next/image";
-import styles from "./BoosterCard.module.css";
+import Image from 'next/image';
+import styles from './BoosterCard.module.css';
 
 interface BoosterCardProps {
-  booster: BoosterType;
-  onClick?: () => void;
+  booster: {
+    id: string;
+    name: string;
+    imageUrl: string;
+    price: number;
+    description: string;
+  };
 }
 
-const BoosterCard: React.FC<BoosterCardProps> = ({ booster, onClick }) => {
+export default function BoosterCard({ booster }: BoosterCardProps) {
   return (
-    <div 
-      className={`${styles.boosterCard} ${styles[booster.rarity.toLowerCase()]}`}
-      onClick={onClick}
-    >
+    <div className={styles.boosterCard}>
       <div className={styles.imageContainer}>
         <Image
           src={booster.imageUrl}
           alt={booster.name}
-          width={200}
-          height={300}
+          sizes="200px"
+          fill
+          style={{
+            objectFit: 'cover'
+          }}
           className={styles.boosterImage}
+          priority={false}
         />
       </div>
       <div className={styles.boosterInfo}>
-        <h3 className={styles.boosterName}>{booster.name}</h3>
-        <p className={styles.boosterDescription}>{booster.description}</p>
-        <div className={styles.boosterDetails}>
-          <span className={styles.cardCount}>{booster.cardCount} cards</span>
-          <span className={styles.price}>{booster.price} coins</span>
-        </div>
-        {booster.isLimited && (
-          <div className={styles.limitedInfo}>
-            <span>Limited Edition</span>
-            {booster.currentSupply && booster.maxSupply && (
-              <span>{booster.currentSupply}/{booster.maxSupply}</span>
-            )}
-          </div>
-        )}
+        <h3>{booster.name}</h3>
+        <p>{booster.description}</p>
+        <span className={styles.price}>{booster.price} €</span>
       </div>
     </div>
   );
-};
-
-export default BoosterCard;
+}

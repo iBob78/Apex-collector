@@ -1,15 +1,15 @@
 .boosterCard {
-  width: 250px;
-  border-radius: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
   overflow: hidden;
-  background: #1a1a1a;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
-  cursor: pointer;
+  transition: transform 0.2s;
+  background: white;
+  max-width: 300px;
 }
 
 .boosterCard:hover {
   transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .imageContainer {
@@ -26,55 +26,10 @@
   padding: 1rem;
 }
 
-.boosterName {
-  font-size: 1.2rem;
+.price {
+  display: block;
+  font-size: 1.25rem;
   font-weight: bold;
-  margin: 0 0 0.5rem 0;
-}
-
-.boosterDescription {
-  font-size: 0.9rem;
-  color: #888;
-  margin-bottom: 1rem;
-}
-
-.boosterDetails {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
-}
-
-.cardCount, .price {
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.limitedInfo {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  color: #ffd700;
-  border-top: 1px solid #333;
-  padding-top: 0.5rem;
-}
-
-/* Rarity colors */
-.common {
-  border: 2px solid #666;
-}
-
-.uncommon {
-  border: 2px solid #1a9900;
-}
-
-.rare {
-  border: 2px solid #0066cc;
-}
-
-.epic {
-  border: 2px solid #9900cc;
-}
-
-.legendary {
-  border: 2px solid #ff9900;
+  color: #2c5282;
+  margin-top: 0.5rem;
 }
