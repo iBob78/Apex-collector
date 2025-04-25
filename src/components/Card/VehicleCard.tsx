@@ -23,8 +23,7 @@ export default function VehicleCard({ card }: Props) {
         <Image
           src={card.image_url}
           alt={card.name}
-          width={250}
-          height={125}
+          fill
           className="object-cover"
           priority
         />
