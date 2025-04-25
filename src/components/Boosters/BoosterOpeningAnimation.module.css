@@ -1,82 +1,96 @@
-/* ... (styles précédents) */
-
-.card.holographic {
-  position: relative;
-  overflow: hidden;
-}
-
-.holographicOverlay {
-  position: absolute;
+.container {
+  position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--holographic-gradient,
-    linear-gradient(
-      var(--holographic-angle, 0deg),
-      var(--holographic-colors)
-    )
-  );
-  mix-blend-mode: overlay;
-  opacity: var(--holographic-intensity, 0.2);
-  pointer-events: none;
-  transform: rotate(var(--holographic-angle, 0deg));
-  transition: transform calc(var(--holographic-speed, 1) * 0.2s) ease-out;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
 }
 
-.card.revealed .holographicOverlay {
-  animation: holographic-shine calc(var(--holographic-speed, 1) * 5s) linear infinite;
+.boosterWrapper {
+  position: relative;
+  width: 300px;
+  height: 450px;
+  perspective: 1000px;
 }
 
-@keyframes holographic-shine {
-  0% {
-    opacity: var(--holographic-intensity);
-    transform: rotate(0deg) translateY(-100%);
-  }
-  25% {
-    opacity: calc(var(--holographic-intensity) * 1.5);
-  }
-  50% {
-    opacity: var(--holographic-intensity);
-    transform: rotate(180deg) translateY(100%);
-  }
-  75% {
-    opacity: calc(var(--holographic-intensity) * 0.5);
-  }
-  100% {
-    opacity: var(--holographic-intensity);
-    transform: rotate(360deg) translateY(-100%);
-  }
-}
-
-@keyframes card-flip {
-  0% {
-    transform: perspective(1000px) rotateY(180deg) scale(0);
-    filter: brightness(0.5);
-  }
-  50% {
-    transform: perspective(1000px) rotateY(90deg) scale(0.8);
-    filter: brightness(1.2);
-  }
-  100% {
-    transform: perspective(1000px) rotateY(0) scale(1);
-    filter: brightness(1);
-  }
-}
-
-/* Optimisations de performance */
-.card {
-  will-change: transform, opacity;
+.boosterFront,
+.boosterBack {
+  position: absolute;
+  width: 100%;
+  height: 100%;
   backface-visibility: hidden;
-  transform: translateZ(0);
+  transition: transform 1s ease-in-out;
 }
 
-.holographicOverlay {
-  will-change: transform, opacity;
-  transform: translateZ(0);
+.boosterImage {
+  object-fit: cover;
 }
 
-.particleCanvas {
-  will-change: transform;
-  transform: translateZ(0);
+.boosterFront {
+  transform: rotateY(0);
+}
+
+.boosterBack {
+  transform: rotateY(180deg);
+  background: linear-gradient(45deg, #1a1a1a, #4a4a4a);
+}
+
+.opened.boosterFront {
+  transform: rotateY(-180deg);
+}
+
+.opened.boosterBack {
+  transform: rotateY(0);
+}
+
+.cardBack {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2c5282, #4299e1);
+}
+
+.glowEffect {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 45%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.1) 55%,
+    transparent 100%
+  );
+  transform: translate(-100%, -100%);
+  animation: glow 2s infinite linear;
+}
+
+@keyframes glow {
+  0% {
+    transform: translate(-100%, -100%);
+  }
+  100% {
+    transform: translate(50%, 50%);
+  }
+}
+
+.open {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
