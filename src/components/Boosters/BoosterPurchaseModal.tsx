@@ -1,111 +1,76 @@
-import React, { useState } from "react";
-import { BoosterType } from "@/types/boosters";
-import styles from "./BoosterPurchaseModal.module.css";
-import BoosterOpeningAnimation from "./BoosterOpeningAnimation";
+import React, { useState } from 'react';
+import { BoosterType } from './BoosterCard';
+import BoosterOpeningAnimation from './BoosterOpeningAnimation';
+import styles from './BoosterPurchaseModal.module.css';
 
 interface BoosterPurchaseModalProps {
   booster: BoosterType;
   isOpen: boolean;
   onClose: () => void;
-  onPurchase: (booster: BoosterType) => Promise<void>;
-  userCoins: number;
+  onPurchaseComplete?: (cards: string[]) => void;
 }
 
-const BoosterPurchaseModal: React.FC<BoosterPurchaseModalProps> = ({
+export default function BoosterPurchaseModal({
   booster,
   isOpen,
   onClose,
-  onPurchase,
-  userCoins,
-}) => {
+  onPurchaseComplete
+}: BoosterPurchaseModalProps) {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isOpening, setIsOpening] = useState(false);
-  const canPurchase = userCoins >= booster.price;
+  const [purchasedCards, setPurchasedCards] = useState<string[]>([]);
 
   const handlePurchase = async () => {
     try {
       setIsPurchasing(true);
-      await onPurchase(booster);
+      // Simulation d'un appel API pour l'achat
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Simulation des cartes obtenues
+      const mockCards = ['Card1', 'Card2', 'Card3'];
+      setPurchasedCards(mockCards);
       setIsOpening(true);
     } catch (error) {
-      console.error("Purchase failed:", error);
+      console.error('Erreur lors de l\'achat:', error);
     } finally {
       setIsPurchasing(false);
     }
   };
 
-  const handleAnimationComplete = (cards: string[]) => {
-    console.log("Cards revealed:", cards);
-    setIsOpening(false);
+  const handleAnimationComplete = () => {
+    if (purchasedCards.length > 0) {
+      onPurchaseComplete?.(purchasedCards);
+    }
     onClose();
   };
-
-  if (!isOpen) return null;
 
   if (isOpening) {
     return (
       <BoosterOpeningAnimation
         booster={booster}
         isOpen={true}
-        onClose={onClose}
-        onAnimationComplete={handleAnimationComplete}
+        onAnimationComplete={() => handleAnimationComplete()}
       />
     );
   }
 
   return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.modal}>
-        <button className={styles.closeButton} onClick={onClose}>×</button>
-        
-        <div className={styles.modalContent}>
-          <h2>Purchase Booster</h2>
-          
-          <div className={styles.boosterInfo}>
-            <h3>{booster.name}</h3>
-            <p>{booster.description}</p>
-            
-            <div className={styles.guaranteedCards}>
-              <h4>Guaranteed Cards:</h4>
-              <ul>
-                {booster.guaranteedRarities?.map((guarantee, index) => (
-                  <li key={index}>
-                    {guarantee.count}x {guarantee.rarity}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className={styles.priceInfo}>
-              <span className={styles.price}>Price: {booster.price} coins</span>
-              <span className={styles.balance}>Your balance: {userCoins} coins</span>
-            </div>
-
-            {booster.isLimited && (
-              <div className={styles.limitedInfo}>
-                <span>Limited Edition: {booster.currentSupply}/{booster.maxSupply}</span>
-              </div>
-            )}
-          </div>
-
-          <div className={styles.actions}>
-            <button
-              className={`${styles.purchaseButton} ${!canPurchase ? styles.disabled : ""}`}
-              onClick={handlePurchase}
-              disabled={!canPurchase || isPurchasing}
-            >
-              {isPurchasing ? "Processing..." : "Purchase Booster"}
-            </button>
-            {!canPurchase && (
-              <p className={styles.insufficientFunds}>
-                Insufficient funds. You need {booster.price - userCoins} more coins.
-              </p>
-            )}
-          </div>
-        </div>
+    <div className={`${styles.modal} ${isOpen ? styles.open : ''}`}>
+      <div className={styles.modalContent}>
+        <button className={styles.closeButton} onClick={onClose}>
+          ×
+        </button>
+        <h2>Acheter {booster.name}</h2>
+        <p>{booster.description}</p>
+        <p className={styles.price}>Prix : {booster.price} €</p>
+        <button
+          className={styles.purchaseButton}
+          onClick={handlePurchase}
+          disabled={isPurchasing}
+        >
+          {isPurchasing ? 'Achat en cours...' : 'Acheter maintenant'}
+        </button>
       </div>
     </div>
   );
-};
-
-export default BoosterPurchaseModal;
+}
