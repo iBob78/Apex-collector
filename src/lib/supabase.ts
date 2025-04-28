@@ -9,12 +9,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey)
 
-// Ajout de la validation des entrées
+// Validation des emails
 export const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email)
 }
 
+// Fonction de connexion
 export const signInWithEmail = async (email: string) => {
   if (!validateEmail(email)) {
     return { error: { message: 'Invalid email format' } }
@@ -25,4 +26,9 @@ export const signInWithEmail = async (email: string) => {
       emailRedirectTo: `${window.location.origin}/auth/callback`
     }
   })
+}
+
+// Fonction de déconnexion
+export const signOut = async () => {
+  return await supabase.auth.signOut()
 }

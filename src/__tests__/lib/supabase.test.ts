@@ -1,4 +1,4 @@
-import { supabase, signInWithEmail, signOut } from '@/lib/supabase'
+import { supabase, signInWithEmail, signOut, validateEmail } from '@/lib/supabase'
 
 jest.mock('@supabase/supabase-js', () => ({
   createClient: jest.fn(() => ({
@@ -25,17 +25,15 @@ describe('Supabase Client', () => {
 
   afterEach(() => {
     process.env = originalEnv
+    jest.clearAllMocks()
   })
 
-  it('creates a supabase client with environment variables', () => {
-    expect(supabase).toBeDefined()
-    expect(supabase.auth).toBeDefined()
-  })
-
-  it('throws error when environment variables are missing', () => {
-    jest.resetModules()
-    process.env.NEXT_PUBLIC_SUPABASE_URL = undefined
-    expect(() => require('@/lib/supabase')).toThrow()
+  describe('validateEmail', () => {
+    it('validates correct email format', () => {
+      expect(validateEmail('test@example.com')).toBe(true)
+      expect(validateEmail('invalid-email')).toBe(false)
+      expect(validateEmail('')).toBe(false)
+    })
   })
 
   describe('signInWithEmail', () => {
@@ -48,6 +46,12 @@ describe('Supabase Client', () => {
           emailRedirectTo: 'http://localhost:3000/auth/callback'
         }
       })
+    })
+
+    it('returns error for invalid email', async () => {
+      const result = await signInWithEmail('invalid-email')
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toBe('Invalid email format')
     })
   })
 

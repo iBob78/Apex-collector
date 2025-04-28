@@ -1,7 +1,7 @@
 export const mockSupabase = {
   auth: {
-    signInWithOtp: jest.fn(),
-    signOut: jest.fn(),
+    signInWithOtp: jest.fn().mockResolvedValue({ error: null }),
+    signOut: jest.fn().mockResolvedValue({ error: null }),
     getSession: jest.fn(),
     onAuthStateChange: jest.fn()
   },
@@ -19,5 +19,5 @@ export const validateEmail = (email: string): boolean => {
   return emailRegex.test(email);
 };
 
-export const signInWithEmail = jest.fn();
-export const signOut = jest.fn();
+export const signInWithEmail = jest.fn().mockResolvedValue({ error: null });
+export const signOut = jest.fn().mockResolvedValue({ error: null });
