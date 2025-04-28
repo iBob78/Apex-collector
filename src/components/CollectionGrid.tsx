@@ -1,35 +1,41 @@
-import Card from './Card'
-
-type CardType = {
-  id: number
-  name: string
-  rarity?: string
-  price?: string
-}
+import React from 'react';
+import { Card } from '@/types/card';
+import CardDisplay from './cards/CardDisplay';
 
 interface CollectionGridProps {
-  items?: CardType[] | null
-  onCardClick?: (card: CardType) => void
+  cards: Card[];
+  onCardClick?: (card: Card) => void;
+  loading?: boolean;
 }
 
-export default function CollectionGrid({ items, onCardClick }: CollectionGridProps) {
-  // Gestion explicite des cas null/undefined
-  if (!items || items.length === 0) {
-    return <div className="text-center p-4">No items in collection</div>
+const CollectionGrid: React.FC<CollectionGridProps> = ({ 
+  cards, 
+  onCardClick,
+  loading = false 
+}) => {
+  if (loading) {
+    return <div className="flex justify-center items-center">Loading...</div>;
+  }
+
+  if (!Array.isArray(cards) || cards.length === 0) {
+    return (
+      <div className="flex justify-center items-center p-4">
+        <p className="text-gray-500">No cards in collection</p>
+      </div>
+    );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-      {items.map((card) => (
-        <Card 
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+      {cards.map((card) => (
+        <CardDisplay 
           key={card.id} 
-          name={card.name}
-          rarity={card.rarity}
-          price={card.price}
+          card={card}
           onClick={() => onCardClick?.(card)}
-          data-testid="card"
         />
       ))}
     </div>
-  )
-}
+  );
+};
+
+export default CollectionGrid;
