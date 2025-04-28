@@ -1,69 +1,57 @@
-'use client';
-
-import { useState } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
-import { Database } from '@/types/supabase';
-
-type AuthError = {
-  message: string;
-};
+import { useState } from 'react'
+import { signInWithEmail } from '@/lib/supabase'
 
 export default function Auth() {
-  const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState<AuthError | null>(null);
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const supabase = createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) throw error;
-      alert('Check your email for the login link!');
-    } catch (error) {
-      setError(error as AuthError);
+      const { error: signInError } = await signInWithEmail(email)
+      if (signInError) {
+        setError(signInError.message)
+      } else {
+        alert('Check your email for the login link!')
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
-      <form
-        className="flex-1 flex flex-col w-full justify-center gap-2"
-        onSubmit={handleLogin}
-      >
+      <form onSubmit={handleSubmit} className="flex-1 flex flex-col w-full justify-center gap-2">
         <label className="text-md" htmlFor="email">
           Email
         </label>
         <input
-          className="rounded-md px-4 py-2 bg-inherit border mb-6"
+          id="email"
           name="email"
-          onChange={(e) => setEmail(e.target.value)}
+          type="email"
+          placeholder="email@example.com"
           value={email}
-          placeholder="you@example.com"
+          onChange={(e) => setEmail(e.target.value)}
+          className="rounded-md px-4 py-2 bg-inherit border mb-6"
+          required
         />
         <button
-          className="bg-green-700 rounded px-4 py-2 text-white mb-6"
+          type="submit"
           disabled={loading}
+          className="bg-green-700 rounded px-4 py-2 text-white mb-6 disabled:opacity-50"
         >
           {loading ? 'Loading...' : 'Send magic link'}
         </button>
-        {error && <p className="text-red-600">{error.message}</p>}
+        {error && (
+          <p className="text-red-500 text-sm">{error}</p>
+        )}
       </form>
     </div>
-  );
+  )
 }
