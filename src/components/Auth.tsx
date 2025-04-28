@@ -5,10 +5,12 @@ export default function Auth() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
+    setSuccessMessage(null)
     setLoading(true)
 
     try {
@@ -16,7 +18,7 @@ export default function Auth() {
       if (signInError) {
         setError(signInError.message)
       } else {
-        alert('Check your email for the login link!')
+        setSuccessMessage('Check your email for the login link!')
       }
     } catch (err) {
       setError('An error occurred. Please try again.')
@@ -49,7 +51,10 @@ export default function Auth() {
           {loading ? 'Loading...' : 'Send magic link'}
         </button>
         {error && (
-          <p className="text-red-500 text-sm">{error}</p>
+          <p className="text-red-500 text-sm" role="alert">{error}</p>
+        )}
+        {successMessage && (
+          <p className="text-green-500 text-sm" role="status">{successMessage}</p>
         )}
       </form>
     </div>

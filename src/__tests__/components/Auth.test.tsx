@@ -57,12 +57,11 @@ describe('Auth Component', () => {
     fireEvent.click(submitButton)
 
     await waitFor(() => {
-      expect(screen.getByText('An error occurred. Please try again.')).toBeInTheDocument()
+      expect(screen.getByRole('alert')).toHaveTextContent('An error occurred. Please try again.')
     })
   })
 
   it('shows success message on successful submission', async () => {
-    const mockAlert = jest.spyOn(window, 'alert').mockImplementation()
     mockSignIn.mockResolvedValueOnce({ error: null })
 
     render(<Auth />)
@@ -73,9 +72,7 @@ describe('Auth Component', () => {
     fireEvent.click(submitButton)
 
     await waitFor(() => {
-      expect(mockAlert).toHaveBeenCalledWith('Check your email for the login link!')
+      expect(screen.getByRole('status')).toHaveTextContent('Check your email for the login link!')
     })
-
-    mockAlert.mockRestore()
   })
 })
