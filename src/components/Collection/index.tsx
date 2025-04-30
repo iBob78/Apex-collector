@@ -13,7 +13,6 @@ export const CollectionGrid: React.FC<CollectionGridProps> = ({
   collectedCards = new Set(),
   onCardClick,
 }) => {
-  const [selectedCard, setSelectedCard] = useState<Card | null>(null)
 
   const handleCardClick = (card: Card) => {
     setSelectedCard(card)
