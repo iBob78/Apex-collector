@@ -8,24 +8,27 @@ import LazyImage from "../components/LazyImage";
 import AccessibilityCheck from "../components/AccessibilityCheck";
 import AxeClient from "../components/AxeClient";
 
-// Optionnel : bénficier du marquage sémantique en enveloppant l'ensemble dans une balise <div> ou <main>
 const Page = () => {
   return (
     <div lang="fr">
-      {/* Assure-toi que Header rend un <header> */}
-      <Header />
-      {/* Le contenu principal est dans <main> */}
+      {/* Encapsulation de l'en-tête dans un landmark */}
+      <header>
+        <Header />
+      </header>
+      
+      {/* Contenu principal dans <main> */}
       <main style={{ padding: "20px" }}>
-        {/* Appels aux composants d'accessibilité */}
         <AxeClient />
         <AccessibilityCheck />
-        {/* Contenu principal */}
         <CounterButton />
         <LazyImage />
         <p>Ceci est le contenu principal.</p>
       </main>
-      {/* Assure-toi que Footer rend un <footer> */}
-      <Footer />
+      
+      {/* Encapsulation du pied de page dans un landmark */}
+      <footer>
+        <Footer />
+      </footer>
     </div>
   );
 };
