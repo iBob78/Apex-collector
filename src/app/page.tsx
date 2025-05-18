@@ -8,23 +8,23 @@ import LazyImage from "../components/LazyImage";
 import AccessibilityCheck from "../components/AccessibilityCheck";
 import AxeClient from "../components/AxeClient";
 
-// Définir des métadonnées (optionnel, mais recommande d'ajouter un <title> via <Head> ou dans metadata)
-export const metadata = {
-  title: "Apex Collector - Accueil",
-};
-
+// Optionnel : bénficier du marquage sémantique en enveloppant l'ensemble dans une balise <div> ou <main>
 const Page = () => {
   return (
     <div lang="fr">
+      {/* Assure-toi que Header rend un <header> */}
       <Header />
-      {/* On peut garder AxeClient et AccessibilityCheck ici puisqu'ils retournent null */}
-      <AxeClient />
-      <AccessibilityCheck />
+      {/* Le contenu principal est dans <main> */}
       <main style={{ padding: "20px" }}>
+        {/* Appels aux composants d'accessibilité */}
+        <AxeClient />
+        <AccessibilityCheck />
+        {/* Contenu principal */}
         <CounterButton />
         <LazyImage />
         <p>Ceci est le contenu principal.</p>
       </main>
+      {/* Assure-toi que Footer rend un <footer> */}
       <Footer />
     </div>
   );
