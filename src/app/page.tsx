@@ -11,12 +11,9 @@ import AxeClient from "../components/AxeClient";
 const Page = () => {
   return (
     <div lang="fr">
-      {/* Encapsulation de l'en-tête dans un landmark */}
       <header>
         <Header />
       </header>
-      
-      {/* Contenu principal dans <main> */}
       <main style={{ padding: "20px" }}>
         <AxeClient />
         <AccessibilityCheck />
@@ -24,8 +21,6 @@ const Page = () => {
         <LazyImage />
         <p>Ceci est le contenu principal.</p>
       </main>
-      
-      {/* Encapsulation du pied de page dans un landmark */}
       <footer>
         <Footer />
       </footer>
