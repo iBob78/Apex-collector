@@ -2,7 +2,7 @@
   "name": "apex-collector",
   "version": "0.1.0",
   "private": true,
-  "type": "module",  // ✅ Ajouté correctement ici !
+  "type": "module",  // ✅ Doit être ici et non dans un bloc séparé
   "scripts": {
     "dev": "next dev",
     "build": "next build",
