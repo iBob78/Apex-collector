@@ -1,0 +1,34 @@
+"use client";
+import { useEffect } from "react";
+import Image from 'next/image';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import CounterButton from '../components/CounterButtoimport LazyImage from '../components/LazyImage';
+import AccessibilityCheck from '../components/AccessibilityCheck';
+import AxeClient from "../components/AxeClient";
+
+const Page = () => {
+  useEffect(() => {
+    if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+      axe(React, document, 1000).then((results) => {
+        console.log('🚨 Résultats accessibilité axe-core:', results);
+      });
+    }
+  }, []);
+
+  return (
+    <>
+      <Header />
+        <AxeClient />
+      <AccessibilityCheck />
+      <main style={{ padding: '20px' }}>
+        <CounterButton />
+        <LazyImage />
+        <p>Ceci est le contenu principal.</p>
+      </main>
+      <Footer />
+    </>
+  );
+};
+
+export default Page;
