@@ -1,12 +1,12 @@
 "use client";
 
-import AccessibilityCheck from "../components/AccessibilityCheck";
 import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CounterButton from "../components/CounterButton";
 import LazyImage from "../components/LazyImage";
 import AxeClient from "../components/AxeClient";
+import AccessibilityCheck from "../components/AccessibilityCheck";
 
 const Page = () => {
   return (
