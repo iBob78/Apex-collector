@@ -1,6 +1,6 @@
-import AccessibilityCheck from "../components/AccessibilityCheck";
 "use client";
 
+import AccessibilityCheck from "../components/AccessibilityCheck";
 import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
