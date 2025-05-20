@@ -16,9 +16,9 @@
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.39.0",
     "framer-motion": "^12.9.1",
-    "next": "^14.2.28",
-    "react": "^18",
-    "react-dom": "^18"
+    "next": "^15.3.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@axe-core/react": "^4.10.1",
