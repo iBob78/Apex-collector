@@ -2,18 +2,15 @@ import path from "path";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true, // Active le mode strict pour détecter les erreurs
-
+  reactStrictMode: true, 
   experimental: {
-    optimizeCss: false, // Désactive temporairement l'optimisation CSS
-    middlewarePrefetch: "strict" // Optimise les préchargements liés aux middlewares
+    optimizeCss: false,
+    middlewarePrefetch: "strict",
   },
-
   images: {
-    domains: ['your-cdn.com', 'your-image-source.com'], // Autorise le chargement d’images externes
-    formats: ['image/avif', 'image/webp'], // Active des formats optimisés pour le rendu
+    domains: ['your-cdn.com', 'your-image-source.com'],
+    formats: ['image/avif', 'image/webp'],
   },
-
   webpack(config) {
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -22,6 +19,6 @@ const nextConfig = {
     };
     return config;
   }
-}
+};
 
-module.exports = nextConfig;
+export default nextConfig; // ✅ Remplace `module.exports` par `export default`
