@@ -1,3 +1,4 @@
+import AccessibilityCheck from "../components/AccessibilityCheck";
 "use client";
 
 import React from "react";
@@ -5,7 +6,6 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CounterButton from "../components/CounterButton";
 import LazyImage from "../components/LazyImage";
-import AccessibilityCheck from "../components/AccessibilityCheck";
 import AxeClient from "../components/AxeClient";
 
 const Page = () => {
