@@ -1,0 +1,31 @@
+name: 💡 Suggestion de fonctionnalité
+description: Suggérez une idée pour Apex Collector
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de votre suggestion pour améliorer Apex Collector !
+  - type: textarea
+    id: problem
+    attributes:
+      label: Le problème
+      description: Décrivez le problème que votre fonctionnalité résoudrait
+      placeholder: Je suis toujours frustré quand [...]
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solution souhaitée
+      description: Décrivez la solution que vous aimeriez
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considérées
+      description: Décrivez les alternatives que vous avez considérées
+    validations:
+      required: false
