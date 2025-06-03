@@ -1,5 +1,8 @@
 # Changelog
 
+##03/06/2025 :
+Project is not ready, the git is full of bugs and nothing can be exploitable at this moment.
+
 ## [Unreleased]
 
 ### Added
