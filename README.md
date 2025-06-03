@@ -34,4 +34,19 @@ Avec mes tentatives de IA, voici tout ce qui à été mis en place sur le git...
 - Supabase
 - Vercel
 
+🤝 Comment contribuer
+Nous accueillons toutes les contributions ! Voici comment vous pouvez nous aider :
 
+Forkez le projet
+Créez votre branche (git checkout -b feature/NouvelleFeature)
+Committez vos changements (git commit -m 'Add: Nouvelle Feature')
+Poussez vers la branche (git push origin feature/NouvelleFeature)
+Ouvrez une Pull Request
+Pour plus de détails, consultez notre guide de contribution.
+
+📝 Licence
+Ce projet est sous licence MIT - voir le fichier LICENSE.md pour plus de détails.
+
+👥 Auteurs et contributeurs
+@iBob78 - Créateur et mainteneur
+⭐ Montrez votre soutien !
