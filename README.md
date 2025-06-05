@@ -2,23 +2,22 @@
 
 French & English version below
 
-Développé par iBob78
 Dernière mise à jour : 2025-04-23
 
-About me : Je suis un gros passioné d'automobile, mais je déteste le code, programmation et j'y connais absolument rien a part 'npm run dev'.
-J'ai pleins d'idées mais c'est la technique qui me freine, j'ai essayer IA pour m'aider mais a chaque fois ca tourne en rond et y'a plus de bugs de concret 
+About me : Je suis un gros passioné d'automobile, mais je déteste le code, la programmation et j'y connais absolument rien a part 'npm run dev'.
+J'ai pleins d'idées mais c'est la technique qui me freine, j'ai essayer 4 IA pour m'aider mais a chaque fois ca tourne en rond et y'a plus de bugs de concret.
+
+
 
 ## 🚀 Le projet : 
 
-apex collector est une application TypeScript
+apex collector est un jeu de carte a collectionner basé sur l'automobile
 
-- Jeu de carte a collectionner basé sur l'automobile
 - Le schéma sera beaucoup inspiré de qui ce fait déja (Pokémon, Anciens jeu de carte initial D, trumps, top gear)
 - Gestion de collection de cartes
 - Affichage des cartes sous forme d'un album comme pokémon 
-- Système de marché d'échanges/achat de carte intégré
-- Statistiques de profil, succès a débloquer ( succès au bout de 10 cartes possédées)
-- Changement de langues dans les parametres 
+- Système de marketplace d'échanges/achat de carte intégré
+- Statistiques de profil, succès a débloquer (ex: succès au bout de 10 cartes possédées)
 - Interface réactive et animée
 
 ## 🛠️ Stack Technique
@@ -34,6 +33,38 @@ Avec mes tentatives de IA, voici tout ce qui à été mis en place sur le git...
 - Supabase
 - Vercel
 
+
+## Design
+
+Le désign global est axé sur le sport automobile et le gentleman driver. D'autres themes pourront se débloquer plus tard au fur a mesure de la progression dans le jeu.
+
+J'aime les inspirations tirés des jeux :
+- Gran turismo
+- Test drive unlimited
+- Colin Mc rae rally 2000
+
+
+## Cartes
+
+
+Le design des cartes est encore a determiner, 
+- Holographique
+- Effet carbone
+- Effet Kevlar
+- Effet carbone forgé
+- Titane brossé
+- Titane bleu
+- echappement blanc mat ?
+- Feuille d’isolant or
+- Monochrome
+- Blueprint
+- Croquis design
+- Carte rétros
+- Acier brossé
+
+
+
+
 🤝 Comment contribuer
 Nous accueillons toutes les contributions ! Voici comment vous pouvez nous aider :
 
@@ -48,5 +79,5 @@ Pour plus de détails, consultez notre guide de contribution.
 Ce projet est sous licence MIT - voir le fichier LICENSE.md pour plus de détails.
 
 👥 Auteurs et contributeurs
-@iBob78 - Créateur et mainteneur
+@iBob78 - Créateur
 ⭐ Montrez votre soutien !
