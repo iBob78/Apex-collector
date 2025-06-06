@@ -11,9 +11,10 @@ J'ai pleins d'idées mais c'est la technique qui me freine, j'ai essayer 4 IA po
 
 ## 🚀 Le projet : 
 
-apex collector est un jeu de carte a collectionner basé sur l'automobile
+About
+Apex Collector - Collectez les cartes de jeu basé sur le monde automobile. Débloquez des succès, gérez votre collection et échangez vos cartes !
 
-- Le schéma sera beaucoup inspiré de qui ce fait déja (Pokémon, Anciens jeu de carte initial D, trumps, top gear)
+- Le schéma sera beaucoup inspiré de qui ce fait déja (Pokémon, Anciens jeu de carte initial D, trumps, top gear, top maxx)
 - Gestion de collection de cartes
 - Affichage des cartes sous forme d'un album comme pokémon 
 - Système de marketplace d'échanges/achat de carte intégré
@@ -22,7 +23,7 @@ apex collector est un jeu de carte a collectionner basé sur l'automobile
 
 ## 🛠️ Stack Technique
 
-Avec mes tentatives de IA, voici tout ce qui à été mis en place sur le git... Je suis pas persuadé de l'utilitée de toutes.
+Avec mes 958 tentatives de IA, voici tout ce qui à été mis en place sur le git... Je suis pas persuadé de l'utilitée de toutes.
 
 - Next.js 14
 - TypeScript
@@ -42,6 +43,7 @@ J'aime les inspirations tirés des jeux :
 - Gran turismo
 - Test drive unlimited
 - Colin Mc rae rally 2000
+- Need for speed 3 & 4
 
 
 ## Cartes
