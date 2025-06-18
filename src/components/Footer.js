@@ -1,17 +1,9 @@
-"use client";
-
-const Footer = () => {
+export default function Footer() {
   return (
-    <footer style={{
-      textAlign: 'center',
-      padding: '20px',
-      backgroundColor: '#f8f9fa',
-      color: '#333',
-      borderTop: '1px solid #ddd'
-    }}>
-      © 2025 - Tous droits réservés
+    <footer className="w-full bg-gray-900 text-sm text-gray-400 py-4 mt-8">
+      <div className="max-w-screen-xl mx-auto px-4 text-center">
+        © {new Date().getFullYear()} Apex Collector · Fait avec 💎 par Etienne & ton copilote IA
+      </div>
     </footer>
   );
-};
-
-export default Footer;
+}
