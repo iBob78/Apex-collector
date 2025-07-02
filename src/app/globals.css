@@ -13,8 +13,84 @@ html, body {
   min-height: 100vh;
 }
 
+/* Titre personnalisé (si utilisé) */
 .title {
   font-family: Arial, sans-serif;
   font-weight: 300;
   text-transform: lowercase;
+}
+
+/* ✨ Animation foil brillante (légendaire + épique) */
+@keyframes foil {
+  0% {
+    background: linear-gradient(
+      115deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 100%
+    );
+  }
+  50% {
+    background: linear-gradient(
+      135deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%
+    );
+  }
+  100% {
+    background: linear-gradient(
+      115deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 100%
+    );
+  }
+}
+
+.animate-foil {
+  background-size: 300% 300%;
+  animation: foil 4s infinite linear;
+  mix-blend-mode: overlay;
+  opacity: 0.3;
+  transition: opacity 0.3s ease-in-out;
+  transform: rotateZ(0.0001deg); /* GPU acceleration subtile */
+}
+
+/* 🪄 Fallback si une carte n’a pas d’image */
+.card-placeholder {
+  background: repeating-linear-gradient(
+    -45deg,
+    #2a2a2a,
+    #2a2a2a 10px,
+    #333 10px,
+    #333 20px
+  );
+  color: white;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rarete-epic:hover {
+  box-shadow: 0 0 12px 4px rgba(118, 0, 226, 0.5); /* Violet magique */
+}
+
+.rarete-legend:hover {
+  box-shadow: 0 0 16px 6px rgba(255, 166, 0, 0.6); /* Doré lumineux */
+}
+
+.rarete-epic,
+.rarete-legend {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
 }
