@@ -1,0 +1,509 @@
+### 🧩 Présentation du projet : Apex Collector
+- **Objectif principal** :  
+
+**Apex Collector** est une application web construite avec **Next.js** et **TypeScript**, dédiée à la collection de voitures sous forme de cartes à jouer interactives. Chaque carte affiche les spécifications techniques d’un véhicule, avec une image associée, des badges et des statistiques.
+
+- **Public cible** :  
+Fans d'automobile
+
+### 🎯 Objectif principal
+Créer une interface immersive pour les passionnés d’automobile, permettant de :
+#NOM?
+#NOM?
+- Offrir une expérience fluide et responsive, avec un design soigné
+
+- **Fonctionnalités clés** :
+  - Tableau de bord personnalisé
+  - Historique des parties
+  - Statistiques détaillées (K/D, winrate, etc.)
+  - Comparaison avec d'autres joueurs
+  - Alertes de performance ou progression
+
+- **Technologies envisagées** :
+  - Frontend : React / Vue.js
+  - Backend : Node.js / Python (FastAPI)
+  - Base de données : PostgreSQL / MongoDB
+  - API : utilisation de l’API d’Apex Legends (si disponible) ou scrapping
+
+- **Design & UX** :
+  - Interface sombre type gentleman driver
+  - Responsive pour mobile et desktop
+  - Graphiques interactifs (D3.js ou Chart.js)
+
+
+---
+
+## 🧱 Stack Technique
+
+| Élément              | Détail                                                                 |
+|----------------------|------------------------------------------------------------------------|
+| Framework            | Next.js (rendu client via `'use client'`)                              |
+| Langage              | TypeScript                                                             |
+| Styling              | Tailwind CSS                                                           |
+| Fonts                | Google Fonts – Rajdhani                                                |
+| Images               | `next/image` pour optimisation                                         |
+| State Management     | Context API (`CardModalContext`)                                       |
+| Utilitaires          | `clsx` pour les classes conditionnelles                                |
+
+---
+
+
+- **Composant `Card`** :
+  - Affiche les données techniques : puissance, couple, vitesse max, accélération, poids, transmission
+  - Calcule un indice de performance (IP) basé sur la puissance et le poids
+  - Affiche des badges de niveau (`CardLevelBadge`) et d’IP (`IPBadge`)
+  - Utilise des icônes SVG pour les stats
+  - Responsive avec deux tailles : `md` et `lg`
+
+- **Gestion des images** :
+  - Les images des voitures sont stockées dans `public/images/cards/`
+  - Le nom de chaque image suit la logique : `marque-modele-année.jpg` (ex. `ferrari-f50-1995.jpg`)
+  - Le chemin est généré dynamiquement dans le composant à partir des props
+  - Les noms sont nettoyés (minuscules, tirets, sans accents) pour correspondre aux fichiers
+
+- **Fallback automatique** :
+  - Si une image personnalisée n’est pas trouvée, une image par défaut est utilisée (`default.jpg`)
+  - Le fallback est géré ailleurs dans l’app (pas dans le composant `Card` directement)
+
+- **Context API** :
+  - Utilisation de `CardModalContext` pour gérer l’état actif d’une carte sélectionnée
+
+
+
+
+## 📦 Structure des Données
+
+Le composant `Card` reçoit les props suivantes :
+
+```ts
+type CardProps = {
+  make: string
+  model: string
+  year: string
+  power_hp: string
+  torque_nm: string
+  max_speed_kmh: string
+  acceleration_0_100: string
+  weight_t: string
+  transmission?: 'FWD' | 'RWD' | 'AWD'
+  count?: number
+  size?: 'md' | 'lg'
+  showLevel?: boolean
+}
+```
+
+---
+
+## 🖼️ Gestion des Images
+
+- Les images sont stockées dans `public/images/cards/`
+- Convention de nommage : `marque-modele-année.jpg`  
+  → Exemple : `ferrari-f50-1995.jpg`
+- Le chemin est généré dynamiquement à partir des props :
+
+```ts
+const clean = (str: string) =>
+  str.normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, '-')
+    .toLowerCase()
+
+const imageName = `${clean(make)}-${clean(model)}-${year}.jpg`
+const imageSrc = `/images/cards/${imageName}`
+```
+
+- Le fallback vers une image par défaut (`default.jpg`) est géré ailleurs dans l’application
+
+---
+
+## 📊 Calculs Dynamiques
+
+- **Indice de performance (IP)** : basé sur la puissance et le poids
+
+```ts
+const ip = parsedPower && parsedWeight
+  ? Math.floor((parsedPower / (parsedWeight * 1000)) * 1000)
+###############################################################################################################################################################################################################################################################
+```
+
+- Affiché via le composant `<IPBadge />`
+
+---
+
+## 🧩 Composants Intégrés
+
+- `CardLevelBadge` : badge de niveau (ex. rareté)
+- `IPBadge` : badge de performance
+- `Stat` : icône + valeur pour chaque caractéristique
+- `CardModalContext` : permet d’ouvrir une carte en modal via `setActiveCard`
+
+---
+
+## 🧪 Problème Rencontré
+
+- Les images personnalisées ne s’affichaient plus, seule l’image par défaut apparaissait
+- Cause identifiée : la logique initiale du composant `Card` utilisait `customImage` sans générer dynamiquement le chemin
+- Correction apportée :
+  - Suppression de `customImage`
+  - Ajout d’une fonction `clean()` pour générer le nom de fichier à partir des props
+  - Intégration directe du chemin dans le composant `Card`
+
+---
+
+Backlog :
+
+- Le composant `Card` utilise maintenant `make`, `model`, `year` pour générer le chemin de l’image
+#NOM?
+- Le bug persiste malgré la correction, ce qui suggère :
+  - un problème de nom de fichier dans `public/images/cards/`
+  - un souci de build ou de cache
+  - ou une erreur silencieuse côté Next.js
+
+---
+
+## 📌 À Vérifier
+
+- Que les fichiers dans `public/images/cards/` respectent bien la convention de nommage
+- Que les noms sont en minuscules, sans accents, et avec tirets
+- Que le build Next.js inclut bien les fichiers du dossier `public`
+- Que le serveur local ou distant ne bloque pas l’accès aux images
+Human,tu as planté recommence
+Discussion sur le projet Apex Collector,2025-08-21T12:51:58,AI,"Bien sûr Etienne, voici un **résumé complet et technique** de tout ce que j’ai appris sur ton projet **Apex Collector** au fil de notre échange, prêt à être transmis à un autre chat, collaborateur ou document technique :
+
+
+
+### 📦 Structure des données
+
+Chaque carte représente une voiture avec les propriétés suivantes :
+
+```ts
+type CardProps = {
+  make: string
+  model: string
+  year: string
+  power_hp: string
+  torque_nm: string
+  max_speed_kmh: string
+  acceleration_0_100: string
+  weight_t: string
+  transmission?: 'FWD' | 'RWD' | 'AWD'
+  count?: number
+  size?: 'md' | 'lg'
+  showLevel?: boolean
+}
+```
+
+---
+
+### 🖼️ Gestion des images
+
+- Les images sont stockées dans `public/images/cards/`
+- Le nom de chaque image suit la convention :  
+  `marque-modele-année.jpg` → ex. `ferrari-f50-1995.jpg`
+- Le chemin est généré dynamiquement dans le composant `Card` :
+
+```ts
+const clean = (str: string) =>
+  str.normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, '-')
+    .toLowerCase()
+
+const imageName = `${clean(make)}-${clean(model)}-${year}.jpg`
+const imageSrc = `/images/cards/${imageName}`
+```
+
+- Le fallback vers une image par défaut (`default.jpg`) est géré ailleurs dans l’app (pas dans le composant `Card`)
+
+---
+
+### 📊 Calculs dynamiques
+
+- **Indice de performance (IP)** : calculé à partir de la puissance et du poids
+
+```ts
+const ip = parsedPower && parsedWeight
+  ? Math.floor((parsedPower / (parsedWeight * 1000)) * 1000)
+###############################################################################################################################################################################################################################################################
+```
+
+- Affiché via le composant `<IPBadge />`
+
+---
+
+### 🧩 Composants intégrés
+
+- `CardLevelBadge` : badge de niveau (rare, épique, etc.)
+- `IPBadge` : badge de performance
+- `Stat` : icône + valeur pour chaque caractéristique technique
+- `CardModalContext` : permet d’ouvrir une carte en modal via `setActiveCard`
+
+---
+
+### 🧪 Problème rencontré
+
+- Les images ne s’affichaient plus, seule l’image par défaut apparaissait
+- Cause identifiée : la logique initiale du composant `Card` ne générait pas dynamiquement le chemin de l’image à partir des props
+- Correction apportée : génération du nom de fichier avec nettoyage (`clean`) et suppression de la logique `customImage`
+
+---
+
+- Le composant `Card` a été corrigé pour générer dynamiquement le chemin de l’image
+- Le fallback est conservé ailleurs dans l’app
+- Le bug d’affichage persiste malgré la correction, ce qui suggère :
+  - soit un problème de nom de fichier dans `public/images/cards/`
+  - soit un souci de build ou de cache
+  - soit une erreur silencieuse côté Next.js
+
+
+
+
+Bien sûr Etienne — voici un résumé technique complet de la première partie de notre conversation, avant que l’on bascule sur le projet de cartes véhicules. Ce résumé est conçu pour une passation fluide à un autre développeur ou pour reprendre le fil dans une future session.
+
+---
+
+**Refonte et nettoyage du fichier `globals.css`**
+
+### 🎯 Objectif
+Corriger et stabiliser le fichier `globals.css` pour :
+- Neutraliser les overlays et styles injectés en développement.
+- Appliquer des animations et effets visuels spécifiques aux cartes.
+- Garantir une base Tailwind propre et extensible.
+
+---
+
+## 📄 Fichier concerné : `globals.css`
+
+### ✅ Nettoyages appliqués
+- Suppression des overlays fixes en dev :
+  ```css
+  body > div[style*="position:fixed"],
+  .dot_net {
+    display: none !important;
+  }
+
+  body > * {
+    pointer-events: auto !important;
+  }
+
+  [data-nextjs-dev-tool-style] {
+    all: unset !important;
+    display: none !important;
+  }
+  ```
+
+### ✅ Structure Tailwind
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+### ✅ Variables CSS
+```css
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 0, 0, 0;
+}
+```
+
+### ✅ Styles globaux
+```css
+html, body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb)) !important;
+  min-height: 100vh;
+}
+```
+
+---
+
+## ✨ Animations et effets visuels
+
+### 🔹 Animation foil brillante
+```css
+@keyframes foil { ... }
+.animate-foil {
+  background-size: 300% 300%;
+  animation: foil 4s infinite linear;
+  mix-blend-mode: overlay;
+  opacity: 0.3;
+  transition: opacity 0.3s ease-in-out;
+  transform: rotateZ(0.0001deg);
+}
+```
+
+### 🔹 Animation fade-in
+```css
+@keyframes fade-in { ... }
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+```
+
+### 🔹 Animation booster reveal
+```css
+@keyframes boosterReveal { ... }
+.booster-card {
+  animation: boosterReveal 0.6s ease-out forwards;
+  transform-origin: center;
+  perspective: 1000px;
+}
+```
+
+---
+
+## 🧩 Comportements spécifiques
+
+### 🔹 Placeholder visuel pour cartes sans image
+```css
+.card-placeholder {
+  background: repeating-linear-gradient(-45deg, #2a2a2a 0px, #2a2a2a 10px, #333 10px, #333 20px);
+  color: white;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+```
+
+### 🔹 Hover rareté
+```css
+.rarete-epic:hover {
+  box-shadow: 0 0 12px 4px rgba(118, 0, 226, 0.5);
+}
+.rarete-legend:hover {
+  box-shadow: 0 0 16px 6px rgba(255, 166, 0, 0.6);
+}
+```
+
+---
+
+## 🧪 Hook React complémentaire : `useDevCleanup.ts`
+
+### ✅ Objectif
+Supprimer dynamiquement les styles injectés et overlays en mode développement.
+
+### ✅ Fonctionnement
+- Supprime `[data-nextjs-dev-tool-style]`
+- Supprime `.dot_net`
+- Supprime tout `div` fixe non `#__next`
+- Observe le DOM en continu via `MutationObserver`
+
+### ✅ Usage
+À placer dans `CreateCard.tsx` :
+```tsx
+import { useDevCleanup } from '@/hooks/useDevCleanup'
+useDevCleanup()
+
+---
+
+## 🧱 1. Stabilisation du socle technique (priorité haute)
+
+✅ **Objectif** : garantir que l’interface est fonctionnelle, sans bugs bloquants.
+
+- [x] Corriger le débordement de l’image de fond (`<Image fill />`) → ✅ fait avec fallback `<img>` ou conteneur `relative`.
+- [x] Assurer que le header reste au-dessus (`z-[999]`) → ✅ intégré dans `CreateCard.tsx`.
+- [x] Vérifier que tous les composants interactifs (formulaires, boutons) sont accessibles et visibles.
+- [ ] Supprimer les warnings Next/Image restants (si tu réintroduis `fill`, bien vérifier le parent direct).
+- [ ] Ajouter un mode debug visuel (ex: `border-red-500` sur les zones interactives) pour tester l’empilement.
+
+---
+
+## 🎨 2. Amélioration UX/UI
+
+✅ **Objectif** : rendre l’interface plus intuitive et agréable à utiliser.
+
+- [ ] Ajouter des transitions fluides entre les étapes (ex: apparition du cropper, validation de la carte).
+- [ ] Ajouter un indicateur de rareté visuel (ex: halo animé, badge coloré).
+- [ ] Permettre le drag & drop d’image dans le panneau de création.
+- [ ] Ajouter un bouton “Réinitialiser la carte” avec confirmation.
+
+---
+
+## 🧠 3. Logique métier et données
+
+✅ **Objectif** : enrichir la logique de création et de calcul.
+
+- [ ] Calcul dynamique du niveau de carte selon le `count` (déjà partiellement géré via `getCardLevel`).
+- [ ] Calcul de l’IP (indice de performance) avec arrondi et validation.
+- [ ] Ajout d’un système de “points de rareté” selon les stats (ex: si HP > 500 → +1 rareté).
+- [ ] Validation des champs (ex: année entre 1950 et 2025, poids > 0).
+
+---
+
+## 💾 4. Sauvegarde et export
+
+✅ **Objectif** : permettre à l’utilisateur de conserver ou partager sa carte.
+
+- [ ] Ajouter un bouton “Exporter la carte” (image ou JSON).
+- [ ] Ajouter une fonction “Copier dans le presse-papier” (données ou visuel).
+- [ ] Intégrer une sauvegarde locale (localStorage ou IndexedDB).
+- [ ] Préparer une API POST pour enregistrer la carte côté serveur (si backend prévu).
+
+---
+
+## 🧪 5. Tests et fiabilité
+
+✅ **Objectif** : s’assurer que tout fonctionne dans tous les cas.
+
+- [ ] Tester sur mobile (responsive, cropper, interactions).
+- [ ] Tester avec des images très grandes ou très petites.
+- [ ] Vérifier que le cropper ne bloque pas le scroll ou les clics.
+- [ ] Ajouter des tests unitaires simples (ex: calcul IP, niveau).
+
+---
+
+## 🚀 6. Extensions futures (optionnel)
+
+✅ **Objectif** : ouvrir le projet à plus de fonctionnalités.
+
+- [ ] Ajouter un système de rareté aléatoire (booster pack).
+- [ ] Intégrer un mode “édition avancée” (couleurs, typographie).
+- [ ] Les profils pourront etres consultable par d'autres joueurs pour voir leur succes etc. La carte phare
+
+
+Créer une interface d’ouverture de booster dans ton application de cartes, avec les étapes suivantes :
+- Sélection d’un booster dans une grille
+- Animation d’ouverture du pack
+- Apparition des cartes en dos
+- Flip individuel ou “Tout retourner”
+- Ajout des cartes à la collection (cartes ou circuits)
+
+📦 Fichiers clés utilisés
+- useRandomBoosters.ts : hook qui génère les cartes via generateBooster(count)
+- BoosterPage.tsx : page principale avec la grille de boosters et la modale
+- BoosterOpeningAnimation.tsx : composant modale avec animation + grille de cartes
+- FlippableCard.tsx : composant pour flip individuel des cartes
+- addToCollection.ts : fonction qui ajoute les cartes ou circuits à la base Supabase
+- BoosterGrid.tsx + BoosterCard.tsx : affichage des boosters dans une grille stylée
+
+🎨 Comportement final obtenu
+- La page affiche une grille responsive de boosters avec sidebar
+- Au clic sur un booster :
+- Une modale plein écran s’ouvre
+- Le booster pack s’affiche et flippe automatiquement après 800 ms
+- Les 5 cartes apparaissent en ligne, centrées
+- Deux boutons en dessous : “Tout retourner” et “Ajouter à ma collection”
+- Les cartes peuvent être retournées individuellement ou toutes à la fois
+- L’ajout à la collection gère les cartes et les circuits via Supabase
+
+🛠️ Problèmes rencontrés et corrigés
+- Modale trop petite → corrigée avec layout fullscreen
+- Cartes mal affichées → corrigé en passant card.data à Card
+- Boutons mal positionnés → déplacés sous la grille
+- Erreur HMR CSS → patch dans next.config.js
+- Flip du booster sans affichage des cartes → corrigé avec loading et cards.length
+
+✅ État actuel
+Tout fonctionne :
+- Layout responsive
+- 
+- Animation fluide
+- Ajout à la collection
+- UX propre et intuitive
+Tu peux maintenant repartir sur un nouveau chat avec ce résumé, et je pourrai t’aider à continuer ou à intégrer d’autres fonctionnalités (sons, effets, transitions, etc.).
+Prêt pour la suite 💪
+
+
+
