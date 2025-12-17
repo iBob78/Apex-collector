@@ -1,0 +1,116 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
+import type { BoosterType } from './BoosterCard';
+import styles from './BoosterOpeningAnimation.module.css';
+import CardRenderer from './CardRenderer';
+import type { BoosterItem } from '@/lib/generateBooster';
+import { addToCollection } from '@/lib/addToCollection';
+import { supabase } from '@/lib/supabaseClient';
+
+interface Props {
+  booster: BoosterType;
+  isOpen: boolean;
+  cards: BoosterItem[];
+  onClose?: () => void;
+  onCardSelect?: (item: BoosterItem) => void;
+}
+
+export default function BoosterOpeningAnimation({
+  booster,
+  isOpen,
+  cards,
+  onClose,
+  onCardSelect,
+}: Props) {
+  const [flipped, setFlipped] = useState(false);
+  const [addedToCollection, setAddedToCollection] = useState(false);
+
+  // Flip booster + ajouter à la collection
+  useEffect(() => {
+    let flipTimer: ReturnType<typeof setTimeout>;
+    if (isOpen) {
+      flipTimer = setTimeout(() => {
+        setFlipped(true);
+
+        // Ajout automatique à la collection
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (user && cards.length > 0) {
+            addToCollection(user, cards).then(() => {
+              setAddedToCollection(true);
+            });
+          }
+        });
+      }, 1000);
+    } else {
+      setFlipped(false);
+      setAddedToCollection(false);
+    }
+    return () => clearTimeout(flipTimer);
+  }, [isOpen, cards]);
+
+  function handleBackdropClick() {
+    onClose?.();
+  }
+
+  function stopPropagation(e: React.MouseEvent) {
+    e.stopPropagation();
+  }
+
+  return (
+    <div
+      className={`${styles.container} ${isOpen ? styles.open : ''}`}
+      onClick={handleBackdropClick}
+    >
+      {/* Booster flip */}
+      <div className={styles.boosterWrapper} onClick={stopPropagation}>
+        <div className={`${styles.boosterFront} ${flipped ? styles.opened : ''}`}>
+          <Image
+            src={booster.imageUrl}
+            alt={booster.name}
+            fill
+            sizes="300px"
+            className={styles.boosterImage}
+            priority
+          />
+        </div>
+        <div className={`${styles.boosterBack} ${flipped ? styles.opened : ''}`}>
+          <div className={styles.cardBack}>
+            <span className={styles.glowEffect} />
+          </div>
+        </div>
+      </div>
+
+      {/* Cartes tirées */}
+      {flipped && cards.length > 0 && (
+        <div className={styles.cardsGrid} onClick={stopPropagation}>
+          {cards.map((item, idx) => (
+            <div
+              key={idx}
+              className={styles.cardWrapper}
+              onClick={() => onCardSelect?.(item)}
+            >
+              <CardRenderer item={item} count={1} flipped />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Bouton collection */}
+      {flipped && (
+        <div className={styles.collectionButton}>
+          {addedToCollection ? (
+            <button disabled className={styles.disabled}>
+              ✅ Déjà ajouté à la collection
+            </button>
+          ) : (
+            <button className={styles.active}>
+              Ajouter à ma collection
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

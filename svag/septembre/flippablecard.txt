@@ -1,0 +1,52 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Card from './Card';
+import styles from './FlippableCard.module.css';
+
+type FlippableCardProps = {
+  card: any;
+  index: number;
+  flipped?: boolean;
+};
+
+export default function FlippableCard({ card, index, flipped = false }: FlippableCardProps) {
+  const [isFlipped, setIsFlipped] = useState(flipped);
+
+  useEffect(() => {
+    setIsFlipped(flipped);
+  }, [flipped]);
+
+  // Exemple de calcul dynamique du décalage
+  const cardOffset = '20px'; // Tu peux adapter selon index, rareté, etc.
+
+  return (
+    <div className={styles.cardFlipContainer}>
+      <div
+        className={`${styles.cardFlip} ${isFlipped ? styles.flipped : ''}`}
+        onClick={() => setIsFlipped(true)}
+      >
+        {/* Face arrière */}
+        <div className={`${styles.cardFace} ${styles.cardBack}`}>
+          <div
+            className={styles.cardBackContent}
+            style={{ '--card-offset': cardOffset } as React.CSSProperties}
+          >
+            <img
+              src="/images/card-back.png"
+              alt="Dos de carte"
+              className={styles.cardImage}
+            />
+          </div>
+        </div>
+
+        {/* Face avant */}
+        <div className={`${styles.cardFace} ${styles.cardFront}`}>
+          <div className={styles.cardContent}>
+            <Card {...card} count={1} showLevel={false} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

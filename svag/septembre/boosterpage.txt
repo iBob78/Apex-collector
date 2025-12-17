@@ -1,0 +1,94 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { supabase } from '@/lib/supabaseClient';
+import { useRandomBoosters } from '@/lib/useRandomBoosters';
+import type { BoosterType } from '@/types/booster';
+import BoosterOpeningAnimation from '@/components/Boosters/BoosterOpeningAnimation';
+import styles from './page.module.css';
+
+export default function BoostersPage() {
+  const [boosters, setBoosters] = useState<BoosterType[]>([]);
+  const [loadingBoosters, setLoadingBoosters] = useState(true);
+
+  useEffect(() => {
+    async function loadBoosters() {
+      setLoadingBoosters(true);
+      const { data, error } = await supabase
+        .from<BoosterType>('boosters')
+        .select('*');
+      if (error) {
+        console.error('Supabase error:', error.message || error);
+      } else {
+        setBoosters(data ?? []);
+      }
+      setLoadingBoosters(false);
+    }
+    loadBoosters();
+  }, []);
+
+  const [selectedBooster, setSelectedBooster] = useState<BoosterType | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const { items, loading: loadingItems, fetchItems } = useRandomBoosters(
+    selectedBooster?.cardCount ?? 5
+  );
+
+  function handleOpen(booster: BoosterType) {
+    setSelectedBooster(booster);
+    setIsOpen(true);
+    fetchItems();
+  }
+
+  function handleClose() {
+    setIsOpen(false);
+    setSelectedBooster(null);
+  }
+
+  function handleCardClick(item: any) {
+    console.log('Carte sélectionnée :', item);
+    handleClose();
+  }
+
+  return (
+    <div className={styles.container}>
+      <h1 className={styles.title}>Choisis un booster</h1>
+
+      {loadingBoosters ? (
+        <p className={styles.loading}>Chargement des boosters…</p>
+      ) : (
+        <div className={styles.grid}>
+          {boosters.map((b) => (
+            <div
+              key={b.id}
+              className={styles.cardWrapper}
+              onClick={() => handleOpen(b)}
+              aria-disabled={loadingItems}
+            >
+              <Image
+                src={b.imageUrl}
+                alt={b.name}
+                width={140}
+                height={140}
+                className={styles.cardImage}
+                priority
+              />
+              <div className={styles.cardName}>{b.name}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {selectedBooster && (
+        <BoosterOpeningAnimation
+          booster={selectedBooster}
+          isOpen={isOpen}
+          cards={items}
+          onClose={handleClose}
+          onCardSelect={handleCardClick}
+        />
+      )}
+    </div>
+  );
+}

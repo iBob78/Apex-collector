@@ -1,0 +1,23 @@
+import { useEffect, useState } from 'react';
+import supabase from './supabase'; // adapte le chemin si ton client est ailleurs
+
+export function useCards(limit = 5) {
+  const [cards, setCards] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCards = async () => {
+      const { data, error } = await supabase.from('cards').select('*').limit(limit);
+      if (error) {
+        console.error('Erreur Supabase:', error);
+      } else {
+        setCards(data);
+      }
+      setLoading(false);
+    };
+
+    fetchCards();
+  }, [limit]);
+
+  return { cards, loading };
+}
