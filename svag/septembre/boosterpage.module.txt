@@ -1,0 +1,45 @@
+.container {
+  padding: 2rem;
+  max-width: 1024px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.loading {
+  font-style: italic;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}
+
+.cardWrapper {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cardWrapper:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.cardWrapper[aria-disabled='true'] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.cardImage {
+  border-radius: 8px;
+}
+
+.cardName {
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
