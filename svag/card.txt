@@ -1,0 +1,17 @@
+export interface Card {
+  id: string
+  name: string
+  category: 'car' | 'circuit'
+  rarity?: string
+  image_url?: string
+  make?: string
+  model?: string
+  year?: number
+  type?: string
+  stats?: {
+    speed?: number
+    handling?: number
+    endurance?: number
+    tech?: number
+  }
+}

@@ -1,0 +1,56 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Card from './Card';
+import styles from './FlippableCard.module.css';
+
+type FlippableCardProps = {
+  card: any;           // l’objet BoosterItem
+  index: number;
+  flippedAll: boolean; // pour le “Tout retourner”
+  onFlip?: () => void; // callback quand on flip manuellement
+};
+
+export default function FlippableCard({
+  card,
+  index,
+  flippedAll,
+  onFlip,
+}: FlippableCardProps) {
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  // si on appuie sur “Tout retourner”, on flip tout
+  useEffect(() => {
+    if (flippedAll) {
+      setIsFlipped(true);
+    }
+  }, [flippedAll]);
+
+  // on gère le flip individuel au clic
+  function handleClick() {
+    if (!isFlipped) {
+      setIsFlipped(true);
+      onFlip?.();
+    }
+  }
+
+  return (
+    <div className={styles.cardFlipContainer} onClick={handleClick}>
+      <div className={`${styles.cardFlip} ${isFlipped ? styles.flipped : ''}`}>
+        {/* Dos de la carte */}
+        <div className={`${styles.cardFace} ${styles.cardBack}`}>
+          <img
+            src="/images/card-back.png"
+            alt="Dos de carte"
+            className={styles.cardImage}
+          />
+        </div>
+
+        {/* Recto : on affiche le contenu via ton composant Card */}
+        <div className={`${styles.cardFace} ${styles.cardFront}`}>
+          <Card {...card} count={1} showLevel={false} />
+        </div>
+      </div>
+    </div>
+  );
+}

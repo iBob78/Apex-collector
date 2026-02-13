@@ -1,0 +1,30 @@
+// src/lib/generateBooster.ts
+
+import { supabase } from './supabaseClient'
+import type { Card } from '../types/card'
+import type { Circuit } from '../types/circuit'
+
+export type BoosterItem =
+  | { type: 'vehicle'; data: Card }
+  | { type: 'circuit'; data: Circuit }
+
+export async function generateBooster(count = 5): Promise<BoosterItem[]> {
+  // 1) Récupération simultanée (sans génériques)
+  const [cardsRes, circuitsRes] = await Promise.all([
+    supabase.from('cards').select('*'),
+    supabase.from('circuits').select('*'),
+  ])
+
+  // 2) Cast manuel vers nos types
+  const cards = (cardsRes.data ?? []) as Card[]
+  const circuits = (circuitsRes.data ?? []) as Circuit[]
+
+  // 3) Pool mixte
+  const pool: BoosterItem[] = [
+    ...cards.map((c) => ({ type: 'vehicle' as const, data: c })),
+    ...circuits.map((c) => ({ type: 'circuit' as const, data: c })),
+  ]
+
+  // 4) Shuffle + slice
+  return pool.sort(() => Math.random() - 0.5).slice(0, count)
+}

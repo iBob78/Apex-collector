@@ -1,0 +1,143 @@
+// src/components/Boosters/BoosterOpeningAnimation.tsx
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
+import FlippableCard from '../FlippableCard';
+import styles from './BoosterOpeningAnimation.module.css';
+import type { BoosterType } from './BoosterCard';
+import type { BoosterItem } from '@/lib/generateBooster';
+import { addToCollection } from '@/lib/addToCollection';
+import { supabase } from '@/lib/supabaseClient';
+
+interface Props {
+  booster: BoosterType;
+  isOpen: boolean;
+  loading: boolean;
+  cards: BoosterItem[];
+  onClose: () => void;
+  onCardSelect: (item: BoosterItem) => void;
+}
+
+export default function BoosterOpeningAnimation({
+  booster,
+  isOpen,
+  loading,
+  cards,
+  onClose,
+  onCardSelect,
+}: Props) {
+  const [flippedPack, setFlippedPack] = useState(false);
+  const [flipAll, setFlipAll] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [added, setAdded] = useState(false);
+
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>;
+    if (isOpen) {
+      setFlippedPack(false);
+      setFlipAll(false);
+      setAdded(false);
+      t = setTimeout(() => setFlippedPack(true), 800);
+    } else {
+      clearTimeout(t);
+      setFlippedPack(false);
+      setFlipAll(false);
+      setAdded(false);
+    }
+    return () => clearTimeout(t);
+  }, [isOpen, booster.id]);
+
+  const handleAdd = async () => {
+    setAdding(true);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      await addToCollection(user, cards);
+      setAdded(true);
+    }
+    setAdding(false);
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className={`${styles.container} ${styles.open}`} onClick={onClose}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <button className={styles.closeButton} onClick={onClose}>
+          ✕
+        </button>
+
+        <div className={styles.boosterWrapper}>
+          <div
+            className={`${styles.boosterFront} ${
+              flippedPack ? styles.opened : ''
+            }`}
+          >
+            <Image
+              src={booster.imageUrl}
+              alt={booster.name}
+              fill
+              sizes="300px"
+              className={styles.boosterImage}
+              priority
+            />
+          </div>
+          <div
+            className={`${styles.boosterBack} ${
+              flippedPack ? styles.opened : ''
+            }`}
+          >
+            <div className={styles.cardBack}>
+              <span className={styles.glowEffect} />
+            </div>
+          </div>
+        </div>
+
+        {flippedPack && (
+          <div className={styles.gridWrapper}>
+            {loading ? (
+              <p className={styles.loading}>Chargement des cartes…</p>
+            ) : (
+              <>
+                <div className={styles.cardsGrid}>
+                  {cards.map((item, idx) => (
+                    <div key={idx} className={styles.cardWrapper}>
+                      <FlippableCard
+                        card={item}
+                        index={idx}
+                        flippedAll={flipAll}
+                        onFlip={() => onCardSelect(item)}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <div className={styles.actionBar}>
+                  <button
+                    className={styles.discreetButton}
+                    onClick={() => setFlipAll(true)}
+                  >
+                    Tout retourner
+                  </button>
+                  <button
+                    className={styles.discreetButton}
+                    onClick={handleAdd}
+                    disabled={adding || added}
+                  >
+                    {adding
+                      ? 'Ajout…'
+                      : added
+                      ? '✅ Ajouté'
+                      : 'Ajouter à ma collection'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

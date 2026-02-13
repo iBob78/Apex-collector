@@ -1,0 +1,21 @@
+// src/lib/useRandomBoosters.ts
+import { useState } from 'react'
+import { generateBooster, type BoosterItem } from './generateBooster'
+
+export function useRandomBoosters(count = 5) {
+  const [items, setItems]   = useState<BoosterItem[]>([])
+  const [loading, setLoading] = useState(false)
+
+  async function fetchItems() {
+    setLoading(true)
+    try {
+      const boosterItems = await generateBooster(count)
+      console.log('⚡️ generateBooster →', boosterItems)
+      setItems(boosterItems)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { items, loading, fetchItems }
+}
