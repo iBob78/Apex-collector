@@ -1,0 +1,24 @@
+// src/lib/cardPools.ts
+export interface BoosterType {
+  id: string
+  name: string
+  imageUrl: string
+}
+
+export const boosterList: BoosterType[] = [
+  {
+    id: 'classique',
+    name: 'Classique',
+    imageUrl: '/images/boosters/booster-classique.jpg',
+  },
+  {
+    id: 'epique',
+    name: 'Épique',
+    imageUrl: '/images/boosters/booster-epique.jpg',
+  },
+  {
+    id: 'legendaire',
+    name: 'Légendaire',
+    imageUrl: '/images/boosters/booster-legendaire.jpg',
+  },
+]

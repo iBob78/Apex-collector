@@ -1,0 +1,266 @@
+'use client';
+
+import Image from 'next/image';
+import clsx from 'clsx';
+import IPBadge from './IPBadge';
+import CardLevelBadge from './CardLevelBadge';
+import { Rajdhani } from 'next/font/google';
+import { useImagePath } from '@/lib/useImagePath';
+import { getCardLevel } from '@/lib/level';
+import { useActiveCard } from '@/context/CardModalContext';
+
+const rajdhani = Rajdhani({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+});
+
+type CardProps = {
+  category?: 'vehicle' | 'circuit';
+  count?: number;
+  size?: 'md' | 'lg';
+  showLevel?: boolean;
+  customImage?: string;
+  onClick?: () => void;
+
+  // Véhicule
+  make?: string;
+  model?: string;
+  year?: string;
+  power_hp?: string;
+  torque_nm?: string;
+  max_speed_kmh?: string;
+  acceleration_0_100?: string;
+  weight_t?: string;
+  transmission?: 'FWD' | 'RWD' | 'AWD';
+
+  // Circuit
+  name?: string;
+  country?: string;
+  country_code?: string;
+  length_km?: number;
+  turns?: number;
+  straight_km?: number;
+  type?: 'Route' | 'Urbain' | 'Oval';
+
+  // Commun
+  rarity?: 'Common' | 'Rare' | 'Epic' | 'Legendary';
+  image_url?: string;
+};
+
+const getBorderClass = (level: number) =>
+  level === 5
+    ? 'border-yellow-400 shadow-[0_0_8px_2px_rgba(255,215,0,0.5)]'
+    : level === 4
+    ? 'border-purple-500 shadow-[0_0_6px_1px_rgba(192,128,255,0.4)]'
+    : level === 3
+    ? 'border-blue-400 shadow-[0_0_6px_1px_rgba(64,192,255,0.3)]'
+    : level === 2
+    ? 'border-green-400 shadow-[0_0_6px_1px_rgba(64,255,192,0.3)]'
+    : level === 1
+    ? 'border-gray-400'
+    : 'border-gray-600';
+
+// ISO ou emoji → emoji drapeau
+function countryCodeToFlagEmoji(input?: string) {
+  if (!input) return '🏁';
+  const clean = input.trim();
+
+  // déjà un emoji drapeau
+  const first = clean.codePointAt(0);
+  if (
+    clean.length <= 4 &&
+    first !== undefined &&
+    first >= 0x1F1E6 && first <= 0x1F1FF
+  ) {
+    return clean;
+  }
+
+  const upper = clean.toUpperCase();
+  if (upper.length === 2 && /^[A-Z]{2}$/.test(upper)) {
+    return upper.replace(/./g, ch =>
+      String.fromCodePoint(127397 + ch.charCodeAt(0))
+    );
+  }
+  return '🏁';
+}
+
+export default function Card(props: CardProps) {
+  const {
+    category,
+    make,
+    model,
+    year,
+    power_hp,
+    torque_nm,
+    max_speed_kmh,
+    acceleration_0_100,
+    weight_t,
+    transmission,
+    name,
+    country,
+    country_code,
+    length_km,
+    turns,
+    straight_km,
+    type,
+    image_url,
+    count = 1,
+    size = 'md',
+    showLevel = true,
+    customImage,
+    onClick,
+  } = props;
+
+  const resolvedCategory: 'vehicle' | 'circuit' =
+    category ?? ((make || model) ? 'vehicle' : 'circuit');
+
+  const { setActiveCard } = useActiveCard();
+  const level = getCardLevel(count);
+  const borderClass = getBorderClass(level);
+  const widthClass = size === 'lg'
+    ? 'w-[480px] sm:w-[360px] max-w-full'
+    : 'w-[176px]';
+
+  const safe = (value: any, suffix = '') =>
+    value !== null && value !== undefined && value !== '' && value !== 'null' && value !== 'undefined'
+      ? `${value}${suffix}`
+      : '—';
+
+  const parsedPower = Number.parseInt(power_hp || '');
+  const parsedWeight = Number.parseFloat(weight_t || '');
+  const ip =
+    Number.isFinite(parsedPower) && Number.isFinite(parsedWeight) && parsedWeight > 0
+      ? Math.floor((parsedPower / (parsedWeight * 1000)) * 1000)
+      : 0;
+
+  const normalize = (str: string | null | undefined) =>
+    str ? str.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '') : 'unknown';
+
+  const vehicleImagePath = `/images/cards/${normalize(make)}-${normalize(model)}-${year || 'unknown'}.jpg`;
+  const baseImage =
+    resolvedCategory === 'vehicle'
+      ? vehicleImagePath
+      : image_url || '/images/cards/default.jpg';
+
+  const fallbackImage = '/images/cards/default.jpg';
+  const cardImage = useImagePath(baseImage, fallbackImage) || fallbackImage;
+
+  const logoPeriod = year && Number.parseInt(year) >= 2021 ? '2021' : '2010';
+  const logoPath = `/images/logos/${normalize(make)}-${logoPeriod}.png`;
+  const fallbackLogo = `/images/logos/${normalize(make)}.png`;
+  const logoImage =
+    resolvedCategory === 'vehicle'
+      ? (useImagePath(logoPath, fallbackLogo) || fallbackLogo)
+      : '';
+
+  const transmissionIcons = {
+    FWD: '/icons/transmission/fwd.svg',
+    RWD: '/icons/transmission/rwd.svg',
+    AWD: '/icons/transmission/awd.svg',
+  };
+
+  const countryFlags: Record<string, string> = {
+    Ferrari: '🇮🇹',
+    Ford: '🇺🇸',
+    Audi: '🇩🇪',
+    BMW: '🇩🇪',
+  };
+
+  // Debug pour vérifier la conversion
+  console.log('Flag debug →', country_code, country, countryCodeToFlagEmoji(country_code || country));
+
+  return (
+    <div className="flex flex-col items-center">
+      <div
+        onClick={() => {
+          onClick?.();
+          setActiveCard({ ...props, image_url: customImage || cardImage, category: resolvedCategory });
+        }}
+        className={clsx(
+          rajdhani.className,
+          widthClass,
+          'relative overflow-hidden rounded-[6px] shadow-lg',
+          'aspect-[63/88] text-white',
+          'border-[3px] cursor-pointer hover:scale-[1.02] transition',
+          borderClass
+        )}
+      >
+        <Image
+          src={customImage || cardImage}
+          alt=""
+          fill
+          className="object-cover object-center"
+        />
+
+        {resolvedCategory === 'vehicle' && ip > 0 && <IPBadge value={ip} />}
+
+        {resolvedCategory === 'vehicle' && make && (
+          <div className="absolute top-1 right-1 z-10">
+            <Image src={logoImage} alt={`logo ${make}`} width={20} height={20} />
+          </div>
+        )}
+
+        {resolvedCategory === 'circuit' && (
+          <div className="absolute top-1 right-1 z-10 text-2xl">
+            {countryCodeToFlagEmoji(country_code || country)}
+          </div>
+        )}
+
+        <div className="absolute bottom-0 inset-x-0 bg-black/70 px-3 py-2 text-center rounded-b-[6px] z-10 w-full">
+          {resolvedCategory === 'vehicle' ? (
+            <>
+              <p className="text-[13px] font-bold uppercase text-white leading-tight">
+                {make} {countryFlags[make || ''] || ''}
+              </p>
+              <p className="text-[11px] text-gray-400 lowercase leading-tight font-normal">
+                {model} · {year}
+              </p>
+              <div className="mt-1 grid grid-cols-2 gap-x-2 gap-y-1 text-[12px] text-gray-200 justify-items-center w-full">
+                <Stat icon="/icons/power.svg" label={safe(power_hp, ' HP')} />
+                <Stat icon="/icons/torque.svg" label={safe(torque_nm, ' Nm')} />
+                <Stat icon="/icons/speed.svg" label={safe(max_speed_kmh, ' km/h')} />
+                <Stat icon="/icons/acceleration.svg" label={safe(acceleration_0_100, ' s')} />
+                <Stat icon="/icons/weight.svg" label={safe(Number.isFinite(parsedWeight) ? parsedWeight : '', ' kg')} />
+                {transmission && transmissionIcons[transmission] && (
+                  <Stat icon={transmissionIcons[transmission]} label={transmission} />
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-[13px] font-bold uppercase text-white leading-tight">
+                {name || '—'}
+              </p>
+              <p className="text-[11px] text-gray-400 lowercase leading-tight font-normal">
+                {country || '—'} · {year || '—'}
+              </p>
+              <div className="mt-1 grid grid-cols-2 gap-x-2 gap-y-1 text-[12px] text-gray-200 justify-items-center w-full">
+                <Stat icon="/icons/speed.svg" label={safe(length_km, ' km')} />
+                <Stat icon="/icons/steering.svg" label={safe(turns)} />
+                <Stat icon="/icons/speed.svg" label={safe(straight_km, ' km')} />
+                <Stat icon="/icons/type.svg" label={safe(type)} />
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Niveau visible uniquement pour véhicules */}
+      {showLevel && resolvedCategory === 'vehicle' && (
+        <div className="mt-2">
+          <CardLevelBadge level={level} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Stat({ icon, label }: { icon: string; label: string }) {
+  return (
+    <div className="flex items-center gap-1">
+      <Image src={icon} alt="" width={12} height={12} />
+      <span className="leading-none">{label}</span>
+    </div>
+  );
+}
+
