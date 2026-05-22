@@ -1,0 +1,38 @@
+.boosterCard {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s;
+  background: white;
+  max-width: 300px;
+  cursor: pointer;
+}
+
+.boosterCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  height: 300px;
+}
+
+.boosterImage {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.boosterInfo {
+  padding: 1rem;
+}
+
+.price {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #2c5282;
+  margin-top: 0.5rem;
+}

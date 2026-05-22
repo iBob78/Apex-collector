@@ -1,0 +1,8 @@
+id,user_id,opened_at,booster_type,cards,name,imageUrl,price,description
+357fe569-56f2-499d-9d78-57a544a00d51,,2025-08-13 09:49:52.851462+00,,,Booster Classique,/images/boosters/booster-classique.jpg,5,Un pack de 5 cartes aléatoires
+385cb4d0-f7b6-40eb-b40a-34d2ec36f28e,,2025-08-13 08:37:44.674458+00,,,Booster Classique,/images/boosters/booster-classique.jpg,5,Un pack de 5 cartes aléatoires
+5820f989-f61b-42d3-b55a-10e15800cd88,,2025-08-13 08:37:44.674458+00,,,Booster Épique,/images/boosters/booster-epique.jpg,10,Contient des cartes rares et épiques
+72751b10-696a-43ea-9db9-c4d0efeea5d7,,2025-08-13 09:49:52.851462+00,,,Booster Légendaire,/images/boosters/booster-legendaire.jpg,20,Seulement des cartes légendaires 🔥
+ba33584e-da96-44a5-99b9-2db9048c2240,,2025-08-27 08:30:47.983988+00,,,Booster carbon,/images/boosters/booster-legendaire.jpg,35,booster carbon
+ea377ef2-c8a1-420d-95f2-ba9dac81fedf,,2025-08-13 08:37:44.674458+00,,,Booster Légendaire,/images/boosters/booster-legendaire.jpg,20,Seulement des cartes légendaires 🔥
+f1be9220-4364-4315-ad55-f858057cebd0,,2025-08-13 09:49:52.851462+00,,,Booster Épique,/images/boosters/booster-epique.jpg,10,Contient des cartes rares et épiques

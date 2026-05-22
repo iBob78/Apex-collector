@@ -1,0 +1,48 @@
+@keyframes reveal {
+  0% {
+    transform: scale(0.1) rotate(-10deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+.animate-reveal {
+  animation: reveal 0.5s ease-out forwards;
+}
+
+.shadow-rainbow {
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+  background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+  background-size: 400%;
+  animation: rainbow 20s linear infinite;
+}
+
+.shadow-carbon {
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+  background: repeating-linear-gradient(
+    45deg,
+    #1a1a1a,
+    #1a1a1a 10px,
+    #2c2c2c 10px,
+    #2c2c2c 20px
+  );
+}
+
+.shadow-kevlar {
+  box-shadow: 0 0 15px rgba(255, 207, 0, 0.3);
+  background: linear-gradient(45deg, #ffd700, #b8860b);
+}
+
+.shadow-titanium {
+  box-shadow: 0 0 15px rgba(192, 192, 192, 0.5);
+  background: linear-gradient(135deg, #c0c0c0, #808080);
+}
+
+@keyframes rainbow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
