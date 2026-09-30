@@ -82,6 +82,14 @@ export interface CardImageParams {
 }
 
 /**
+ * Construit la clé Storage d'une image de véhicule : cards/vehicle/{make}-{model}-{year}.jpg
+ */
+export function buildVehicleKey(params: Pick<CardImageParams, 'make' | 'model' | 'year'>): string {
+    const { make, model, year } = params;
+    return `${IMAGE_PATHS.VEHICLE_CARD}/${normalize(make)}-${normalize(model)}-${year || 'unknown'}.jpg`;
+}
+
+/**
  * Résout l'image d'une carte avec stratégie de fallback.
  */
 export function resolveCardImage(params: CardImageParams): string | undefined {
@@ -101,11 +109,7 @@ export function resolveCardImage(params: CardImageParams): string | undefined {
         return getPublicImage(key);
     } else {
         // Défaut: véhicule
-        const normalizedMake = normalize(make);
-        const normalizedModel = normalize(model);
-        const normalizedYear = year || 'unknown';
-        const key = `${IMAGE_PATHS.VEHICLE_CARD}/${normalizedMake}-${normalizedModel}-${normalizedYear}.jpg`;
-        return getPublicImage(key);
+        return getPublicImage(buildVehicleKey({ make, model, year }));
     }
 }
 

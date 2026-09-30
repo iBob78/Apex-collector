@@ -11,6 +11,7 @@ export type { TransmissionType } from './paths';
 export {
     getPublicImage,
     normalize,
+    buildVehicleKey,
     resolveCardImage,
     resolveBrandLogo,
     resolveCountryFlag,

@@ -118,7 +118,7 @@ export default function Sidebar() {
           className="mt-auto p-6 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl border border-blue-500/30 text-center transition-all shadow-xl shadow-blue-500/20 group"
         >
           <div className="text-xs font-black uppercase tracking-[0.2em]">Se Connecter</div>
-          <div className="text-[9px] font-medium opacity-70 mt-1">Rejoignez l'élite Apex</div>
+          <div className="text-[9px] font-medium opacity-70 mt-1">Rejoignez l&apos;élite Apex</div>
         </Link>
       )}
     </aside>

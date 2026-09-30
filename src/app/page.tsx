@@ -136,7 +136,7 @@ export default function LandingPage() {
               </span>
               <br />
               <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                l'Élite Automobile
+                l&apos;Élite Automobile
               </span>
             </motion.h2>
 
@@ -197,7 +197,7 @@ export default function LandingPage() {
             >
               <h3 className="text-5xl font-black uppercase italic tracking-tighter mb-4">
                 <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                  Trois Piliers d'Excellence
+                  Trois Piliers d&apos;Excellence
                 </span>
               </h3>
               <p className="text-gray-500 text-lg max-w-2xl mx-auto">
@@ -278,7 +278,7 @@ export default function LandingPage() {
               <div className="relative z-10">
                 <h3 className="text-5xl font-black uppercase italic tracking-tighter mb-6">
                   <span className="bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                    Rejoignez l'Élite
+                    Rejoignez l&apos;Élite
                   </span>
                 </h3>
                 <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
