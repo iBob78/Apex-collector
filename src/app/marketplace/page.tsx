@@ -163,7 +163,7 @@ export default function MarketplacePage() {
 
                   <div className="bg-white/5 rounded-2xl p-4 flex items-center justify-between group-hover:bg-blue-500/10 transition-colors">
                     <div>
-                      <div className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">Prix d'achat</div>
+                      <div className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">Prix d&apos;achat</div>
                       <div className="text-lg font-black italic tracking-tighter">▲ {item.price} <span className="text-[10px] not-italic text-gray-400">AP</span></div>
                     </div>
                     <button

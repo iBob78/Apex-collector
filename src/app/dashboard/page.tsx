@@ -123,8 +123,8 @@ export default function DashboardPage() {
           <div className="bg-gradient-to-r from-blue-900/20 to-transparent border-l-4 border-blue-500 p-6 rounded-r-xl">
             <h3 className="font-bold mb-2">Conseil du jour</h3>
             <p className="text-sm text-gray-400 leading-relaxed">
-              Les cartes de rareté <span className="text-yellow-400">Legend</span> ont un taux d'apparition de 20% dans le Pack Légendaire.
-              N'oubliez pas d'échanger vos doublons au marché pour optimiser votre progression.
+              Les cartes de rareté <span className="text-yellow-400">Legend</span> ont un taux d&apos;apparition de 20% dans le Pack Légendaire.
+              N&apos;oubliez pas d&apos;échanger vos doublons au marché pour optimiser votre progression.
             </p>
           </div>
         </div>

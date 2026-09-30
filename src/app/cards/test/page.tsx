@@ -1,6 +1,9 @@
 import Card from '@/components/Card';
+import type { VehicleCard } from '@/types/game';
 
-const carteTest = {
+const carteTest: VehicleCard = {
+  id: 'test-ford-mustang-gt',
+  rarity: 'Common',
   name: 'Ford Mustang GT',
   make: 'Ford',
   model: 'mustang gt',

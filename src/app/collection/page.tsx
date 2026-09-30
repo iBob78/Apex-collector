@@ -164,7 +164,7 @@ export default function CollectionPage() {
                   Mon Garage
                 </h1>
                 <p className="text-gray-500 font-mono text-sm mt-1">
-                  Collection complète des véhicules et circuits d'exception.
+                  Collection complète des véhicules et circuits d&apos;exception.
                 </p>
               </div>
 
