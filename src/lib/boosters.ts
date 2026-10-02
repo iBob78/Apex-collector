@@ -5,6 +5,7 @@ export interface PackConfig {
     name: string;
     price: number;
     cardCount: number;
+    circuitDropRate: number;
     description: string;
     color: string;
     imageUrl: string;
@@ -18,6 +19,7 @@ export const PACKS: Record<string, PackConfig> = {
         description: 'Le point d\'entrée idéal. Contient principalement des cartes Standard.',
         price: 250,
         cardCount: 6,
+        circuitDropRate: 0.1,
         color: 'from-blue-600 to-blue-800',
         imageUrl: 'boosters/common.jpg',
         probabilities: {
@@ -35,6 +37,7 @@ export const PACKS: Record<string, PackConfig> = {
         description: 'Pour les collectionneurs sérieux. Taux de cartes Épiques doublé.',
         price: 750,
         cardCount: 6,
+        circuitDropRate: 0.1,
         color: 'from-purple-600 to-purple-900',
         imageUrl: 'boosters/rare.jpg',
         probabilities: {
@@ -52,6 +55,7 @@ export const PACKS: Record<string, PackConfig> = {
         description: 'Le luxe absolu. Garanti au moins une carte Rare ou supérieure.',
         price: 2500,
         cardCount: 6,
+        circuitDropRate: 0.1,
         color: 'from-yellow-400 to-orange-600',
         imageUrl: 'boosters/legend.jpg',
         probabilities: {
@@ -69,6 +73,7 @@ export const PACKS: Record<string, PackConfig> = {
         description: 'L\'élite ultime. Seul pack contenant des cartes ICON.',
         price: 5000,
         cardCount: 8,
+        circuitDropRate: 0.1,
         color: 'from-gray-700 to-black',
         imageUrl: 'boosters/carbon.jpg',
         probabilities: {

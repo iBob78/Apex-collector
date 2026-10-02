@@ -14,7 +14,7 @@ import {
   LockIcon
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@/lib/supabaseBrowser';
 import { useState, useEffect } from 'react';
 
 const navItems = [
@@ -29,12 +29,36 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const supabase = createClient();
   const [user, setUser] = useState<any>(null);
+  const [authLoaded, setAuthLoaded] = useState(false);
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((_event, session) => {
+    let mounted = true;
+    let authEventReceived = false;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      authEventReceived = true;
+      if (!mounted) return;
       setUser(session?.user ?? null);
+      setAuthLoaded(true);
     });
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (mounted && !authEventReceived) {
+        setUser(user);
+        setAuthLoaded(true);
+      }
+    }).catch(() => {
+      if (mounted && !authEventReceived) {
+        setUser(null);
+        setAuthLoaded(true);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
@@ -54,7 +78,7 @@ export default function Sidebar() {
       <nav className="flex flex-col gap-2 flex-1">
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href;
-          const isLocked = !user && href !== '/login';
+          const isLocked = authLoaded && !user && href !== '/login';
 
           return (
             <Link
@@ -91,7 +115,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Pilot Stats Mini Card */}
-      {user ? (
+      {!authLoaded ? null : user ? (
         <div className="mt-auto p-4 bg-gradient-to-br from-[#111] to-black rounded-2xl border border-white/5 relative overflow-hidden group">
           <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="flex items-center gap-3 relative z-10">

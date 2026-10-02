@@ -23,7 +23,7 @@ export default function CollectionPage() {
   const [activeTab, setActiveTab] = useState<'all' | 'vehicle' | 'circuit'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [rarityFilter, setRarityFilter] = useState<Rarity | 'All'>('All');
-  const [sortBy, setSortBy] = useState<'name' | 'rarity' | 'newest'>('name');
+  const [sortBy, setSortBy] = useState<'name' | 'make-asc' | 'make-desc' | 'ip-desc' | 'ip-asc' | 'rarity' | 'newest'>('name');
 
   // Authentification
   useEffect(() => {
@@ -130,6 +130,22 @@ export default function CollectionPage() {
       if (sortBy === 'newest') {
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }
+      if (sortBy === 'make-asc' || sortBy === 'make-desc') {
+        const makeA = a.make || a.manufacturer || a.name || '';
+        const makeB = b.make || b.manufacturer || b.name || '';
+        const direction = sortBy === 'make-asc' ? 1 : -1;
+        return direction * makeA.localeCompare(makeB, undefined, { sensitivity: 'base' });
+      }
+      if (sortBy === 'ip-desc' || sortBy === 'ip-asc') {
+        const getIp = (card: any) => {
+          const power = Number(card.power_hp) || 0;
+          const rawWeight = Number(card.weight_t) || 0;
+          const weightKg = rawWeight > 50 ? rawWeight : rawWeight * 1000;
+          return power > 0 && weightKg > 0 ? Math.floor((power / weightKg) * 1000) : 0;
+        };
+        const direction = sortBy === 'ip-desc' ? -1 : 1;
+        return direction * (getIp(a) - getIp(b));
+      }
       // Par défaut: Nom (Make + Model)
       const nameA = `${a.make || ''} ${a.model || a.name || ''}`;
       const nameB = `${b.make || ''} ${b.model || b.name || ''}`;
@@ -154,7 +170,7 @@ export default function CollectionPage() {
     <div className="flex min-h-screen bg-[#050505] text-white">
       <Sidebar />
 
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 min-w-0 flex flex-col">
         <div className="p-4 md:p-8 flex-1">
           {/* Header & Stats */}
           <header className="mb-8">
@@ -205,7 +221,7 @@ export default function CollectionPage() {
               <select
                 value={rarityFilter}
                 onChange={(e) => setRarityFilter(e.target.value as any)}
-                className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none"
+                className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none [&>option]:bg-[#171717] [&>option]:text-white"
               >
                 <option value="All">Toutes les raretés</option>
                 <option value="Common">Commun</option>
@@ -220,9 +236,13 @@ export default function CollectionPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none"
+                className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none [&>option]:bg-[#171717] [&>option]:text-white"
               >
                 <option value="name">Trier par Nom</option>
+                <option value="make-asc">Marques, A à Z</option>
+                <option value="make-desc">Marques, Z à A</option>
+                <option value="ip-desc">IP, décroissant</option>
+                <option value="ip-asc">IP, croissant</option>
                 <option value="rarity">Trier par Rareté</option>
                 <option value="newest">Plus récent</option>
               </select>
@@ -240,7 +260,7 @@ export default function CollectionPage() {
               {filteredCards.length > 0 ? (
                 <motion.div
                   layout
-                  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6"
+                  className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,15rem),1fr))] gap-6"
                 >
                   {filteredCards.map((card, index) => {
                     const cid = String((card as any).card_id || card.id).toLowerCase().trim();

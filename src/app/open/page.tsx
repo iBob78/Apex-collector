@@ -103,7 +103,7 @@ function OpenContent() {
   if (loading) return null;
 
   return (
-    <div className="min-h-screen bg-[#050505] overflow-hidden flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-[#050505] overflow-x-hidden flex flex-col items-center justify-center p-4 relative">
 
       {/* Background Ambience */}
       <div className={`absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-60 z-0`}></div>
@@ -175,7 +175,7 @@ function OpenContent() {
             key="reveal"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="w-full max-w-6xl z-10 flex flex-col items-center"
+            className="w-full max-w-[1400px] z-10 flex flex-col items-center"
           >
             <header className="mb-12 text-center">
               <motion.h2
@@ -188,17 +188,20 @@ function OpenContent() {
               <p className="text-gray-500 mt-2">Voice les cartes ajoutées à votre collection.</p>
             </header>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-16">
-              {drawnCards.map((card, idx) => (
-                <motion.div
-                  key={`${card.id}-${idx}`}
-                  initial={{ rotateY: 90, opacity: 0, scale: 0.5 }}
-                  animate={{ rotateY: 0, opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2 + (idx * 0.15), type: 'spring', damping: 15 }}
-                >
-                  <Card {...card} owned={true} rarity={card.rarity} count={1} showLevel={false} />
-                </motion.div>
-              ))}
+            <div className="mb-16 w-full max-w-[1400px]">
+              <div className="grid w-full grid-flow-col auto-cols-fr gap-2 px-1">
+                {drawnCards.map((card, idx) => (
+                  <motion.div
+                    key={`${card.id}-${idx}`}
+                    initial={{ rotateY: 90, opacity: 0, scale: 0.5 }}
+                    animate={{ rotateY: 0, opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 + (idx * 0.15), type: 'spring', damping: 15 }}
+                    className="min-w-0"
+                  >
+                    <Card {...card} owned={true} rarity={card.rarity} count={1} showLevel={false} compact />
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
             <motion.button

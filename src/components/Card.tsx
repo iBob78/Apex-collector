@@ -14,6 +14,7 @@ type CardProps = AnyCard & {
   owned?: boolean;
   count?: number;
   showLevel?: boolean;
+  compact?: boolean;
 };
 
 export default function Card(props: CardProps) {
@@ -26,6 +27,7 @@ export default function Card(props: CardProps) {
     owned = true,
     count = 1,
     showLevel = true,
+    compact = false,
   } = props;
 
   // ID ROBUSTE : card_id d'abord (CSV), puis id
@@ -71,11 +73,11 @@ export default function Card(props: CardProps) {
   });
 
   return (
-    <div className="flex flex-col gap-2 group/card">
+    <div className="flex w-full min-w-0 flex-col gap-2 group/card">
       <div
         className={clsx(
-          "relative flex-shrink-0 cursor-pointer transition-all duration-300",
-          "w-[240px] aspect-[2/3] rounded-xl overflow-hidden bg-[#0a0a0a]",
+          "relative w-full min-w-0 cursor-pointer transition-all duration-300",
+          "aspect-[2/3] rounded-xl overflow-hidden bg-[#0a0a0a]",
           "border-[3px]",
           getRarityBorderClass(rarity),
           !owned && "grayscale opacity-60 hover:grayscale-0 hover:opacity-100"
@@ -97,12 +99,12 @@ export default function Card(props: CardProps) {
 
         {/* Top Right Logo / Flag */}
         {isVehicle && (props as any).make && (
-          <div className="absolute top-2 right-2 z-10 w-8 h-8 bg-black/40 backdrop-blur-sm rounded-full p-1 border border-white/10">
+          <div className="absolute top-1 right-1 z-10 w-7 h-7">
             <SafeImage
               src={resolveBrandLogo((props as any).make)}
               alt={(props as any).make}
               fill
-              className="object-contain p-1"
+              className="object-contain"
             />
           </div>
         )}
@@ -120,26 +122,26 @@ export default function Card(props: CardProps) {
 
         {/* IP Badge - Top Left */}
         {isVehicle && ip > 0 && (
-          <div className="absolute top-2 left-2 z-20 origin-top-left">
-            <IPBadge value={ip} size="md" />
+          <div className="absolute top-1 left-1 z-20 origin-top-left">
+            <IPBadge value={ip} size="sm" />
           </div>
         )}
         {/* Content Container */}
-        <div className="absolute bottom-0 inset-x-0 p-4 z-10 flex flex-col items-center">
+        <div className={clsx("absolute bottom-0 inset-x-0 z-10 flex flex-col items-center", compact ? "p-2" : "p-4")}>
 
           {/* Title Section */}
-          <div className="text-center mb-3">
-            <h3 className="text-lg font-bold text-white uppercase tracking-wider leading-tight">
+          <div className={clsx("text-center", compact ? "mb-2" : "mb-3")}>
+            <h3 className={clsx("font-bold text-white uppercase tracking-wider leading-tight", compact ? "text-sm" : "text-lg")}>
               {isVehicle ? (props as any).make : (props as any).name}
             </h3>
-            <p className="text-xs text-gray-300 font-medium tracking-wide">
+            <p className={clsx("text-gray-300 font-medium tracking-wide", compact ? "text-[10px]" : "text-xs")}>
               {isVehicle ? `${(props as any).model} · ${(props as any).year}` : (props as any).country}
             </p>
           </div>
 
           {/* Stats Grid 2x2 */}
           {isVehicle && (
-            <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs font-semibold text-gray-200 mb-3 w-full px-2">
+            <div className={clsx("grid grid-cols-2 gap-y-2 font-semibold text-gray-200 w-full", compact ? "gap-x-1 text-[10px] mb-2 px-0" : "gap-x-6 text-xs mb-3 px-2")}>
               <div className="flex items-center gap-1.5 justify-end">
                 <Zap size={14} className="text-yellow-400" />
                 <span>{power_hp} HP</span>
@@ -161,7 +163,7 @@ export default function Card(props: CardProps) {
 
           {/* Stats Grid 2x2 for Circuits */}
           {isCircuit && (
-            <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs font-semibold text-gray-200 mb-3 w-full px-2">
+            <div className={clsx("grid grid-cols-2 gap-y-2 font-semibold text-gray-200 w-full", compact ? "gap-x-1 text-[10px] mb-2 px-0" : "gap-x-6 text-xs mb-3 px-2")}>
               <div className="flex items-center gap-1.5 justify-end">
                 <MoveRight size={14} className="text-blue-400" />
                 <span>{length_km} km</span>
@@ -183,7 +185,7 @@ export default function Card(props: CardProps) {
 
           {/* Bottom Metadata : Weight Only */}
           {isVehicle && (
-            <div className="flex items-center gap-4 text-[10px] text-gray-400 mb-3">
+            <div className={clsx("flex items-center text-[10px] text-gray-400", compact ? "gap-2 mb-2" : "gap-4 mb-3")}>
               <span className="flex items-center gap-1">
                 ⚖️ {weight_kg} kg
               </span>
