@@ -57,7 +57,7 @@ export const IMAGE_PATHS = {
         BRAND_LOGO: 'placeholders/brand-logo.png',
         NO_IMAGE: 'placeholders/no-image.png',
         VEHICLE_CARD: 'cards/vehicle/default.jpg',
-        CIRCUIT_CARD: 'placeholders/circuit_default.jpg',
+        CIRCUIT_CARD: 'placeholders/circuit-default.jpg',
     } as const,
 } as const;
 

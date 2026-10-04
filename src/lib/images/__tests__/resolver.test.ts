@@ -39,4 +39,8 @@ describe('Image Resolver', () => {
             expect(buildVehicleKey(params)).toBe(expected);
         });
     });
+
+    it('should use the Supabase circuit card placeholder key', () => {
+        expect(IMAGE_PATHS.PLACEHOLDERS.CIRCUIT_CARD).toBe('placeholders/circuit-default.jpg');
+    });
 });
