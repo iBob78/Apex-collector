@@ -64,6 +64,7 @@ export default function Card(props: CardProps) {
   // Niveau de la carte
   const countValue = Number(props.count ?? count ?? 0);
   const level = getCardLevel(countValue);
+  const levelEffectClass = level > 0 ? `card-level-effect-${level}` : null;
 
   // Utilisation du resolver centralisé pour gérer les chemins complexes (véhicules vs circuits)
   const finalImage = resolveCardImage({
@@ -118,9 +119,16 @@ export default function Card(props: CardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         </div>
 
+        {levelEffectClass && (
+          <div
+            aria-hidden="true"
+            className={clsx("card-level-effect", levelEffectClass)}
+          />
+        )}
+
         {/* Top Right Logo / Flag */}
         {isVehicle && (props as any).make && (
-          <div className="absolute top-1 right-1 z-10 w-7 h-7">
+          <div className="absolute top-3 right-3 z-10 w-7 h-7">
             <SafeImage
               src={resolveBrandLogo((props as any).make)}
               alt={(props as any).make}
@@ -131,7 +139,7 @@ export default function Card(props: CardProps) {
         )}
 
         {isCircuit && ((props as any).country_code || (props as any).country) && (
-          <div className="absolute top-2 right-2 z-10 w-8 h-8 bg-black/40 backdrop-blur-sm rounded-full overflow-hidden border border-white/10">
+          <div className="absolute top-3 right-3 z-10 w-8 h-8 bg-black/40 backdrop-blur-sm rounded-full overflow-hidden border border-white/10">
             <SafeImage
               src={resolveCountryFlag((props as any).country_code || (props as any).country)}
               alt={(props as any).country || 'Circuit'}
@@ -143,7 +151,7 @@ export default function Card(props: CardProps) {
 
         {/* IP Badge - Top Left */}
         {isVehicle && ip > 0 && (
-          <div className="absolute top-1 left-1 z-20 origin-top-left">
+          <div className="absolute top-3 left-3 z-20 origin-top-left">
             <IPBadge value={ip} size="sm" />
           </div>
         )}

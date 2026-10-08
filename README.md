@@ -69,6 +69,23 @@ The card design is still undecided, but possible styles include:
 * Retro-style cards
 * Brushed steel
 
+### Card levels, badges, and visual effects
+
+A card's level is based on the number of copies owned. The level badge is displayed below the card when enabled; level 0 has no material overlay, while levels 1–9 apply a distinct finish as a border-like overlay inside the card, up to the rarity outline.
+
+| Level | Copies owned | Visual effect |
+| --- | ---: | --- |
+| 0 | 1 | No visual effect |
+| 1 | 2 | Aluminium |
+| 2 | 5 | Brushed aluminium |
+| 3 | 10 | Carbon |
+| 4 | 25 | Forged carbon |
+| 5 | 50 | Carbon Kevlar |
+| 6 | 100 | Exhaust-manifold thermal wrap |
+| 7 | 200 | Polished metal |
+| 8 | 500 | Shiny gold foil |
+| 9 | 1,000 | Heat-blued titanium |
+
 ---
 
 ## 🤝 How to Contribute
@@ -162,6 +179,22 @@ Le design des cartes est encore a determiner,
 - Carte rétros
 - Acier brossé
 
+### Niveaux, badges et effets visuels des cartes
+
+Le niveau d’une carte dépend du nombre d’exemplaires possédés. Lorsque son affichage est activé, le badge « Niveau X » apparaît sous la carte. Le niveau 0 n’a pas d’effet de matière ; du niveau 1 au niveau 9, chaque palier applique une finition distincte sous forme de liseré à l’intérieur de la carte, jusqu’au contour de rareté.
+
+| Niveau | Exemplaires possédés | Effet visuel |
+| --- | ---: | --- |
+| 0 | 1 | Aucun effet visuel |
+| 1 | 2 | Aluminium |
+| 2 | 5 | Aluminium brossé |
+| 3 | 10 | Carbone |
+| 4 | 25 | Carbone forgé |
+| 5 | 50 | Carbone kevlar |
+| 6 | 100 | Bandes thermiques de collecteur d’échappement |
+| 7 | 200 | Métal poli brillant |
+| 8 | 500 | Feuilles d’isolant doré brillant |
+| 9 | 1 000 | Titane bleui par la chaleur |
 
 
 

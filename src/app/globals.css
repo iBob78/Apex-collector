@@ -57,6 +57,85 @@ html, body {
   transform: rotateZ(0.0001deg); /* GPU acceleration subtile */
 }
 
+.card-level-effect {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  box-sizing: border-box;
+  padding: 4px;
+  border-radius: 8px;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+.card-level-effect-1 {
+  background:
+    repeating-linear-gradient(178deg, rgba(255, 255, 255, 0.5) 0 1px, rgba(71, 79, 86, 0.58) 2px 3px),
+    linear-gradient(120deg, #e5e9ec, #747d85 42%, #c8ced2);
+  opacity: 0.94;
+}
+
+.card-level-effect-2 {
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.48) 0 1px, rgba(58, 67, 75, 0.45) 1px 3px),
+    linear-gradient(110deg, #e0e5e9, #7a858c 48%, #c5cbd0);
+  opacity: 0.96;
+}
+
+.card-level-effect-3 {
+  background:
+    repeating-linear-gradient(45deg, #777 0 2px, #17191a 2px 5px, #414547 5px 7px),
+    linear-gradient(135deg, #b0b7ba, #101112);
+  opacity: 0.94;
+}
+
+.card-level-effect-4 {
+  background:
+    repeating-linear-gradient(45deg, transparent 0 5px, rgba(222, 230, 234, 0.72) 6px, transparent 7px 10px),
+    repeating-linear-gradient(-45deg, #252a2d 0 5px, #626a6e 6px 8px, #181a1b 9px 12px);
+  opacity: 0.96;
+}
+
+.card-level-effect-5 {
+  background:
+    repeating-linear-gradient(60deg, rgba(226, 205, 157, 0.9) 0 2px, #26231e 3px 5px, #70644c 6px 7px),
+    repeating-linear-gradient(-60deg, rgba(10, 10, 10, 0.78) 0 3px, transparent 4px 7px);
+  opacity: 0.96;
+}
+
+.card-level-effect-6 {
+  background:
+    repeating-linear-gradient(35deg, #e1cfad 0 2px, #76543d 3px 5px, #bb8050 6px 8px),
+    repeating-linear-gradient(-35deg, transparent 0 5px, rgba(248, 230, 194, 0.78) 6px 8px, transparent 9px 12px);
+  opacity: 0.98;
+}
+
+.card-level-effect-7 {
+  background:
+    linear-gradient(112deg, #aebac2 0 20%, #f8fcff 31% 42%, #75838c 55%, #e7edf0 73%, #8c9aa2);
+  box-shadow: 0 0 7px rgba(230, 246, 255, 0.95), inset 0 0 5px rgba(255, 255, 255, 0.95);
+  opacity: 0.98;
+}
+
+.card-level-effect-8 {
+  background:
+    linear-gradient(115deg, #b77b05 0 18%, #fff0a3 28% 39%, #d99d08 49% 64%, #fff6c2 75% 83%, #bd8100),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.8) 0 1px, transparent 1px 4px);
+  box-shadow: 0 0 9px rgba(255, 207, 50, 0.9), inset 0 0 5px #fff2aa;
+  opacity: 0.98;
+}
+
+.card-level-effect-9 {
+  background:
+    linear-gradient(115deg, #17688d 0 16%, #9ceaff 28% 40%, #2863ba 50% 66%, #e3a4ff 78% 84%, #155978),
+    repeating-linear-gradient(168deg, rgba(215, 250, 255, 0.82) 0 1px, transparent 1px 5px);
+  box-shadow: 0 0 9px rgba(90, 199, 255, 0.95), inset 0 0 5px rgba(198, 238, 255, 0.95);
+  opacity: 0.98;
+}
+
 /* 🪄 Fallback si une carte n’a pas d’image */
 .card-placeholder {
   background: repeating-linear-gradient(
