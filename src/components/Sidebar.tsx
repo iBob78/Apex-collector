@@ -11,11 +11,13 @@ import {
   UserIcon,
   Layers3Icon,
   CrownIcon,
-  LockIcon
+  LockIcon,
+  MapIcon,
+  WrenchIcon,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabaseBrowser';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 const navItems = [
   { href: '/dashboard', label: 'ACCUEIL', icon: HomeIcon },
@@ -29,7 +31,7 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [user, setUser] = useState<any>(null);
   const [authLoaded, setAuthLoaded] = useState(false);
 
@@ -59,7 +61,7 @@ export default function Sidebar() {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [supabase]);
 
   return (
     <aside className="w-[280px] h-screen bg-[#080808] border-r border-white/5 p-8 flex flex-col gap-10 sticky top-0 z-50">
@@ -76,7 +78,10 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex flex-col gap-2 flex-1">
-        {navItems.map(({ href, label, icon: Icon }) => {
+        {[...navItems, ...(user ? [
+          { href: '/admin/cards', label: 'ATELIER CARTES', icon: WrenchIcon },
+          { href: '/admin/circuits', label: 'ATELIER CIRCUITS', icon: MapIcon },
+        ] : [])].map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href;
           const isLocked = authLoaded && !user && href !== '/login';
 

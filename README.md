@@ -163,6 +163,12 @@ J'aime les inspirations tirés des jeux :
 
 ## Cartes
 
+### Atelier d’administration
+
+Les ateliers `/admin/cards` et `/admin/circuits` permettent aux administrateurs de créer et modifier les catalogues de véhicules et de circuits dans Supabase. Ils sont accessibles depuis la navigation quand un utilisateur est connecté et vérifient son adresse côté serveur. Les modifications restent également soumises aux règles RLS de Supabase.
+
+Configure `ADMIN_EMAILS` dans `.env.local` et dans les variables d’environnement de déploiement. La variable accepte plusieurs adresses séparées par des virgules. Exemple : `ADMIN_EMAILS="admin@example.com"`. L’adresse doit aussi correspondre à celle autorisée par les migrations `005_cards_admin_write_policies.sql` et `006_circuits_admin_write_policies.sql` ; mets à jour ces policies si tu changes d’administrateur. Dans Codespaces, l’origine du port courant est automatiquement autorisée pour les actions Next.js ; pour un autre proxy, indique ses noms d’hôtes exacts dans `SERVER_ACTIONS_ALLOWED_ORIGINS`, séparés par des virgules. Applique les migrations Supabase pour activer l’image et les droits d’écriture de l’atelier.
+
 
 Le design des cartes est encore a determiner, 
 - Holographique

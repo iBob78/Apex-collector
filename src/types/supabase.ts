@@ -8,7 +8,7 @@ export type Database = {
           card_id: string;
           name: string;
           rarity: string;
-          image_url: string;
+          image_url: string | null;
           description: string;
           power_hp: number;
           torque_nm: number;
