@@ -260,7 +260,7 @@ export default function CollectionPage() {
               {filteredCards.length > 0 ? (
                 <motion.div
                   layout
-                  className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,15rem),1fr))] gap-6"
+                  className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,14rem),1fr))] gap-6"
                 >
                   {filteredCards.map((card, index) => {
                     const cid = String((card as any).card_id || card.id).toLowerCase().trim();

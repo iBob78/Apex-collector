@@ -1,10 +1,21 @@
-import clsx from 'clsx';
+import { Exo } from 'next/font/google';
+
+const exo = Exo({ subsets: ['latin'], weight: ['700', '800', '900'] });
 
 export default function IPBadge({ value, size = "md" }: { value: number, size?: "sm" | "md" | "lg" }) {
   // Compact scaling
   const scale = size === "sm" ? 0.8 : size === "lg" ? 1.2 : 1;
   const width = 50 * scale;
   const height = 50 * scale;
+  const ipClass = value >= 1000 ? "SS"
+    : value >= 800 ? "S"
+      : value >= 700 ? "A"
+        : value >= 600 ? "B"
+          : value >= 500 ? "C"
+            : value >= 400 ? "D"
+              : value >= 300 ? "E"
+                : value >= 200 ? "F"
+                  : "G";
 
   // New Design: A golden-bordered square/badge style
   return (
@@ -16,14 +27,14 @@ export default function IPBadge({ value, size = "md" }: { value: number, size?: 
         {/* Main Background shape - 90% Opacity, White Border */}
         <rect x="2" y="2" width="46" height="46" rx="6" fill="#0A0A0A" fillOpacity="0.9" stroke="white" strokeWidth="2" />
 
-        {/* "IP" Label Header - White */}
-        <path d="M 2 16 L 48 16" stroke="white" strokeWidth="1" strokeOpacity="0.5" />
-        <text x="25" y="12" textAnchor="middle" fill="white" fontSize="9" fontWeight="800" fontFamily="sans-serif" style={{ letterSpacing: '1px' }}>
-          IP
+        {/* Class label header */}
+        <path d="M 2 23 L 48 23" stroke="white" strokeWidth="1" strokeOpacity="0.7" />
+        <text className={exo.className} x="25" y="19" textAnchor="middle" fill="#FFFFFF" fontSize="17" fontWeight="900" style={{ letterSpacing: '0.5px' }}>
+          {ipClass}
         </text>
 
         {/* Value Display */}
-        <text x="25" y="34" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold" fontFamily="monospace">
+        <text className={exo.className} x="25" y="40" textAnchor="middle" fill="white" fontSize="16" fontWeight="700">
           {value}
         </text>
       </svg>
