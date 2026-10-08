@@ -14,7 +14,8 @@ describe('site preference formatters', () => {
   });
 
   it('formats power, torque, and weight for both unit systems', () => {
-    expect(formatPower(100, 'metric', 'en')).toBe('75 kW');
+    expect(formatPower(100, 'metric', 'en')).toBe('101 CV');
+    expect(formatPower(100, 'metric', 'en', 74.57)).toBe('101 CV');
     expect(formatPower(100, 'imperial', 'en')).toBe('100 HP');
     expect(formatTorque(100, 'imperial', 'en')).toBe('74 lb-ft');
     expect(formatWeight(1.5, 'metric', 'en')).toBe('1,500 kg');

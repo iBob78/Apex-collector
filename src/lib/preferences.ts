@@ -665,7 +665,7 @@ export function formatSpeed(value: number, units: UnitSystem, language: SiteLang
 
 export function formatPower(powerHp: number, units: UnitSystem, language: SiteLanguage = 'fr', powerKw?: number | null) {
   return units === 'metric'
-    ? `${new Intl.NumberFormat(language, { maximumFractionDigits: 0 }).format(powerKw ?? powerHp * 0.7457)} kW`
+    ? `${new Intl.NumberFormat(language, { maximumFractionDigits: 0 }).format(powerKw != null ? powerKw * 1.35962 : powerHp * 1.01387)} CV`
     : `${new Intl.NumberFormat(language, { maximumFractionDigits: 0 }).format(powerHp)} HP`;
 }
 
