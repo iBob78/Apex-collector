@@ -14,9 +14,11 @@ import {
   SettingsIcon
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { t } = useSitePreferences();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [stats, setStats] = useState({ totalCards: 0, uniqueCards: 0 });
@@ -88,7 +90,7 @@ export default function ProfilePage() {
                 <h1 className="text-3xl font-black uppercase italic tracking-tighter">
                   {profile?.username || user.email?.split('@')[0]}
                 </h1>
-                <p className="text-blue-500 font-mono text-xs tracking-widest uppercase">PILOTE OFFICIEL APEX</p>
+                <p className="text-blue-500 font-mono text-xs tracking-widest uppercase">{t('PILOTE OFFICIEL APEX')}</p>
               </div>
             </div>
 
@@ -98,7 +100,7 @@ export default function ProfilePage() {
                 className="bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-3 rounded-xl flex items-center gap-3 transition-all text-xs font-black uppercase tracking-widest"
               >
                 <SettingsIcon size={16} />
-                Editer Profil
+                {t('Editer Profil')}
               </button>
             </div>
           </div>
@@ -113,19 +115,19 @@ export default function ProfilePage() {
                     <WalletIcon size={24} className="text-blue-500" />
                   </div>
                   <div>
-                    <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-500">Balance Actuelle</h3>
+                    <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-500">{t('Balance Actuelle')}</h3>
                     <p className="text-2xl font-black italic tracking-tighter">▲ {profile?.ap || 0} <span className="text-[10px] not-italic text-gray-400 uppercase">AP</span></p>
                   </div>
                 </div>
                 <button className="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20">
-                  Recharger mon compte
+                  {t('Recharger mon compte')}
                 </button>
               </div>
 
               <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl p-6 space-y-4 shadow-2xl">
-                <StatItem label="Cartes Collection" value={stats.totalCards} icon={<LayersIcon size={16} />} color="text-blue-400" />
-                <StatItem label="Modèles Uniques" value={stats.uniqueCards} icon={<TrophyIcon size={16} />} color="text-purple-400" />
-                <StatItem label="Niveau Pilote" value={Math.floor(stats.uniqueCards / 5) + 1} icon={<CreditCardIcon size={16} />} color="text-green-400" />
+                <StatItem label={t('Cartes Collection')} value={stats.totalCards} icon={<LayersIcon size={16} />} color="text-blue-400" />
+                <StatItem label={t('Modèles Uniques')} value={stats.uniqueCards} icon={<TrophyIcon size={16} />} color="text-purple-400" />
+                <StatItem label={t('Niveau Pilote')} value={Math.floor(stats.uniqueCards / 5) + 1} icon={<CreditCardIcon size={16} />} color="text-green-400" />
               </div>
 
               <button
@@ -133,7 +135,7 @@ export default function ProfilePage() {
                 className="w-full bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3"
               >
                 <LogOutIcon size={16} />
-                Se déconnecter
+                {t('Se déconnecter')}
               </button>
             </div>
 
@@ -141,26 +143,26 @@ export default function ProfilePage() {
             <div className="lg:col-span-2 space-y-8">
               <section>
                 <h2 className="text-xl font-black uppercase italic tracking-tighter mb-4 inline-flex items-center gap-4">
-                  Activité Récente
+                  {t('Activité Récente')}
                   <div className="h-1 w-12 bg-blue-500 rounded-full" />
                 </h2>
                 <div className="space-y-4">
                   <ActivityRow
-                    label="Ouverture de Booster"
-                    desc="Pack Standard ouvert dans la boutique"
-                    time="il y a 2 heures"
+                    label={t('Ouverture de Booster')}
+                    desc={t('Pack Standard ouvert dans la boutique')}
+                    time={t('il y a 2 heures')}
                     icon="🎁"
                   />
                   <ActivityRow
-                    label="Nouvelle Carte"
-                    desc="Ferrari 488 GTB ajoutée au garage"
-                    time="il y a 5 heures"
+                    label={t('Nouvelle Carte')}
+                    desc={`Ferrari 488 GTB ${t('ajoutée au garage')}`}
+                    time={t('il y a 5 heures')}
                     icon="🏎️"
                   />
                   <ActivityRow
-                    label="Bonus Journalier"
-                    desc="+150 AP collectés"
-                    time="Hier"
+                    label={t('Bonus Journalier')}
+                    desc={t('+150 AP collectés')}
+                    time={t('Hier')}
                     icon="▲"
                   />
                 </div>
@@ -168,15 +170,15 @@ export default function ProfilePage() {
 
               <section>
                 <h2 className="text-xl font-black uppercase italic tracking-tighter mb-4 inline-flex items-center gap-4">
-                  Badges Débloqués
+                  {t('Badges Débloqués')}
                   <div className="h-1 w-12 bg-purple-500 rounded-full" />
                 </h2>
                 <div className="flex flex-wrap gap-4">
-                  <Badge icon="🏁" label="Premier Circuit" color="bg-blue-500/10 border-blue-500/30" />
-                  <Badge icon="🔥" label="Collectionneur" color="bg-purple-500/10 border-purple-500/30" />
-                  <Badge icon="⚡" label="Accro au Boost" color="bg-yellow-500/10 border-yellow-500/30" />
+                  <Badge icon="🏁" label={t('Premier Circuit')} color="bg-blue-500/10 border-blue-500/30" />
+                  <Badge icon="🔥" label={t('Collectionneur')} color="bg-purple-500/10 border-purple-500/30" />
+                  <Badge icon="⚡" label={t('Accro au Boost')} color="bg-yellow-500/10 border-yellow-500/30" />
                   <div className="w-16 h-16 rounded-2xl border-2 border-dashed border-white/5 flex items-center justify-center text-gray-700 text-xs text-center font-black uppercase tracking-tighter">
-                    +12 <br /> Locked
+                    +12 <br /> {t('Locked')}
                   </div>
                 </div>
               </section>

@@ -3,6 +3,7 @@
 import Sidebar from '@/components/Sidebar';
 import { motion } from 'framer-motion';
 import { TrophyIcon, StarIcon, CheckCircle2Icon, LockIcon } from 'lucide-react';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 const ACHIEVEMENTS = [
   { id: 1, title: 'Premières Roues', desc: 'Posséder votre premier véhicule.', date: '12 Déc 2025', unlocked: true, icon: '🚗' },
@@ -14,6 +15,7 @@ const ACHIEVEMENTS = [
 ];
 
 export default function AchievementsPage() {
+  const { t } = useSitePreferences();
   return (
     <div className="flex min-h-screen bg-[#050505] text-white font-sans">
       <Sidebar />
@@ -22,10 +24,10 @@ export default function AchievementsPage() {
           {/* Header */}
           <header className="mb-12">
             <h1 className="text-4xl font-black uppercase italic tracking-tighter bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">
-              Centre des Succès
+              {t('Centre des Succès')}
             </h1>
             <p className="text-gray-500 font-mono text-sm mt-1">
-              Suivez votre progression et vos exploits sur la piste.
+              {t('Suivez votre progression et vos exploits sur la piste.')}
             </p>
           </header>
 
@@ -41,12 +43,12 @@ export default function AchievementsPage() {
               </div>
             </div>
             <div>
-              <h2 className="text-2xl font-black uppercase italic tracking-tighter mb-2">Maître de Collection</h2>
-              <p className="text-gray-400 text-sm max-w-md">Continuez à débloquer des succès pour obtenir des récompenses exclusives et monter dans le classement mondial des pilotes.</p>
+              <h2 className="text-2xl font-black uppercase italic tracking-tighter mb-2">{t('Maître de Collection')}</h2>
+              <p className="text-gray-400 text-sm max-w-md">{t('Continuez à débloquer des succès pour obtenir des récompenses exclusives et monter dans le classement mondial des pilotes.')}</p>
               <div className="mt-4 flex gap-4 text-[10px] font-black uppercase tracking-widest text-blue-400">
-                <span>3 / 6 SUCCÈS DÉBLOQUÉS</span>
+                <span>{t('3 / 6 SUCCÈS DÉBLOQUÉS')}</span>
                 <span className="text-gray-600">|</span>
-                <span>RANG: PILOTE AMATEUR</span>
+                <span>{t('RANG: PILOTE AMATEUR')}</span>
               </div>
             </div>
           </div>
@@ -85,16 +87,16 @@ export default function AchievementsPage() {
 
                 <div className="mt-6 relative z-10">
                   <h3 className="text-lg font-black uppercase italic tracking-tighter leading-none mb-2">
-                    {ach.title}
+                    {t(ach.title)}
                   </h3>
                   <p className="text-xs text-gray-500 font-medium leading-relaxed">
-                    {ach.desc}
+                    {t(ach.desc)}
                   </p>
                 </div>
 
                 {ach.unlocked && (
                   <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-gray-600 uppercase italic">Débloqué le {ach.date}</span>
+                    <span className="text-[10px] font-mono text-gray-600 uppercase italic">{t('Débloqué le')} {ach.date}</span>
                     <div className="flex items-center gap-1 text-[10px] text-blue-400 font-black">
                       <StarIcon size={10} fill="currentColor" />
                       <span>+100 XP</span>

@@ -4,11 +4,14 @@ import clsx from 'clsx';
 import IPBadge from './IPBadge';
 import SafeImage from './SafeImage';
 import { resolveCardImage, resolveBrandLogo, resolveCountryFlag, IMAGE_PATHS } from '@/lib/images';
-import type { AnyCard, Transmission } from '@/types/game';
+import type { AnyCard } from '@/types/game';
 import { useRouter } from 'next/navigation';
 import { Zap, Gauge, Wind, Timer, ArrowUpCircle, Compass, MoveRight } from 'lucide-react';
 import { getCardLevel, getLevelProgress } from '@/lib/level';
 import { getRarityBorderClass } from '@/lib/rarity';
+import { calculateVehicleIP } from '@/lib/vehicleStats';
+import { formatDistance, formatPower, formatTorque, formatWeight } from '@/lib/preferences';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 type CardProps = AnyCard & {
   owned?: boolean;
@@ -21,6 +24,7 @@ type CardProps = AnyCard & {
 
 export default function Card(props: CardProps) {
   const router = useRouter();
+  const { language, units, t } = useSitePreferences();
   const {
     id: propId,
     image_url,
@@ -42,8 +46,7 @@ export default function Card(props: CardProps) {
 
   // Extraction sécurisée des données avec valeurs par défaut
   const power_hp = isVehicle ? Number((props as any).power_hp) || 0 : 0;
-  const torque_nm = isVehicle ? (props as any).torque_nm : 0;
-  const max_speed_kmh = isVehicle ? (props as any).max_speed_kmh : 0;
+  const torque_nm = isVehicle ? Number((props as any).torque_nm) || 0 : 0;
   const acceleration = isVehicle ? (props as any).acceleration_0_100 : 0;
 
   // New Circuit Stats
@@ -54,12 +57,10 @@ export default function Card(props: CardProps) {
 
   // Correction Poids : On gère le cas où la donnée est déjà en KG (ex: 1060) ou en Tonnes (ex: 1.06)
   const rawWeight = isVehicle ? Number((props as any).weight_t) || 0 : 0;
-  const weight_kg = rawWeight > 50 ? rawWeight : rawWeight * 1000;
-
   const transmission = isVehicle ? (props as any).transmission : undefined;
 
   // Calcul IP
-  const ip = (power_hp > 0 && weight_kg > 0) ? Math.floor((power_hp / weight_kg) * 1000) : 0;
+  const ip = isVehicle ? calculateVehicleIP(power_hp, rawWeight) : 0;
 
   // Niveau de la carte
   const countValue = Number(props.count ?? count ?? 0);
@@ -164,7 +165,9 @@ export default function Card(props: CardProps) {
               {isVehicle ? (props as any).make : (props as any).name}
             </h3>
             <p className={clsx("text-gray-300 font-medium tracking-wide", compact ? "text-[10px]" : "text-xs")}>
-              {isVehicle ? `${(props as any).model} · ${(props as any).year}` : (props as any).country}
+              {isVehicle
+                ? `${(props as any).model} · ${(props as any).year}${(props as any).country_code ? ` · ${(props as any).country_code}` : ''}`
+                : (props as any).country}
             </p>
           </div>
 
@@ -173,19 +176,19 @@ export default function Card(props: CardProps) {
             <div className={clsx("grid grid-cols-2 gap-y-2 font-semibold text-gray-200 w-full", compact ? "gap-x-1 text-[10px] mb-2 px-0" : "gap-x-6 text-xs mb-3 px-2")}>
               <div className="flex items-center gap-1.5 justify-end">
                 <Zap size={14} className="text-yellow-400" />
-                <span>{power_hp} HP</span>
+                <span>{formatPower(power_hp, units, language, Number((props as any).power_kw) || undefined)}</span>
               </div>
               <div className="flex items-center gap-1.5 justify-start">
                 <Gauge size={14} className="text-orange-400" />
-                <span>{torque_nm} Nm</span>
+                <span>{formatTorque(torque_nm, units, language)}</span>
               </div>
               <div className="flex items-center gap-1.5 justify-end">
-                <Wind size={14} className="text-blue-400" />
-                <span>{max_speed_kmh} km/h</span>
-              </div>
-              <div className="flex items-center gap-1.5 justify-start">
                 <Timer size={14} className="text-green-400" />
                 <span>{acceleration} s</span>
+              </div>
+              <div className="flex items-center gap-1.5 justify-start">
+                <Compass size={14} className="text-cyan-300" />
+                <span>{transmission || '--'}</span>
               </div>
             </div>
           )}
@@ -195,15 +198,15 @@ export default function Card(props: CardProps) {
             <div className={clsx("grid grid-cols-2 gap-y-2 font-semibold text-gray-200 w-full", compact ? "gap-x-1 text-[10px] mb-2 px-0" : "gap-x-6 text-xs mb-3 px-2")}>
               <div className="flex items-center gap-1.5 justify-end">
                 <MoveRight size={14} className="text-blue-400" />
-                <span>{length_km} km</span>
+                <span>{formatDistance(Number(length_km) || 0, units, language)}</span>
               </div>
               <div className="flex items-center gap-1.5 justify-start">
                 <Compass size={14} className="text-green-400" />
-                <span>{turns} virages</span>
+                <span>{turns} {t('virages')}</span>
               </div>
               <div className="flex items-center gap-1.5 justify-end">
                 <ArrowUpCircle size={14} className="text-yellow-400" />
-                <span>{straight_km} km ligne</span>
+                <span>{formatDistance(Number(straight_km) || 0, units, language)} {t('ligne')}</span>
               </div>
               <div className="flex items-center gap-1.5 justify-start">
                 <Wind size={14} className="text-orange-400" />
@@ -216,7 +219,7 @@ export default function Card(props: CardProps) {
           {isVehicle && (
             <div className={clsx("flex items-center text-[10px] text-gray-400", compact ? "gap-2 mb-2" : "gap-4 mb-3")}>
               <span className="flex items-center gap-1">
-                ⚖️ {weight_kg} kg
+                ⚖️ {formatWeight(rawWeight, units, language)}
               </span>
             </div>
           )}
@@ -227,7 +230,7 @@ export default function Card(props: CardProps) {
       {showLevel && (
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-bold text-white bg-blue-600 px-3 py-1 rounded-full shadow-sm border border-blue-400/30 uppercase tracking-tight">
-            Niveau {level}
+            {t('Niveau')} {level}
           </span>
         </div>
       )}

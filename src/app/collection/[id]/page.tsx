@@ -19,10 +19,13 @@ import {
 import { IMAGE_PATHS, resolveBrandLogo } from '@/lib/images';
 import { Rarity } from '@/types/game';
 import clsx from 'clsx';
+import { formatPower, formatSpeed, formatWeight } from '@/lib/preferences';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 export default function CardShowcasePage() {
     const { id } = useParams();
     const router = useRouter();
+    const { language, units, t } = useSitePreferences();
     const [card, setCard] = useState<any>(null);
     const [ownedCount, setOwnedCount] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -68,9 +71,9 @@ export default function CardShowcasePage() {
 
     if (!card) return (
         <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center gap-6">
-            <h1 className="text-2xl font-black uppercase italic">Carte introuvable</h1>
+            <h1 className="text-2xl font-black uppercase italic">{t('Carte introuvable')}</h1>
             <button onClick={() => router.back()} className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl uppercase text-xs font-bold tracking-widest">
-                Retour au garage
+                {t('Retour au garage')}
             </button>
         </div>
     );
@@ -96,7 +99,7 @@ export default function CardShowcasePage() {
                         onClick={() => router.back()}
                         className="flex items-center gap-3 text-gray-500 hover:text-white transition-colors uppercase text-[10px] font-black tracking-[0.3em] mb-12"
                     >
-                        <ArrowLeftIcon size={16} /> Retour au garage
+                        <ArrowLeftIcon size={16} /> {t('Retour au garage')}
                     </button>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -126,7 +129,7 @@ export default function CardShowcasePage() {
 
                             {/* Owned Badge */}
                             <div className="absolute -bottom-6 -right-6 bg-blue-600 border-4 border-[#050505] px-6 py-4 rounded-3xl shadow-2xl">
-                                <div className="text-[10px] font-black uppercase tracking-widest text-blue-100">Exemplaires</div>
+                                <div className="text-[10px] font-black uppercase tracking-widest text-blue-100">{t('Exemplaires')}</div>
                                 <div className="text-3xl font-black italic tracking-tighter">x{ownedCount}</div>
                             </div>
                         </motion.div>
@@ -165,14 +168,14 @@ export default function CardShowcasePage() {
 
                             {/* Technical Grid */}
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-                                <SpecItem icon={<ZapIcon size={16} />} label="Puissance" value={`${card.power_hp} HP`} sub={card.power_kw ? `${card.power_kw} KW` : undefined} />
-                                <SpecItem icon={<GaugeIcon size={16} />} label="Vitesse Max" value={`${card.max_speed_kmh} KM/H`} />
-                                <SpecItem icon={<ActivityIcon size={16} />} label="0-100 KM/H" value={card.acceleration_0_100 ? `${card.acceleration_0_100}s` : '--'} />
-                                <SpecItem icon={<WeightIcon size={16} />} label="Poids" value={`${card.weight_t} T`} />
-                                <SpecItem icon={<ActivityIcon size={16} />} label="Moteur" value={card.engine_size ? card.engine_size : '--'} sub={card.cylinder} />
-                                <SpecItem icon={<WindIcon size={16} />} label="Induction" value={card.boost || 'Atmosphérique'} />
-                                <SpecItem icon={<FlagIcon size={16} />} label="Pays" value={card.country_code || '--'} />
-                                <SpecItem icon={<FuelIcon size={16} />} label="Transmission" value={card.transmission || 'RWD'} />
+                                <SpecItem icon={<ZapIcon size={16} />} label={t('Puissance')} value={formatPower(Number(card.power_hp), units, language, Number(card.power_kw) || undefined)} />
+                                <SpecItem icon={<GaugeIcon size={16} />} label={t('Vitesse Max')} value={formatSpeed(Number(card.max_speed_kmh), units, language)} />
+                                <SpecItem icon={<ActivityIcon size={16} />} label={t('0 à 100 km/h')} value={card.acceleration_0_100 ? `${card.acceleration_0_100}s` : '--'} />
+                                <SpecItem icon={<WeightIcon size={16} />} label={t('Poids')} value={formatWeight(Number(card.weight_t), units, language)} />
+                                <SpecItem icon={<ActivityIcon size={16} />} label={t('Moteur')} value={card.engine_size ? card.engine_size : '--'} sub={card.cylinder} />
+                                <SpecItem icon={<WindIcon size={16} />} label={t('Induction')} value={card.boost || t('Atmosphérique')} />
+                                <SpecItem icon={<FlagIcon size={16} />} label={t('Pays')} value={card.country_code || '--'} />
+                                <SpecItem icon={<FuelIcon size={16} />} label={t('Transmission')} value={card.transmission || 'RWD'} />
                             </div>
 
                             {/* Actions */}

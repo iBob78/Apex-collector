@@ -8,6 +8,7 @@ import CardDetailsModal from '@/components/Collection/CardDetailsModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Rarity } from '@/types/game';
 import { getCardLevel } from '@/lib/level';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 interface UserCardData {
   card_id: string;
@@ -15,6 +16,7 @@ interface UserCardData {
 }
 
 export default function CollectionPage() {
+  const { t } = useSitePreferences();
   const [user, setUser] = useState<any>(null);
   const [cards, setCards] = useState<any[]>([]);
   const [selectedCard, setSelectedCard] = useState<any | null>(null);
@@ -193,16 +195,16 @@ export default function CollectionPage() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
               <div>
                 <h1 className="text-4xl font-black uppercase italic tracking-tighter bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">
-                  Mon Garage
+                  {t('Mon Garage')}
                 </h1>
                 <p className="text-gray-500 font-mono text-sm mt-1">
-                  Collection complète des véhicules et circuits d&apos;exception.
+                  {t('Collection complète des véhicules et circuits d’exception.')}
                 </p>
               </div>
 
               <div className="flex gap-4">
-                <StatCard label="Collection" value={`${stats.owned}/${stats.total}`} sub={`${stats.percentage}%`} color="text-blue-400" />
-                <StatCard label="Total Cartes" value={stats.totalCopies} sub="Exemplaires" color="text-purple-400" />
+                <StatCard label={t('Collection')} value={`${stats.owned}/${stats.total}`} sub={`${stats.percentage}%`} color="text-blue-400" />
+                <StatCard label={t('Total Cartes')} value={stats.totalCopies} sub={t('Exemplaires')} color="text-purple-400" />
               </div>
             </div>
 
@@ -217,7 +219,7 @@ export default function CollectionPage() {
                     className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
                       }`}
                   >
-                    {tab === 'all' ? 'Tous' : tab === 'vehicle' ? 'Véhicules' : 'Circuits'}
+                    {t(tab === 'all' ? 'Tous' : tab === 'vehicle' ? 'Véhicules' : 'Circuits')}
                   </button>
                 ))}
               </div>
@@ -226,7 +228,7 @@ export default function CollectionPage() {
               <div className="flex-1 min-w-[200px]">
                 <input
                   type="text"
-                  placeholder="Rechercher une carte..."
+                  placeholder={t('Rechercher une carte...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500/50 transition-colors"
@@ -239,13 +241,13 @@ export default function CollectionPage() {
                 onChange={(e) => setRarityFilter(e.target.value as any)}
                 className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none [&>option]:bg-[#171717] [&>option]:text-white"
               >
-                <option value="All">Toutes les raretés</option>
-                <option value="Common">Commun</option>
-                <option value="Uncommon">Inhabituel</option>
-                <option value="Rare">Rare</option>
-                <option value="Epic">Épique</option>
-                <option value="Legend">Légendaire</option>
-                <option value="Icon">Icon</option>
+                <option value="All">{t('Toutes les raretés')}</option>
+                <option value="Common">{t('Commun')}</option>
+                <option value="Uncommon">{t('Inhabituel')}</option>
+                <option value="Rare">{t('Rare')}</option>
+                <option value="Epic">{t('Épique')}</option>
+                <option value="Legend">{t('Légendaire')}</option>
+                <option value="Icon">{t('Icon')}</option>
               </select>
 
               {/* Sort Select */}
@@ -254,15 +256,15 @@ export default function CollectionPage() {
                 onChange={(e) => setSortBy(e.target.value as any)}
                 className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none [&>option]:bg-[#171717] [&>option]:text-white"
               >
-                <option value="name">Trier par Nom</option>
-                <option value="make-asc">Marques, A à Z</option>
-                <option value="make-desc">Marques, Z à A</option>
-                <option value="ip-desc">IP, décroissant</option>
-                <option value="ip-asc">IP, croissant</option>
-                <option value="level-asc">Niveau, croissant</option>
-                <option value="level-desc">Niveau, décroissant</option>
-                <option value="rarity">Trier par Rareté</option>
-                <option value="newest">Plus récent</option>
+                <option value="name">{t('Trier par Nom')}</option>
+                <option value="make-asc">{t('Marques, A à Z')}</option>
+                <option value="make-desc">{t('Marques, Z à A')}</option>
+                <option value="ip-desc">{t('IP, décroissant')}</option>
+                <option value="ip-asc">{t('IP, croissant')}</option>
+                <option value="level-asc">{t('Niveau, croissant')}</option>
+                <option value="level-desc">{t('Niveau, décroissant')}</option>
+                <option value="rarity">{t('Trier par Rareté')}</option>
+                <option value="newest">{t('Plus récent')}</option>
               </select>
             </div>
           </header>
@@ -271,7 +273,7 @@ export default function CollectionPage() {
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 opacity-50">
               <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="font-mono text-sm uppercase tracking-widest">Initialisation du garage...</p>
+              <p className="font-mono text-sm uppercase tracking-widest">{t('Initialisation du garage...')}</p>
             </div>
           ) : (
             <AnimatePresence mode="popLayout">
@@ -306,7 +308,7 @@ export default function CollectionPage() {
                 </motion.div>
               ) : (
                 <div className="text-center py-20 border-2 border-dashed border-white/5 rounded-3xl">
-                  <p className="text-gray-500 font-mono italic">Aucune carte trouvée pour ces critères.</p>
+                  <p className="text-gray-500 font-mono italic">{t('Aucune carte trouvée pour ces critères.')}</p>
                 </div>
               )}
             </AnimatePresence>

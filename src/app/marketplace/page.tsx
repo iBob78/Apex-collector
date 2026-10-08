@@ -7,8 +7,10 @@ import { supabase } from '@/lib/supabaseClient';
 import { getMarketplaceListings, buyListing, createListing } from '@/lib/actions/marketplace';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SearchIcon, FilterIcon, TagIcon, GavelIcon, CoinsIcon, Loader2Icon, XIcon, PlusIcon } from 'lucide-react';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 export default function MarketplacePage() {
+  const { t } = useSitePreferences();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [userCards, setUserCards] = useState<any[]>([]);
@@ -50,21 +52,21 @@ export default function MarketplacePage() {
   }, []);
 
   const handleBuy = async (listingId: string, price: number) => {
-    if (!user) return alert('Veuillez vous connecter pour acheter.');
-    if (profile && profile.ap < price) return alert('Solde AP insuffisant.');
+    if (!user) return alert(t('Veuillez vous connecter pour acheter.'));
+    if (profile && profile.ap < price) return alert(t('Solde AP insuffisant.'));
 
-    if (!confirm(`Voulez-vous acheter cette carte pour ${price} AP ?`)) return;
+    if (!confirm(t('Voulez-vous acheter cette carte pour {price} AP ?', { price }))) return;
 
     setProcessingId(listingId);
     const result = await buyListing(user.id, listingId);
 
     if (result.success) {
-      alert('Achat réussi ! La carte a été ajoutée à votre garage.');
+      alert(t('Achat réussi ! La carte a été ajoutée à votre garage.'));
       refreshListings();
       // Update local profile balance
       setProfile({ ...profile, ap: profile.ap - price });
     } else {
-      alert(`Erreur: ${result.error}`);
+      alert(`${t('Erreur')}: ${result.error}`);
     }
     setProcessingId(null);
   };
@@ -80,7 +82,7 @@ export default function MarketplacePage() {
               Marketplace
             </h1>
             <p className="text-gray-500 font-mono text-sm mt-1">
-              Échangez et achetez des pièces rares pour votre écurie.
+              {t('Échangez et achetez des pièces rares pour votre écurie.')}
             </p>
 
             {/* Navigation Tabs */}
@@ -90,7 +92,7 @@ export default function MarketplacePage() {
                 className={`pb-4 px-2 text-sm font-black tracking-widest uppercase transition-all relative ${activeTab === 'browse' ? 'text-blue-500' : 'text-gray-500 hover:text-white'
                   }`}
               >
-                Parcourir
+                {t('Parcourir')}
                 {activeTab === 'browse' && <motion.div layoutId="mkt_tab" className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500" />}
               </button>
               <button
@@ -98,7 +100,7 @@ export default function MarketplacePage() {
                 className={`pb-4 px-2 text-sm font-black tracking-widest uppercase transition-all relative ${activeTab === 'my_listings' ? 'text-blue-500' : 'text-gray-500 hover:text-white'
                   }`}
               >
-                Mes Ventes
+                {t('Mes Ventes')}
                 {activeTab === 'my_listings' && <motion.div layoutId="mkt_tab" className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500" />}
               </button>
             </div>
@@ -110,7 +112,7 @@ export default function MarketplacePage() {
               <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
               <input
                 type="text"
-                placeholder="Rechercher une rareté, une marque..."
+                placeholder={t('Rechercher une rareté, une marque...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:border-blue-500/50 transition-colors"
@@ -119,7 +121,7 @@ export default function MarketplacePage() {
 
             <button className="bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-3 rounded-xl flex items-center gap-3 transition-all">
               <FilterIcon size={18} className="text-blue-400" />
-              <span className="text-xs font-bold uppercase tracking-widest">Filtres</span>
+              <span className="text-xs font-bold uppercase tracking-widest">{t('Filtres')}</span>
             </button>
 
             <button
@@ -127,7 +129,7 @@ export default function MarketplacePage() {
               className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-xl flex items-center gap-3 transition-all shadow-lg shadow-blue-500/20"
             >
               <TagIcon size={18} />
-              <span className="text-xs font-bold uppercase tracking-widest">Vendre une carte</span>
+              <span className="text-xs font-bold uppercase tracking-widest">{t('Vendre une carte')}</span>
             </button>
           </div>
 
@@ -135,7 +137,7 @@ export default function MarketplacePage() {
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 opacity-50">
               <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="font-mono text-xs uppercase tracking-[0.3em]">Ouverture du marché...</p>
+              <p className="font-mono text-xs uppercase tracking-[0.3em]">{t('Ouverture du marché...')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -157,12 +159,12 @@ export default function MarketplacePage() {
                       </div>
                       <span className="text-[11px] text-gray-400 font-mono">@{item.seller.username}</span>
                     </div>
-                    <div className="text-[10px] text-gray-600 font-mono">il y a 2h</div>
+                    <div className="text-[10px] text-gray-600 font-mono">{t('il y a 2h')}</div>
                   </div>
 
                   <div className="bg-white/5 rounded-2xl p-4 flex items-center justify-between group-hover:bg-blue-500/10 transition-colors">
                     <div>
-                      <div className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">Prix d&apos;achat</div>
+                      <div className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">{t('Prix d’achat')}</div>
                       <div className="text-lg font-black italic tracking-tighter">▲ {item.price} <span className="text-[10px] not-italic text-gray-400">AP</span></div>
                     </div>
                     <button
@@ -171,7 +173,7 @@ export default function MarketplacePage() {
                       className="bg-white text-black px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-500 hover:text-white transition-all disabled:opacity-50 disabled:grayscale flex items-center gap-2"
                     >
                       {processingId === item.id ? <Loader2Icon size={14} className="animate-spin" /> : null}
-                      {profile && profile.ap < item.price ? 'Solde Insuffisant' : 'Acheter'}
+                      {profile && profile.ap < item.price ? t('Solde Insuffisant') : t('Acheter')}
                     </button>
                   </div>
                 </motion.div>
@@ -184,7 +186,7 @@ export default function MarketplacePage() {
             <div className="bg-blue-600 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-blue-400/30">
               <CoinsIcon size={24} className="text-blue-100" />
               <div>
-                <div className="text-[10px] uppercase font-black tracking-widest text-blue-200">Balance AP</div>
+                <div className="text-[10px] uppercase font-black tracking-widest text-blue-200">{t('Balance AP')}</div>
                 <div className="text-xl font-black italic tracking-tighter text-white">▲ {profile.ap}</div>
               </div>
             </div>
@@ -212,8 +214,8 @@ export default function MarketplacePage() {
             >
               <div className="p-8 border-b border-white/5 flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-black uppercase italic tracking-tighter">Mettre en vente</h2>
-                  <p className="text-gray-500 text-xs font-mono uppercase tracking-widest mt-1">Sélectionnez une pièce de votre garage</p>
+                  <h2 className="text-2xl font-black uppercase italic tracking-tighter">{t('Mettre en vente')}</h2>
+                  <p className="text-gray-500 text-xs font-mono uppercase tracking-widest mt-1">{t('Sélectionnez une pièce de votre garage')}</p>
                 </div>
                 <button onClick={() => setIsSellModalOpen(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
                   <XIcon size={24} />
@@ -233,7 +235,7 @@ export default function MarketplacePage() {
                   ))}
                   {userCards.length === 0 && (
                     <div className="col-span-full py-20 text-center opacity-30">
-                      <p className="font-mono text-sm uppercase tracking-widest">Votre garage est vide</p>
+                      <p className="font-mono text-sm uppercase tracking-widest">{t('Votre garage est vide')}</p>
                     </div>
                   )}
                 </div>
@@ -249,23 +251,24 @@ export default function MarketplacePage() {
     if (!user) return;
     const res = await createListing(user.id, cardId, price);
     if (res.success) {
-      alert('Annonce créée avec succès !');
+      alert(t('Annonce créée avec succès !'));
       setIsSellModalOpen(false);
       refreshListings();
     } else {
-      alert(`Erreur: ${res.error}`);
+      alert(`${t('Erreur')}: ${res.error}`);
     }
   }
 }
 
 function SellCardItem({ userCard, onSelect }: { userCard: any, onSelect: (price: number) => void }) {
+  const { t } = useSitePreferences();
   const [isSettingPrice, setIsSettingPrice] = useState(false);
   const [price, setPrice] = useState(150);
 
   if (isSettingPrice) {
     return (
       <div className="bg-white/5 border border-blue-500/50 rounded-2xl p-4 flex flex-col items-center justify-center gap-4 animate-in fade-in zoom-in duration-200">
-        <div className="text-[10px] font-black uppercase tracking-widest text-blue-400">Fixer le prix</div>
+        <div className="text-[10px] font-black uppercase tracking-widest text-blue-400">{t('Fixer le prix')}</div>
         <div className="flex items-center gap-2">
           <input
             type="number"
@@ -280,13 +283,13 @@ function SellCardItem({ userCard, onSelect }: { userCard: any, onSelect: (price:
             onClick={() => onSelect(price)}
             className="w-full bg-blue-600 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest"
           >
-            Confirmer
+            {t('Confirmer')}
           </button>
           <button
             onClick={() => setIsSettingPrice(false)}
             className="w-full bg-white/5 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest"
           >
-            Annuler
+            {t('Annuler')}
           </button>
         </div>
       </div>

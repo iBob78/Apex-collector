@@ -16,9 +16,11 @@ import {
     ChevronRightIcon
 } from 'lucide-react';
 import clsx from 'clsx';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 export default function MissionsPage() {
     const router = useRouter();
+    const { t } = useSitePreferences();
     const [user, setUser] = useState<any>(null);
     const [quests, setQuests] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -44,10 +46,10 @@ export default function MissionsPage() {
         setClaimingId(userQuestId);
         const res = await claimQuestReward(user.id, userQuestId);
         if (res.success) {
-            alert(`Bravo ! Vous avez récupéré ${res.reward} AP.`);
+            alert(`${t('Récompense récupérée')} +${res.reward} AP.`);
             fetchQuests(user.id);
         } else {
-            alert(`Erreur: ${res.error}`);
+            alert(`${t('Erreur')}: ${res.error}`);
         }
         setClaimingId(null);
     };
@@ -60,10 +62,10 @@ export default function MissionsPage() {
                     {/* Header */}
                     <header className="mb-12">
                         <h1 className="text-4xl font-black uppercase italic tracking-tighter bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">
-                            Contrats de Pilote
+                            {t('Contrats de Pilote')}
                         </h1>
                         <p className="text-gray-500 font-mono text-xs uppercase tracking-[0.3em] mt-2">
-                            Remplissez vos objectifs pour financer votre écurie.
+                            {t('Remplissez vos objectifs pour financer votre écurie.')}
                         </p>
                     </header>
 
@@ -105,7 +107,7 @@ export default function MissionsPage() {
                                                     "font-black uppercase italic tracking-tight text-lg",
                                                     uq.status === 'claimed' ? 'text-gray-600 line-through' : 'text-white'
                                                 )}>
-                                                    {uq.quest.title}
+                                                    {t(uq.quest.title)}
                                                 </h3>
                                                 <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full border border-white/5">
                                                     <GiftIcon size={12} className="text-blue-500" />
@@ -114,14 +116,14 @@ export default function MissionsPage() {
                                             </div>
 
                                             <p className="text-gray-500 text-xs mb-6 font-medium leading-relaxed">
-                                                {uq.quest.description}
+                                                {t(uq.quest.description)}
                                             </p>
 
                                             {/* Progress Bar */}
                                             {uq.status !== 'claimed' && (
                                                 <div className="space-y-2">
                                                     <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">
-                                                        <span>Progression</span>
+                                                        <span>{t('Progression')}</span>
                                                         <span className={uq.status === 'completed' ? 'text-yellow-500' : 'text-blue-400'}>
                                                             {uq.current_count} / {uq.quest.required_count}
                                                         </span>
@@ -149,14 +151,14 @@ export default function MissionsPage() {
                                                     {claimingId === uq.id ? (
                                                         <TimerIcon size={16} className="animate-spin" />
                                                     ) : (
-                                                        <>Réclamer la récompense <ChevronRightIcon size={16} /></>
+                                                        <>{t('Réclamer la récompense')} <ChevronRightIcon size={16} /></>
                                                     )}
                                                 </button>
                                             )}
 
                                             {uq.status === 'claimed' && (
                                                 <div className="mt-6 text-center text-[10px] uppercase font-black tracking-widest text-green-500/50 flex items-center justify-center gap-2">
-                                                    <CheckCircle2Icon size={14} /> Contrat Honoré
+                                                    <CheckCircle2Icon size={14} /> {t('Contrat Honoré')}
                                                 </div>
                                             )}
                                         </div>
@@ -167,7 +169,7 @@ export default function MissionsPage() {
                     ) : (
                         <div className="flex flex-col items-center justify-center py-20 bg-white/5 border border-white/5 border-dashed rounded-3xl">
                             <TrophyIcon size={48} className="text-gray-700 mb-4" />
-                            <p className="text-gray-500 font-mono text-sm uppercase tracking-widest italic">Aucun contrat disponible pour le moment.</p>
+                            <p className="text-gray-500 font-mono text-sm uppercase tracking-widest italic">{t('Aucun contrat disponible pour le moment.')}</p>
                         </div>
                     )}
                 </div>

@@ -26,7 +26,7 @@ export interface VehicleCard extends BaseCard {
     max_speed_kmh: number | string;
     acceleration_0_100?: string | number;
     weight_t: number | string;
-    transmission?: Transmission;
+    transmission?: Transmission | string;
     engine_temp?: string | number;
     logo_url?: string;
 
@@ -36,6 +36,10 @@ export interface VehicleCard extends BaseCard {
     engine_size?: string;
     boost?: string;
     country_code?: string;
+    new_price_eur?: number | string;
+    fuel_type?: string;
+    max_rpm?: number | string;
+    units_sold?: number | string;
 }
 
 export interface CircuitCard extends BaseCard {

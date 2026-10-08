@@ -23,7 +23,12 @@ export type Database = {
           price_eur: number;
           collection_number: number;
           total_in_collection: number;
-        };
+          transmission: string | null;
+          new_price_eur: number | null;
+          fuel_type: string | null;
+          max_rpm: number | null;
+          units_sold: number | null;
+        }
       };
       // Ajoutez d'autres tables selon vos besoins
     };

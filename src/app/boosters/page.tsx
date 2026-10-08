@@ -7,9 +7,11 @@ import { supabase } from '@/lib/supabaseClient';
 import { PACKS } from '@/lib/boosters';
 import { motion } from 'framer-motion';
 import SafeImage from '@/components/SafeImage';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 export default function BoostersPage() {
   const router = useRouter();
+  const { t } = useSitePreferences();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -49,9 +51,9 @@ export default function BoostersPage() {
           <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <h1 className="text-4xl font-black uppercase italic tracking-tighter bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent mb-2">
-                Boutique Officielle
+                {t('Boutique Officielle')}
               </h1>
-              <p className="text-gray-500 font-mono text-sm">Débloquez de nouvelles mécaniques et agrandissez votre garage.</p>
+              <p className="text-gray-500 font-mono text-sm">{t('Débloquez de nouvelles mécaniques et agrandissez votre garage.')}</p>
             </div>
 
             {profile && (
@@ -60,7 +62,7 @@ export default function BoostersPage() {
                   <span className="text-blue-500 text-xl font-bold">▲</span>
                 </div>
                 <div>
-                  <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">Votre Solde</div>
+                  <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">{t('Votre Solde')}</div>
                   <div className="text-xl font-black italic tracking-tighter">{profile.ap} <span className="text-xs not-italic text-blue-500">AP</span></div>
                 </div>
               </div>
@@ -94,12 +96,12 @@ export default function BoostersPage() {
                       <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent`}></div>
                     </div>
 
-                    <h2 className="text-2xl font-bold mb-2">{pack.name}</h2>
+                    <h2 className="text-2xl font-bold mb-2">{t(pack.name)}</h2>
                     <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-                      {pack.description}
+                      {t(pack.description)}
                       <br />
                       <span className="text-white/60 text-xs italic mt-2 block">
-                        Contient {pack.cardCount} cartes aléatoires
+                        {t('Contient')} {pack.cardCount} {t('cartes aléatoires')}
                       </span>
                     </p>
                   </div>
@@ -109,7 +111,7 @@ export default function BoostersPage() {
                       <span className="text-2xl font-black italic tracking-tighter">
                         <span className="text-blue-500 not-italic mr-1 text-base">▲</span>{pack.price}
                       </span>
-                      <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-600">Apex Points</span>
+                      <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-600">{t('Apex Points')}</span>
                     </div>
 
                     <button
@@ -121,7 +123,7 @@ export default function BoostersPage() {
                           : `bg-gradient-to-r ${pack.color} text-white hover:scale-[1.02] active:scale-[0.98] hover:shadow-2xl hover:shadow-black/50`
                         }`}
                     >
-                      {profile && profile.ap < pack.price ? 'Solde Insuffisant' : 'Acheter le pack'}
+                      {profile && profile.ap < pack.price ? t('Solde Insuffisant') : t('Acheter le pack')}
                     </button>
                   </div>
                 </div>

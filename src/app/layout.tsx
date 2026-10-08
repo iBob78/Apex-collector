@@ -4,6 +4,7 @@ import "./globals.css";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navigation/Navbar";
 import { ReactNode } from 'react';
+import { SitePreferencesProvider } from '@/contexts/SitePreferencesContext';
 
 export const metadata = {
   title: 'Apex Collector',
@@ -14,8 +15,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="fr">
       <body className="bg-gray-950 text-white font-sans">
-        {children}
-        <Footer />
+        <SitePreferencesProvider>
+          {children}
+          <Footer />
+        </SitePreferencesProvider>
       </body>
     </html>
   );

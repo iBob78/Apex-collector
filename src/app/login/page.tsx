@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabaseBrowser';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogInIcon, UserPlusIcon, ArrowRightIcon, ZapIcon } from 'lucide-react';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -16,6 +17,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || '/dashboard';
   const supabase = createClient();
+  const { language, t } = useSitePreferences();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +28,11 @@ function LoginForm() {
     try {
       const { data, error: authError } = isLogin
         ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password });
+        : await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { language } },
+          });
 
       console.log('[LoginForm] Auth result:', { data, error: authError });
 
@@ -40,7 +46,7 @@ function LoginForm() {
       }
     } catch (err: any) {
       console.error('[LoginForm] Unexpected error:', err);
-      setError("Une erreur inattendue est survenue.");
+      setError(t("Une erreur inattendue est survenue."));
     } finally {
       setLoading(false);
       console.log('[LoginForm] Loading finished');
@@ -64,16 +70,16 @@ function LoginForm() {
               {isLogin ? <LogInIcon size={28} /> : <UserPlusIcon size={28} />}
             </div>
             <h2 className="text-3xl font-black uppercase italic tracking-tighter text-white">
-              {isLogin ? 'Accès Pilote' : 'Nouvelle Écurie'}
+              {t(isLogin ? 'Accès Pilote' : 'Nouvelle Écurie')}
             </h2>
           </header>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Email</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">{t('Email')}</label>
               <input
                 type="email"
-                placeholder="nom@ecurie.com"
+                placeholder={t('nom@ecurie.com')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -82,7 +88,7 @@ function LoginForm() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Mot de passe</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">{t('Mot de passe')}</label>
               <input
                 type="password"
                 placeholder="••••••••"
@@ -115,7 +121,7 @@ function LoginForm() {
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  {isLogin ? 'Connexion' : 'Créer l\'écurie'}
+                  {t(isLogin ? 'Connexion' : 'Créer l\'écurie')}
                   <ArrowRightIcon size={16} className="group-hover:translate-x-1 transition-transform" />
                 </>
               )}
@@ -127,7 +133,7 @@ function LoginForm() {
               onClick={() => setIsLogin(!isLogin)}
               className="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors"
             >
-              {isLogin ? "Inscrivez-vous" : "Connectez-vous"}
+              {t(isLogin ? 'Inscrivez-vous' : 'Connectez-vous')}
             </button>
           </div>
         </div>
@@ -137,13 +143,14 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
+  const { t } = useSitePreferences();
   return (
     <main className="flex items-center justify-center min-h-screen bg-[#050505] text-white p-6 relative overflow-hidden">
       {/* Dynamic Background Elements */}
       <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-blue-600/5 blur-[150px] rounded-full animate-pulse" />
       <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-indigo-600/5 blur-[150px] rounded-full animate-pulse delay-1000" />
 
-      <Suspense fallback={<div className="text-gray-500 font-mono text-xs uppercase animate-pulse">Chargement système...</div>}>
+      <Suspense fallback={<div className="text-gray-500 font-mono text-xs uppercase animate-pulse">{t('Chargement système...')}</div>}>
         <LoginForm />
       </Suspense>
     </main>

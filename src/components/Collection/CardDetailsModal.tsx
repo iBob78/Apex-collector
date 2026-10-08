@@ -5,6 +5,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import SafeImage from '@/components/SafeImage';
 import { IMAGE_PATHS, resolveCardImage } from '@/lib/images';
+import { calculateVehicleIP } from '@/lib/vehicleStats';
+import { formatDistance, formatPower, formatSpeed, formatTorque, formatWeight } from '@/lib/preferences';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 interface CardDetailsModalProps {
   card: any | null;
@@ -13,6 +16,7 @@ interface CardDetailsModalProps {
 }
 
 export default function CardDetailsModal({ card, ownedCount, onClose }: CardDetailsModalProps) {
+  const { language, units, t } = useSitePreferences();
   useEffect(() => {
     if (!card) return;
 
@@ -48,28 +52,43 @@ export default function CardDetailsModal({ card, ownedCount, onClose }: CardDeta
       })
     : '';
   const rawWeight = Number(card?.weight_t);
+  const vehicleIp = isVehicle ? calculateVehicleIP(card?.power_hp, card?.weight_t) : 0;
+  const formattedPrice = Number.isFinite(Number(card?.new_price_eur)) && card?.new_price_eur !== null && card?.new_price_eur !== undefined
+    ? `${new Intl.NumberFormat(language).format(Number(card.new_price_eur))} €`
+    : '—';
+  const formattedUnitsSold = Number.isFinite(Number(card?.units_sold)) && card?.units_sold !== null && card?.units_sold !== undefined
+    ? new Intl.NumberFormat(language).format(Number(card.units_sold))
+    : '—';
   const details: { label: string; value: string | number | null | undefined }[] = !card
     ? []
     : isVehicle
       ? [
-          { label: 'Puissance', value: card.power_hp ? `${card.power_hp} HP` : null },
-          { label: 'Couple', value: card.torque_nm ? `${card.torque_nm} Nm` : null },
-          { label: 'Vitesse maximale', value: card.max_speed_kmh ? `${card.max_speed_kmh} km/h` : null },
-          { label: '0 à 100 km/h', value: card.acceleration_0_100 ? `${card.acceleration_0_100} s` : null },
-          { label: 'Poids', value: rawWeight > 0 ? `${rawWeight} ${rawWeight > 50 ? 'kg' : 't'}` : null },
-          { label: 'Moteur', value: card.engine_size || null },
-          { label: 'Cylindres', value: card.cylinder || null },
-          { label: 'Transmission', value: card.transmission || null },
-          { label: 'Induction', value: card.boost || null },
-          { label: 'Pays', value: card.country_code || null },
+          { label: t('Pays'), value: card.country_code || '—' },
+          { label: t('Année'), value: card.year || '—' },
+          { label: t('Marque'), value: card.make || '—' },
+          { label: t('Modèle'), value: card.model || '—' },
+          { label: t('Puissance'), value: card.power_hp !== null && card.power_hp !== undefined ? formatPower(Number(card.power_hp), units, language, Number(card.power_kw) || undefined) : '—' },
+          { label: t('Couple'), value: card.torque_nm !== null && card.torque_nm !== undefined ? formatTorque(Number(card.torque_nm), units, language) : '—' },
+          { label: t('Poids'), value: rawWeight > 0 ? formatWeight(rawWeight, units, language) : '—' },
+          { label: t('0 à 100 km/h'), value: card.acceleration_0_100 !== null && card.acceleration_0_100 !== undefined ? `${card.acceleration_0_100} s` : '—' },
+          { label: t('Transmission'), value: card.transmission || '—' },
+          { label: t('Indice de performance (IP)'), value: vehicleIp > 0 ? vehicleIp : '—' },
+          { label: t('Vitesse maximale'), value: card.max_speed_kmh !== null && card.max_speed_kmh !== undefined ? formatSpeed(Number(card.max_speed_kmh), units, language) : '—' },
+          { label: t('Prix neuf'), value: formattedPrice },
+          { label: t('Carburant'), value: card.fuel_type || '—' },
+          { label: t('Régime maximal'), value: card.max_rpm ? `${new Intl.NumberFormat(language).format(Number(card.max_rpm))} rpm` : '—' },
+          { label: t('Exemplaires vendus (monde)'), value: formattedUnitsSold },
+          { label: t('Cylindrée'), value: card.engine_size || '—' },
+          { label: t('Cylindres'), value: card.cylinder || '—' },
+          { label: t('Aspiration'), value: card.boost?.toLowerCase() === 'na' ? t('Atmosphérique') : card.boost || '—' },
         ]
       : [
-          { label: 'Longueur', value: card.length_km ? `${card.length_km} km` : null },
-          { label: 'Virages', value: card.turns ?? null },
-          { label: 'Ligne droite', value: card.straight_km ? `${card.straight_km} km` : null },
-          { label: 'Type', value: card.type || null },
-          { label: 'Pays', value: card.country || card.country_code || null },
-          { label: 'Année', value: card.year || null },
+          { label: t('Longueur'), value: card.length_km ? formatDistance(Number(card.length_km), units, language) : null },
+          { label: t('Virages'), value: card.turns ?? null },
+          { label: t('Ligne droite'), value: card.straight_km ? formatDistance(Number(card.straight_km), units, language) : null },
+          { label: t('Type'), value: card.type || null },
+          { label: t('Pays'), value: card.country || card.country_code || null },
+          { label: t('Année'), value: card.year || null },
         ];
 
   return (
@@ -108,7 +127,7 @@ export default function CardDetailsModal({ card, ownedCount, onClose }: CardDeta
             <div className="relative min-h-0 overflow-y-auto p-5 sm:p-7">
               <button
                 type="button"
-                aria-label="Fermer les détails"
+                aria-label={t('Fermer les détails')}
                 onClick={onClose}
                 className="absolute right-4 top-4 z-10 rounded-md border border-white/10 bg-black/50 p-2 text-gray-300 transition-colors hover:text-white"
               >
@@ -116,7 +135,7 @@ export default function CardDetailsModal({ card, ownedCount, onClose }: CardDeta
               </button>
 
               <div className="mb-6 pr-10">
-                <p className="mb-2 text-xs font-bold uppercase text-blue-400">{isVehicle ? 'Véhicule' : 'Circuit'}</p>
+                <p className="mb-2 text-xs font-bold uppercase text-blue-400">{t(isVehicle ? 'Véhicule' : 'Circuit')}</p>
                 <h2 id="card-details-title" className="text-2xl font-black uppercase italic leading-tight sm:text-3xl">
                   {title}
                 </h2>
@@ -124,7 +143,7 @@ export default function CardDetailsModal({ card, ownedCount, onClose }: CardDeta
                   {card.rarity && <span className="rounded border border-white/10 px-2 py-1">{card.rarity}</span>}
                   {isVehicle && card.year && <span>{card.year}</span>}
                   {card.country && <span>{card.country}</span>}
-                  <span>{ownedCount} exemplaire{ownedCount > 1 ? 's' : ''} possédé{ownedCount > 1 ? 's' : ''}</span>
+                  <span>{ownedCount} {t(ownedCount > 1 ? 'exemplaires' : 'exemplaire')} {t(ownedCount > 1 ? 'possédés' : 'possédé')}</span>
                 </div>
               </div>
 
@@ -134,9 +153,9 @@ export default function CardDetailsModal({ card, ownedCount, onClose }: CardDeta
                 </p>
               )}
 
-              {details.some(({ value }) => value !== null && value !== undefined && value !== '') && (
+              {details.length > 0 && (
                 <dl className="grid grid-cols-2 gap-2">
-                  {details.map(({ label, value }) => value !== null && value !== undefined && value !== '' && (
+                  {details.map(({ label, value }) => (
                     <div key={label} className="min-w-0 border-t border-white/10 py-3">
                       <dt className="text-[10px] font-bold uppercase text-gray-500">{label}</dt>
                       <dd className="mt-1 break-words text-sm font-semibold text-gray-100">{value}</dd>

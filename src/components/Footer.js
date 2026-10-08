@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 const footerLinks = [
   { href: '/', label: 'Accueil' },
@@ -15,17 +18,18 @@ const footerLinks = [
 ];
 
 export default function Footer() {
+  const { t } = useSitePreferences();
   return (
     <footer className="w-full border-t border-white/5 bg-[#080808] text-sm text-gray-400">
       <div className="mx-auto flex max-w-7xl flex-col items-center gap-5 px-4 py-6 sm:px-6 md:flex-row md:justify-between">
-        <nav aria-label="Navigation de pied de page" className="flex flex-wrap justify-center gap-x-5 gap-y-3">
+        <nav aria-label={t('Navigation de pied de page')} className="flex flex-wrap justify-center gap-x-5 gap-y-3">
           {footerLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
               className="transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             >
-              {label}
+              {t(label)}
             </Link>
           ))}
         </nav>

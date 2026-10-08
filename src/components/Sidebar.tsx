@@ -18,6 +18,7 @@ import {
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabaseBrowser';
 import { useState, useEffect, useMemo } from 'react';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 const navItems = [
   { href: '/dashboard', label: 'ACCUEIL', icon: HomeIcon },
@@ -31,6 +32,7 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { t } = useSitePreferences();
   const supabase = useMemo(() => createClient(), []);
   const [user, setUser] = useState<any>(null);
   const [authLoaded, setAuthLoaded] = useState(false);
@@ -72,7 +74,7 @@ export default function Sidebar() {
         </h1>
         <div className="flex items-center gap-2 mt-2">
           <div className="h-1 w-8 bg-blue-500 rounded-full"></div>
-          <span className="text-[10px] font-mono tracking-[0.3em] text-gray-500 uppercase">Season One</span>
+          <span className="text-[10px] font-mono tracking-[0.3em] text-gray-500 uppercase">{t('Season One')}</span>
         </div>
       </div>
 
@@ -105,7 +107,7 @@ export default function Sidebar() {
               )}
 
               <Icon size={20} className={`transition-colors ${isActive ? 'text-blue-500' : isLocked ? 'text-gray-800' : 'group-hover:text-blue-400'}`} />
-              <span className="text-xs font-black tracking-widest uppercase">{label}</span>
+              <span className="text-xs font-black tracking-widest uppercase">{t(label)}</span>
 
               {isLocked && (
                 <LockIcon size={12} className="ml-auto text-gray-800" />
@@ -128,8 +130,8 @@ export default function Sidebar() {
               <CrownIcon size={18} className="text-blue-500" />
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-tighter text-gray-500 font-bold">Rang Actuel</div>
-              <div className="text-sm font-black uppercase italic tracking-tighter">Écurie Platine</div>
+              <div className="text-[10px] uppercase tracking-tighter text-gray-500 font-bold">{t('Rang Actuel')}</div>
+              <div className="text-sm font-black uppercase italic tracking-tighter">{t('Écurie Platine')}</div>
             </div>
           </div>
 
@@ -137,7 +139,7 @@ export default function Sidebar() {
             <div className="h-full w-[65%] bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
           </div>
           <div className="flex justify-between mt-2 text-[9px] font-mono text-gray-500 uppercase tracking-widest">
-            <span>XP PILOTE</span>
+            <span>{t('XP PILOTE')}</span>
             <span>65%</span>
           </div>
         </div>
@@ -146,8 +148,8 @@ export default function Sidebar() {
           href="/login"
           className="mt-auto p-6 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl border border-blue-500/30 text-center transition-all shadow-xl shadow-blue-500/20 group"
         >
-          <div className="text-xs font-black uppercase tracking-[0.2em]">Se Connecter</div>
-          <div className="text-[9px] font-medium opacity-70 mt-1">Rejoignez l&apos;élite Apex</div>
+          <div className="text-xs font-black uppercase tracking-[0.2em]">{t('Se Connecter')}</div>
+          <div className="text-[9px] font-medium opacity-70 mt-1">{t('Rejoignez l\'élite Apex')}</div>
         </Link>
       )}
     </aside>

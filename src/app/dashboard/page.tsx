@@ -6,9 +6,11 @@ import { supabase } from '@/lib/supabaseClient';
 import Sidebar from '@/components/Sidebar';
 import { motion } from 'framer-motion';
 import { PACKS } from '@/lib/boosters';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { t } = useSitePreferences();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [stats, setStats] = useState({ totalCards: 0, uniqueCards: 0 });
@@ -56,9 +58,9 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center mb-12">
             <div>
               <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">
-                Tableau de bord
+                {t('Tableau de bord')}
               </h1>
-              <p className="text-gray-500 mt-1">Gérez votre écurie et vos actifs.</p>
+              <p className="text-gray-500 mt-1">{t('Gérez votre écurie et vos actifs.')}</p>
             </div>
             {user && (
               <button
@@ -78,21 +80,21 @@ export default function DashboardPage() {
 
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <StatCard label="Cartes totales" value={stats.totalCards} sub="Dans votre collection" color="blue" />
-            <StatCard label="Modèles uniques" value={stats.uniqueCards} sub="Garage distinct" color="purple" />
-            <StatCard label="Balance AP" value={profile?.ap || 0} sub="Disponibles" color="green" />
-            <StatCard label="Niveau écurie" value={Math.floor(stats.uniqueCards / 10) + 1} sub="Prochaine récompense à +5" color="orange" />
+            <StatCard label={t('Cartes totales')} value={stats.totalCards} sub={t('Dans votre collection')} color="blue" />
+            <StatCard label={t('Modèles uniques')} value={stats.uniqueCards} sub={t('Garage distinct')} color="purple" />
+            <StatCard label={t('Balance AP')} value={profile?.ap || 0} sub={t('Disponibles')} color="green" />
+            <StatCard label={t('Niveau écurie')} value={Math.floor(stats.uniqueCards / 10) + 1} sub={t('Prochaine récompense à +5')} color="orange" />
           </div>
 
           {/* Featured Boosters Section */}
           <section className="mb-12">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold uppercase tracking-widest text-gray-400">Boosters Populaires</h2>
+              <h2 className="text-xl font-bold uppercase tracking-widest text-gray-400">{t('Boosters Populaires')}</h2>
               <button
                 onClick={() => router.push('/boosters')}
                 className="text-blue-400 text-sm hover:underline"
               >
-                Voir toute la boutique
+                {t('Voir toute la boutique')}
               </button>
             </div>
 
@@ -120,10 +122,10 @@ export default function DashboardPage() {
 
           {/* Recent Activity / Tips */}
           <div className="bg-gradient-to-r from-blue-900/20 to-transparent border-l-4 border-blue-500 p-6 rounded-r-xl">
-            <h3 className="font-bold mb-2">Conseil du jour</h3>
+            <h3 className="font-bold mb-2">{t('Conseil du jour')}</h3>
             <p className="text-sm text-gray-400 leading-relaxed">
-              Les cartes de rareté <span className="text-yellow-400">Legend</span> ont un taux d&apos;apparition de 20% dans le Pack Légendaire.
-              N&apos;oubliez pas d&apos;échanger vos doublons au marché pour optimiser votre progression.
+              {t('Les cartes de rareté')} <span className="text-yellow-400">Legend</span> {t('Il y a 20% de chance dans le')} Pack Légendaire.
+              {t('N’oubliez pas d’échanger vos doublons au marché pour optimiser votre progression.')}
             </p>
           </div>
         </div>

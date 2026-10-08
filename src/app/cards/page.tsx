@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import Sidebar from '@/components/Sidebar';
 import Card from '@/components/Card';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 export default function CardsPage() {
+  const { t } = useSitePreferences();
   const [cards, setCards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtreRarity, setFiltreRarity] = useState('Toutes');
@@ -37,11 +39,11 @@ export default function CardsPage() {
     <div className="flex min-h-screen">
       <Sidebar />
       <main className="flex-1 p-8 overflow-y-auto">
-        <h1 className="text-3xl font-bold mb-6">📘 Toutes les Cartes</h1>
+        <h1 className="text-3xl font-bold mb-6">📘 {t('Toutes les Cartes')}</h1>
 
         <div className="mb-6">
           <label htmlFor="rarete" className="mr-2 font-medium">
-            Filtrer par rareté :
+            {t('Filtrer par rareté :')}
           </label>
           <select
             id="rarete"
@@ -49,7 +51,7 @@ export default function CardsPage() {
             onChange={(e) => setFiltreRarity(e.target.value)}
             className="p-2 rounded border border-gray-300 text-black"
           >
-            <option value="Toutes">Toutes</option>
+            <option value="Toutes">{t('Toutes')}</option>
             <option value="Common">Common</option>
             <option value="Rare">Rare</option>
             <option value="Epic">Epic</option>
@@ -58,7 +60,7 @@ export default function CardsPage() {
         </div>
 
         {loading ? (
-          <p className="text-gray-400">Chargement des cartes...</p>
+          <p className="text-gray-400">{t('Chargement des cartes...')}</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {cartesFiltrees.map((card) => (

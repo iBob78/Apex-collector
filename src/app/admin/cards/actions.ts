@@ -9,6 +9,7 @@ const draftFields: (keyof CardDraft)[] = [
   'make', 'model', 'year', 'rarity', 'image_url', 'description',
   'power_hp', 'power_kw', 'torque_nm', 'max_speed_kmh', 'weight_t',
   'acceleration_0_100', 'engine_size', 'cylinder', 'boost', 'country_code',
+  'transmission', 'new_price_eur', 'fuel_type', 'max_rpm', 'units_sold',
 ];
 
 export type CardDraft = {
@@ -28,6 +29,11 @@ export type CardDraft = {
   cylinder: string;
   boost: string;
   country_code: string;
+  transmission: string;
+  new_price_eur: string;
+  fuel_type: string;
+  max_rpm: string;
+  units_sold: string;
 };
 
 export type CardData = {
@@ -50,6 +56,11 @@ export type CardData = {
   cylinder: string | null;
   boost: string | null;
   country_code: string | null;
+  transmission: string | null;
+  new_price_eur: number | null;
+  fuel_type: string | null;
+  max_rpm: number | null;
+  units_sold: number | null;
 };
 
 export type CircuitDraft = {
@@ -118,9 +129,18 @@ function parseCardDraft(draft: CardDraft) {
     max_speed_kmh: parseOptionalNumber(draft.max_speed_kmh, 'La vitesse maximale'),
     weight_t: parseOptionalNumber(draft.weight_t, 'Le poids'),
     acceleration_0_100: parseOptionalNumber(draft.acceleration_0_100, 'L’accélération'),
+    new_price_eur: parseOptionalNumber(draft.new_price_eur, 'Le prix neuf'),
+    max_rpm: parseOptionalNumber(draft.max_rpm, 'Le régime maximal'),
+    units_sold: parseOptionalNumber(draft.units_sold, 'Le nombre d’exemplaires vendus'),
   };
   const invalidNumber = Object.values(numbers).find(({ error }) => error);
   if (invalidNumber?.error) return { error: invalidNumber.error } as const;
+  if (numbers.max_rpm.value !== null && !Number.isInteger(numbers.max_rpm.value)) {
+    return { error: 'Le régime maximal doit être un nombre entier.' } as const;
+  }
+  if (numbers.units_sold.value !== null && !Number.isInteger(numbers.units_sold.value)) {
+    return { error: 'Le nombre d’exemplaires vendus doit être un nombre entier.' } as const;
+  }
 
   return {
     data: {
@@ -141,6 +161,11 @@ function parseCardDraft(draft: CardDraft) {
       cylinder: draft.cylinder.trim() || null,
       boost: draft.boost.trim() || null,
       country_code: draft.country_code.trim() || null,
+      transmission: draft.transmission.trim() || null,
+      new_price_eur: numbers.new_price_eur.value,
+      fuel_type: draft.fuel_type.trim() || null,
+      max_rpm: numbers.max_rpm.value,
+      units_sold: numbers.units_sold.value,
     },
   } as const;
 }

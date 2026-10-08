@@ -38,6 +38,11 @@ const emptyDraft: CardDraft = {
   cylinder: '',
   boost: '',
   country_code: '',
+  transmission: '',
+  new_price_eur: '',
+  fuel_type: '',
+  max_rpm: '',
+  units_sold: '',
 };
 
 function toDraft(card: CardData): CardDraft {
@@ -58,6 +63,11 @@ function toDraft(card: CardData): CardDraft {
     cylinder: card.cylinder ?? '',
     boost: card.boost ?? '',
     country_code: card.country_code ?? '',
+    transmission: card.transmission ?? '',
+    new_price_eur: String(card.new_price_eur ?? ''),
+    fuel_type: card.fuel_type ?? '',
+    max_rpm: String(card.max_rpm ?? ''),
+    units_sold: String(card.units_sold ?? ''),
   };
 }
 
@@ -273,6 +283,11 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                   <TextField label="Motorisation" value={draft.engine_size} onChange={(value) => setField('engine_size', value)} placeholder="4.0L flat-six" />
                   <TextField label="Cylindres" value={draft.cylinder} onChange={(value) => setField('cylinder', value)} placeholder="6" />
                   <TextField label="Suralimentation" value={draft.boost} onChange={(value) => setField('boost', value)} placeholder="Atmosphérique" />
+                  <TextField label="Transmission" value={draft.transmission} onChange={(value) => setField('transmission', value)} placeholder="RWD, AWD, Manuelle…" />
+                  <TextField label="Prix neuf" value={draft.new_price_eur} onChange={(value) => setField('new_price_eur', value)} type="number" min="0" step="any" placeholder="245000" hint="Euros (€)" />
+                  <TextField label="Carburant" value={draft.fuel_type} onChange={(value) => setField('fuel_type', value)} placeholder="Essence, Diesel, Électrique…" />
+                  <TextField label="Régime maximal" value={draft.max_rpm} onChange={(value) => setField('max_rpm', value)} type="number" min="0" step="1" placeholder="9000" hint="Tours par minute (tr/min)" />
+                  <TextField label="Exemplaires vendus" value={draft.units_sold} onChange={(value) => setField('units_sold', value)} type="number" min="0" step="1" placeholder="9181" hint="Production réelle du modèle" />
                 </div>
               </div>
 
@@ -323,6 +338,7 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                   max_speed_kmh={draft.max_speed_kmh || 0}
                   acceleration_0_100={draft.acceleration_0_100 || 0}
                   weight_t={draft.weight_t || 0}
+                  transmission={draft.transmission || undefined}
                   country_code={draft.country_code}
                   compact
                   showLevel={false}

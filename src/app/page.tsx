@@ -18,8 +18,10 @@ import {
   UsersIcon
 } from 'lucide-react';
 import Link from 'next/link';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 export default function LandingPage() {
+  const { t } = useSitePreferences();
   const [user, setUser] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
@@ -94,7 +96,7 @@ export default function LandingPage() {
           href="/login"
           className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors px-6 py-2 rounded-full border border-white/10 hover:border-white/30"
         >
-          Connexion
+          {t('Connexion')}
         </Link>
       </motion.header>
 
@@ -122,7 +124,7 @@ export default function LandingPage() {
               >
                 <ZapIcon size={16} className="text-blue-500" />
               </motion.div>
-              <span className="text-xs font-black uppercase tracking-widest text-blue-400">Saison 1 · Édition Limitée</span>
+              <span className="text-xs font-black uppercase tracking-widest text-blue-400">{t('Saison 1 · Édition Limitée')}</span>
             </motion.div>
 
             <motion.h2
@@ -132,11 +134,11 @@ export default function LandingPage() {
               className="text-8xl font-black uppercase italic tracking-tighter mb-8 leading-none"
             >
               <span className="bg-gradient-to-r from-white via-blue-200 to-indigo-300 bg-clip-text text-transparent">
-                Collectionnez
+                {t('Collectionnez')}
               </span>
               <br />
               <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                l&apos;Élite Automobile
+                {t('l’Élite Automobile')}
               </span>
             </motion.h2>
 
@@ -146,8 +148,7 @@ export default function LandingPage() {
               transition={{ duration: 0.8, delay: 0.5 }}
               className="text-2xl text-gray-400 max-w-3xl mx-auto mb-16 leading-relaxed font-light"
             >
-              Ouvrez des packs premium, construisez votre garage légendaire et dominez le marché mondial.
-              Chaque carte est une icône automobile rare.
+              {t('Ouvrez des packs premium, construisez votre garage légendaire et dominez le marché mondial. Chaque carte est une icône automobile rare.')}
             </motion.p>
 
             <motion.div
@@ -165,7 +166,7 @@ export default function LandingPage() {
                   animate={{ x: [-100, 100] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 />
-                <span className="relative z-10">Commencer Gratuitement</span>
+                <span className="relative z-10">{t('Commencer Gratuitement')}</span>
                 <ArrowRightIcon size={20} className="relative z-10 group-hover:translate-x-2 transition-transform" />
               </Link>
             </motion.div>
@@ -178,11 +179,11 @@ export default function LandingPage() {
             transition={{ duration: 0.8, delay: 1 }}
             className="absolute bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-12 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl px-10 py-6"
           >
-            <StatItem value="500+" label="Cartes Uniques" />
+            <StatItem value="500+" label={t('Cartes Uniques')} />
             <div className="w-px h-12 bg-white/10" />
-            <StatItem value="∞" label="Possibilités" />
+            <StatItem value="∞" label={t('Possibilités')} />
             <div className="w-px h-12 bg-white/10" />
-            <StatItem value="24/7" label="Marketplace" />
+            <StatItem value="24/7" label={t('Marketplace')} />
           </motion.div>
         </motion.section>
 
@@ -197,25 +198,25 @@ export default function LandingPage() {
             >
               <h3 className="text-5xl font-black uppercase italic tracking-tighter mb-4">
                 <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                  Trois Piliers d&apos;Excellence
+                  {t('Trois Piliers d’Excellence')}
                 </span>
               </h3>
               <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-                Une expérience de collection premium avec des mécaniques de jeu avancées
+                {t('Une expérience de collection premium avec des mécaniques de jeu avancées')}
               </p>
             </motion.div>
 
             <div className="space-y-32">
               <DetailedFeature
                 icon={<PackageIcon size={40} />}
-                title="Système de Boosters Premium"
-                description="Des packs exclusifs pour tous les collectionneurs"
+                title={t('Système de Boosters Premium')}
+                description={t('Des packs exclusifs pour tous les collectionneurs')}
                 image="/showcase-boosters.png"
                 features={[
-                  { icon: <CrownIcon size={18} />, text: "Pack Carbon, Icon & Legendary avec raretés exclusives" },
-                  { icon: <SparklesIcon size={18} />, text: "Animation d'ouverture cinématique immersive" },
-                  { icon: <TrophyIcon size={18} />, text: "Cartes garanties selon la rareté du pack" },
-                  { icon: <ZapIcon size={18} />, text: "Distribution équilibrée avec anti-doublon intelligent" }
+                  { icon: <CrownIcon size={18} />, text: t('Pack Carbon, Icon & Legendary avec raretés exclusives') },
+                  { icon: <SparklesIcon size={18} />, text: t('Animation d’ouverture cinématique immersive') },
+                  { icon: <TrophyIcon size={18} />, text: t('Cartes garanties selon la rareté du pack') },
+                  { icon: <ZapIcon size={18} />, text: t('Distribution équilibrée avec anti-doublon intelligent') }
                 ]}
                 gradient="from-blue-500/20 to-cyan-500/20"
                 index={0}
@@ -223,14 +224,14 @@ export default function LandingPage() {
 
               <DetailedFeature
                 icon={<StoreIcon size={40} />}
-                title="Marketplace Mondial"
-                description="Achetez, vendez et dominez l'économie"
+                title={t('Marketplace Mondial')}
+                description={t('Achetez, vendez et dominez l’économie')}
                 image="/showcase-marketplace.png"
                 features={[
-                  { icon: <CoinsIcon size={18} />, text: "Transactions en Apex Points (AP) - Monnaie premium" },
-                  { icon: <TrendingUpIcon size={18} />, text: "Fixez vos propres prix et stratégies de vente" },
-                  { icon: <ShieldCheckIcon size={18} />, text: "Système anti-fraude et transactions sécurisées" },
-                  { icon: <UsersIcon size={18} />, text: "Marché en temps réel avec autres collectionneurs" }
+                  { icon: <CoinsIcon size={18} />, text: t('Transactions en Apex Points (AP) - Monnaie premium') },
+                  { icon: <TrendingUpIcon size={18} />, text: t('Fixez vos propres prix et stratégies de vente') },
+                  { icon: <ShieldCheckIcon size={18} />, text: t('Système anti-fraude et transactions sécurisées') },
+                  { icon: <UsersIcon size={18} />, text: t('Marché en temps réel avec autres collectionneurs') }
                 ]}
                 gradient="from-indigo-500/20 to-purple-500/20"
                 index={1}
@@ -239,14 +240,14 @@ export default function LandingPage() {
 
               <DetailedFeature
                 icon={<TrophyIcon size={40} />}
-                title="Missions & Contrats"
-                description="Complétez des défis pour gagner des récompenses"
+                title={t('Missions & Contrats')}
+                description={t('Complétez des défis pour gagner des récompenses')}
                 image="/showcase-missions.png"
                 features={[
-                  { icon: <TargetIcon size={18} />, text: "Contrats quotidiens avec objectifs progressifs" },
-                  { icon: <CoinsIcon size={18} />, text: "Récompenses en AP pour chaque mission complétée" },
-                  { icon: <ZapIcon size={18} />, text: "Suivi automatique de progression en temps réel" },
-                  { icon: <CrownIcon size={18} />, text: "Défis spéciaux pour débloquer des cartes exclusives" }
+                  { icon: <TargetIcon size={18} />, text: t('Contrats quotidiens avec objectifs progressifs') },
+                  { icon: <CoinsIcon size={18} />, text: t('Récompenses en AP pour chaque mission complétée') },
+                  { icon: <ZapIcon size={18} />, text: t('Suivi automatique de progression en temps réel') },
+                  { icon: <CrownIcon size={18} />, text: t('Défis spéciaux pour débloquer des cartes exclusives') }
                 ]}
                 gradient="from-purple-500/20 to-pink-500/20"
                 index={2}
@@ -278,17 +279,17 @@ export default function LandingPage() {
               <div className="relative z-10">
                 <h3 className="text-5xl font-black uppercase italic tracking-tighter mb-6">
                   <span className="bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                    Rejoignez l&apos;Élite
+                    {t('Rejoignez l’Élite')}
                   </span>
                 </h3>
                 <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-                  Créez votre compte gratuitement et recevez votre premier pack de bienvenue pour démarrer votre collection.
+                  {t('Créez votre compte gratuitement et recevez votre premier pack de bienvenue pour démarrer votre collection.')}
                 </p>
                 <Link
                   href="/login"
                   className="inline-flex items-center gap-4 bg-white text-black hover:bg-blue-50 px-12 py-6 rounded-2xl text-sm font-black uppercase tracking-[0.2em] transition-all shadow-2xl shadow-white/20 group"
                 >
-                  Créer mon Garage Elite
+                  {t('Créer mon Garage Elite')}
                   <ArrowRightIcon size={20} className="group-hover:translate-x-2 transition-transform" />
                 </Link>
               </div>

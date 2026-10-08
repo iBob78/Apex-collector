@@ -11,8 +11,10 @@ import { drawBoosterCards, PACKS } from '@/lib/boosters';
 import Card from '@/components/Card';
 import SafeImage from '@/components/SafeImage';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 function OpenContent() {
+  const { t } = useSitePreferences();
   const searchParams = useSearchParams();
   const router = useRouter();
   const packSlug = searchParams.get('pack') || 'common';
@@ -70,7 +72,7 @@ function OpenContent() {
       const deduction = await deductAP(userId, pack.price);
 
       if (!deduction.success) {
-        alert(`Erreur: ${deduction.error}`);
+        alert(`${t('Erreur')}: ${deduction.error}`);
         setIsOpening(false);
         return;
       }
@@ -105,7 +107,7 @@ function OpenContent() {
 
     } catch (err) {
       console.error('Erreur lors de l\'ouverture du pack:', err);
-      alert('Une erreur est survenue lors de l\'ouverture.');
+      alert(t('Une erreur est survenue lors de l\'ouverture.'));
       setIsOpening(false);
     }
   };
@@ -213,7 +215,7 @@ function OpenContent() {
                         {pack.name}
                       </h2>
                       <div className="mt-4 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded text-[10px] tracking-[0.3em] font-bold uppercase">
-                        {pack.cardCount} CARTES
+                        {pack.cardCount} {t('Cartes')}
                       </div>
                     </div>
                   )}
@@ -236,7 +238,7 @@ function OpenContent() {
                     </div>
                     <div className="flex h-full flex-col items-center justify-center px-4 text-center">
                       <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/70">
-                        Déchirer de gauche à droite
+                        {t('Déchirer de gauche à droite')}
                       </span>
                     </div>
                   </div>
@@ -254,7 +256,7 @@ function OpenContent() {
                   {!isTorn && (
                     <button
                       type="button"
-                      aria-label="Faire glisser de gauche à droite pour déchirer le booster"
+                      aria-label={t('Faire glisser de gauche à droite pour déchirer le booster')}
                       onPointerDown={startTear}
                       onPointerMove={moveTear}
                       onPointerUp={endTear}
@@ -284,20 +286,20 @@ function OpenContent() {
                 onClick={handleOpenPack}
                 className="mt-12 px-12 py-4 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-colors tracking-widest uppercase text-sm"
               >
-                Ouvrir le booster
+                {t('Ouvrir le booster')}
               </motion.button>
             )}
 
             {isOpening && (
               <p className="mt-8 text-blue-400 font-mono animate-pulse tracking-widest uppercase text-sm">
-                Ouverture en cours...
+                {t('Ouverture en cours...')}
               </p>
             )}
 
             {isPrepared && !isTorn && (
               <div className="mt-8 text-center">
                 <p className="font-mono text-sm uppercase tracking-widest text-blue-300">
-                  Attrape la languette et fais-la glisser jusqu’au bord droit.
+                  {t('Attrape la languette et fais-la glisser jusqu’au bord droit.')}
                 </p>
               </div>
             )}
@@ -315,9 +317,9 @@ function OpenContent() {
                 animate={{ y: 0 }}
                 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent"
               >
-                Tes cartes sont là !
+                {t('Tes cartes sont là !')}
               </motion.h2>
-              <p className="mt-2 text-gray-500">Clique sur une carte pour la retourner, ou révèle-les toutes.</p>
+              <p className="mt-2 text-gray-500">{t('Clique sur une carte pour la retourner, ou révèle-les toutes.')}</p>
             </header>
 
             <button
@@ -326,8 +328,8 @@ function OpenContent() {
               className="mb-8 rounded-full border border-blue-400/40 bg-blue-500/15 px-6 py-3 text-xs font-bold uppercase tracking-widest text-blue-200 transition hover:bg-blue-500/25"
             >
               {flippedCards.size === drawnCards.length
-                ? 'Retourner les cartes face cachée'
-                : 'Retourner toutes les cartes'}
+                ? t('Retourner les cartes face cachée')
+                : t('Retourner toutes les cartes')}
             </button>
 
             <div className="mb-12 w-full max-w-[1400px]">
@@ -351,7 +353,7 @@ function OpenContent() {
                         disabled={flippedCards.has(idx)}
                         tabIndex={flippedCards.has(idx) ? -1 : 0}
                         onClick={() => flipCard(idx)}
-                        aria-label={`Retourner la carte ${idx + 1}`}
+                        aria-label={t('Retourner la carte {number}', { number: idx + 1 })}
                         className="absolute inset-0 overflow-hidden rounded-xl border-2 border-white/30 bg-gradient-to-br from-slate-900 via-blue-950 to-black shadow-[0_12px_30px_rgba(0,0,0,0.5)]"
                         style={{ backfaceVisibility: 'hidden' }}
                       >
@@ -362,7 +364,7 @@ function OpenContent() {
                           <span className="mt-2 text-[9px] font-bold uppercase tracking-[0.35em] text-blue-200/80">Apex Collector</span>
                         </div>
                         <span className="absolute bottom-3 left-0 right-0 text-center text-[8px] font-bold uppercase tracking-[0.3em] text-white/40">
-                          Cliquez pour révéler
+                          {t('Cliquez pour révéler')}
                         </span>
                       </button>
                       <div
@@ -393,7 +395,7 @@ function OpenContent() {
               onClick={() => router.push('/boosters')}
               className="px-8 py-3 bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition-colors"
             >
-              Retour à la boutique
+              {t('Retour à la boutique')}
             </motion.button>
           </motion.div>
         )}
