@@ -1,0 +1,24 @@
+<svg width="1200" height="1600" viewBox="0 0 1200 1600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="160" y1="120" x2="1060" y2="1480" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9A5B00"/>
+      <stop offset="0.46" stop-color="#1F2937"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="300" y1="180" x2="950" y2="1260" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDE68A" stop-opacity="0.96"/>
+      <stop offset="0.45" stop-color="#FBBF24" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#F59E0B" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1600" rx="80" fill="url(#bg)"/>
+  <path d="M600 160L980 340V1260L600 1440L220 1260V340L600 160Z" fill="rgba(17,24,39,0.7)" stroke="rgba(253,224,71,0.82)" stroke-width="10"/>
+  <path d="M600 240L900 400V1200L600 1360L300 1200V400L600 240Z" fill="url(#shine)" opacity="0.2"/>
+  <circle cx="600" cy="540" r="220" fill="rgba(251,191,36,0.07)"/>
+  <path d="M600 330L705 465L840 540L705 615L600 750L495 615L360 540L495 465L600 330Z" fill="rgba(254,240,138,0.97)"/>
+  <path d="M600 470L657 540L600 610L543 540L600 470Z" fill="#FEF3C7"/>
+  <text x="600" y="980" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="112" font-weight="900" letter-spacing="12" fill="#Fef3C7">LEGEND</text>
+  <text x="600" y="1085" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="700" letter-spacing="15" fill="#FCD34D">HALL OF FAME</text>
+  <rect x="370" y="1180" width="460" height="120" rx="24" fill="rgba(17,24,39,0.72)" stroke="rgba(253,224,71,0.8)" stroke-width="4"/>
+  <text x="600" y="1255" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="70" font-weight="900" letter-spacing="8" fill="#FFF7ED">6 CARTES</text>
+</svg>

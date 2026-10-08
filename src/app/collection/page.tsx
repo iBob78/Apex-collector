@@ -5,8 +5,10 @@ import { supabase } from '@/lib/supabaseClient';
 import Sidebar from '@/components/Sidebar';
 import Footer from '@/components/Footer';
 import Card from '@/components/Card';
+import CardDetailsModal from '@/components/Collection/CardDetailsModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Rarity } from '@/types/game';
+import { getCardLevel } from '@/lib/level';
 
 interface UserCardData {
   card_id: string;
@@ -16,6 +18,7 @@ interface UserCardData {
 export default function CollectionPage() {
   const [user, setUser] = useState<any>(null);
   const [cards, setCards] = useState<any[]>([]);
+  const [selectedCard, setSelectedCard] = useState<any | null>(null);
   const [userCards, setUserCards] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +26,7 @@ export default function CollectionPage() {
   const [activeTab, setActiveTab] = useState<'all' | 'vehicle' | 'circuit'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [rarityFilter, setRarityFilter] = useState<Rarity | 'All'>('All');
-  const [sortBy, setSortBy] = useState<'name' | 'make-asc' | 'make-desc' | 'ip-desc' | 'ip-asc' | 'rarity' | 'newest'>('name');
+  const [sortBy, setSortBy] = useState<'name' | 'make-asc' | 'make-desc' | 'ip-desc' | 'ip-asc' | 'level-asc' | 'level-desc' | 'rarity' | 'newest'>('name');
 
   // Authentification
   useEffect(() => {
@@ -121,6 +124,14 @@ export default function CollectionPage() {
       result = result.filter(c => c.rarity === rarityFilter);
     }
 
+    const cardLevels = new Map<string, number>();
+    if (sortBy === 'level-asc' || sortBy === 'level-desc') {
+      result.forEach(card => {
+        const cardId = String(card.card_id || card.id).toLowerCase().trim();
+        cardLevels.set(cardId, getCardLevel(userCards[cardId] || 0));
+      });
+    }
+
     // Tri
     result.sort((a, b) => {
       if (sortBy === 'rarity') {
@@ -145,6 +156,12 @@ export default function CollectionPage() {
         };
         const direction = sortBy === 'ip-desc' ? -1 : 1;
         return direction * (getIp(a) - getIp(b));
+      }
+      if (sortBy === 'level-asc' || sortBy === 'level-desc') {
+        const cardIdA = String(a.card_id || a.id).toLowerCase().trim();
+        const cardIdB = String(b.card_id || b.id).toLowerCase().trim();
+        const levelDifference = (cardLevels.get(cardIdA) || 0) - (cardLevels.get(cardIdB) || 0);
+        return sortBy === 'level-asc' ? levelDifference : -levelDifference;
       }
       // Par défaut: Nom (Make + Model)
       const nameA = `${a.make || ''} ${a.model || a.name || ''}`;
@@ -243,6 +260,8 @@ export default function CollectionPage() {
                 <option value="make-desc">Marques, Z à A</option>
                 <option value="ip-desc">IP, décroissant</option>
                 <option value="ip-asc">IP, croissant</option>
+                <option value="level-asc">Niveau, croissant</option>
+                <option value="level-desc">Niveau, décroissant</option>
                 <option value="rarity">Trier par Rareté</option>
                 <option value="newest">Plus récent</option>
               </select>
@@ -280,6 +299,7 @@ export default function CollectionPage() {
                           {...card}
                           owned={c > 0}
                           count={c}
+                          onCardClick={() => setSelectedCard(card)}
                         />
                       </motion.div>
                     );
@@ -295,6 +315,11 @@ export default function CollectionPage() {
         </div>
         <Footer />
       </main>
+      <CardDetailsModal
+        card={selectedCard}
+        ownedCount={selectedCard ? userCards[String(selectedCard.card_id || selectedCard.id).toLowerCase().trim()] || 0 : 0}
+        onClose={() => setSelectedCard(null)}
+      />
     </div>
   );
 }

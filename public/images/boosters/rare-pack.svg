@@ -1,0 +1,24 @@
+<svg width="1200" height="1600" viewBox="0 0 1200 1600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="180" y1="160" x2="1030" y2="1460" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4C1D95"/>
+      <stop offset="0.52" stop-color="#111827"/>
+      <stop offset="1" stop-color="#030712"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="312" y1="210" x2="910" y2="1270" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C084FC" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#A78BFA" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#8B5CF6" stop-opacity="0.12"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1600" rx="80" fill="url(#bg)"/>
+  <path d="M600 160L980 340V1260L600 1440L220 1260V340L600 160Z" fill="rgba(17,24,39,0.7)" stroke="rgba(196,181,253,0.7)" stroke-width="10"/>
+  <path d="M600 240L900 400V1200L600 1360L300 1200V400L600 240Z" fill="url(#shine)" opacity="0.18"/>
+  <circle cx="600" cy="560" r="240" fill="rgba(168,85,247,0.1)"/>
+  <path d="M600 350L705 455L760 560L705 665L600 770L495 665L440 560L495 455L600 350Z" fill="rgba(216,180,254,0.95)"/>
+  <circle cx="600" cy="560" r="110" stroke="rgba(244,114,182,0.8)" stroke-width="12"/>
+  <text x="600" y="980" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="118" font-weight="900" letter-spacing="12" fill="#F5F3FF">EPIC</text>
+  <text x="600" y="1085" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="46" font-weight="700" letter-spacing="15" fill="#C4B5FD">RARE DROP</text>
+  <rect x="370" y="1180" width="460" height="120" rx="24" fill="rgba(17,24,39,0.72)" stroke="rgba(196,181,253,0.7)" stroke-width="4"/>
+  <text x="600" y="1255" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="70" font-weight="900" letter-spacing="8" fill="#F8FAFC">6 CARTES</text>
+</svg>

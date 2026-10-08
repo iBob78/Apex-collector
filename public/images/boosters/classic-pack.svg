@@ -1,0 +1,26 @@
+<svg width="1200" height="1600" viewBox="0 0 1200 1600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="110" y1="80" x2="1090" y2="1520" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1E3A8A"/>
+      <stop offset="0.5" stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="300" y1="180" x2="980" y2="1230" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#93C5FD" stop-opacity="0.95"/>
+      <stop offset="0.5" stop-color="#60A5FA" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#1D4ED8" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1600" rx="80" fill="url(#bg)"/>
+  <path d="M600 160L980 340V1260L600 1440L220 1260V340L600 160Z" fill="rgba(15,23,42,0.68)" stroke="rgba(148,163,184,0.6)" stroke-width="10"/>
+  <path d="M600 230L904 392V1208L600 1368L296 1208V392L600 230Z" fill="url(#shine)" opacity="0.18"/>
+  <circle cx="600" cy="510" r="230" fill="rgba(148,163,184,0.08)"/>
+  <circle cx="600" cy="510" r="150" stroke="rgba(191,219,254,0.9)" stroke-width="12"/>
+  <path d="M600 360L660 510L600 660L540 510L600 360Z" fill="rgba(191,219,254,0.9)"/>
+  <path d="M465 510H735" stroke="rgba(191,219,254,0.7)" stroke-width="12" stroke-linecap="round"/>
+  <path d="M600 380V640" stroke="rgba(191,219,254,0.7)" stroke-width="12" stroke-linecap="round"/>
+  <text x="600" y="970" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="116" font-weight="900" letter-spacing="14" fill="#E2E8F0">CLASSIC</text>
+  <text x="600" y="1095" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="700" letter-spacing="16" fill="#93C5FD">APEX SERIES</text>
+  <rect x="370" y="1180" width="460" height="120" rx="24" fill="rgba(15,23,42,0.7)" stroke="rgba(147,197,253,0.8)" stroke-width="4"/>
+  <text x="600" y="1255" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="900" letter-spacing="8" fill="#F8FAFC">6 CARTES</text>
+</svg>

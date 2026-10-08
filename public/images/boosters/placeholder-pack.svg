@@ -1,0 +1,16 @@
+<svg width="1200" height="1600" viewBox="0 0 1200 1600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="170" y1="110" x2="1030" y2="1490" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#111827"/>
+      <stop offset="0.5" stop-color="#1F2937"/>
+      <stop offset="1" stop-color="#030712"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1600" rx="80" fill="url(#bg)"/>
+  <path d="M600 160L980 340V1260L600 1440L220 1260V340L600 160Z" fill="rgba(15,23,42,0.7)" stroke="rgba(148,163,184,0.6)" stroke-width="10"/>
+  <rect x="420" y="420" width="360" height="360" rx="48" fill="rgba(148,163,184,0.14)" stroke="rgba(148,163,184,0.6)" stroke-width="10"/>
+  <path d="M510 510L600 610L690 510" stroke="#E2E8F0" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M600 610V780" stroke="#E2E8F0" stroke-width="22" stroke-linecap="round"/>
+  <text x="600" y="990" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="100" font-weight="900" letter-spacing="12" fill="#E2E8F0">PACK</text>
+  <text x="600" y="1085" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="700" letter-spacing="14" fill="#94A3B8">PREVIEW</text>
+</svg>

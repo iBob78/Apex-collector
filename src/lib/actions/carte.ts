@@ -11,7 +11,6 @@ export async function ajouterCarteAuJoueur(user_id: string, card_id: string, sou
   }
 
   try {
-    // 1. Récupérer toutes les occurrences de la carte (pour gérer les doublons de lignes)
     const { data: existingRows, error: selectError } = await supabase
       .from('user_cards')
       .select('id, count')
@@ -23,11 +22,9 @@ export async function ajouterCarteAuJoueur(user_id: string, card_id: string, sou
     }
 
     if (existingRows && existingRows.length > 0) {
-      // Calculer le total actuel
       const totalCount = existingRows.reduce((acc, row) => acc + (row.count || 1), 0);
       const newCount = totalCount + 1;
 
-      // 2. Mettre à jour la première ligne
       const { error: updateError } = await supabase
         .from('user_cards')
         .update({ count: newCount })
@@ -38,50 +35,109 @@ export async function ajouterCarteAuJoueur(user_id: string, card_id: string, sou
         return { success: false, error: updateError.message };
       }
 
-      // 3. Nettoyer les lignes superflues s'il y en avait
       if (existingRows.length > 1) {
         const extraIds = existingRows.slice(1).map(r => r.id);
         await supabase.from('user_cards').delete().in('id', extraIds);
       }
 
       return { success: true, action: 'incrément', count: newCount };
-    } else {
-      // 3. Première acquisition
-      const { error: insertError } = await supabase
-        .from('user_cards')
+    }
+
+    const { error: insertError } = await supabase
+      .from('user_cards')
+      .insert({
+        user_id,
+        card_id,
+        count: 1,
+        source
+      });
+
+    if (insertError) {
+      console.error('[ajouterCarteAuJoueur] Erreur insert:', insertError.message);
+
+      const { error: secondAttemptError } = await supabase
+        .from('users_cards')
         .insert({
           user_id,
           card_id,
-          count: 1,
+          quantity: 1,
           source
         });
 
-      if (insertError) {
-        console.error('[ajouterCarteAuJoueur] Erreur insert:', insertError.message);
-
-        // Tentative de secours : peut-être que la table s'appelle 'users_cards' ?
-        console.log('[ajouterCarteAuJoueur] Tentative sur users_cards...');
-        const { error: secondAttemptError } = await supabase
-          .from('users_cards')
-          .insert({
-            user_id,
-            card_id,
-            quantity: 1,
-            source
-          });
-
-        if (secondAttemptError) {
-          console.error('[ajouterCarteAuJoueur] Échec final:', secondAttemptError.message);
-          return { success: false, error: secondAttemptError.message };
-        }
-
-        return { success: true, action: 'insertion (via users_cards)' };
+      if (secondAttemptError) {
+        console.error('[ajouterCarteAuJoueur] Échec final:', secondAttemptError.message);
+        return { success: false, error: secondAttemptError.message };
       }
 
-      return { success: true, action: 'insertion' };
+      return { success: true, action: 'insertion (via users_cards)' };
     }
+
+    return { success: true, action: 'insertion' };
   } catch (err: any) {
     console.error('[ajouterCarteAuJoueur] Erreur critique:', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Ajoute un circuit à la collection du joueur.
+ * L’algorithme est identique à celui des cartes pour garder une collection homogène.
+ */
+export async function ajouterCircuitAuJoueur(user_id: string, circuit_id: string) {
+  if (!user_id || !circuit_id) {
+    console.error('[ajouterCircuitAuJoueur] Paramètres manquants:', { user_id, circuit_id });
+    return { success: false, error: 'Paramètres manquants' };
+  }
+
+  try {
+    const { data: existingRows, error: selectError } = await supabase
+      .from('user_circuits')
+      .select('id, count')
+      .eq('user_id', user_id)
+      .eq('circuit_id', circuit_id);
+
+    if (selectError) {
+      console.error('[ajouterCircuitAuJoueur] Erreur de lecture user_circuits:', selectError.message);
+    }
+
+    if (existingRows && existingRows.length > 0) {
+      const totalCount = existingRows.reduce((acc, row) => acc + (row.count || 1), 0);
+      const newCount = totalCount + 1;
+
+      const { error: updateError } = await supabase
+        .from('user_circuits')
+        .update({ count: newCount })
+        .eq('id', existingRows[0].id);
+
+      if (updateError) {
+        console.error('[ajouterCircuitAuJoueur] Erreur update:', updateError.message);
+        return { success: false, error: updateError.message };
+      }
+
+      if (existingRows.length > 1) {
+        const extraIds = existingRows.slice(1).map(r => r.id);
+        await supabase.from('user_circuits').delete().in('id', extraIds);
+      }
+
+      return { success: true, action: 'incrément', count: newCount };
+    }
+
+    const { error: insertError } = await supabase
+      .from('user_circuits')
+      .insert({
+        user_id,
+        circuit_id,
+        count: 1
+      });
+
+    if (insertError) {
+      console.error('[ajouterCircuitAuJoueur] Erreur insert user_circuits:', insertError.message);
+      return { success: false, error: insertError.message };
+    }
+
+    return { success: true, action: 'insertion' };
+  } catch (err: any) {
+    console.error('[ajouterCircuitAuJoueur] Erreur critique:', err.message);
     return { success: false, error: err.message };
   }
 }

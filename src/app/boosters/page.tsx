@@ -85,7 +85,7 @@ export default function BoostersPage() {
                   <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${pack.color}`}></div>
 
                   <div className="flex-1">
-                    <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden mb-6 shadow-2xl group-hover:scale-[1.02] transition-transform duration-500">
+                    <div className="relative w-[50%] mx-auto aspect-[3/4] rounded-xl overflow-hidden mb-6 shadow-2xl group-hover:scale-[1.02] transition-transform duration-500">
                       <SafeImage
                         src={pack.imageUrl}
                         alt={pack.name}
@@ -119,7 +119,7 @@ export default function BoostersPage() {
                       className={`w-full py-4 rounded-xl font-black text-xs tracking-[0.2em] uppercase transition-all duration-300 shadow-lg shadow-black/40 
                         ${profile && profile.ap < pack.price
                           ? 'bg-gray-800 text-gray-600 grayscale cursor-not-allowed border border-white/5'
-                          : `bg-gradient-to-r ${pack.color} text-white hover:scale-[1.02] active:scale-[0.98] hover:shadow-${pack.color.split('-')[1]}-500/20`
+                          : `bg-gradient-to-r ${pack.color} text-white hover:scale-[1.02] active:scale-[0.98] hover:shadow-2xl hover:shadow-black/50`
                         }`}
                     >
                       {profile && profile.ap < pack.price ? 'Solde Insuffisant' : 'Acheter le pack'}

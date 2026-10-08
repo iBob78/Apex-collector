@@ -15,6 +15,8 @@ type CardProps = AnyCard & {
   count?: number;
   showLevel?: boolean;
   compact?: boolean;
+  className?: string;
+  onCardClick?: () => void;
 };
 
 export default function Card(props: CardProps) {
@@ -28,6 +30,8 @@ export default function Card(props: CardProps) {
     count = 1,
     showLevel = true,
     compact = false,
+    className,
+    onCardClick,
   } = props;
 
   // ID ROBUSTE : card_id d'abord (CSV), puis id
@@ -72,17 +76,34 @@ export default function Card(props: CardProps) {
     image_url: cardImage
   });
 
+  const handleCardClick = () => {
+    if (onCardClick) {
+      onCardClick();
+      return;
+    }
+
+    router.push(`/collection/${id}`);
+  };
+
   return (
-    <div className="flex w-full min-w-0 flex-col gap-2 group/card">
+    <div className={clsx("flex w-full min-w-0 flex-col gap-2 group/card", className)}>
       <div
         className={clsx(
           "relative w-full min-w-0 cursor-pointer transition-all duration-300",
           "aspect-[2/3] rounded-xl overflow-hidden bg-[#0a0a0a]",
-          "border-[3px]",
+          "border-[3px] shadow-[0_12px_30px_rgba(0,0,0,0.35)]",
           getRarityBorderClass(rarity),
           !owned && "grayscale opacity-60 hover:grayscale-0 hover:opacity-100"
         )}
-        onClick={() => router.push(`/collection/${id}`)}
+        onClick={handleCardClick}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            handleCardClick();
+          }
+        }}
+        role="button"
+        tabIndex={0}
       >
         {/* Image Background */}
         <div className="absolute inset-0 z-0">
