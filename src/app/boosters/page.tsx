@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
-import Footer from '@/components/Footer';
 import { supabase } from '@/lib/supabaseClient';
 import { PACKS } from '@/lib/boosters';
 import { motion } from 'framer-motion';
@@ -130,7 +129,6 @@ export default function BoostersPage() {
             ))}
           </div>
         </div>
-        <Footer />
       </main>
     </div>
   );

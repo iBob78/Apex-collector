@@ -296,10 +296,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="py-12 px-8 border-t border-white/5 text-center text-gray-500 text-sm">
-          <p>© 2026 Apex Collector · Saison 1</p>
-        </footer>
       </div>
     </main>
   );

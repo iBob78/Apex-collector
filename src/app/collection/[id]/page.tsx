@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import Sidebar from '@/components/Sidebar';
-import Footer from '@/components/Footer';
 import SafeImage from '@/components/SafeImage';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -188,7 +187,6 @@ export default function CardShowcasePage() {
                         </motion.div>
                     </div>
                 </div>
-                <Footer />
             </main>
         </div>
     );

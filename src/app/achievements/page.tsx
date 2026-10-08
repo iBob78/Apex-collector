@@ -1,7 +1,6 @@
 'use client';
 
 import Sidebar from '@/components/Sidebar';
-import Footer from '@/components/Footer';
 import { motion } from 'framer-motion';
 import { TrophyIcon, StarIcon, CheckCircle2Icon, LockIcon } from 'lucide-react';
 
@@ -106,7 +105,6 @@ export default function AchievementsPage() {
             ))}
           </div>
         </div>
-        <Footer />
       </main>
     </div>
   );

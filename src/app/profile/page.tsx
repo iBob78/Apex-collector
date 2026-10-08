@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import Sidebar from '@/components/Sidebar';
-import Footer from '@/components/Footer';
 import { motion } from 'framer-motion';
 import {
   UserIcon,
@@ -184,7 +183,6 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-        <Footer />
       </main>
     </div>
   );

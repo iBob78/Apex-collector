@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
-import Footer from '@/components/Footer';
 import Card from '@/components/Card';
 import { supabase } from '@/lib/supabaseClient';
 import { getMarketplaceListings, buyListing, createListing } from '@/lib/actions/marketplace';
@@ -191,7 +190,6 @@ export default function MarketplacePage() {
             </div>
           </div>
         )}
-        <Footer />
       </main>
 
       {/* SELL MODAL */}

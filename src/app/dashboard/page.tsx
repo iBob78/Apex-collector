@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import Sidebar from '@/components/Sidebar';
-import Footer from '@/components/Footer';
 import { motion } from 'framer-motion';
 import { PACKS } from '@/lib/boosters';
 
@@ -128,7 +127,6 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
-        <Footer />
       </main>
     </div>
   );

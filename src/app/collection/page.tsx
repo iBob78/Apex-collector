@@ -3,7 +3,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import Sidebar from '@/components/Sidebar';
-import Footer from '@/components/Footer';
 import Card from '@/components/Card';
 import CardDetailsModal from '@/components/Collection/CardDetailsModal';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -313,7 +312,6 @@ export default function CollectionPage() {
             </AnimatePresence>
           )}
         </div>
-        <Footer />
       </main>
       <CardDetailsModal
         card={selectedCard}

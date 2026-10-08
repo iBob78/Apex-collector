@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import Sidebar from '@/components/Sidebar';
-import Footer from '@/components/Footer';
 import { getUserQuests, claimQuestReward } from '@/lib/actions/quests';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -172,7 +171,6 @@ export default function MissionsPage() {
                         </div>
                     )}
                 </div>
-                <Footer />
             </main>
         </div>
     );

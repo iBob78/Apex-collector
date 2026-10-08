@@ -1,7 +1,6 @@
 'use client';
 
 import Sidebar from '@/components/Sidebar';
-import Footer from '@/components/Footer';
 import { useState, useEffect } from 'react';
 
 export default function SettingsPage() {
@@ -42,7 +41,6 @@ export default function SettingsPage() {
           </button>
         </section>
 
-        <Footer />
       </main>
     </div>
   );

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import Sidebar from '@/components/Sidebar';
-import Footer from '@/components/Footer';
 import Card from '@/components/Card';
 
 export default function CardsPage() {
@@ -72,7 +71,6 @@ export default function CardsPage() {
           </div>
         )}
 
-        <Footer />
       </main>
     </div>
   );
