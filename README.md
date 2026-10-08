@@ -85,7 +85,13 @@ Vehicle and circuit specifications are displayed using the selected unit system 
 
 The card admin studio supports vehicle specification fields, including power in HP and kW, torque, maximum speed, and weight. Vehicle performance index is calculated from horsepower and weight.
 
+Vehicle cards also support transmission, new price in euros, fuel type, maximum RPM, and units sold. Migration `007_vehicle_card_specs.sql` adds these optional columns to `public.cards`.
+
 For a fresh Supabase setup, apply migrations `007_vehicle_card_specs.sql`, `008_profiles_language_default.sql`, and `009_profiles_unit_preference.sql` in addition to the admin access migrations described below.
+
+New sign-ups send `language: 'fr'` as Supabase Auth user metadata. Migration `008_profiles_language_default.sql` also sets `public.profiles.language` to `fr` when an insert omits the column. Apply the migration in the Supabase SQL Editor or through the project's migration workflow; it does not replace an explicit `NULL` inserted by a database trigger.
+
+Email confirmation and delivery are controlled by the Supabase Auth email settings. A successful sign-up response does not guarantee that the confirmation email was delivered or that the address is confirmed. Check the user's status under **Authentication → Users**, and review Auth logs and SMTP settings if the email does not arrive. The login page currently redirects after a successful sign-up response, including when email confirmation is still pending.
 
 Jest tests cover preference translations, unit conversions, and vehicle performance-index calculations.
 
@@ -205,7 +211,13 @@ Les caractéristiques des véhicules et des circuits sont affichées selon le sy
 
 L’atelier d’administration des cartes prend en charge les caractéristiques des véhicules, notamment la puissance en HP et en kW, le couple, la vitesse maximale et le poids. L’indice de performance du véhicule est calculé à partir de la puissance en chevaux et du poids.
 
+Les cartes de véhicules prennent aussi en charge la transmission, le prix neuf en euros, le type de carburant, le régime maximal et le nombre d’exemplaires vendus. La migration `007_vehicle_card_specs.sql` ajoute ces colonnes facultatives à `public.cards`.
+
 Pour une nouvelle installation Supabase, appliquer les migrations `007_vehicle_card_specs.sql`, `008_profiles_language_default.sql` et `009_profiles_unit_preference.sql`, en plus des migrations de droits d’administration décrites ci-dessus.
+
+Lors d’une nouvelle inscription, l’application transmet `language: 'fr'` dans les métadonnées utilisateur de Supabase Auth. La migration `008_profiles_language_default.sql` définit également `fr` comme valeur par défaut de `public.profiles.language` lorsqu’une insertion omet cette colonne. Appliquer la migration dans le SQL Editor de Supabase ou via le processus de migrations du projet ; cette valeur par défaut ne remplace pas un `NULL` explicitement inséré par un trigger.
+
+L’envoi et la confirmation des e-mails dépendent des réglages e-mail de Supabase Auth. Une réponse positive à l’inscription ne garantit pas que le mail de confirmation a été livré ni que l’adresse est confirmée. Vérifier le statut du compte dans **Authentication → Users** et consulter les journaux Auth ainsi que les réglages SMTP si le mail n’arrive pas. La page de connexion redirige actuellement après une réponse positive, même si la confirmation par e-mail est encore en attente.
 
 Les tests Jest couvrent les traductions des préférences, les conversions d’unités et le calcul de l’indice de performance des véhicules.
 
