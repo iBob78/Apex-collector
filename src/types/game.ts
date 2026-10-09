@@ -4,7 +4,8 @@
  */
 
 export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Epic' | 'Legend' | 'Icon';
-export type Transmission = 'FWD' | 'RWD' | 'AWD';
+export type DrivetrainLayout = 'MR' | 'FF' | 'FR' | 'MF' | 'FA' | 'RR' | 'MA';
+export type Transmission = DrivetrainLayout;
 export type CardCategory = 'vehicle' | 'circuit';
 
 export interface BaseCard {
@@ -26,7 +27,7 @@ export interface VehicleCard extends BaseCard {
     max_speed_kmh: number | string;
     acceleration_0_100?: string | number;
     weight_t: number | string;
-    transmission?: Transmission | string;
+    transmission?: DrivetrainLayout | string;
     engine_temp?: string | number;
     logo_url?: string;
 

@@ -47,6 +47,15 @@ export const IMAGE_PATHS = {
             RWD: 'icons/transmission/rwd.svg',
             AWD: 'icons/transmission/awd.svg',
         },
+        DRIVETRAIN_LAYOUT: {
+            MR: 'icons/MR.png',
+            FF: 'icons/FF.png',
+            FR: 'icons/FR.png',
+            MF: 'icons/MF.png',
+            FA: 'icons/FA.png',
+            RR: 'icons/RR.png',
+            MA: 'icons/MA.png',
+        },
     } as const,
 
     /**
@@ -71,4 +80,10 @@ export type TransmissionType = keyof typeof IMAGE_PATHS.ICONS.TRANSMISSION;
  */
 export function getTransmissionIcon(type: TransmissionType): string {
     return IMAGE_PATHS.ICONS.TRANSMISSION[type];
+}
+
+export type DrivetrainLayout = keyof typeof IMAGE_PATHS.ICONS.DRIVETRAIN_LAYOUT;
+
+export function getDrivetrainLayoutIcon(layout: DrivetrainLayout): string {
+    return IMAGE_PATHS.ICONS.DRIVETRAIN_LAYOUT[layout];
 }

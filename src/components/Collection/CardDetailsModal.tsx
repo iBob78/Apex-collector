@@ -4,7 +4,9 @@ import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import SafeImage from '@/components/SafeImage';
-import { IMAGE_PATHS, resolveCardImage } from '@/lib/images';
+import VehicleStatIcon from '@/components/VehicleStatIcon';
+import { IMAGE_PATHS, resolveBrandLogo, resolveCardImage, resolveCountryFlag, resolveDrivetrainLayoutIcon } from '@/lib/images';
+import { drivetrainLayoutDescriptions } from '@/lib/drivetrain';
 import { calculateVehicleIP } from '@/lib/vehicleStats';
 import { formatDistance, formatPower, formatSpeed, formatTorque, formatWeight } from '@/lib/preferences';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
@@ -52,6 +54,19 @@ export default function CardDetailsModal({ card, ownedCount, onClose }: CardDeta
       })
     : '';
   const rawWeight = Number(card?.weight_t);
+  const countryCode = countryCodeFromValue(card?.country_code || card?.country);
+  const countryFlag = isVehicle ? resolveCountryFlag(card?.country_code || card?.country) : undefined;
+  const brandLogo = isVehicle ? resolveBrandLogo(card?.make) : undefined;
+  const drivetrainLayoutIcon = isVehicle ? resolveDrivetrainLayoutIcon(card?.transmission) : undefined;
+  const drivetrainDescription = typeof card?.transmission === 'string'
+    && Object.prototype.hasOwnProperty.call(drivetrainLayoutDescriptions, card.transmission)
+    ? drivetrainLayoutDescriptions[card.transmission as keyof typeof drivetrainLayoutDescriptions]
+    : null;
+  const countryName = card?.country && countryCodeFromValue(card.country) !== countryCode
+    ? card.country
+    : countryCode
+      ? new Intl.DisplayNames([language], { type: 'region' }).of(countryCode) || card?.country || countryCode
+      : card?.country || null;
   const vehicleIp = isVehicle ? calculateVehicleIP(card?.power_hp, card?.weight_t) : 0;
   const formattedPrice = Number.isFinite(Number(card?.new_price_eur)) && card?.new_price_eur !== null && card?.new_price_eur !== undefined
     ? `${new Intl.NumberFormat(language).format(Number(card.new_price_eur))} €`
@@ -71,7 +86,7 @@ export default function CardDetailsModal({ card, ownedCount, onClose }: CardDeta
           { label: t('Couple'), value: card.torque_nm !== null && card.torque_nm !== undefined ? formatTorque(Number(card.torque_nm), units, language) : '—' },
           { label: t('Poids'), value: rawWeight > 0 ? formatWeight(rawWeight, units, language) : '—' },
           { label: t('0 à 100 km/h'), value: card.acceleration_0_100 !== null && card.acceleration_0_100 !== undefined ? `${card.acceleration_0_100} s` : '—' },
-          { label: t('Transmission'), value: card.transmission || '—' },
+          { label: t('Position moteur / transmission'), value: card.transmission || '—' },
           { label: t('Indice de performance (IP)'), value: vehicleIp > 0 ? vehicleIp : '—' },
           { label: t('Vitesse maximale'), value: card.max_speed_kmh !== null && card.max_speed_kmh !== undefined ? formatSpeed(Number(card.max_speed_kmh), units, language) : '—' },
           { label: t('Prix neuf'), value: formattedPrice },
@@ -136,8 +151,15 @@ export default function CardDetailsModal({ card, ownedCount, onClose }: CardDeta
 
               <div className="mb-6 pr-10">
                 <p className="mb-2 text-xs font-bold uppercase text-blue-400">{t(isVehicle ? 'Véhicule' : 'Circuit')}</p>
-                <h2 id="card-details-title" className="text-2xl font-black uppercase italic leading-tight sm:text-3xl">
-                  {title}
+                <h2 id="card-details-title" className="text-2xl uppercase italic leading-tight sm:text-3xl">
+                  {isVehicle ? (
+                    <>
+                      <span className="font-black">{card.make}</span>
+                      {card.model && <> <span className="font-normal">{card.model}</span></>}
+                    </>
+                  ) : (
+                    <span className="font-black">{title}</span>
+                  )}
                 </h2>
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-gray-400">
                   {card.rarity && <span className="rounded border border-white/10 px-2 py-1">{card.rarity}</span>}
@@ -147,7 +169,7 @@ export default function CardDetailsModal({ card, ownedCount, onClose }: CardDeta
                 </div>
               </div>
 
-              {card.description && (
+              {!isVehicle && card.description && (
                 <p className="mb-6 border-l-2 border-blue-500/60 pl-3 text-sm leading-relaxed text-gray-300">
                   {card.description}
                 </p>
@@ -158,7 +180,63 @@ export default function CardDetailsModal({ card, ownedCount, onClose }: CardDeta
                   {details.map(({ label, value }) => (
                     <div key={label} className="min-w-0 border-t border-white/10 py-3">
                       <dt className="text-[10px] font-bold uppercase text-gray-500">{label}</dt>
-                      <dd className="mt-1 break-words text-sm font-semibold text-gray-100">{value}</dd>
+                      <dd className="mt-1 break-words text-sm font-semibold text-gray-100">
+                        {isVehicle && label === t('Pays') ? (
+                          <span className="inline-flex items-center gap-2">
+                            {countryFlag && (
+                              <span className="relative inline-block h-3 w-[18px] overflow-hidden rounded-[1px] border border-white/20">
+                                <SafeImage
+                                  src={countryFlag}
+                                  alt=""
+                                  fill
+                                  showPlaceholderOnError={false}
+                                  className="object-cover"
+                                />
+                              </span>
+                            )}
+                            <span>{countryName || '—'}</span>
+                          </span>
+                        ) : isVehicle && label === t('Marque') ? (
+                          <span className="inline-flex items-center gap-2">
+                            {brandLogo && (
+                              <SafeImage
+                                src={brandLogo}
+                                alt=""
+                                width={22}
+                                height={22}
+                                showPlaceholderOnError={false}
+                                className="h-[22px] w-[22px] object-contain"
+                              />
+                            )}
+                            <span>{value}</span>
+                          </span>
+                        ) : isVehicle && label === t('Puissance') ? (
+                          <span className="inline-flex items-center gap-1.5"><VehicleStatIcon kind="engine" />{value}</span>
+                        ) : isVehicle && label === t('Couple') ? (
+                          <span className="inline-flex items-center gap-1.5"><VehicleStatIcon kind="torque" />{value}</span>
+                        ) : isVehicle && label === t('Poids') ? (
+                          <span className="inline-flex items-center gap-1.5"><VehicleStatIcon kind="weight" />{value}</span>
+                        ) : isVehicle && label === t('0 à 100 km/h') ? (
+                          <span className="inline-flex items-center gap-1.5"><VehicleStatIcon kind="acceleration" />{value}</span>
+                        ) : isVehicle && label === t('Position moteur / transmission') ? (
+                          <span className="inline-flex flex-col items-start gap-1">
+                            {drivetrainLayoutIcon && (
+                              <SafeImage
+                                src={drivetrainLayoutIcon}
+                                alt={`Configuration moteur et transmission ${card.transmission}`}
+                                width={40}
+                                height={22}
+                                showPlaceholderOnError={false}
+                                className="h-auto w-10"
+                              />
+                            )}
+                            <span className="text-xs leading-snug">
+                              {value}
+                              {drivetrainDescription && <> - {t(drivetrainDescription)}</>}
+                            </span>
+                          </span>
+                        ) : value}
+                      </dd>
                     </div>
                   ))}
                 </dl>
@@ -169,4 +247,26 @@ export default function CardDetailsModal({ card, ownedCount, onClose }: CardDeta
       )}
     </AnimatePresence>
   );
+}
+
+function countryCodeFromValue(value?: string | null): string | undefined {
+  if (!value) return undefined;
+
+  const trimmed = value.trim();
+  if (/^[a-z]{2}$/i.test(trimmed)) return trimmed.toUpperCase();
+
+  const flagCharacters = Array.from(trimmed);
+  if (
+    flagCharacters.length === 2 &&
+    flagCharacters.every((character) => {
+      const codePoint = character.codePointAt(0);
+      return codePoint !== undefined && codePoint >= 0x1f1e6 && codePoint <= 0x1f1ff;
+    })
+  ) {
+    return flagCharacters
+      .map((character) => String.fromCharCode(character.codePointAt(0)! - 0x1f1e6 + 65))
+      .join('');
+  }
+
+  return undefined;
 }

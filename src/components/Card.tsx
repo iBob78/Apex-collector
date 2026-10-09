@@ -3,10 +3,11 @@
 import clsx from 'clsx';
 import IPBadge from './IPBadge';
 import SafeImage from './SafeImage';
-import { resolveCardImage, resolveBrandLogo, resolveCountryFlag, IMAGE_PATHS } from '@/lib/images';
+import VehicleStatIcon from './VehicleStatIcon';
+import { resolveCardImage, resolveBrandLogo, resolveCountryFlag, resolveDrivetrainLayoutIcon, IMAGE_PATHS } from '@/lib/images';
 import type { AnyCard } from '@/types/game';
 import { useRouter } from 'next/navigation';
-import { Zap, Gauge, Wind, Timer, ArrowUpCircle, Compass, MoveRight } from 'lucide-react';
+import { Wind, ArrowUpCircle, Compass, MoveRight } from 'lucide-react';
 import { getCardLevel, getLevelProgress } from '@/lib/level';
 import { getRarityBorderClass } from '@/lib/rarity';
 import { calculateVehicleIP } from '@/lib/vehicleStats';
@@ -57,7 +58,8 @@ export default function Card(props: CardProps) {
 
   // Correction Poids : On gère le cas où la donnée est déjà en KG (ex: 1060) ou en Tonnes (ex: 1.06)
   const rawWeight = isVehicle ? Number((props as any).weight_t) || 0 : 0;
-  const transmission = isVehicle ? (props as any).transmission : undefined;
+  const drivetrainLayout = isVehicle ? (props as any).transmission : undefined;
+  const drivetrainLayoutIcon = resolveDrivetrainLayoutIcon(drivetrainLayout);
 
   // Calcul IP
   const ip = isVehicle ? calculateVehicleIP(power_hp, rawWeight) : 0;
@@ -77,6 +79,8 @@ export default function Card(props: CardProps) {
     country: (props as any).country,
     image_url: cardImage
   });
+  const vehicleCountry = (props as any).country_code || (props as any).country;
+  const vehicleFlag = isVehicle ? resolveCountryFlag(vehicleCountry) : undefined;
 
   const handleCardClick = () => {
     if (onCardClick) {
@@ -128,14 +132,29 @@ export default function Card(props: CardProps) {
         )}
 
         {/* Top Right Logo / Flag */}
-        {isVehicle && (props as any).make && (
-          <div className="absolute top-3 right-3 z-10 w-7 h-7">
-            <SafeImage
-              src={resolveBrandLogo((props as any).make)}
-              alt={(props as any).make}
-              fill
-              className="object-contain"
-            />
+        {isVehicle && ((props as any).make || vehicleFlag) && (
+          <div className="absolute top-3 right-3 z-10 flex flex-col items-center gap-1">
+            {(props as any).make && (
+              <div className="relative h-7 w-7">
+                <SafeImage
+                  src={resolveBrandLogo((props as any).make)}
+                  alt={(props as any).make}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            )}
+            {vehicleFlag && (
+              <div className="relative h-[11px] w-4 overflow-hidden rounded-[1px] border border-white/30 bg-black/40">
+                <SafeImage
+                  src={vehicleFlag}
+                  alt={vehicleCountry}
+                  fill
+                  showPlaceholderOnError={false}
+                  className="object-cover"
+                />
+              </div>
+            )}
           </div>
         )}
 
@@ -165,30 +184,49 @@ export default function Card(props: CardProps) {
               {isVehicle ? (props as any).make : (props as any).name}
             </h3>
             <p className={clsx("text-gray-300 font-medium tracking-wide", compact ? "text-[10px]" : "text-xs")}>
-              {isVehicle
-                ? `${(props as any).model} · ${(props as any).year}${(props as any).country_code ? ` · ${(props as any).country_code}` : ''}`
-                : (props as any).country}
+              {isVehicle ? (
+                <>
+                  {(props as any).model} · {(props as any).year}
+                </>
+              ) : (props as any).country}
             </p>
           </div>
 
-          {/* Stats Grid 2x2 */}
+          {/* Vehicle stats */}
           {isVehicle && (
-            <div className={clsx("grid grid-cols-2 gap-y-2 font-semibold text-gray-200 w-full", compact ? "gap-x-1 text-[10px] mb-2 px-0" : "gap-x-6 text-xs mb-3 px-2")}>
-              <div className="flex items-center gap-1.5 justify-end">
-                <Zap size={14} className="text-yellow-400" />
-                <span>{formatPower(power_hp, units, language, Number((props as any).power_kw) || undefined)}</span>
+            <div className={clsx("grid grid-cols-2 gap-x-1.5 gap-y-1 text-center text-gray-200 w-full", compact ? "mb-1.5 px-0" : "mb-2 px-2")}>
+              <div className="min-w-0">
+                <div className="flex items-center justify-center gap-1">
+                  <VehicleStatIcon kind="engine" />
+                  <div className="min-w-0 text-left">
+                    <p className="text-[8px] font-medium uppercase tracking-wide text-gray-400">{t('Puissance')}</p>
+                    <p className={clsx("font-semibold", compact ? "text-[9px]" : "text-[11px]")}>
+                      {formatPower(power_hp, units, language, Number((props as any).power_kw) || undefined)}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 justify-start">
-                <Gauge size={14} className="text-orange-400" />
-                <span>{formatTorque(torque_nm, units, language)}</span>
+              <div className="min-w-0">
+                <div className="flex items-center justify-center gap-1">
+                  <VehicleStatIcon kind="torque" />
+                  <div className="min-w-0 text-left">
+                    <p className="text-[8px] font-medium uppercase tracking-wide text-gray-400">{t('Couple')}</p>
+                    <p className={clsx("font-semibold", compact ? "text-[9px]" : "text-[11px]")}>
+                      {formatTorque(torque_nm, units, language)}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 justify-end">
-                <Timer size={14} className="text-green-400" />
-                <span>{acceleration} s</span>
-              </div>
-              <div className="flex items-center gap-1.5 justify-start">
-                <Compass size={14} className="text-cyan-300" />
-                <span>{transmission || '--'}</span>
+              <div className="min-w-0">
+                <div className="flex items-center justify-center gap-1">
+                  <VehicleStatIcon kind="acceleration" />
+                  <div className="min-w-0 text-left">
+                    <p className="text-[8px] font-medium uppercase tracking-wide text-gray-400">{t('0 à 100 km/h')}</p>
+                    <p className={clsx("font-semibold", compact ? "text-[9px]" : "text-[11px]")}>
+                      {acceleration !== null && acceleration !== undefined ? `${acceleration} s` : '—'}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -217,13 +255,25 @@ export default function Card(props: CardProps) {
 
           {/* Bottom Metadata : Weight Only */}
           {isVehicle && (
-            <div className={clsx("flex items-center text-[10px] text-gray-400", compact ? "gap-2 mb-2" : "gap-4 mb-3")}>
-              <span className="flex items-center gap-1">
-                ⚖️ {formatWeight(rawWeight, units, language)}
-              </span>
+            <div className={clsx("flex items-center justify-center gap-1 pr-14 text-[9px]", compact ? "mb-1.5" : "mb-2")}>
+              <VehicleStatIcon kind="weight" />
+              <span className="text-gray-400">{t('Poids')}</span>
+              <span className="font-medium text-gray-200">{formatWeight(rawWeight, units, language)}</span>
             </div>
           )}
         </div>
+        {isVehicle && drivetrainLayoutIcon && (
+          <div className="absolute bottom-2 right-2 z-20">
+            <SafeImage
+              src={drivetrainLayoutIcon}
+              alt={`Configuration moteur et transmission ${drivetrainLayout}`}
+              width={compact ? 54 : 68}
+              height={compact ? 28 : 36}
+              showPlaceholderOnError={false}
+              className={clsx("h-auto drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]", compact ? "w-[54px]" : "w-[68px]")}
+            />
+          </div>
+        )}
       </div>
 
       {/* Discrete Level Below Card */}
@@ -234,15 +284,6 @@ export default function Card(props: CardProps) {
           </span>
         </div>
       )}
-    </div>
-  );
-}
-
-function Stat({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return (
-    <div className="flex items-center gap-1">
-      <div className="flex-shrink-0">{icon}</div>
-      <span className="truncate">{label}</span>
     </div>
   );
 }

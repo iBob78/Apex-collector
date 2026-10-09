@@ -3,7 +3,7 @@
  * Handles URL construction, fallbacks, and validation.
  */
 
-import { IMAGE_PATHS } from './paths';
+import { getDrivetrainLayoutIcon, IMAGE_PATHS, type DrivetrainLayout } from './paths';
 
 // Configuration pour Supabase Storage
 const BUCKET_NAME = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'assets';
@@ -187,4 +187,13 @@ export function resolveTransmissionIcon(transmission?: string | null): string {
     if (trans.includes('AWD') || trans.includes('4WD')) return getPublicImage(IMAGE_PATHS.ICONS.TRANSMISSION.AWD)!;
     if (trans.includes('FWD')) return getPublicImage(IMAGE_PATHS.ICONS.TRANSMISSION.FWD)!;
     return getPublicImage(IMAGE_PATHS.ICONS.TRANSMISSION.RWD)!;
+}
+
+export function resolveDrivetrainLayoutIcon(layout?: string | null): string | undefined {
+    const normalized = layout?.trim().toUpperCase();
+    if (!normalized || !Object.prototype.hasOwnProperty.call(IMAGE_PATHS.ICONS.DRIVETRAIN_LAYOUT, normalized)) return undefined;
+    const iconPath = getDrivetrainLayoutIcon(normalized as DrivetrainLayout);
+    return SUPABASE_URL
+        ? `${STORAGE_ENDPOINT}/${iconPath}`
+        : getPublicImage(iconPath);
 }

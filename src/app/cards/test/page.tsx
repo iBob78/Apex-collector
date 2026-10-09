@@ -16,7 +16,7 @@ const carteTest: VehicleCard = {
   acceleration_0_100: '4.3',
   weight_t: '1.65',
   engine_temp: '90',
-  transmission: 'RWD',
+  transmission: 'MR',
 };
 
 export default function Page() {

@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import Card from '@/components/Card';
+import { drivetrainLayouts } from '@/lib/drivetrain';
 import { getRarityColor } from '@/lib/rarity';
 import { createCard, updateCard, type CardData, type CardDraft } from './actions';
 
@@ -283,7 +284,20 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                   <TextField label="Motorisation" value={draft.engine_size} onChange={(value) => setField('engine_size', value)} placeholder="4.0L flat-six" />
                   <TextField label="Cylindres" value={draft.cylinder} onChange={(value) => setField('cylinder', value)} placeholder="6" />
                   <TextField label="Suralimentation" value={draft.boost} onChange={(value) => setField('boost', value)} placeholder="Atmosphérique" />
-                  <TextField label="Transmission" value={draft.transmission} onChange={(value) => setField('transmission', value)} placeholder="RWD, AWD, Manuelle…" />
+                  <label className="block min-w-0">
+                    <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Position moteur / transmission</span>
+                    <select
+                      value={draft.transmission}
+                      onChange={(event) => setField('transmission', event.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm text-white outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/10"
+                    >
+                      <option value="">Non renseignée</option>
+                      {!drivetrainLayouts.some((layout) => layout === draft.transmission) && draft.transmission && (
+                        <option value={draft.transmission}>Ancienne valeur : {draft.transmission}</option>
+                      )}
+                      {drivetrainLayouts.map((layout) => <option key={layout} value={layout}>{layout}</option>)}
+                    </select>
+                  </label>
                   <TextField label="Prix neuf" value={draft.new_price_eur} onChange={(value) => setField('new_price_eur', value)} type="number" min="0" step="any" placeholder="245000" hint="Euros (€)" />
                   <TextField label="Carburant" value={draft.fuel_type} onChange={(value) => setField('fuel_type', value)} placeholder="Essence, Diesel, Électrique…" />
                   <TextField label="Régime maximal" value={draft.max_rpm} onChange={(value) => setField('max_rpm', value)} type="number" min="0" step="1" placeholder="9000" hint="Tours par minute (tr/min)" />

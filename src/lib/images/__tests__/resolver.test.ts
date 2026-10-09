@@ -1,4 +1,4 @@
-import { getPublicImage, normalize, buildVehicleKey } from '../resolver';
+import { getPublicImage, normalize, buildVehicleKey, resolveDrivetrainLayoutIcon } from '../resolver';
 import { IMAGE_PATHS } from '../paths';
 
 describe('Image Resolver', () => {
@@ -42,5 +42,22 @@ describe('Image Resolver', () => {
 
     it('should use the Supabase circuit card placeholder key', () => {
         expect(IMAGE_PATHS.PLACEHOLDERS.CIRCUIT_CARD).toBe('placeholders/circuit-default.jpg');
+    });
+
+    describe('resolveDrivetrainLayoutIcon', () => {
+        it.each(['MR', 'FF', 'FR', 'MF', 'FA', 'RR', 'MA'])('resolves the %s layout icon', (layout) => {
+            expect(resolveDrivetrainLayoutIcon(layout)).toBeDefined();
+            expect(IMAGE_PATHS.ICONS.DRIVETRAIN_LAYOUT[layout as keyof typeof IMAGE_PATHS.ICONS.DRIVETRAIN_LAYOUT])
+                .toBe(`icons/${layout}.png`);
+        });
+
+        it('normalizes case and whitespace', () => {
+            expect(resolveDrivetrainLayoutIcon(' mr ')).toBeDefined();
+        });
+
+        it('does not resolve unsupported layouts', () => {
+            expect(resolveDrivetrainLayoutIcon('AWD')).toBeUndefined();
+            expect(resolveDrivetrainLayoutIcon(null)).toBeUndefined();
+        });
     });
 });

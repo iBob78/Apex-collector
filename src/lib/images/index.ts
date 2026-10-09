@@ -4,8 +4,8 @@
  */
 
 // Constants
-export { IMAGE_PATHS, getTransmissionIcon } from './paths';
-export type { TransmissionType } from './paths';
+export { IMAGE_PATHS, getDrivetrainLayoutIcon, getTransmissionIcon } from './paths';
+export type { DrivetrainLayout, TransmissionType } from './paths';
 
 // Resolvers
 export {
@@ -16,6 +16,7 @@ export {
     resolveBrandLogo,
     resolveCountryFlag,
     resolveTransmissionIcon,
+    resolveDrivetrainLayoutIcon,
 } from './resolver';
 
 export type {

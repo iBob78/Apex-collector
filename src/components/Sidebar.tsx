@@ -14,6 +14,7 @@ import {
   LockIcon,
   MapIcon,
   WrenchIcon,
+  StarIcon,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabaseBrowser';
@@ -26,6 +27,7 @@ const navItems = [
   { href: '/boosters', label: 'BOUTIQUE PACKS', icon: ZapIcon },
   { href: '/marketplace', label: 'MARKETPLACE', icon: ShoppingBagIcon },
   { href: '/missions', label: 'CONTRATS', icon: TrophyIcon },
+  { href: '/achievements', label: 'Succès', icon: StarIcon },
   { href: '/profile', label: 'PROFIL PILOTE', icon: UserIcon },
   { href: '/settings', label: 'RÉGLAGES', icon: SettingsIcon },
 ];

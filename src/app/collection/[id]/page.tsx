@@ -175,7 +175,7 @@ export default function CardShowcasePage() {
                                 <SpecItem icon={<ActivityIcon size={16} />} label={t('Moteur')} value={card.engine_size ? card.engine_size : '--'} sub={card.cylinder} />
                                 <SpecItem icon={<WindIcon size={16} />} label={t('Induction')} value={card.boost || t('Atmosphérique')} />
                                 <SpecItem icon={<FlagIcon size={16} />} label={t('Pays')} value={card.country_code || '--'} />
-                                <SpecItem icon={<FuelIcon size={16} />} label={t('Transmission')} value={card.transmission || 'RWD'} />
+                                <SpecItem icon={<FuelIcon size={16} />} label={t('Position moteur / transmission')} value={card.transmission || '—'} />
                             </div>
 
                             {/* Actions */}
