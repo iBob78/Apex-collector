@@ -3,8 +3,8 @@
  * Consistent with the Supabase schema and UI components.
  */
 
-export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Epic' | 'Legend' | 'Icon';
-export type DrivetrainLayout = 'MR' | 'FF' | 'FR' | 'MF' | 'FA' | 'RR' | 'MA';
+export type Rarity = 'Common' | 'Uncommon' | 'Atypique' | 'Rare' | 'Very rare' | 'Epic' | 'Legend' | 'Mythic' | 'Icon';
+export type DrivetrainLayout = 'MR' | 'FF' | 'FR' | 'MF' | 'FA' | 'RR' | 'RA' | 'MA';
 export type Transmission = DrivetrainLayout;
 export type CardCategory = 'vehicle' | 'circuit';
 

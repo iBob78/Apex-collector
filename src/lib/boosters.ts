@@ -1,5 +1,6 @@
 import { getPublicImage } from '@/lib/images';
-import { Rarity } from '@/types/game';
+
+type BoosterRarity = 'Common' | 'Uncommon' | 'Rare' | 'Epic' | 'Legend' | 'Icon';
 
 export interface BoosterCatalogCard {
     id?: string;
@@ -17,7 +18,7 @@ export interface PackConfig {
     description: string;
     color: string;
     imageUrl: string;
-    probabilities: Record<Rarity, number>;
+    probabilities: Record<BoosterRarity, number>;
 }
 
 export const PACKS: Record<string, PackConfig> = {
@@ -175,13 +176,13 @@ export function getPackImageUrl(packSlug: string): string {
 /**
  * Tirage aléatoire d'une rareté basée sur les probabilités du pack
  */
-export function drawRarity(packSlug: string): Rarity {
+export function drawRarity(packSlug: string): BoosterRarity {
     const pack = PACKS[packSlug] || PACKS.common;
     const rand = Math.random();
     let cumulative = 0;
 
     // On trie les raretés pour assurer un ordre de tirage logique (plus rare en premier)
-    const raritiesOrder: Rarity[] = ['Icon', 'Legend', 'Epic', 'Rare', 'Uncommon', 'Common'];
+    const raritiesOrder: BoosterRarity[] = ['Icon', 'Legend', 'Epic', 'Rare', 'Uncommon', 'Common'];
 
     for (const rarity of raritiesOrder) {
         cumulative += pack.probabilities[rarity] || 0;
@@ -203,13 +204,13 @@ export function drawBoosterCards(
     const pack = PACKS[packSlug] || PACKS.common;
     if (count <= 0) return [];
 
-    const supportedRarities = (Object.keys(pack.probabilities) as Rarity[]).filter(
+    const supportedRarities = (Object.keys(pack.probabilities) as BoosterRarity[]).filter(
         (rarity) => pack.probabilities[rarity] > 0
     );
     const unclassifiedCircuits = circuitCards.filter(
-        (card) => !supportedRarities.includes(card.rarity as Rarity)
+        (card) => !supportedRarities.includes(card.rarity as BoosterRarity)
     );
-    const circuitsForRarity = (rarity: Rarity) => [
+    const circuitsForRarity = (rarity: BoosterRarity) => [
         ...circuitCards.filter((card) => card.rarity === rarity),
         ...unclassifiedCircuits
     ];
@@ -228,7 +229,7 @@ export function drawBoosterCards(
         throw new Error('Aucune carte circuit disponible dans le catalogue du booster.');
     }
 
-    const drawRarityFrom = (rarities: Rarity[]) => {
+    const drawRarityFrom = (rarities: BoosterRarity[]) => {
         const totalWeight = rarities.reduce((sum, rarity) => sum + pack.probabilities[rarity], 0);
         let rarityRoll = random() * totalWeight;
         let selectedRarity = rarities[rarities.length - 1];
@@ -250,7 +251,7 @@ export function drawBoosterCards(
     const guaranteedCircuit = guaranteedCircuitPool[Math.floor(random() * guaranteedCircuitPool.length)];
     results.push({
         ...guaranteedCircuit,
-        rarity: supportedRarities.includes(guaranteedCircuit.rarity as Rarity)
+        rarity: supportedRarities.includes(guaranteedCircuit.rarity as BoosterRarity)
             ? guaranteedCircuit.rarity
             : guaranteedCircuitRarity,
         category: 'circuit'
@@ -272,7 +273,7 @@ export function drawBoosterCards(
         const selected = source[Math.floor(random() * source.length)];
         results.push({
             ...selected,
-            rarity: supportedRarities.includes(selected.rarity as Rarity) ? selected.rarity : rarity,
+            rarity: supportedRarities.includes(selected.rarity as BoosterRarity) ? selected.rarity : rarity,
             category: source === circuits ? 'circuit' : 'vehicle'
         });
     }

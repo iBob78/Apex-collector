@@ -54,6 +54,7 @@ export const IMAGE_PATHS = {
             MF: 'icons/MF.png',
             FA: 'icons/FA.png',
             RR: 'icons/RR.png',
+            RA: 'icons/RA.png',
             MA: 'icons/MA.png',
         },
     } as const,

@@ -26,6 +26,10 @@ describe('Image Resolver', () => {
             const path = '/local/image.png';
             expect(getPublicImage(path)).toBe(path);
         });
+
+        it('should preserve case-sensitive storage object names', () => {
+            expect(getPublicImage('icons/MR.png')).toBe('/icons/MR.png');
+        });
     });
 
     describe('buildVehicleKey', () => {
@@ -45,7 +49,7 @@ describe('Image Resolver', () => {
     });
 
     describe('resolveDrivetrainLayoutIcon', () => {
-        it.each(['MR', 'FF', 'FR', 'MF', 'FA', 'RR', 'MA'])('resolves the %s layout icon', (layout) => {
+        it.each(['MR', 'FF', 'FR', 'MF', 'FA', 'RR', 'RA', 'MA'])('resolves the %s layout icon', (layout) => {
             expect(resolveDrivetrainLayoutIcon(layout)).toBeDefined();
             expect(IMAGE_PATHS.ICONS.DRIVETRAIN_LAYOUT[layout as keyof typeof IMAGE_PATHS.ICONS.DRIVETRAIN_LAYOUT])
                 .toBe(`icons/${layout}.png`);

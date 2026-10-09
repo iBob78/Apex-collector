@@ -16,11 +16,12 @@ import {
   X,
 } from 'lucide-react';
 import Card from '@/components/Card';
-import { drivetrainLayouts } from '@/lib/drivetrain';
+import { drivetrainLayoutDescriptions, drivetrainLayouts } from '@/lib/drivetrain';
 import { getRarityColor } from '@/lib/rarity';
 import { createCard, updateCard, type CardData, type CardDraft } from './actions';
 
-const rarities = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legend', 'Icon'];
+const rarities = ['Common', 'Uncommon', 'Atypique', 'Rare', 'Very rare', 'Epic', 'Legend', 'Mythic', 'Icon'];
+const CUSTOM_MAKE = '__custom_make__';
 
 const emptyDraft: CardDraft = {
   make: '',
@@ -129,6 +130,7 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
   const [cards, setCards] = useState(initialCards);
   const [draft, setDraft] = useState<CardDraft>(emptyDraft);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isCustomMake, setIsCustomMake] = useState(false);
   const [filter, setFilter] = useState('');
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -136,6 +138,11 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
   useEffect(() => setCards(initialCards), [initialCards]);
 
   const selectedCard = cards.find((card) => card.id === selectedId) ?? null;
+  const makes = useMemo(
+    () => Array.from(new Set(cards.map((card) => card.make.trim()).filter(Boolean)))
+      .sort((first, second) => first.localeCompare(second, 'fr')),
+    [cards],
+  );
   const filteredCards = useMemo(() => {
     const query = filter.trim().toLowerCase();
     if (!query) return cards;
@@ -152,12 +159,14 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
   const startNewCard = () => {
     setSelectedId(null);
     setDraft(emptyDraft);
+    setIsCustomMake(false);
     setFeedback(null);
   };
 
   const selectCard = (card: CardData) => {
     setSelectedId(card.id);
     setDraft(toDraft(card));
+    setIsCustomMake(false);
     setFeedback(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -245,7 +254,39 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
 
               <SectionHeading eyebrow="01 — identité" title="Informations générales" />
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <TextField label="Marque" value={draft.make} onChange={(value) => setField('make', value)} placeholder="Porsche" required />
+                <label className="block min-w-0">
+                  <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                    Marque<span className="ml-1 text-cyan-300">*</span>
+                  </span>
+                  <select
+                    value={isCustomMake ? CUSTOM_MAKE : draft.make}
+                    onChange={(event) => {
+                      if (event.target.value === CUSTOM_MAKE) {
+                        setIsCustomMake(true);
+                      } else {
+                        setIsCustomMake(false);
+                        setField('make', event.target.value);
+                      }
+                    }}
+                    className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm text-white outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/10"
+                    required
+                  >
+                    <option value="">Sélectionner une marque</option>
+                    {makes.map((make) => <option key={make} value={make}>{make}</option>)}
+                    <option value={CUSTOM_MAKE}>Autre marque…</option>
+                  </select>
+                  {isCustomMake && (
+                    <input
+                      autoFocus
+                      className="mt-3 w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/10"
+                      type="text"
+                      value={draft.make}
+                      onChange={(event) => setField('make', event.target.value)}
+                      placeholder="Saisir une nouvelle marque"
+                      required
+                    />
+                  )}
+                </label>
                 <TextField label="Modèle" value={draft.model} onChange={(value) => setField('model', value)} placeholder="911 GT3 RS" required />
                 <TextField label="Année" value={draft.year} onChange={(value) => setField('year', value)} type="number" min="1886" step="1" required />
                 <label className="block min-w-0">
@@ -295,7 +336,11 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                       {!drivetrainLayouts.some((layout) => layout === draft.transmission) && draft.transmission && (
                         <option value={draft.transmission}>Ancienne valeur : {draft.transmission}</option>
                       )}
-                      {drivetrainLayouts.map((layout) => <option key={layout} value={layout}>{layout}</option>)}
+                      {drivetrainLayouts.map((layout) => (
+                        <option key={layout} value={layout}>
+                          {layout} - {drivetrainLayoutDescriptions[layout]}
+                        </option>
+                      ))}
                     </select>
                   </label>
                   <TextField label="Prix neuf" value={draft.new_price_eur} onChange={(value) => setField('new_price_eur', value)} type="number" min="0" step="any" placeholder="245000" hint="Euros (€)" />

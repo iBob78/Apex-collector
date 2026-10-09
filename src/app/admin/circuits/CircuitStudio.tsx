@@ -24,7 +24,7 @@ import {
   type CircuitDraft,
 } from '../cards/actions';
 
-const rarities = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legend', 'Icon'];
+const rarities = ['Common', 'Uncommon', 'Atypique', 'Rare', 'Very rare', 'Epic', 'Legend', 'Mythic', 'Icon'];
 const circuitTypes = ['Route', 'Urbain', 'Oval'];
 
 const emptyDraft: CircuitDraft = {

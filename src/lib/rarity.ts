@@ -1,17 +1,19 @@
-export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Ultra Rare' | 'Epic' | 'Legend' | 'Legendary' | 'Icon' | 'Prototype' | 'Unique' | 'Mythic';
+export type Rarity = 'Common' | 'Uncommon' | 'Atypique' | 'Rare' | 'Very rare' | 'Ultra Rare' | 'Epic' | 'Legend' | 'Legendary' | 'Icon' | 'Prototype' | 'Unique' | 'Mythic';
 
 export const RARITY_CONFIG: Record<Rarity, { color: string; material: string }> = {
-    'Common': { color: '#22c55e', material: 'bg-green-500' }, // Vert
-    'Uncommon': { color: '#3b82f6', material: 'bg-blue-500' }, // Bleu
-    'Rare': { color: '#ef4444', material: 'bg-[url("/textures/carbon.png")]' }, // Rouge / Carbone
+    'Common': { color: '#ffffff', material: 'bg-white' },
+    'Uncommon': { color: '#22c55e', material: 'bg-green-500' },
+    'Atypique': { color: '#ec4899', material: 'bg-pink-500' },
+    'Rare': { color: '#eab308', material: 'bg-yellow-500' },
+    'Very rare': { color: '#f97316', material: 'bg-orange-500' },
     'Ultra Rare': { color: '#a855f7', material: 'bg-[url("/textures/kevlar.png")]' }, // Violet / Kevlar
-    'Epic': { color: '#f59e0b', material: 'bg-[url("/textures/kevlar-carbon.png")]' }, // Or / Kevlar Carbone
+    'Epic': { color: '#a855f7', material: 'bg-[url("/textures/kevlar-carbon.png")]' },
     'Legend': { color: '#fbbf24', material: 'bg-[url("/textures/titanium.png")]' },
     'Legendary': { color: '#94a3b8', material: 'bg-[url("/textures/titanium.png")]' }, // Gris / Titane
-    'Icon': { color: '#ef4444', material: 'bg-red-600' },
+    'Icon': { color: '#3b82f6', material: 'bg-blue-500' },
     'Prototype': { color: '#06b6d4', material: 'bg-cyan-500' }, // Cyan
     'Unique': { color: '#ec4899', material: 'bg-pink-500' }, // Rose
-    'Mythic': { color: '#000000', material: 'bg-[url("/textures/forged-carbon.png")]' }, // Noir / Carbone Forgé
+    'Mythic': { color: '#c0c0c0', material: 'bg-slate-300' },
 };
 
 export function getRarityColor(rarity: string): string {
@@ -29,17 +31,19 @@ export function getRarityBorderClass(rarity: string): string {
     ) as Rarity | undefined;
 
     switch (normalizedKey) {
-        case 'Common': return 'border-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]';
-        case 'Uncommon': return 'border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.4)]';
-        case 'Rare': return 'border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.4)]';
+        case 'Common': return 'border-white shadow-[0_0_10px_rgba(255,255,255,0.4)]';
+        case 'Uncommon': return 'border-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]';
+        case 'Atypique': return 'border-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.4)]';
+        case 'Rare': return 'border-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.4)]';
+        case 'Very rare': return 'border-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.4)]';
         case 'Ultra Rare': return 'border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.4)]';
-        case 'Epic': return 'border-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.4)]';
+        case 'Epic': return 'border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.4)]';
         case 'Legend': return 'border-yellow-400 shadow-[0_0_14px_rgba(250,204,21,0.55)]';
         case 'Legendary': return 'border-slate-400 shadow-[0_0_10px_rgba(148,163,184,0.4)]';
-        case 'Icon': return 'border-red-500 shadow-[0_0_16px_rgba(239,68,68,0.65)]';
+        case 'Icon': return 'border-blue-500 shadow-[0_0_16px_rgba(59,130,246,0.65)]';
         case 'Prototype': return 'border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]';
         case 'Unique': return 'border-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.4)]';
-        case 'Mythic': return 'border-white shadow-[0_0_15px_rgba(255,255,255,0.6)]';
-        default: return 'border-green-500';
+        case 'Mythic': return 'border-slate-300 shadow-[0_0_15px_rgba(192,192,192,0.6)]';
+        default: return 'border-white';
     }
 }

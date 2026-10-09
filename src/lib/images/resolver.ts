@@ -32,12 +32,12 @@ export function getPublicImage(key?: string | null): string | undefined {
 
     // 3. Construction de la base URL
     if (!SUPABASE_URL) {
-        return trimmed.startsWith('/') ? trimmed : `/${trimmed.toLowerCase()}`;
+        return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
     }
 
     // Si c'est déjà une URL Supabase, on force le passage en minuscule pour le chemin
     if (trimmed.includes(SUPABASE_URL) && trimmed.includes('/storage/v1/object/public/')) {
-        return trimmed.toLowerCase();
+        return trimmed;
     }
 
     // On s'assure de ne pas doubler le nom du bucket si le chemin commence déjà par celui-ci
@@ -47,8 +47,7 @@ export function getPublicImage(key?: string | null): string | undefined {
         : trimmed;
 
     // URL standard: https://[project].supabase.co/storage/v1/object/public/[bucket]/[path]
-    // On force TOUT en minuscule car Supabase Storage est sensible à la casse
-    const finalUrl = `${STORAGE_ENDPOINT}/${pathWithoutBucket.toLowerCase()}`;
+    const finalUrl = `${STORAGE_ENDPOINT}/${pathWithoutBucket}`;
 
     return finalUrl;
 }

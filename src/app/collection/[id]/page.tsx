@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { IMAGE_PATHS, resolveBrandLogo } from '@/lib/images';
 import { Rarity } from '@/types/game';
-import clsx from 'clsx';
+import { getRarityColor } from '@/lib/rarity';
 import { formatPower, formatSpeed, formatWeight } from '@/lib/preferences';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
@@ -85,14 +85,10 @@ export default function CardShowcasePage() {
             <Sidebar />
             <main className="flex-1 flex flex-col relative overflow-hidden">
                 {/* Cinematic Background Glow */}
-                <div className={clsx(
-                    "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] blur-[150px] opacity-20 rounded-full z-0",
-                    card.rarity === 'Icon' ? 'bg-red-500' :
-                        card.rarity === 'Legend' ? 'bg-yellow-500' :
-                            card.rarity === 'Epic' ? 'bg-purple-500' :
-                                card.rarity === 'Rare' ? 'bg-blue-500' :
-                                    'bg-gray-500'
-                )} />
+                <div
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] blur-[150px] opacity-20 rounded-full z-0"
+                    style={{ backgroundColor: getRarityColor(card.rarity) }}
+                />
 
                 <div className="z-10 p-8 md:p-12 flex-1 flex flex-col">
                     <button
@@ -109,13 +105,10 @@ export default function CardShowcasePage() {
                             animate={{ opacity: 1, x: 0 }}
                             className="relative aspect-[63/88] w-full max-w-md mx-auto group"
                         >
-                            <div className={clsx(
-                                "absolute -inset-1 rounded-[32px] blur-2xl opacity-30 group-hover:opacity-50 transition-opacity",
-                                card.rarity === 'Icon' ? 'bg-red-500' :
-                                    card.rarity === 'Legend' ? 'bg-yellow-500' :
-                                        card.rarity === 'Epic' ? 'bg-purple-500' :
-                                            'bg-blue-500'
-                            )} />
+                            <div
+                                className="absolute -inset-1 rounded-[32px] blur-2xl opacity-30 group-hover:opacity-50 transition-opacity"
+                                style={{ backgroundColor: getRarityColor(card.rarity) }}
+                            />
 
                             <div className="relative h-full w-full rounded-[24px] overflow-hidden border border-white/10 shadow-2xl">
                                 <SafeImage
@@ -148,13 +141,14 @@ export default function CardShowcasePage() {
                                         {card.make} <span className="text-transparent border-text block md:inline" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.3)' }}>{card.model}</span>
                                     </h1>
                                     <div className="flex items-center gap-4">
-                                        <span className={clsx(
-                                            "px-3 py-1 rounded text-[10px] font-black uppercase tracking-widest border",
-                                            card.rarity === 'Icon' ? 'bg-red-500/10 border-red-500 text-red-500' :
-                                                card.rarity === 'Legend' ? 'bg-yellow-500/10 border-yellow-500 text-yellow-500' :
-                                                    card.rarity === 'Epic' ? 'bg-purple-500/10 border-purple-500 text-purple-500' :
-                                                        'bg-blue-500/10 border-blue-500 text-blue-500'
-                                        )}>
+                                        <span
+                                            className="px-3 py-1 rounded text-[10px] font-black uppercase tracking-widest border"
+                                            style={{
+                                                backgroundColor: `${getRarityColor(card.rarity)}1A`,
+                                                borderColor: getRarityColor(card.rarity),
+                                                color: getRarityColor(card.rarity),
+                                            }}
+                                        >
                                             {card.rarity}
                                         </span>
                                         <span className="text-gray-500 font-mono text-xs uppercase tracking-widest">{card.year} · {card.country_code}</span>

@@ -53,9 +53,14 @@ export default function CardsPage() {
           >
             <option value="Toutes">{t('Toutes')}</option>
             <option value="Common">Common</option>
+            <option value="Uncommon">Uncommon</option>
+            <option value="Atypique">Atypique</option>
             <option value="Rare">Rare</option>
+            <option value="Very rare">Very rare</option>
             <option value="Epic">Epic</option>
             <option value="Legend">Legend</option>
+            <option value="Mythic">Mythic</option>
+            <option value="Icon">Icon</option>
           </select>
         </div>
 

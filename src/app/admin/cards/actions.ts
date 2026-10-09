@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
 import { isAdminEmail } from '@/lib/admin';
 
-const rarities = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legend', 'Icon'] as const;
+const rarities = ['Common', 'Uncommon', 'Atypique', 'Rare', 'Very rare', 'Epic', 'Legend', 'Mythic', 'Icon'] as const;
 const draftFields: (keyof CardDraft)[] = [
   'make', 'model', 'year', 'rarity', 'image_url', 'description',
   'power_hp', 'power_kw', 'torque_nm', 'max_speed_kmh', 'weight_t',
