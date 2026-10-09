@@ -21,12 +21,12 @@ describe('game card rarities', () => {
     expect(getRarityBorderClass('Epic')).toContain('border-purple-500');
 
     expect(getRarityColor('Legend')).toBe('#fbbf24');
-    expect(getRarityBorderClass('Legend')).toContain('border-yellow-400');
+    expect(getRarityBorderClass('Legend')).toBe('rarity-legend-holographic');
 
-    expect(getRarityColor('Icon')).toBe('#3b82f6');
-    expect(getRarityBorderClass('Icon')).toContain('border-blue-500');
+    expect(getRarityColor('Icon')).toBe('#ff4fd8');
+    expect(getRarityBorderClass('Icon')).toBe('rarity-icon-holographic');
 
     expect(getRarityColor('Mythic')).toBe('#c0c0c0');
-    expect(getRarityBorderClass('Mythic')).toContain('border-slate-300');
+    expect(getRarityBorderClass('Mythic')).toBe('rarity-mythic-holographic');
   });
 });

@@ -10,7 +10,7 @@ export const RARITY_CONFIG: Record<Rarity, { color: string; material: string }> 
     'Epic': { color: '#a855f7', material: 'bg-[url("/textures/kevlar-carbon.png")]' },
     'Legend': { color: '#fbbf24', material: 'bg-[url("/textures/titanium.png")]' },
     'Legendary': { color: '#94a3b8', material: 'bg-[url("/textures/titanium.png")]' }, // Gris / Titane
-    'Icon': { color: '#3b82f6', material: 'bg-blue-500' },
+    'Icon': { color: '#ff4fd8', material: 'bg-pink-500' },
     'Prototype': { color: '#06b6d4', material: 'bg-cyan-500' }, // Cyan
     'Unique': { color: '#ec4899', material: 'bg-pink-500' }, // Rose
     'Mythic': { color: '#c0c0c0', material: 'bg-slate-300' },
@@ -38,12 +38,12 @@ export function getRarityBorderClass(rarity: string): string {
         case 'Very rare': return 'border-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.4)]';
         case 'Ultra Rare': return 'border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.4)]';
         case 'Epic': return 'border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.4)]';
-        case 'Legend': return 'border-yellow-400 shadow-[0_0_14px_rgba(250,204,21,0.55)]';
+        case 'Legend': return 'rarity-legend-holographic';
         case 'Legendary': return 'border-slate-400 shadow-[0_0_10px_rgba(148,163,184,0.4)]';
-        case 'Icon': return 'border-blue-500 shadow-[0_0_16px_rgba(59,130,246,0.65)]';
+        case 'Icon': return 'rarity-icon-holographic';
         case 'Prototype': return 'border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]';
         case 'Unique': return 'border-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.4)]';
-        case 'Mythic': return 'border-slate-300 shadow-[0_0_15px_rgba(192,192,192,0.6)]';
+        case 'Mythic': return 'rarity-mythic-holographic';
         default: return 'border-white';
     }
 }

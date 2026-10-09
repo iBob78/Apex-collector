@@ -124,6 +124,19 @@ export default function Card(props: CardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
         </div>
 
+        {['icon', 'mythic', 'legend'].includes(String(rarity).toLowerCase()) && (
+          <div
+            aria-hidden="true"
+            className={
+              String(rarity).toLowerCase() === 'mythic'
+                ? 'rarity-mythic-holo-sheen'
+                : String(rarity).toLowerCase() === 'legend'
+                  ? 'rarity-legend-holo-sheen'
+                  : 'rarity-icon-holo-sheen'
+            }
+          />
+        )}
+
         {levelEffectClass && (
           <div
             aria-hidden="true"

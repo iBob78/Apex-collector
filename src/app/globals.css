@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@property --rarity-holo-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 :root {
   --foreground-rgb: 255, 255, 255;
   --background-rgb: 0, 0, 0;
@@ -55,6 +61,175 @@ html, body {
   opacity: 0.3;
   transition: opacity 0.3s ease-in-out;
   transform: rotateZ(0.0001deg); /* GPU acceleration subtile */
+}
+
+.rarity-icon-holographic {
+  border-color: transparent;
+  box-shadow:
+    0 0 12px rgba(255, 79, 216, 0.45),
+    0 0 22px rgba(34, 234, 255, 0.3);
+}
+
+.rarity-icon-holographic::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  padding: 3px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--rarity-holo-angle),
+    #ff4fd8,
+    #ffffff 18%,
+    #20eaff 34%,
+    #9146ff 52%,
+    #ffffff 68%,
+    #ff4fd8
+  );
+  animation: rarity-holo-rotate 5s linear infinite;
+  content: "";
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+.rarity-mythic-holographic {
+  border-color: transparent;
+  box-shadow:
+    0 0 12px rgba(235, 240, 246, 0.55),
+    0 0 24px rgba(148, 163, 184, 0.38);
+}
+
+.rarity-mythic-holographic::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  padding: 3px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--rarity-holo-angle),
+    #ffffff,
+    #8b929c 18%,
+    #f8fafc 34%,
+    #b8c0ca 50%,
+    #ffffff 68%,
+    #737b86 84%,
+    #ffffff
+  );
+  animation: rarity-holo-rotate 5s linear infinite;
+  content: "";
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+.rarity-legend-holographic {
+  border-color: transparent;
+  box-shadow:
+    0 0 12px rgba(255, 193, 7, 0.52),
+    0 0 24px rgba(217, 145, 0, 0.35);
+}
+
+.rarity-legend-holographic::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  padding: 3px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--rarity-holo-angle),
+    #fff8d6,
+    #b77900 18%,
+    #ffe58a 34%,
+    #d89b00 50%,
+    #fffdf2 68%,
+    #a86f00 84%,
+    #fff8d6
+  );
+  animation: rarity-holo-rotate 5s linear infinite;
+  content: "";
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+.rarity-icon-holo-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  background:
+    linear-gradient(118deg, transparent 24%, rgba(255, 79, 216, 0.24) 38%, rgba(255, 255, 255, 0.3) 42%, transparent 51%),
+    linear-gradient(28deg, transparent 30%, rgba(32, 234, 255, 0.18) 45%, transparent 59%),
+    linear-gradient(150deg, transparent 38%, rgba(145, 70, 255, 0.2) 52%, transparent 66%);
+  background-size: 220% 220%;
+  animation: rarity-holo-sweep 6s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.rarity-mythic-holo-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  background:
+    linear-gradient(118deg, transparent 24%, rgba(255, 255, 255, 0.32) 38%, rgba(226, 232, 240, 0.42) 42%, transparent 51%),
+    linear-gradient(28deg, transparent 30%, rgba(148, 163, 184, 0.25) 45%, transparent 59%),
+    linear-gradient(150deg, transparent 38%, rgba(248, 250, 252, 0.3) 52%, transparent 66%);
+  background-size: 220% 220%;
+  animation: rarity-holo-sweep 6s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.rarity-legend-holo-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  background:
+    linear-gradient(118deg, transparent 24%, rgba(255, 217, 102, 0.25) 38%, rgba(255, 255, 240, 0.42) 42%, transparent 51%),
+    linear-gradient(28deg, transparent 30%, rgba(255, 184, 0, 0.22) 45%, transparent 59%),
+    linear-gradient(150deg, transparent 38%, rgba(255, 239, 180, 0.24) 52%, transparent 66%);
+  background-size: 220% 220%;
+  animation: rarity-holo-sweep 6s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+@keyframes rarity-holo-rotate {
+  to {
+    --rarity-holo-angle: 360deg;
+  }
+}
+
+@keyframes rarity-holo-sweep {
+  from {
+    background-position: 100% 0, 0 100%, 100% 100%;
+  }
+  to {
+    background-position: 0 100%, 100% 0, 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rarity-icon-holographic::before,
+  .rarity-icon-holo-sheen,
+  .rarity-mythic-holographic::before,
+  .rarity-mythic-holo-sheen,
+  .rarity-legend-holographic::before,
+  .rarity-legend-holo-sheen {
+    animation: none;
+  }
 }
 
 .card-level-effect {
