@@ -87,7 +87,7 @@ The card admin studio supports vehicle specification fields, including power in 
 
 Vehicle cards also support transmission, new price in euros, fuel type, maximum RPM, and units sold. Migration `007_vehicle_card_specs.sql` adds these optional columns to `public.cards`.
 
-For a fresh Supabase setup, apply migrations `007_vehicle_card_specs.sql`, `008_profiles_language_default.sql`, and `009_profiles_unit_preference.sql` in addition to the admin access migrations described below.
+For a fresh Supabase setup, apply migrations `007_vehicle_card_specs.sql` through `013_purchase_card_upgrades.sql` in order, in addition to the admin access migrations described below. These add vehicle specifications, profile preferences, card numbering and availability controls, and purchasable player card upgrades.
 
 New sign-ups send `language: 'fr'` as Supabase Auth user metadata. Migration `008_profiles_language_default.sql` also sets `public.profiles.language` to `fr` when an insert omits the column. Apply the migration in the Supabase SQL Editor or through the project's migration workflow; it does not replace an explicit `NULL` inserted by a database trigger.
 
@@ -97,20 +97,25 @@ Jest tests cover preference translations, unit conversions, and vehicle performa
 
 ### Card levels, badges, and visual effects
 
-A card's level is based on the number of copies owned. The level badge is displayed below the card when enabled; level 0 has no material overlay, while levels 1–9 apply a distinct finish as a border-like overlay inside the card, up to the rarity outline.
+A vehicle card's upgrade level is purchased by the player and applies to all copies of that vehicle in their collection. Duplicate-copy thresholds unlock the next purchase but are not consumed. The level badge below owned cards shows the next level and its AP price when that level is unlocked. Card detail views show the current level and duplicate progress.
 
-| Level | Copies owned | Visual effect |
-| --- | ---: | --- |
-| 0 | 1 | No visual effect |
-| 1 | 2 | Aluminium |
-| 2 | 5 | Brushed aluminium |
-| 3 | 10 | Carbon |
-| 4 | 25 | Forged carbon |
-| 5 | 50 | Carbon Kevlar |
-| 6 | 100 | Exhaust-manifold thermal wrap |
-| 7 | 200 | Polished metal |
-| 8 | 500 | Shiny gold foil |
-| 9 | 1,000 | Heat-blued titanium |
+| Level to purchase | Copies required | Price (AP) | Visual effect |
+| --- | ---: | ---: | --- |
+| 1 | 2 | 250 | Base level |
+| 2 | 5 | 500 | Subtle crystal sparkle |
+| 3 | 10 | 1,000 | Brighter crystal sparkle |
+| 4 | 25 | 2,000 | Intense crystal shine |
+| 5 | 50 | 3,000 | Holographic |
+| 6 | 100 | 5,000 | Stronger holographic |
+| 7 | 200 | 10,000 | Stronger holographic |
+| 8 | 500 | 20,000 | Stronger holographic |
+| 9 | 1,000 | 50,000 | Strongest holographic |
+
+The purchase is validated and processed atomically in Supabase: the player must own the card, meet its duplicate threshold, and have enough AP. Reduced-motion preferences disable the animated parts of the card effects.
+
+The Card Studio can assign each vehicle a permanent collection number, deactivate it in the game without deleting it, and independently exclude it from booster draws. Deactivated vehicles are hidden from player-facing game surfaces; booster-excluded vehicles remain in the catalog and game but cannot be drawn from packs.
+
+Apply Supabase migrations `010_card_catalog_status_and_numbering.sql`, `011_card_booster_eligibility.sql`, `012_user_card_upgrade_levels.sql`, and `013_purchase_card_upgrades.sql` in order to enable these catalog controls and upgrades.
 
 ---
 
@@ -213,7 +218,7 @@ L’atelier d’administration des cartes prend en charge les caractéristiques 
 
 Les cartes de véhicules prennent aussi en charge la transmission, le prix neuf en euros, le type de carburant, le régime maximal et le nombre d’exemplaires vendus. La migration `007_vehicle_card_specs.sql` ajoute ces colonnes facultatives à `public.cards`.
 
-Pour une nouvelle installation Supabase, appliquer les migrations `007_vehicle_card_specs.sql`, `008_profiles_language_default.sql` et `009_profiles_unit_preference.sql`, en plus des migrations de droits d’administration décrites ci-dessus.
+Pour une nouvelle installation Supabase, appliquer dans l’ordre les migrations `007_vehicle_card_specs.sql` à `013_purchase_card_upgrades.sql`, en plus des migrations de droits d’administration décrites ci-dessus. Elles ajoutent les caractéristiques véhicule, les préférences de profil, la numérotation et les contrôles de disponibilité des cartes, ainsi que les améliorations achetables par les joueurs.
 
 Lors d’une nouvelle inscription, l’application transmet `language: 'fr'` dans les métadonnées utilisateur de Supabase Auth. La migration `008_profiles_language_default.sql` définit également `fr` comme valeur par défaut de `public.profiles.language` lorsqu’une insertion omet cette colonne. Appliquer la migration dans le SQL Editor de Supabase ou via le processus de migrations du projet ; cette valeur par défaut ne remplace pas un `NULL` explicitement inséré par un trigger.
 
@@ -222,40 +227,29 @@ L’envoi et la confirmation des e-mails dépendent des réglages e-mail de Supa
 Les tests Jest couvrent les traductions des préférences, les conversions d’unités et le calcul de l’indice de performance des véhicules.
 
 
-Le design des cartes est encore a determiner, 
-- Holographique
-- Effet carbone
-- Effet Kevlar
-- Effet carbone forgé
-- Titane brossé
-- Titane bleu
-- echappement blanc mat ?
-- Feuille d’isolant or
-- Monochrome
-- Blueprint
-- Croquis design
-- Carte rétros
-- Acier brossé
+Les cartes Icon, Mythic et Legend disposent d’effets holographiques spécifiques. Les améliorations achetées apportent progressivement un effet cristal scintillant (niveaux 2 à 4), puis un effet holographique plus intense (niveaux 5 à 9).
 
 ### Niveaux, badges et effets visuels des cartes
 
-Le niveau d’une carte dépend du nombre d’exemplaires possédés. Lorsque son affichage est activé, le badge « Niveau X » apparaît sous la carte. Le niveau 0 n’a pas d’effet de matière ; du niveau 1 au niveau 9, chaque palier applique une finition distincte sous forme de liseré à l’intérieur de la carte, jusqu’au contour de rareté.
+Le niveau d’amélioration d’une carte véhicule est acheté par le joueur et s’applique à tous les exemplaires de ce véhicule dans sa collection. Les doublons débloquent l’achat du niveau suivant, mais ne sont pas consommés. Le badge sous une carte possédée indique le prochain niveau et son prix en AP lorsqu’il est débloqué. La fenêtre de détails affiche le niveau actuel et la progression en doublons.
 
-| Niveau | Exemplaires possédés | Effet visuel |
-| --- | ---: | --- |
-| 0 | 1 | Aucun effet visuel |
-| 1 | 2 | Aluminium |
-| 2 | 5 | Aluminium brossé |
-| 3 | 10 | Carbone |
-| 4 | 25 | Carbone forgé |
-| 5 | 50 | Carbone kevlar |
-| 6 | 100 | Bandes thermiques de collecteur d’échappement |
-| 7 | 200 | Métal poli brillant |
-| 8 | 500 | Feuilles d’isolant doré brillant |
-| 9 | 1 000 | Titane bleui par la chaleur |
+| Niveau à acheter | Exemplaires requis | Prix (AP) | Effet visuel |
+| --- | ---: | ---: | --- |
+| 1 | 2 | 250 | Niveau de base |
+| 2 | 5 | 500 | Scintillement cristal léger |
+| 3 | 10 | 1 000 | Scintillement cristal renforcé |
+| 4 | 25 | 2 000 | Effet cristal brillant |
+| 5 | 50 | 3 000 | Holographique |
+| 6 | 100 | 5 000 | Holographique renforcé |
+| 7 | 200 | 10 000 | Holographique renforcé |
+| 8 | 500 | 20 000 | Holographique renforcé |
+| 9 | 1 000 | 50 000 | Holographique maximal |
 
+L’achat est vérifié et traité de façon atomique dans Supabase : le joueur doit posséder la carte, avoir assez de doublons et disposer des AP nécessaires. La préférence de réduction des animations désactive les parties animées des effets.
 
+L’atelier Card Studio permet d’attribuer un numéro permanent à chaque carte véhicule, de la désactiver dans le jeu sans la supprimer et, indépendamment, de l’exclure des boosters. Une carte désactivée est masquée dans les surfaces destinées aux joueurs ; une carte exclue des boosters reste visible et disponible dans le jeu, mais ne peut plus être tirée dans un pack.
 
+Pour activer ces contrôles et améliorations dans Supabase, appliquer dans l’ordre les migrations `010_card_catalog_status_and_numbering.sql`, `011_card_booster_eligibility.sql`, `012_user_card_upgrade_levels.sql` et `013_purchase_card_upgrades.sql`.
 🤝 Comment contribuer
 Nous accueillons toutes les contributions ! Voici comment vous pouvez nous aider :
 
