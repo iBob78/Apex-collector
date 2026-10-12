@@ -87,9 +87,11 @@ The card admin studio supports vehicle specification fields, including power in 
 
 Vehicle cards also support transmission, new price in euros, fuel type, maximum RPM, and units sold. Migration `007_vehicle_card_specs.sql` adds these optional columns to `public.cards`.
 
+Circuit images use the same Supabase Storage image resolver as vehicle cards. Enter a storage key such as `assets/cards/circuit/spa-francorchamps-2012.jpg`, a full public URL, or a local path beginning with `/`; the Card Studio preview resolves the storage key and shows a country flag for a country code such as `BE`.
+
 The Card Studio fuel selector supports the acronyms ES, GO, EL, EE, EH, GL, GH, E85, ET, GP, GN, H2, EG, EN, FG, and FL. Recognized fuel types appear as a compact badge below the vehicle's performance-index badge; existing common values such as “Diesel” and “Essence” are recognized too.
 
-For a fresh Supabase setup, apply migrations `007_vehicle_card_specs.sql` through `014_manage_objectives.sql` in order, in addition to the admin access migrations described below. These add vehicle specifications, profile preferences, card numbering and availability controls, purchasable player card upgrades, and manageable contracts and achievements.
+For a fresh Supabase setup, apply migrations `007_vehicle_card_specs.sql` through `015_align_circuit_rarities.sql` in order, in addition to the admin access migrations described below. These add vehicle specifications, profile preferences, card numbering and availability controls, purchasable player card upgrades, manageable contracts and achievements, and aligned circuit rarity constraints.
 
 New sign-ups send `language: 'fr'` as Supabase Auth user metadata. Migration `008_profiles_language_default.sql` also sets `public.profiles.language` to `fr` when an insert omits the column. Apply the migration in the Supabase SQL Editor or through the project's migration workflow; it does not replace an explicit `NULL` inserted by a database trigger.
 
@@ -124,6 +126,8 @@ Apply Supabase migrations `010_card_catalog_status_and_numbering.sql`, `011_card
 Admins manage contracts and achievements in `/admin/objectives`. Each objective has a title, description, progress target, optional rarity requirement, AP reward, and active state. Supported events are opening boosters, collecting vehicles, collecting a specified rarity, creating marketplace listings, collecting circuits, and logging in on distinct days. Completed objectives award AP when the player claims the reward. Disabling an objective hides it from players while preserving their progress.
 
 Migration `014_manage_objectives.sql` creates the objective definitions and per-player progress, imports existing contracts and progress, and provides the database functions used to track progress and claim rewards atomically.
+
+Migration `015_align_circuit_rarities.sql` aligns the circuit rarity constraints with the rarities available in the Card Studio. Apply it if editing a circuit fails with a rarity check-constraint error.
 
 ---
 
@@ -226,9 +230,11 @@ L’atelier d’administration des cartes prend en charge les caractéristiques 
 
 Les cartes de véhicules prennent aussi en charge la transmission, le prix neuf en euros, le type de carburant, le régime maximal et le nombre d’exemplaires vendus. La migration `007_vehicle_card_specs.sql` ajoute ces colonnes facultatives à `public.cards`.
 
+Les images de circuit utilisent le même résolveur d’images Supabase Storage que les cartes véhicule. Renseigne une clé de stockage comme `assets/cards/circuit/spa-francorchamps-2012.jpg`, une URL publique complète ou un chemin local commençant par `/` ; l’aperçu du Card Studio résout la clé et affiche le drapeau du pays à partir d’un code comme `BE`.
+
 Le sélecteur de carburant du Card Studio propose les acronymes ES, GO, EL, EE, EH, GL, GH, E85, ET, GP, GN, H2, EG, EN, FG et FL. Les carburants reconnus apparaissent dans un petit badge sous le badge d’indice de performance ; les anciennes valeurs courantes comme « Diesel » et « Essence » sont également reconnues.
 
-Pour une nouvelle installation Supabase, appliquer dans l’ordre les migrations `007_vehicle_card_specs.sql` à `014_manage_objectives.sql`, en plus des migrations de droits d’administration décrites ci-dessus. Elles ajoutent les caractéristiques véhicule, les préférences de profil, la numérotation et les contrôles de disponibilité des cartes, les améliorations achetables, ainsi que la gestion des contrats et succès.
+Pour une nouvelle installation Supabase, appliquer dans l’ordre les migrations `007_vehicle_card_specs.sql` à `015_align_circuit_rarities.sql`, en plus des migrations de droits d’administration décrites ci-dessus. Elles ajoutent les caractéristiques véhicule, les préférences de profil, la numérotation et les contrôles de disponibilité des cartes, les améliorations achetables, la gestion des contrats et succès, ainsi que l’alignement des raretés de circuits.
 
 Lors d’une nouvelle inscription, l’application transmet `language: 'fr'` dans les métadonnées utilisateur de Supabase Auth. La migration `008_profiles_language_default.sql` définit également `fr` comme valeur par défaut de `public.profiles.language` lorsqu’une insertion omet cette colonne. Appliquer la migration dans le SQL Editor de Supabase ou via le processus de migrations du projet ; cette valeur par défaut ne remplace pas un `NULL` explicitement inséré par un trigger.
 
@@ -266,6 +272,8 @@ Pour activer ces contrôles et améliorations dans Supabase, appliquer dans l’
 Les administrateurs gèrent les contrats et les succès dans `/admin/objectives`. Chaque objectif possède un titre, une description, une cible de progression, une rareté facultative, une récompense en AP et un statut actif. Les événements disponibles sont l’ouverture de boosters, la collection de véhicules, l’obtention d’une rareté donnée, la création d’annonces Marketplace, la collection de circuits et les connexions sur des jours différents. Une fois l’objectif terminé, le joueur réclame sa récompense en AP. La désactivation masque l’objectif sans supprimer la progression des joueurs.
 
 La migration `014_manage_objectives.sql` crée les définitions et progressions par joueur, importe les contrats et leurs progressions existants, et ajoute les fonctions SQL de suivi et de réclamation atomique des récompenses.
+
+La migration `015_align_circuit_rarities.sql` aligne les contraintes de rareté des circuits sur les raretés proposées dans le Card Studio. Applique-la si la modification d’un circuit échoue avec une erreur de contrainte de rareté.
 🤝 Comment contribuer
 Nous accueillons toutes les contributions ! Voici comment vous pouvez nous aider :
 

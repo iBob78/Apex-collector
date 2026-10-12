@@ -17,6 +17,8 @@ import {
   X,
 } from 'lucide-react';
 import { getRarityColor } from '@/lib/rarity';
+import { resolveCardImage, resolveCountryFlag, IMAGE_PATHS } from '@/lib/images';
+import SafeImage from '@/components/SafeImage';
 import {
   createCircuit,
   updateCircuit,
@@ -160,6 +162,13 @@ export default function CircuitStudio({ initialCircuits }: { initialCircuits: Ci
   };
 
   const rarityColor = getRarityColor(draft.rarity);
+  const previewImage = resolveCardImage({
+    category: 'circuit',
+    name: draft.name,
+    year: draft.year,
+    image_url: draft.image_url,
+  });
+  const previewCountryFlag = resolveCountryFlag(draft.country_code || draft.country);
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#07090d] text-white">
@@ -233,7 +242,7 @@ export default function CircuitStudio({ initialCircuits }: { initialCircuits: Ci
                     {circuitTypes.map((type) => <option key={type} value={type}>{type}</option>)}
                   </select>
                 </label>
-                <TextField label="URL de l’image" value={draft.image_url} onChange={(value) => setField('image_url', value)} placeholder="/images/circuits/spa.jpg" hint="URL publique ou chemin commençant par /" />
+                <TextField label="URL de l’image" value={draft.image_url} onChange={(value) => setField('image_url', value)} placeholder="assets/cards/circuit/spa-francorchamps-2012.jpg" hint="Clé Supabase (ex. assets/cards/circuit/…), URL publique ou chemin local commençant par /" />
               </div>
 
               <div className="mb-7 mt-9">
@@ -270,9 +279,14 @@ export default function CircuitStudio({ initialCircuits }: { initialCircuits: Ci
                 <ImageIcon size={18} className="text-slate-500" />
               </div>
               <div className="relative mx-auto aspect-[2/3] w-full max-w-[250px] overflow-hidden rounded-2xl border-[3px] bg-[#111923] shadow-2xl" style={{ borderColor: rarityColor, boxShadow: `0 0 32px ${rarityColor}24` }}>
-                {draft.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={draft.image_url} alt="Aperçu du circuit" className="absolute inset-0 h-full w-full object-cover" />
+                {previewImage ? (
+                  <SafeImage
+                    src={previewImage}
+                    fallback={IMAGE_PATHS.PLACEHOLDERS.CIRCUIT_CARD}
+                    alt="Aperçu du circuit"
+                    fill
+                    className="object-cover"
+                  />
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_50%_35%,rgba(34,211,238,0.2),transparent_50%),linear-gradient(145deg,#172333,#080b10_70%)]">
                     <Flag size={42} className="text-white/20" />
@@ -282,7 +296,19 @@ export default function CircuitStudio({ initialCircuits }: { initialCircuits: Ci
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-black/10" />
                 <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
                   <div className="rounded-lg border border-white/10 bg-black/55 px-2.5 py-1.5 text-[9px] font-black uppercase tracking-[0.15em] text-white backdrop-blur">{draft.rarity}</div>
-                  <div className="text-xl drop-shadow-lg">{draft.country_code || '🏁'}</div>
+                  {previewCountryFlag ? (
+                    <div className="relative h-6 w-9 overflow-hidden rounded-sm border border-white/40 bg-black/50 shadow-lg">
+                      <SafeImage
+                        src={previewCountryFlag}
+                        alt={`Drapeau ${draft.country || draft.country_code}`}
+                        fill
+                        showPlaceholderOnError={false}
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-xl drop-shadow-lg" aria-label="Drapeau non renseigné">🏁</div>
+                  )}
                 </div>
                 <div className="absolute inset-x-0 bottom-0 p-4">
                   <p className="line-clamp-2 text-lg font-black uppercase tracking-wide">{draft.name || 'NOM DU CIRCUIT'}</p>

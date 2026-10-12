@@ -1,4 +1,4 @@
-import { getPublicImage, normalize, buildVehicleKey, resolveDrivetrainLayoutIcon } from '../resolver';
+import { getPublicImage, normalize, buildVehicleKey, resolveCardImage, resolveCountryFlag, resolveDrivetrainLayoutIcon } from '../resolver';
 import { IMAGE_PATHS } from '../paths';
 
 describe('Image Resolver', () => {
@@ -46,6 +46,20 @@ describe('Image Resolver', () => {
 
     it('should use the Supabase circuit card placeholder key', () => {
         expect(IMAGE_PATHS.PLACEHOLDERS.CIRCUIT_CARD).toBe('placeholders/circuit-default.jpg');
+    });
+
+    it('should resolve a supplied Supabase Storage image key for circuit cards', () => {
+        const imageKey = 'assets/cards/circuit/spa-francorchamps-2012.jpg';
+        expect(resolveCardImage({
+            category: 'circuit',
+            name: 'Spa-Francorchamps',
+            year: 2012,
+            image_url: imageKey,
+        })).toBe(getPublicImage(imageKey));
+    });
+
+    it('should resolve the Belgium country code to its flag asset', () => {
+        expect(resolveCountryFlag('BE')).toContain('logos/country/be.png');
     });
 
     describe('resolveDrivetrainLayoutIcon', () => {

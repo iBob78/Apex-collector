@@ -230,6 +230,13 @@ function parseCircuitDraft(draft: CircuitDraft) {
   } as const;
 }
 
+function circuitWriteError(action: 'créé' | 'modifié', error: { code?: string; message: string }) {
+  if (error.code === '23514' && /rarity/i.test(error.message)) {
+    return `Le circuit n’a pas pu être ${action} : la contrainte de rareté Supabase est incompatible avec les raretés du studio. Applique la migration 015_align_circuit_rarities.sql, puis réessaie.`;
+  }
+  return `Le circuit n’a pas pu être ${action} : ${error.message}`;
+}
+
 async function getAdminClient(): Promise<
   | { client: Awaited<ReturnType<typeof createServerSupabaseClient>>; error: null }
   | { client: null; error: string }
@@ -303,7 +310,7 @@ export async function createCircuit(draft: CircuitDraft): Promise<CircuitSaveRes
     .select('*')
     .single();
 
-  if (error) return { success: false, error: `Le circuit n’a pas pu être créé : ${error.message}` };
+  if (error) return { success: false, error: circuitWriteError('créé', error) };
   revalidatePath('/admin/circuits');
   revalidatePath('/collection');
   revalidatePath('/open');
@@ -328,7 +335,7 @@ export async function updateCircuit(id: string, draft: CircuitDraft): Promise<Ci
     .select('*')
     .single();
 
-  if (error) return { success: false, error: `Le circuit n’a pas pu être modifié : ${error.message}` };
+  if (error) return { success: false, error: circuitWriteError('modifié', error) };
   revalidatePath('/admin/circuits');
   revalidatePath('/collection');
   revalidatePath('/open');
