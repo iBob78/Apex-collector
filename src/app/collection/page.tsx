@@ -7,7 +7,8 @@ import Card from '@/components/Card';
 import CardDetailsModal from '@/components/Collection/CardDetailsModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Rarity } from '@/types/game';
-import { getCardLevel } from '@/lib/level';
+import { getNextLevelUnlock } from '@/lib/level';
+import { purchaseCardUpgrade } from '@/lib/actions/card-upgrades';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 interface UserCardData {
@@ -21,6 +22,8 @@ export default function CollectionPage() {
   const [cards, setCards] = useState<any[]>([]);
   const [selectedCard, setSelectedCard] = useState<any | null>(null);
   const [userCards, setUserCards] = useState<Record<string, number>>({});
+  const [userCardLevels, setUserCardLevels] = useState<Record<string, number>>({});
+  const [upgradingCardId, setUpgradingCardId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Filters
@@ -43,7 +46,7 @@ export default function CollectionPage() {
       try {
         // 1. Récupérer toutes les bases (Véhicules ET Circuits)
         const [cardsRes, circuitsRes] = await Promise.all([
-          supabase.from('cards').select('*'),
+          supabase.from('cards').select('*').eq('is_active', true),
           supabase.from('circuits').select('*')
         ]);
 
@@ -58,6 +61,7 @@ export default function CollectionPage() {
         // 2. Récupérer la collection (UserCards ET UserCircuits)
         if (!user) {
           setCards(combinedBase);
+          setUserCardLevels({});
           setLoading(false);
           return;
         }
@@ -68,6 +72,7 @@ export default function CollectionPage() {
         ]);
 
         let ownedMap: Record<string, number> = {};
+        let levelMap: Record<string, number> = {};
 
         // Mapping des véhicules
         userCardsRes.data?.forEach((item: any) => {
@@ -76,6 +81,7 @@ export default function CollectionPage() {
           if (rawCid) {
             const cid = String(rawCid).toLowerCase().trim();
             ownedMap[cid] = (ownedMap[cid] || 0) + val;
+            levelMap[cid] = Math.max(levelMap[cid] || 0, Number(item.upgrade_level) || 0);
           }
         });
 
@@ -91,6 +97,7 @@ export default function CollectionPage() {
 
         setCards(combinedBase);
         setUserCards(ownedMap);
+        setUserCardLevels(levelMap);
       } catch (err) {
         console.error('Erreur lors du chargement de la collection:', err);
       } finally {
@@ -125,14 +132,6 @@ export default function CollectionPage() {
       result = result.filter(c => c.rarity === rarityFilter);
     }
 
-    const cardLevels = new Map<string, number>();
-    if (sortBy === 'level-asc' || sortBy === 'level-desc') {
-      result.forEach(card => {
-        const cardId = String(card.card_id || card.id).toLowerCase().trim();
-        cardLevels.set(cardId, getCardLevel(userCards[cardId] || 0));
-      });
-    }
-
     // Tri
     result.sort((a, b) => {
       if (sortBy === 'rarity') {
@@ -161,7 +160,7 @@ export default function CollectionPage() {
       if (sortBy === 'level-asc' || sortBy === 'level-desc') {
         const cardIdA = String(a.card_id || a.id).toLowerCase().trim();
         const cardIdB = String(b.card_id || b.id).toLowerCase().trim();
-        const levelDifference = (cardLevels.get(cardIdA) || 0) - (cardLevels.get(cardIdB) || 0);
+        const levelDifference = (userCardLevels[cardIdA] || 0) - (userCardLevels[cardIdB] || 0);
         return sortBy === 'level-asc' ? levelDifference : -levelDifference;
       }
       // Par défaut: Nom (Make + Model)
@@ -171,18 +170,63 @@ export default function CollectionPage() {
     });
 
     return result;
-  }, [cards, activeTab, searchQuery, rarityFilter, sortBy, userCards]);
+  }, [cards, activeTab, searchQuery, rarityFilter, sortBy, userCardLevels]);
 
   // Statistiques
   const stats = useMemo(() => {
     const total = cards.length;
     // Utilisation de userCards normalisée
-    const owned = Object.keys(userCards).length;
+    const activeVehicleIds = new Set(cards.filter((card) => card.category === 'vehicle').map((card) =>
+      String(card.card_id || card.id).toLowerCase().trim(),
+    ));
+    const owned = Object.keys(userCards).filter((cardId) => activeVehicleIds.has(cardId)).length;
     const percentage = total > 0 ? Math.round((owned / total) * 100) : 0;
-    const totalCopies = Object.values(userCards).reduce((a, b) => a + b, 0);
+    const totalCopies = Object.entries(userCards)
+      .filter(([cardId]) => activeVehicleIds.has(cardId) || cards.some((card) =>
+        card.category === 'circuit' && String(card.circuit_id || card.id).toLowerCase().trim() === cardId,
+      ))
+      .reduce((totalCount, [, count]) => totalCount + count, 0);
 
     return { total, owned, percentage, totalCopies };
   }, [cards, userCards]);
+
+  const handleUpgrade = async (card: any) => {
+    if (!user || upgradingCardId) return;
+
+    const cardId = String(card.card_id || card.id);
+    const normalizedId = cardId.toLowerCase().trim();
+    const currentLevel = userCardLevels[normalizedId] || 0;
+    const unlock = getNextLevelUnlock(userCards[normalizedId] || 0, currentLevel);
+    if (!unlock?.unlocked) return;
+
+    const confirmed = window.confirm(
+      t('Acheter le niveau {level} pour {price} AP ?', {
+        level: unlock.nextLevel,
+        price: unlock.price,
+      }),
+    );
+    if (!confirmed) return;
+
+    setUpgradingCardId(normalizedId);
+    try {
+      const result = await purchaseCardUpgrade(cardId);
+      if (!result.success) {
+        window.alert(`${t('Erreur')}: ${result.error}`);
+        return;
+      }
+
+      setUserCardLevels((current) => ({ ...current, [normalizedId]: result.level }));
+      window.alert(t('Niveau {level} acheté. Solde restant : {balance} AP.', {
+        level: result.level,
+        balance: result.balance,
+      }));
+    } catch (error) {
+      console.error('[CollectionPage] Erreur lors de l’achat du niveau:', error);
+      window.alert(t('Une erreur est survenue pendant l’achat du niveau.'));
+    } finally {
+      setUpgradingCardId(null);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-[#050505] text-white">
@@ -285,7 +329,8 @@ export default function CollectionPage() {
                   {filteredCards.map((card, index) => {
                     const cid = String((card as any).card_id || card.id).toLowerCase().trim();
                     const c = userCards[cid] || 0;
-
+                    const currentLevel = userCardLevels[cid] || 0;
+                    const levelUnlock = getNextLevelUnlock(c, currentLevel);
 
                     return (
                       <motion.div
@@ -300,6 +345,11 @@ export default function CollectionPage() {
                           {...card}
                           owned={c > 0}
                           count={c}
+                          upgradeLevel={currentLevel}
+                          upgradeAvailable={Boolean(levelUnlock?.unlocked)}
+                          upgradePrice={levelUnlock?.price}
+                          upgradePending={upgradingCardId === cid}
+                          onUpgrade={() => handleUpgrade(card)}
                           onCardClick={() => setSelectedCard(card)}
                         />
                       </motion.div>
@@ -318,6 +368,10 @@ export default function CollectionPage() {
       <CardDetailsModal
         card={selectedCard}
         ownedCount={selectedCard ? userCards[String(selectedCard.card_id || selectedCard.id).toLowerCase().trim()] || 0 : 0}
+        upgradeLevel={selectedCard ? userCardLevels[String(selectedCard.card_id || selectedCard.id).toLowerCase().trim()] || 0 : 0}
+        upgradePending={upgradingCardId === selectedCard?.card_id?.toLowerCase().trim()
+          || upgradingCardId === selectedCard?.id?.toLowerCase().trim()}
+        onUpgrade={() => selectedCard && handleUpgrade(selectedCard)}
         onClose={() => setSelectedCard(null)}
       />
     </div>

@@ -9,15 +9,26 @@ import { IMAGE_PATHS, resolveBrandLogo, resolveCardImage, resolveCountryFlag, re
 import { drivetrainLayoutDescriptions } from '@/lib/drivetrain';
 import { calculateVehicleIP } from '@/lib/vehicleStats';
 import { formatDistance, formatPower, formatSpeed, formatTorque, formatWeight } from '@/lib/preferences';
+import { getNextLevelUnlock } from '@/lib/level';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 interface CardDetailsModalProps {
   card: any | null;
   ownedCount: number;
+  upgradeLevel: number;
+  upgradePending: boolean;
+  onUpgrade: () => void;
   onClose: () => void;
 }
 
-export default function CardDetailsModal({ card, ownedCount, onClose }: CardDetailsModalProps) {
+export default function CardDetailsModal({
+  card,
+  ownedCount,
+  upgradeLevel,
+  upgradePending,
+  onUpgrade,
+  onClose,
+}: CardDetailsModalProps) {
   const { language, units, t } = useSitePreferences();
   useEffect(() => {
     if (!card) return;
@@ -68,6 +79,9 @@ export default function CardDetailsModal({ card, ownedCount, onClose }: CardDeta
       ? new Intl.DisplayNames([language], { type: 'region' }).of(countryCode) || card?.country || countryCode
       : card?.country || null;
   const vehicleIp = isVehicle ? calculateVehicleIP(card?.power_hp, card?.weight_t) : 0;
+  const nextLevelUnlock = isVehicle && ownedCount > 0
+    ? getNextLevelUnlock(ownedCount, upgradeLevel)
+    : null;
   const formattedPrice = Number.isFinite(Number(card?.new_price_eur)) && card?.new_price_eur !== null && card?.new_price_eur !== undefined
     ? `${new Intl.NumberFormat(language).format(Number(card.new_price_eur))} €`
     : '—';
@@ -168,6 +182,37 @@ export default function CardDetailsModal({ card, ownedCount, onClose }: CardDeta
                   <span>{ownedCount} {t(ownedCount > 1 ? 'exemplaires' : 'exemplaire')} {t(ownedCount > 1 ? 'possédés' : 'possédé')}</span>
                 </div>
               </div>
+
+              {nextLevelUnlock && (
+                <section className="mb-6 rounded-xl border border-cyan-300/15 bg-cyan-300/[0.05] p-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-cyan-200">
+                    {upgradeLevel > 0 ? t('Niveau {level}', { level: upgradeLevel }) : t('Niveau de base')}
+                  </p>
+                  <p className="mt-2 text-sm font-semibold text-white">
+                    {nextLevelUnlock.unlocked
+                      ? t('Niveau {level} débloqué', { level: nextLevelUnlock.nextLevel })
+                      : t('Encore {count} exemplaire(s) pour débloquer le niveau {level}', {
+                          count: nextLevelUnlock.copiesRemaining,
+                          level: nextLevelUnlock.nextLevel,
+                        })}
+                  </p>
+                  {nextLevelUnlock.unlocked && (
+                    <button
+                      type="button"
+                      disabled={upgradePending}
+                      onClick={onUpgrade}
+                      className="mt-3 rounded-lg border border-cyan-300/30 bg-cyan-500 px-3 py-2 text-xs font-black text-white transition hover:bg-cyan-400 disabled:cursor-wait disabled:opacity-60"
+                    >
+                      {upgradePending
+                        ? t('Achat…')
+                        : t('Acheter le niveau {level} · {price} AP', {
+                            level: nextLevelUnlock.nextLevel,
+                            price: nextLevelUnlock.price,
+                          })}
+                    </button>
+                  )}
+                </section>
+              )}
 
               {!isVehicle && card.description && (
                 <p className="mb-6 border-l-2 border-blue-500/60 pl-3 text-sm leading-relaxed text-gray-300">

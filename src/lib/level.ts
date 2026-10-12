@@ -1,7 +1,7 @@
 export const LEVEL_THRESHOLDS = {
-    LEVEL_0: 1,  // Base
-    LEVEL_1: 2,  // 1 Doublon
-    LEVEL_2: 5,  // 4 Doublons
+    LEVEL_0: 1,
+    LEVEL_1: 2,
+    LEVEL_2: 5,
     LEVEL_3: 10,
     LEVEL_4: 25,
     LEVEL_5: 50,
@@ -11,42 +11,39 @@ export const LEVEL_THRESHOLDS = {
     LEVEL_9: 1000,
 } as const;
 
-const LEVEL_THRESHOLD_VALUES = [
-    LEVEL_THRESHOLDS.LEVEL_0,
-    LEVEL_THRESHOLDS.LEVEL_1,
-    LEVEL_THRESHOLDS.LEVEL_2,
-    LEVEL_THRESHOLDS.LEVEL_3,
-    LEVEL_THRESHOLDS.LEVEL_4,
-    LEVEL_THRESHOLDS.LEVEL_5,
-    LEVEL_THRESHOLDS.LEVEL_6,
-    LEVEL_THRESHOLDS.LEVEL_7,
-    LEVEL_THRESHOLDS.LEVEL_8,
-    LEVEL_THRESHOLDS.LEVEL_9,
-];
+const LEVEL_THRESHOLD_VALUES = Object.values(LEVEL_THRESHOLDS);
 
-export function getCardLevel(count: number): number {
-    let lvl = LEVEL_THRESHOLD_VALUES.length - 1;
-    while (lvl > 0 && count < LEVEL_THRESHOLD_VALUES[lvl]) {
-        lvl--;
-    }
+export const LEVEL_UPGRADE_PRICES = [
+    0,
+    250,
+    500,
+    1_000,
+    2_000,
+    3_000,
+    5_000,
+    10_000,
+    20_000,
+    50_000,
+] as const;
 
-    if (count > 1) {
-        console.log(`[Level Logic] Count: ${count}, Result Lvl: ${lvl}`);
-    }
-    return lvl;
+export function getHighestUnlockedLevel(count: number): number {
+    return LEVEL_THRESHOLD_VALUES.reduce(
+        (highestLevel, requiredCopies, level) => count >= requiredCopies ? level : highestLevel,
+        -1,
+    );
 }
 
-export function getLevelProgress(count: number): { currentLevel: number; count: number; nextThreshold: number | null; progress: number } {
-    const level = getCardLevel(count);
+export function getNextLevelUnlock(count: number, currentLevel: number) {
+    const nextLevel = currentLevel + 1;
+    const requiredCopies = LEVEL_THRESHOLD_VALUES[nextLevel];
 
-    if (level === LEVEL_THRESHOLD_VALUES.length - 1) {
-        return { currentLevel: level, count, nextThreshold: null, progress: 100 };
-    }
+    if (requiredCopies === undefined) return null;
 
-    const currentLevelThreshold = LEVEL_THRESHOLD_VALUES[level];
-    const nextThreshold = LEVEL_THRESHOLD_VALUES[level + 1];
-
-    const progress = Math.min(100, Math.floor(((count - currentLevelThreshold) / (nextThreshold - currentLevelThreshold)) * 100));
-
-    return { currentLevel: level, count, nextThreshold, progress };
+    return {
+        nextLevel,
+        requiredCopies,
+        price: LEVEL_UPGRADE_PRICES[nextLevel]!,
+        unlocked: count >= requiredCopies,
+        copiesRemaining: Math.max(requiredCopies - count, 0),
+    };
 }

@@ -11,10 +11,11 @@ export async function getMarketplaceListings() {
         .from('marketplace_listings')
         .select(`
       *,
-      card:cards(*),
+      card:cards!inner(*),
       seller:profiles(username, ap)
     `)
         .eq('status', 'active')
+        .eq('card.is_active', true)
         .order('created_at', { ascending: false });
 
     if (error) {
@@ -43,6 +44,23 @@ export async function createListing(sellerId: string, cardId: string, price: num
         if (cardError || !userCard || userCard.count <= 0) {
             return { success: false, error: 'Vous ne possédez pas cette carte.' };
         }
+
+        let { data: card, error: activeCardError } = await supabase
+            .from('cards')
+            .select('is_active')
+            .eq('card_id', cardId)
+            .maybeSingle();
+        if (!card && !activeCardError) {
+            const fallback = await supabase
+                .from('cards')
+                .select('is_active')
+                .eq('id', cardId)
+                .maybeSingle();
+            card = fallback.data;
+            activeCardError = fallback.error;
+        }
+        if (activeCardError) return { success: false, error: activeCardError.message };
+        if (!card || !card.is_active) return { success: false, error: 'Cette carte est désactivée.' };
 
         // 2. Créer le listing
         const { error: insertError } = await supabase
@@ -81,11 +99,11 @@ export async function buyListing(buyerId: string, listingId: string) {
         // 1. Récupérer le listing
         const { data: listing, error: listError } = await supabase
             .from('marketplace_listings')
-            .select('*, card:cards(*)')
+            .select('*, card:cards!inner(*)')
             .eq('id', listingId)
             .single();
 
-        if (listError || !listing || listing.status !== 'active') {
+        if (listError || !listing || listing.status !== 'active' || !listing.card?.is_active) {
             return { success: false, error: 'Annonce non disponible.' };
         }
 

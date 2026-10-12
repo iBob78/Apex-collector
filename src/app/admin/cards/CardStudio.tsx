@@ -28,6 +28,8 @@ const emptyDraft: CardDraft = {
   model: '',
   year: String(new Date().getFullYear()),
   rarity: 'Common',
+  is_active: true,
+  booster_enabled: true,
   image_url: '',
   description: '',
   power_hp: '',
@@ -53,6 +55,8 @@ function toDraft(card: CardData): CardDraft {
     model: card.model ?? '',
     year: String(card.year ?? ''),
     rarity: card.rarity ?? 'Common',
+    is_active: card.is_active !== false,
+    booster_enabled: card.booster_enabled !== false,
     image_url: card.image_url ?? '',
     description: card.description ?? '',
     power_hp: String(card.power_hp ?? ''),
@@ -299,6 +303,32 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                     {rarities.map((rarity) => <option key={rarity} value={rarity}>{rarity}</option>)}
                   </select>
                 </label>
+                {selectedId && (
+                  <label className="flex min-w-0 items-center gap-3 rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3">
+                    <input
+                      type="checkbox"
+                      checked={draft.is_active}
+                      onChange={(event) => {
+                        setDraft((current) => ({ ...current, is_active: event.target.checked }));
+                        setFeedback(null);
+                      }}
+                      className="h-4 w-4 accent-cyan-300"
+                    />
+                    <span className="text-sm text-slate-200">Carte active dans le jeu</span>
+                  </label>
+                )}
+                <label className="flex min-w-0 items-center gap-3 rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3">
+                  <input
+                    type="checkbox"
+                    checked={draft.booster_enabled}
+                    onChange={(event) => {
+                      setDraft((current) => ({ ...current, booster_enabled: event.target.checked }));
+                      setFeedback(null);
+                    }}
+                    className="h-4 w-4 accent-cyan-300"
+                  />
+                  <span className="text-sm text-slate-200">Disponible dans les boosters</span>
+                </label>
                 <TextField label="Pays / drapeau" value={draft.country_code} onChange={(value) => setField('country_code', value)} placeholder="🇩🇪 ou DE" />
                 <TextField label="URL de l’image" value={draft.image_url} onChange={(value) => setField('image_url', value)} placeholder="/images/vehicles/911.jpg" hint="URL publique ou chemin commençant par /" />
                 <label className="block sm:col-span-2 lg:col-span-3">
@@ -319,7 +349,7 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                   <TextField label="Puissance" value={draft.power_hp} onChange={(value) => setField('power_hp', value)} type="number" min="0" step="any" placeholder="525" hint="Chevaux (HP)" />
                   <TextField label="Puissance" value={draft.power_kw} onChange={(value) => setField('power_kw', value)} type="number" min="0" step="any" placeholder="386" hint="Kilowatts (kW)" />
                   <TextField label="Couple" value={draft.torque_nm} onChange={(value) => setField('torque_nm', value)} type="number" min="0" step="any" placeholder="465" hint="Newton-mètres (Nm)" />
-                  <TextField label="Vitesse maximale" value={draft.max_speed_kmh} onChange={(value) => setField('max_speed_kmh', value)} type="number" min="0" step="any" placeholder="296" hint="Kilomètres par heure" />
+                  <TextField label="Vitesse maximale" value={draft.max_speed_kmh} onChange={(value) => setField('max_speed_kmh', value)} type="number" step="any" placeholder="296" hint="Kilomètres par heure" />
                   <TextField label="0–100 km/h" value={draft.acceleration_0_100} onChange={(value) => setField('acceleration_0_100', value)} type="number" min="0" step="any" placeholder="3.2" hint="Secondes" />
                   <TextField label="Poids" value={draft.weight_t} onChange={(value) => setField('weight_t', value)} type="number" min="0" step="any" placeholder="1.45" hint="Tonnes" />
                   <TextField label="Motorisation" value={draft.engine_size} onChange={(value) => setField('engine_size', value)} placeholder="4.0L flat-six" />
@@ -385,6 +415,7 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
               <div className="mx-auto w-full max-w-[250px]">
                 <Card
                   id={selectedId ?? 'card-preview'}
+                  collection_number={selectedCard?.collection_number}
                   category="vehicle"
                   make={draft.make || 'Marque'}
                   model={draft.model || 'Modèle'}
@@ -399,7 +430,6 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                   weight_t={draft.weight_t || 0}
                   transmission={draft.transmission || undefined}
                   country_code={draft.country_code}
-                  compact
                   showLevel={false}
                   onCardClick={() => {}}
                 />
@@ -442,7 +472,9 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: getRarityColor(card.rarity) }} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-xs font-bold text-slate-100">{card.make} {card.model}</span>
-                      <span className="mt-1 block text-[10px] text-slate-500">{card.year} · {card.rarity}</span>
+                      <span className="mt-1 block text-[10px] text-slate-500">
+                        {card.year} · {card.rarity}{card.is_active === false ? ' · Désactivée' : card.booster_enabled === false ? ' · Hors boosters' : ''}
+                      </span>
                     </span>
                     {selectedId === card.id ? <Check size={15} className="text-cyan-300" /> : <ChevronRight size={15} className="text-slate-600 transition group-hover:text-slate-300" />}
                   </button>

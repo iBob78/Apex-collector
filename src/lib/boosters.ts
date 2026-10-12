@@ -6,6 +6,8 @@ export interface BoosterCatalogCard {
     id?: string;
     card_id?: string;
     rarity?: string | null;
+    is_active?: boolean;
+    booster_enabled?: boolean;
     [key: string]: unknown;
 }
 
@@ -203,6 +205,7 @@ export function drawBoosterCards(
 ): BoosterCatalogCard[] {
     const pack = PACKS[packSlug] || PACKS.common;
     if (count <= 0) return [];
+    vehicleCards = vehicleCards.filter((card) => card.is_active !== false && card.booster_enabled !== false);
 
     const supportedRarities = (Object.keys(pack.probabilities) as BoosterRarity[]).filter(
         (rarity) => pack.probabilities[rarity] > 0

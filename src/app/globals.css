@@ -232,83 +232,228 @@ html, body {
   }
 }
 
-.card-level-effect {
+.card-upgrade-effect {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 6;
   pointer-events: none;
-  box-sizing: border-box;
-  padding: 4px;
-  border-radius: 8px;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
+  overflow: hidden;
+  border-radius: inherit;
+  mix-blend-mode: screen;
 }
 
-.card-level-effect-1 {
-  background:
-    repeating-linear-gradient(178deg, rgba(255, 255, 255, 0.5) 0 1px, rgba(71, 79, 86, 0.58) 2px 3px),
-    linear-gradient(120deg, #e5e9ec, #747d85 42%, #c8ced2);
-  opacity: 0.94;
+.card-upgrade-effect-2::before,
+.card-upgrade-effect-3::before,
+.card-upgrade-effect-4::before,
+.card-upgrade-effect-2::after,
+.card-upgrade-effect-3::after,
+.card-upgrade-effect-4::after {
+  position: absolute;
+  inset: 0;
+  content: "";
 }
 
-.card-level-effect-2 {
+.card-upgrade-effect-2::before,
+.card-upgrade-effect-3::before,
+.card-upgrade-effect-4::before {
   background:
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.48) 0 1px, rgba(58, 67, 75, 0.45) 1px 3px),
-    linear-gradient(110deg, #e0e5e9, #7a858c 48%, #c5cbd0);
-  opacity: 0.96;
+    radial-gradient(circle at 12% 17%, #fff 0 1px, rgba(173, 235, 255, 0.75) 2px, transparent 8px),
+    radial-gradient(circle at 78% 13%, #fff 0 1px, rgba(194, 221, 255, 0.72) 2px, transparent 8px),
+    radial-gradient(circle at 88% 38%, #fff 0 1px, rgba(170, 235, 255, 0.72) 2px, transparent 8px),
+    radial-gradient(circle at 21% 46%, #fff 0 1px, rgba(212, 222, 255, 0.65) 2px, transparent 7px),
+    radial-gradient(circle at 68% 57%, #fff 0 1px, rgba(177, 231, 255, 0.72) 2px, transparent 8px),
+    radial-gradient(circle at 37% 72%, #fff 0 1px, rgba(198, 220, 255, 0.68) 2px, transparent 8px),
+    radial-gradient(circle at 84% 84%, #fff 0 1px, rgba(168, 228, 255, 0.75) 2px, transparent 8px),
+    radial-gradient(ellipse at 50% 50%, rgba(139, 216, 255, 0.08), transparent 72%);
+  opacity: 0.58;
+  filter: brightness(1);
+  animation: card-crystal-twinkle 2.4s ease-in-out infinite alternate;
 }
 
-.card-level-effect-3 {
-  background:
-    repeating-linear-gradient(45deg, #777 0 2px, #17191a 2px 5px, #414547 5px 7px),
-    linear-gradient(135deg, #b0b7ba, #101112);
-  opacity: 0.94;
+.card-upgrade-effect-2::after,
+.card-upgrade-effect-3::after,
+.card-upgrade-effect-4::after {
+  background: linear-gradient(
+    112deg,
+    transparent 30%,
+    rgba(210, 245, 255, 0.08) 42%,
+    rgba(255, 255, 255, 0.72) 49%,
+    rgba(190, 228, 255, 0.16) 54%,
+    transparent 66%
+  );
+  opacity: 0;
+  transform: translateX(-120%) skewX(-14deg);
+  animation: card-crystal-shine 3.6s ease-in-out infinite;
 }
 
-.card-level-effect-4 {
+.card-upgrade-effect-2 {
   background:
-    repeating-linear-gradient(45deg, transparent 0 5px, rgba(222, 230, 234, 0.72) 6px, transparent 7px 10px),
-    repeating-linear-gradient(-45deg, #252a2d 0 5px, #626a6e 6px 8px, #181a1b 9px 12px);
-  opacity: 0.96;
+    linear-gradient(132deg, transparent 0 26%, rgba(210, 248, 255, 0.18) 27%, transparent 35% 61%, rgba(180, 229, 255, 0.16) 62%, transparent 70%),
+    linear-gradient(42deg, transparent 0 43%, rgba(255, 255, 255, 0.15) 44%, transparent 50%),
+    radial-gradient(ellipse at 50% 30%, rgba(160, 225, 255, 0.12), transparent 68%);
+  opacity: 0.62;
 }
 
-.card-level-effect-5 {
-  background:
-    repeating-linear-gradient(60deg, rgba(226, 205, 157, 0.9) 0 2px, #26231e 3px 5px, #70644c 6px 7px),
-    repeating-linear-gradient(-60deg, rgba(10, 10, 10, 0.78) 0 3px, transparent 4px 7px);
-  opacity: 0.96;
+.card-upgrade-effect-2::after {
+  animation-delay: 0.8s;
 }
 
-.card-level-effect-6 {
+.card-upgrade-effect-3 {
   background:
-    repeating-linear-gradient(35deg, #e1cfad 0 2px, #76543d 3px 5px, #bb8050 6px 8px),
-    repeating-linear-gradient(-35deg, transparent 0 5px, rgba(248, 230, 194, 0.78) 6px 8px, transparent 9px 12px);
-  opacity: 0.98;
+    linear-gradient(132deg, transparent 0 19%, rgba(210, 248, 255, 0.28) 20%, transparent 31% 58%, rgba(180, 229, 255, 0.25) 59%, transparent 71%),
+    linear-gradient(42deg, transparent 0 36%, rgba(255, 255, 255, 0.22) 37%, transparent 46% 71%, rgba(168, 223, 255, 0.18) 72%, transparent 80%),
+    radial-gradient(ellipse at 50% 30%, rgba(160, 225, 255, 0.2), transparent 70%);
+  opacity: 0.76;
 }
 
-.card-level-effect-7 {
-  background:
-    linear-gradient(112deg, #aebac2 0 20%, #f8fcff 31% 42%, #75838c 55%, #e7edf0 73%, #8c9aa2);
-  box-shadow: 0 0 7px rgba(230, 246, 255, 0.95), inset 0 0 5px rgba(255, 255, 255, 0.95);
-  opacity: 0.98;
+.card-upgrade-effect-3::before {
+  animation-duration: 1.9s;
 }
 
-.card-level-effect-8 {
-  background:
-    linear-gradient(115deg, #b77b05 0 18%, #fff0a3 28% 39%, #d99d08 49% 64%, #fff6c2 75% 83%, #bd8100),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.8) 0 1px, transparent 1px 4px);
-  box-shadow: 0 0 9px rgba(255, 207, 50, 0.9), inset 0 0 5px #fff2aa;
-  opacity: 0.98;
+.card-upgrade-effect-3::after {
+  animation-duration: 3s;
+  animation-delay: 0.35s;
 }
 
-.card-level-effect-9 {
+.card-upgrade-effect-4 {
   background:
-    linear-gradient(115deg, #17688d 0 16%, #9ceaff 28% 40%, #2863ba 50% 66%, #e3a4ff 78% 84%, #155978),
-    repeating-linear-gradient(168deg, rgba(215, 250, 255, 0.82) 0 1px, transparent 1px 5px);
-  box-shadow: 0 0 9px rgba(90, 199, 255, 0.95), inset 0 0 5px rgba(198, 238, 255, 0.95);
-  opacity: 0.98;
+    linear-gradient(132deg, transparent 0 16%, rgba(210, 248, 255, 0.34) 17%, transparent 30% 56%, rgba(180, 229, 255, 0.32) 57%, transparent 72%),
+    linear-gradient(42deg, transparent 0 31%, rgba(255, 255, 255, 0.3) 32%, transparent 44% 69%, rgba(168, 223, 255, 0.24) 70%, transparent 82%),
+    linear-gradient(150deg, transparent 0 48%, rgba(202, 185, 255, 0.2) 52%, transparent 60%),
+    radial-gradient(ellipse at 50% 30%, rgba(160, 225, 255, 0.25), transparent 72%);
+  opacity: 0.88;
+}
+
+.card-upgrade-effect-4::before {
+  animation-duration: 1.4s;
+}
+
+.card-upgrade-effect-4::after {
+  background: linear-gradient(
+    112deg,
+    transparent 24%,
+    rgba(210, 245, 255, 0.12) 39%,
+    rgba(255, 255, 255, 0.88) 49%,
+    rgba(190, 228, 255, 0.24) 55%,
+    transparent 69%
+  );
+  animation-duration: 2.5s;
+  animation-delay: 0.15s;
+}
+
+.card-upgrade-effect-5,
+.card-upgrade-effect-6,
+.card-upgrade-effect-7,
+.card-upgrade-effect-8,
+.card-upgrade-effect-9 {
+  background-size: 220% 220%, 180% 180%;
+  animation: card-upgrade-holo-sweep 5s ease-in-out infinite alternate;
+}
+
+.card-upgrade-effect-5 {
+  background:
+    linear-gradient(118deg, transparent 20%, rgba(255, 95, 214, 0.24) 38%, rgba(255, 255, 255, 0.36) 43%, transparent 56%),
+    linear-gradient(28deg, transparent 28%, rgba(39, 226, 255, 0.22) 46%, transparent 64%),
+    linear-gradient(150deg, transparent 35%, rgba(157, 96, 255, 0.24) 54%, transparent 70%);
+  opacity: 0.54;
+}
+
+.card-upgrade-effect-6 {
+  background:
+    linear-gradient(118deg, transparent 16%, rgba(255, 95, 214, 0.3) 37%, rgba(255, 255, 255, 0.42) 43%, transparent 58%),
+    linear-gradient(28deg, transparent 24%, rgba(39, 226, 255, 0.28) 46%, transparent 67%),
+    linear-gradient(150deg, transparent 32%, rgba(157, 96, 255, 0.3) 54%, transparent 73%);
+  opacity: 0.62;
+}
+
+.card-upgrade-effect-7 {
+  background:
+    linear-gradient(118deg, transparent 12%, rgba(255, 95, 214, 0.34) 36%, rgba(255, 255, 255, 0.5) 43%, transparent 60%),
+    linear-gradient(28deg, transparent 20%, rgba(39, 226, 255, 0.32) 46%, transparent 69%),
+    linear-gradient(150deg, transparent 28%, rgba(157, 96, 255, 0.34) 54%, transparent 76%);
+  opacity: 0.68;
+}
+
+.card-upgrade-effect-8 {
+  background:
+    linear-gradient(118deg, transparent 10%, rgba(255, 95, 214, 0.38) 35%, rgba(255, 255, 255, 0.56) 43%, transparent 61%),
+    linear-gradient(28deg, transparent 18%, rgba(39, 226, 255, 0.37) 46%, transparent 70%),
+    linear-gradient(150deg, transparent 26%, rgba(157, 96, 255, 0.39) 54%, transparent 78%);
+  opacity: 0.74;
+}
+
+.card-upgrade-effect-9 {
+  background:
+    linear-gradient(118deg, transparent 8%, rgba(255, 95, 214, 0.42) 34%, rgba(255, 255, 255, 0.62) 43%, transparent 62%),
+    linear-gradient(28deg, transparent 16%, rgba(39, 226, 255, 0.42) 46%, transparent 72%),
+    linear-gradient(150deg, transparent 24%, rgba(157, 96, 255, 0.44) 54%, transparent 80%);
+  opacity: 0.82;
+}
+
+@keyframes card-upgrade-holo-sweep {
+  from {
+    background-position: 100% 0, 0 100%, 100% 100%;
+  }
+  to {
+    background-position: 0 100%, 100% 0, 0 0;
+  }
+}
+
+@keyframes card-crystal-twinkle {
+  from {
+    opacity: 0.24;
+    filter: brightness(0.8);
+  }
+  to {
+    opacity: 0.98;
+    filter: brightness(1.65);
+  }
+}
+
+@keyframes card-crystal-shine {
+  0%, 18% {
+    transform: translateX(-120%) skewX(-14deg);
+    opacity: 0;
+  }
+  34% {
+    opacity: 0.9;
+  }
+  62%, 100% {
+    transform: translateX(120%) skewX(-14deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-upgrade-effect-5,
+  .card-upgrade-effect-6,
+  .card-upgrade-effect-7,
+  .card-upgrade-effect-8,
+  .card-upgrade-effect-9 {
+    animation: none;
+  }
+
+  .card-upgrade-effect-2::before,
+  .card-upgrade-effect-3::before,
+  .card-upgrade-effect-4::before,
+  .card-upgrade-effect-2::after,
+  .card-upgrade-effect-3::after,
+  .card-upgrade-effect-4::after {
+    animation: none;
+  }
+
+  .card-upgrade-effect-2::before,
+  .card-upgrade-effect-3::before,
+  .card-upgrade-effect-4::before {
+    opacity: 0.58;
+    filter: none;
+  }
+
+  .card-upgrade-effect-2::after,
+  .card-upgrade-effect-3::after,
+  .card-upgrade-effect-4::after {
+    display: none;
+  }
 }
 
 /* 🪄 Fallback si une carte n’a pas d’image */

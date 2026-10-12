@@ -54,7 +54,7 @@ function OpenContent() {
     try {
       // Charger les catalogues avant paiement évite de débiter si le tirage est impossible.
       const [vehiclesResult, circuitsResult] = await Promise.all([
-        supabase.from('cards').select('*'),
+        supabase.from('cards').select('*').eq('is_active', true),
         supabase.from('circuits').select('*')
       ]);
 

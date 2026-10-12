@@ -15,6 +15,9 @@ export interface BaseCard {
     image_url?: string;
     created_at?: string;
     description?: string;
+    collection_number?: number;
+    is_active?: boolean;
+    upgrade_level?: number;
 }
 
 export interface VehicleCard extends BaseCard {

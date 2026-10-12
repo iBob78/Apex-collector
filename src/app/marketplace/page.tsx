@@ -32,9 +32,9 @@ export default function MarketplacePage() {
         // Fetch user cards for selling
         const { data: uCards } = await supabase
           .from('user_cards')
-          .select('*, card:cards(*)')
+          .select('*, card:cards!inner(*)')
           .eq('user_id', user.id);
-        if (uCards) setUserCards(uCards);
+        if (uCards) setUserCards(uCards.filter((userCard) => userCard.card?.is_active !== false));
       }
     };
     fetchSession();

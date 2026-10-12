@@ -17,6 +17,8 @@ export type CardDraft = {
   model: string;
   year: string;
   rarity: string;
+  is_active: boolean;
+  booster_enabled: boolean;
   image_url: string;
   description: string;
   power_hp: string;
@@ -44,6 +46,9 @@ export type CardData = {
   model: string;
   year: number;
   rarity: string;
+  collection_number: number;
+  is_active: boolean;
+  booster_enabled: boolean;
   image_url: string | null;
   description: string | null;
   power_hp: number | null;
@@ -94,17 +99,23 @@ export type CircuitData = {
 type SaveResult = { success: true; card: CardData } | { success: false; error: string };
 type CircuitSaveResult = { success: true; circuit: CircuitData } | { success: false; error: string };
 
-function parseOptionalNumber(value: string, label: string) {
+function parseOptionalNumber(value: string, label: string, allowNegative = false) {
   if (!value.trim()) return { value: null, error: null };
   const parsed = Number(value);
-  if (!Number.isFinite(parsed) || parsed < 0) {
+  if (!Number.isFinite(parsed) || (!allowNegative && parsed < 0)) {
     return { value: null, error: `${label} doit être un nombre positif ou nul.` };
   }
   return { value: parsed, error: null };
 }
 
 function parseCardDraft(draft: CardDraft) {
-  if (!draft || typeof draft !== 'object' || draftFields.some((field) => typeof draft[field] !== 'string')) {
+  if (
+    !draft ||
+    typeof draft !== 'object' ||
+    draftFields.some((field) => typeof draft[field] !== 'string') ||
+    typeof draft.is_active !== 'boolean' ||
+    typeof draft.booster_enabled !== 'boolean'
+  ) {
     return { error: 'Les informations fournies pour la carte sont invalides.' } as const;
   }
 
@@ -126,7 +137,7 @@ function parseCardDraft(draft: CardDraft) {
     power_hp: parseOptionalNumber(draft.power_hp, 'La puissance'),
     power_kw: parseOptionalNumber(draft.power_kw, 'La puissance en kW'),
     torque_nm: parseOptionalNumber(draft.torque_nm, 'Le couple'),
-    max_speed_kmh: parseOptionalNumber(draft.max_speed_kmh, 'La vitesse maximale'),
+    max_speed_kmh: parseOptionalNumber(draft.max_speed_kmh, 'La vitesse maximale', true),
     weight_t: parseOptionalNumber(draft.weight_t, 'Le poids'),
     acceleration_0_100: parseOptionalNumber(draft.acceleration_0_100, 'L’accélération'),
     new_price_eur: parseOptionalNumber(draft.new_price_eur, 'Le prix neuf'),
@@ -149,6 +160,8 @@ function parseCardDraft(draft: CardDraft) {
       model,
       year,
       rarity: draft.rarity,
+      is_active: draft.is_active,
+      booster_enabled: draft.booster_enabled,
       image_url: draft.image_url.trim() || null,
       description: draft.description.trim() || null,
       power_hp: numbers.power_hp.value,

@@ -55,4 +55,27 @@ describe('Booster card draws', () => {
     expect(() => drawBoosterCards('common', [{ id: 'vehicle-common', rarity: 'Common' }], [], 1))
       .toThrow('Aucune carte circuit disponible');
   });
+
+  it('does not draw inactive vehicles', () => {
+    expect(() => drawBoosterCards(
+      'common',
+      [{ id: 'inactive-vehicle', rarity: 'Common', is_active: false }],
+      [],
+      1,
+    )).toThrow('Aucune carte disponible dans le catalogue du booster');
+  });
+
+  it('excludes vehicles disabled for boosters while keeping eligible circuits available', () => {
+    const cards = drawBoosterCards(
+    'common',
+    [{ id: 'booster-disabled-vehicle', rarity: 'Common', booster_enabled: false }],
+    [{ id: 'circuit-common', rarity: 'Common' }],
+    6,
+    () => 0.99,
+    );
+
+    expect(cards).toHaveLength(6);
+    expect(cards.every((card) => card.category === 'circuit')).toBe(true);
+    expect(cards.some((card) => card.id === 'booster-disabled-vehicle')).toBe(false);
+  });
 });

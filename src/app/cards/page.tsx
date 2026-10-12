@@ -17,6 +17,7 @@ export default function CardsPage() {
       const { data, error } = await supabase
         .from('cards')
         .select('*')
+        .eq('is_active', true)
         .order('name', { ascending: true });
 
       if (error) {

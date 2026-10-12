@@ -18,6 +18,9 @@ export interface CarCard {
   is_holographic: boolean;
   price_eur: number;
   collection_number: number;
+  is_active: boolean;
+  booster_enabled: boolean;
+  upgrade_level: number;
   total_in_collection: number;
   transmission: string | null;
   new_price_eur: number | null;

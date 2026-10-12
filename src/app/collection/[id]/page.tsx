@@ -39,6 +39,7 @@ export default function CardShowcasePage() {
                 .from('cards')
                 .select('*')
                 .eq('id', id)
+                .eq('is_active', true)
                 .single();
 
             if (cardData) {

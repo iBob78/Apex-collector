@@ -8,7 +8,6 @@ import { resolveCardImage, resolveBrandLogo, resolveCountryFlag, resolveDrivetra
 import type { AnyCard } from '@/types/game';
 import { useRouter } from 'next/navigation';
 import { Wind, ArrowUpCircle, Compass, MoveRight } from 'lucide-react';
-import { getCardLevel, getLevelProgress } from '@/lib/level';
 import { getRarityBorderClass } from '@/lib/rarity';
 import { calculateVehicleIP } from '@/lib/vehicleStats';
 import { formatDistance, formatPower, formatTorque, formatWeight } from '@/lib/preferences';
@@ -19,6 +18,11 @@ type CardProps = AnyCard & {
   count?: number;
   showLevel?: boolean;
   compact?: boolean;
+  upgradeLevel?: number;
+  upgradePrice?: number;
+  upgradeAvailable?: boolean;
+  upgradePending?: boolean;
+  onUpgrade?: () => void;
   className?: string;
   onCardClick?: () => void;
 };
@@ -32,9 +36,13 @@ export default function Card(props: CardProps) {
     rarity,
     image_url: cardImage, // fallback to image_url
     owned = true,
-    count = 1,
     showLevel = true,
     compact = false,
+    upgradeLevel = 0,
+    upgradePrice,
+    upgradeAvailable = false,
+    upgradePending = false,
+    onUpgrade,
     className,
     onCardClick,
   } = props;
@@ -58,16 +66,18 @@ export default function Card(props: CardProps) {
 
   // Correction Poids : On gère le cas où la donnée est déjà en KG (ex: 1060) ou en Tonnes (ex: 1.06)
   const rawWeight = isVehicle ? Number((props as any).weight_t) || 0 : 0;
+  const collectionNumber = Number((props as any).collection_number);
+  const hasCollectionNumber = isVehicle && Number.isFinite(collectionNumber) && collectionNumber > 0;
+  const contentPadding = compact
+    ? hasCollectionNumber ? 'p-2 pb-7' : 'p-2'
+    : hasCollectionNumber ? 'p-4 pb-10' : 'p-4';
+  const level = Math.max(0, Math.min(9, Math.floor(Number(upgradeLevel) || 0)));
+  const levelEffectClass = level >= 2 ? `card-upgrade-effect-${level}` : null;
   const drivetrainLayout = isVehicle ? (props as any).transmission : undefined;
   const drivetrainLayoutIcon = resolveDrivetrainLayoutIcon(drivetrainLayout);
 
   // Calcul IP
   const ip = isVehicle ? calculateVehicleIP(power_hp, rawWeight) : 0;
-
-  // Niveau de la carte
-  const countValue = Number(props.count ?? count ?? 0);
-  const level = getCardLevel(countValue);
-  const levelEffectClass = level > 0 ? `card-level-effect-${level}` : null;
 
   // Utilisation du resolver centralisé pour gérer les chemins complexes (véhicules vs circuits)
   const finalImage = resolveCardImage({
@@ -140,7 +150,7 @@ export default function Card(props: CardProps) {
         {levelEffectClass && (
           <div
             aria-hidden="true"
-            className={clsx("card-level-effect", levelEffectClass)}
+            className={clsx("card-upgrade-effect", levelEffectClass)}
           />
         )}
 
@@ -188,8 +198,16 @@ export default function Card(props: CardProps) {
             <IPBadge value={ip} size="sm" />
           </div>
         )}
+        {hasCollectionNumber && (
+          <div className="absolute bottom-2 left-2 z-20 rounded-md border border-white/15 bg-black/70 px-1.5 py-0.5 text-[9px] font-bold tabular-nums text-white/90">
+            #{collectionNumber}
+          </div>
+        )}
         {/* Content Container */}
-        <div className={clsx("absolute bottom-0 inset-x-0 z-10 flex flex-col items-center", compact ? "p-2" : "p-4")}>
+        <div className={clsx(
+          "absolute bottom-0 inset-x-0 z-10 flex flex-col items-center",
+          contentPadding,
+        )}>
 
           {/* Title Section */}
           <div className={clsx("text-center", compact ? "mb-2" : "mb-3")}>
@@ -241,6 +259,17 @@ export default function Card(props: CardProps) {
                   </div>
                 </div>
               </div>
+              <div className="min-w-0">
+                <div className="flex items-center justify-center gap-1">
+                  <VehicleStatIcon kind="weight" />
+                  <div className="min-w-0 text-left">
+                    <p className="text-[8px] font-medium uppercase tracking-wide text-gray-400">{t('Poids')}</p>
+                    <p className={clsx("font-semibold", compact ? "text-[9px]" : "text-[11px]")}>
+                      {formatWeight(rawWeight, units, language)}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -266,14 +295,6 @@ export default function Card(props: CardProps) {
             </div>
           )}
 
-          {/* Bottom Metadata : Weight Only */}
-          {isVehicle && (
-            <div className={clsx("flex items-center justify-center gap-1 pr-14 text-[9px]", compact ? "mb-1.5" : "mb-2")}>
-              <VehicleStatIcon kind="weight" />
-              <span className="text-gray-400">{t('Poids')}</span>
-              <span className="font-medium text-gray-200">{formatWeight(rawWeight, units, language)}</span>
-            </div>
-          )}
         </div>
         {isVehicle && drivetrainLayoutIcon && (
           <div className="absolute bottom-2 right-2 z-20">
@@ -290,11 +311,32 @@ export default function Card(props: CardProps) {
       </div>
 
       {/* Discrete Level Below Card */}
-      {showLevel && (
+      {showLevel && isVehicle && owned && (
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-white bg-blue-600 px-3 py-1 rounded-full shadow-sm border border-blue-400/30 uppercase tracking-tight">
-            {t('Niveau')} {level}
-          </span>
+          {upgradeAvailable && upgradePrice !== undefined && onUpgrade ? (
+            <button
+              type="button"
+              disabled={upgradePending}
+              onClick={(event) => {
+                event.stopPropagation();
+                onUpgrade();
+              }}
+              onKeyDown={(event) => event.stopPropagation()}
+              aria-label={t('Acheter le niveau {level} pour {price} AP', {
+                level: level + 1,
+                price: upgradePrice,
+              })}
+              className="rounded-full border border-cyan-300/40 bg-cyan-500 px-3 py-1 text-[10px] font-black uppercase tracking-tight text-white shadow-sm transition hover:bg-cyan-400 disabled:cursor-wait disabled:opacity-60"
+            >
+              {upgradePending
+                ? t('Achat…')
+                : t('Niveau {level} · {price} AP', { level: level + 1, price: upgradePrice })}
+            </button>
+          ) : (
+            <span className="rounded-full border border-blue-400/30 bg-blue-600 px-3 py-1 text-[10px] font-bold uppercase tracking-tight text-white shadow-sm">
+              {t('Niveau')} {level}
+            </span>
+          )}
         </div>
       )}
     </div>

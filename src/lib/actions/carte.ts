@@ -11,6 +11,33 @@ export async function ajouterCarteAuJoueur(user_id: string, card_id: string, sou
   }
 
   try {
+    let { data: card, error: cardError } = await supabase
+      .from('cards')
+      .select('is_active, booster_enabled')
+      .eq('card_id', card_id)
+      .maybeSingle();
+
+    if (!card && !cardError) {
+      const fallback = await supabase
+        .from('cards')
+        .select('is_active, booster_enabled')
+        .eq('id', card_id)
+        .maybeSingle();
+      card = fallback.data;
+      cardError = fallback.error;
+    }
+
+    if (cardError) {
+      console.error('[ajouterCarteAuJoueur] Erreur de vérification de carte:', cardError.message);
+      return { success: false, error: cardError.message };
+    }
+    if (!card || !card.is_active) {
+      return { success: false, error: 'Cette carte est désactivée ou introuvable.' };
+    }
+    if (source.startsWith('pack_') && !card.booster_enabled) {
+      return { success: false, error: 'Cette carte ne peut plus être obtenue dans les boosters.' };
+    }
+
     const { data: existingRows, error: selectError } = await supabase
       .from('user_cards')
       .select('id, count')

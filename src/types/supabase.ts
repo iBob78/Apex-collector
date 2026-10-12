@@ -22,6 +22,8 @@ export type Database = {
           is_holographic: boolean;
           price_eur: number;
           collection_number: number;
+          is_active: boolean;
+          booster_enabled: boolean;
           total_in_collection: number;
           transmission: string | null;
           new_price_eur: number | null;
@@ -29,6 +31,11 @@ export type Database = {
           max_rpm: number | null;
           units_sold: number | null;
         }
+      };
+      user_cards: {
+        Row: {
+          upgrade_level: number;
+        };
       };
       // Ajoutez d'autres tables selon vos besoins
     };
