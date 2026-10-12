@@ -1,6 +1,7 @@
 jest.mock('@/lib/supabaseClient', () => ({
   supabase: {
-    from: jest.fn()
+    from: jest.fn(),
+    rpc: jest.fn().mockResolvedValue({ error: null })
   }
 }));
 

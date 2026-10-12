@@ -15,11 +15,13 @@ import {
   MapIcon,
   WrenchIcon,
   StarIcon,
+  ClipboardListIcon,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabaseBrowser';
 import { useState, useEffect, useMemo } from 'react';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
+import { updateQuestProgress } from '@/lib/actions/objectives';
 
 const navItems = [
   { href: '/dashboard', label: 'ACCUEIL', icon: HomeIcon },
@@ -47,12 +49,16 @@ export default function Sidebar() {
       if (!mounted) return;
       setUser(session?.user ?? null);
       setAuthLoaded(true);
+      if ((_event === 'SIGNED_IN' || _event === 'INITIAL_SESSION') && session?.user) {
+        window.setTimeout(() => void updateQuestProgress(session.user.id, 'daily_login'), 0);
+      }
     });
 
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (mounted && !authEventReceived) {
         setUser(user);
         setAuthLoaded(true);
+        if (user) void updateQuestProgress(user.id, 'daily_login');
       }
     }).catch(() => {
       if (mounted && !authEventReceived) {
@@ -85,6 +91,7 @@ export default function Sidebar() {
         {[...navItems, ...(user ? [
           { href: '/admin/cards', label: 'ATELIER CARTES', icon: WrenchIcon },
           { href: '/admin/circuits', label: 'ATELIER CIRCUITS', icon: MapIcon },
+          { href: '/admin/objectives', label: 'ATELIER OBJECTIFS', icon: ClipboardListIcon },
         ] : [])].map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href;
           const isLocked = authLoaded && !user && href !== '/login';

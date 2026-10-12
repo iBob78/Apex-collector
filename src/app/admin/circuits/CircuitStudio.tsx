@@ -195,6 +195,7 @@ export default function CircuitStudio({ initialCircuits }: { initialCircuits: Ci
         <div className="mb-6 flex flex-wrap gap-2">
           <Link href="/admin/cards" className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-bold text-slate-400 transition hover:bg-white/5 hover:text-white">Cartes véhicule</Link>
           <Link href="/admin/circuits" className="rounded-xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-2.5 text-xs font-bold text-cyan-200">Cartes circuit</Link>
+          <Link href="/admin/objectives" className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-bold text-slate-400 transition hover:bg-white/5 hover:text-white">Succès & contrats</Link>
         </div>
 
         <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">

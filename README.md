@@ -83,11 +83,13 @@ Vehicle and circuit specifications are displayed using the selected unit system 
 | Speed | km/h | mph |
 | Circuit distance | km | mi |
 
-The card admin studio supports vehicle specification fields, including power in HP and kW, torque, maximum speed, and weight. Vehicle performance index is calculated from horsepower and weight.
+The card admin studio supports vehicle specification fields, including power in HP and kW, torque, maximum speed, and weight. Vehicle performance index is calculated from horsepower and weight. Vehicle cards also display a drivetrain-layout icon; hover over it to see the full engine-position and drivetrain description for its code (MR, FF, FR, MF, FA, RR, RA, or MA).
 
 Vehicle cards also support transmission, new price in euros, fuel type, maximum RPM, and units sold. Migration `007_vehicle_card_specs.sql` adds these optional columns to `public.cards`.
 
-For a fresh Supabase setup, apply migrations `007_vehicle_card_specs.sql` through `013_purchase_card_upgrades.sql` in order, in addition to the admin access migrations described below. These add vehicle specifications, profile preferences, card numbering and availability controls, and purchasable player card upgrades.
+The Card Studio fuel selector supports the acronyms ES, GO, EL, EE, EH, GL, GH, E85, ET, GP, GN, H2, EG, EN, FG, and FL. Recognized fuel types appear as a compact badge below the vehicle's performance-index badge; existing common values such as “Diesel” and “Essence” are recognized too.
+
+For a fresh Supabase setup, apply migrations `007_vehicle_card_specs.sql` through `014_manage_objectives.sql` in order, in addition to the admin access migrations described below. These add vehicle specifications, profile preferences, card numbering and availability controls, purchasable player card upgrades, and manageable contracts and achievements.
 
 New sign-ups send `language: 'fr'` as Supabase Auth user metadata. Migration `008_profiles_language_default.sql` also sets `public.profiles.language` to `fr` when an insert omits the column. Apply the migration in the Supabase SQL Editor or through the project's migration workflow; it does not replace an explicit `NULL` inserted by a database trigger.
 
@@ -116,6 +118,12 @@ The purchase is validated and processed atomically in Supabase: the player must 
 The Card Studio can assign each vehicle a permanent collection number, deactivate it in the game without deleting it, and independently exclude it from booster draws. Deactivated vehicles are hidden from player-facing game surfaces; booster-excluded vehicles remain in the catalog and game but cannot be drawn from packs.
 
 Apply Supabase migrations `010_card_catalog_status_and_numbering.sql`, `011_card_booster_eligibility.sql`, `012_user_card_upgrade_levels.sql`, and `013_purchase_card_upgrades.sql` in order to enable these catalog controls and upgrades.
+
+### Contracts and achievements
+
+Admins manage contracts and achievements in `/admin/objectives`. Each objective has a title, description, progress target, optional rarity requirement, AP reward, and active state. Supported events are opening boosters, collecting vehicles, collecting a specified rarity, creating marketplace listings, collecting circuits, and logging in on distinct days. Completed objectives award AP when the player claims the reward. Disabling an objective hides it from players while preserving their progress.
+
+Migration `014_manage_objectives.sql` creates the objective definitions and per-player progress, imports existing contracts and progress, and provides the database functions used to track progress and claim rewards atomically.
 
 ---
 
@@ -214,11 +222,13 @@ Les caractéristiques des véhicules et des circuits sont affichées selon le sy
 | Vitesse | km/h | mph |
 | Distance du circuit | km | mi |
 
-L’atelier d’administration des cartes prend en charge les caractéristiques des véhicules, notamment la puissance en HP et en kW, le couple, la vitesse maximale et le poids. L’indice de performance du véhicule est calculé à partir de la puissance en chevaux et du poids.
+L’atelier d’administration des cartes prend en charge les caractéristiques des véhicules, notamment la puissance en HP et en kW, le couple, la vitesse maximale et le poids. L’indice de performance du véhicule est calculé à partir de la puissance en chevaux et du poids. L’icône de configuration moteur/transmission de chaque carte affiche sa description complète au survol (codes MR, FF, FR, MF, FA, RR, RA et MA).
 
 Les cartes de véhicules prennent aussi en charge la transmission, le prix neuf en euros, le type de carburant, le régime maximal et le nombre d’exemplaires vendus. La migration `007_vehicle_card_specs.sql` ajoute ces colonnes facultatives à `public.cards`.
 
-Pour une nouvelle installation Supabase, appliquer dans l’ordre les migrations `007_vehicle_card_specs.sql` à `013_purchase_card_upgrades.sql`, en plus des migrations de droits d’administration décrites ci-dessus. Elles ajoutent les caractéristiques véhicule, les préférences de profil, la numérotation et les contrôles de disponibilité des cartes, ainsi que les améliorations achetables par les joueurs.
+Le sélecteur de carburant du Card Studio propose les acronymes ES, GO, EL, EE, EH, GL, GH, E85, ET, GP, GN, H2, EG, EN, FG et FL. Les carburants reconnus apparaissent dans un petit badge sous le badge d’indice de performance ; les anciennes valeurs courantes comme « Diesel » et « Essence » sont également reconnues.
+
+Pour une nouvelle installation Supabase, appliquer dans l’ordre les migrations `007_vehicle_card_specs.sql` à `014_manage_objectives.sql`, en plus des migrations de droits d’administration décrites ci-dessus. Elles ajoutent les caractéristiques véhicule, les préférences de profil, la numérotation et les contrôles de disponibilité des cartes, les améliorations achetables, ainsi que la gestion des contrats et succès.
 
 Lors d’une nouvelle inscription, l’application transmet `language: 'fr'` dans les métadonnées utilisateur de Supabase Auth. La migration `008_profiles_language_default.sql` définit également `fr` comme valeur par défaut de `public.profiles.language` lorsqu’une insertion omet cette colonne. Appliquer la migration dans le SQL Editor de Supabase ou via le processus de migrations du projet ; cette valeur par défaut ne remplace pas un `NULL` explicitement inséré par un trigger.
 
@@ -250,6 +260,12 @@ L’achat est vérifié et traité de façon atomique dans Supabase : le joueur 
 L’atelier Card Studio permet d’attribuer un numéro permanent à chaque carte véhicule, de la désactiver dans le jeu sans la supprimer et, indépendamment, de l’exclure des boosters. Une carte désactivée est masquée dans les surfaces destinées aux joueurs ; une carte exclue des boosters reste visible et disponible dans le jeu, mais ne peut plus être tirée dans un pack.
 
 Pour activer ces contrôles et améliorations dans Supabase, appliquer dans l’ordre les migrations `010_card_catalog_status_and_numbering.sql`, `011_card_booster_eligibility.sql`, `012_user_card_upgrade_levels.sql` et `013_purchase_card_upgrades.sql`.
+
+### Contrats et succès
+
+Les administrateurs gèrent les contrats et les succès dans `/admin/objectives`. Chaque objectif possède un titre, une description, une cible de progression, une rareté facultative, une récompense en AP et un statut actif. Les événements disponibles sont l’ouverture de boosters, la collection de véhicules, l’obtention d’une rareté donnée, la création d’annonces Marketplace, la collection de circuits et les connexions sur des jours différents. Une fois l’objectif terminé, le joueur réclame sa récompense en AP. La désactivation masque l’objectif sans supprimer la progression des joueurs.
+
+La migration `014_manage_objectives.sql` crée les définitions et progressions par joueur, importe les contrats et leurs progressions existants, et ajoute les fonctions SQL de suivi et de réclamation atomique des récompenses.
 🤝 Comment contribuer
 Nous accueillons toutes les contributions ! Voici comment vous pouvez nous aider :
 

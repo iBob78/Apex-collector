@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabaseClient';
+import { updateQuestProgress } from './objectives';
 
 /**
  * Ajoute une carte à la collection du joueur.
@@ -13,14 +14,14 @@ export async function ajouterCarteAuJoueur(user_id: string, card_id: string, sou
   try {
     let { data: card, error: cardError } = await supabase
       .from('cards')
-      .select('is_active, booster_enabled')
+      .select('is_active, booster_enabled, rarity')
       .eq('card_id', card_id)
       .maybeSingle();
 
     if (!card && !cardError) {
       const fallback = await supabase
         .from('cards')
-        .select('is_active, booster_enabled')
+        .select('is_active, booster_enabled, rarity')
         .eq('id', card_id)
         .maybeSingle();
       card = fallback.data;
@@ -67,6 +68,8 @@ export async function ajouterCarteAuJoueur(user_id: string, card_id: string, sou
         await supabase.from('user_cards').delete().in('id', extraIds);
       }
 
+      await updateQuestProgress(user_id, 'collection_count');
+      await updateQuestProgress(user_id, 'rarity_card', 1, { rarity: card.rarity ?? undefined });
       return { success: true, action: 'incrément', count: newCount };
     }
 
@@ -96,9 +99,13 @@ export async function ajouterCarteAuJoueur(user_id: string, card_id: string, sou
         return { success: false, error: secondAttemptError.message };
       }
 
+      await updateQuestProgress(user_id, 'collection_count');
+      await updateQuestProgress(user_id, 'rarity_card', 1, { rarity: card.rarity ?? undefined });
       return { success: true, action: 'insertion (via users_cards)' };
     }
 
+    await updateQuestProgress(user_id, 'collection_count');
+    await updateQuestProgress(user_id, 'rarity_card', 1, { rarity: card.rarity ?? undefined });
     return { success: true, action: 'insertion' };
   } catch (err: any) {
     console.error('[ajouterCarteAuJoueur] Erreur critique:', err.message);
@@ -146,6 +153,7 @@ export async function ajouterCircuitAuJoueur(user_id: string, circuit_id: string
         await supabase.from('user_circuits').delete().in('id', extraIds);
       }
 
+      await updateQuestProgress(user_id, 'circuit_collection');
       return { success: true, action: 'incrément', count: newCount };
     }
 
@@ -162,6 +170,7 @@ export async function ajouterCircuitAuJoueur(user_id: string, circuit_id: string
       return { success: false, error: insertError.message };
     }
 
+    await updateQuestProgress(user_id, 'circuit_collection');
     return { success: true, action: 'insertion' };
   } catch (err: any) {
     console.error('[ajouterCircuitAuJoueur] Erreur critique:', err.message);

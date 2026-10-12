@@ -94,12 +94,7 @@ function OpenContent() {
       setDrawnCards(results);
 
       // 3. Mettre à jour la progression des quêtes
-      updateQuestProgress(userId, 'booster_open');
-
-      // Vérifier les cibles de collection (ex: posséder une Icon)
-      results.forEach(card => {
-        updateQuestProgress(userId, 'collection_target', 1, { rarity: card.rarity ?? undefined });
-      });
+      await updateQuestProgress(userId, 'booster_open');
 
       // Délai pour l'animation de "déchirure" du pack
       setIsPrepared(true);

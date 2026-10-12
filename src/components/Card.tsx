@@ -12,6 +12,8 @@ import { getRarityBorderClass } from '@/lib/rarity';
 import { calculateVehicleIP } from '@/lib/vehicleStats';
 import { formatDistance, formatPower, formatTorque, formatWeight } from '@/lib/preferences';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
+import { getFuelTypeInfo } from '@/lib/fuelTypes';
+import { drivetrainLayoutDescriptions } from '@/lib/drivetrain';
 
 type CardProps = AnyCard & {
   owned?: boolean;
@@ -75,6 +77,11 @@ export default function Card(props: CardProps) {
   const levelEffectClass = level >= 2 ? `card-upgrade-effect-${level}` : null;
   const drivetrainLayout = isVehicle ? (props as any).transmission : undefined;
   const drivetrainLayoutIcon = resolveDrivetrainLayoutIcon(drivetrainLayout);
+  const drivetrainLayoutDescription = typeof drivetrainLayout === 'string'
+    ? Object.entries(drivetrainLayoutDescriptions).find(
+      ([code]) => code === drivetrainLayout.trim().toUpperCase(),
+    )?.[1]
+    : undefined;
 
   // Calcul IP
   const ip = isVehicle ? calculateVehicleIP(power_hp, rawWeight) : 0;
@@ -91,6 +98,7 @@ export default function Card(props: CardProps) {
   });
   const vehicleCountry = (props as any).country_code || (props as any).country;
   const vehicleFlag = isVehicle ? resolveCountryFlag(vehicleCountry) : undefined;
+  const fuelType = isVehicle ? getFuelTypeInfo((props as any).fuel_type) : null;
 
   const handleCardClick = () => {
     if (onCardClick) {
@@ -193,9 +201,18 @@ export default function Card(props: CardProps) {
         )}
 
         {/* IP Badge - Top Left */}
-        {isVehicle && ip > 0 && (
-          <div className="absolute top-3 left-3 z-20 origin-top-left">
-            <IPBadge value={ip} size="sm" />
+        {isVehicle && (ip > 0 || fuelType) && (
+          <div className="absolute top-3 left-3 z-20 flex origin-top-left flex-col items-start gap-1">
+            {ip > 0 && <IPBadge value={ip} size="sm" />}
+            {fuelType && (
+              <span
+                aria-label={`Carburant : ${fuelType.label}`}
+                title={fuelType.label}
+                className="inline-flex min-w-8 items-center justify-center rounded-md border border-sky-200/75 bg-[#061a2e]/90 px-1.5 py-0.5 text-[10px] font-black leading-none tracking-wide text-white shadow-sm shadow-black/40"
+              >
+                {fuelType.code}
+              </span>
+            )}
           </div>
         )}
         {hasCollectionNumber && (
@@ -297,10 +314,19 @@ export default function Card(props: CardProps) {
 
         </div>
         {isVehicle && drivetrainLayoutIcon && (
-          <div className="absolute bottom-2 right-2 z-20">
+          <div
+            className="absolute bottom-2 right-2 z-20 cursor-help"
+            title={drivetrainLayoutDescription
+              ? `${drivetrainLayout}: ${drivetrainLayoutDescription}`
+              : `Configuration moteur et transmission ${drivetrainLayout}`}
+            aria-label={drivetrainLayoutDescription
+              ? `${drivetrainLayout} : ${drivetrainLayoutDescription}`
+              : `Configuration moteur et transmission ${drivetrainLayout}`}
+          >
             <SafeImage
               src={drivetrainLayoutIcon}
-              alt={`Configuration moteur et transmission ${drivetrainLayout}`}
+              alt=""
+              aria-hidden="true"
               width={compact ? 54 : 68}
               height={compact ? 28 : 36}
               showPlaceholderOnError={false}

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
+  Ban,
   Check,
   ChevronRight,
   Image as ImageIcon,
@@ -18,6 +19,7 @@ import {
 import Card from '@/components/Card';
 import { drivetrainLayoutDescriptions, drivetrainLayouts } from '@/lib/drivetrain';
 import { getRarityColor } from '@/lib/rarity';
+import { fuelTypes, getFuelTypeInfo } from '@/lib/fuelTypes';
 import { createCard, updateCard, type CardData, type CardDraft } from './actions';
 
 const rarities = ['Common', 'Uncommon', 'Atypique', 'Rare', 'Very rare', 'Epic', 'Legend', 'Mythic', 'Icon'];
@@ -71,7 +73,7 @@ function toDraft(card: CardData): CardDraft {
     country_code: card.country_code ?? '',
     transmission: card.transmission ?? '',
     new_price_eur: String(card.new_price_eur ?? ''),
-    fuel_type: card.fuel_type ?? '',
+    fuel_type: getFuelTypeInfo(card.fuel_type)?.code ?? card.fuel_type ?? '',
     max_rpm: String(card.max_rpm ?? ''),
     units_sold: String(card.units_sold ?? ''),
   };
@@ -237,6 +239,7 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
         <div className="mb-6 flex flex-wrap gap-2">
           <Link href="/admin/cards" className="rounded-xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-2.5 text-xs font-bold text-cyan-200">Cartes véhicule</Link>
           <Link href="/admin/circuits" className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-bold text-slate-400 transition hover:bg-white/5 hover:text-white">Cartes circuit</Link>
+          <Link href="/admin/objectives" className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-bold text-slate-400 transition hover:bg-white/5 hover:text-white">Succès & contrats</Link>
         </div>
 
         <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
@@ -255,6 +258,17 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                   </button>
                 )}
               </div>
+              {selectedId && !draft.is_active && (
+                <div role="status" className="mb-6 flex items-start gap-3 rounded-2xl border border-red-400/30 bg-red-400/[0.08] px-4 py-3.5 text-red-200">
+                  <Ban size={18} className="mt-0.5 shrink-0 text-red-300" />
+                  <div>
+                    <p className="text-sm font-black uppercase tracking-wide">Carte désactivée</p>
+                    <p className="mt-1 text-xs leading-5 text-red-100/75">
+                      Elle reste dans Supabase, mais est masquée dans le jeu. Les modifications de statut prennent effet après enregistrement.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <SectionHeading eyebrow="01 — identité" title="Informations générales" />
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -374,7 +388,22 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                     </select>
                   </label>
                   <TextField label="Prix neuf" value={draft.new_price_eur} onChange={(value) => setField('new_price_eur', value)} type="number" min="0" step="any" placeholder="245000" hint="Euros (€)" />
-                  <TextField label="Carburant" value={draft.fuel_type} onChange={(value) => setField('fuel_type', value)} placeholder="Essence, Diesel, Électrique…" />
+                  <label className="block min-w-0">
+                    <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Carburant</span>
+                    <select
+                      value={draft.fuel_type}
+                      onChange={(event) => setField('fuel_type', event.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm text-white outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/10"
+                    >
+                      <option value="">Non renseigné</option>
+                      {!getFuelTypeInfo(draft.fuel_type) && draft.fuel_type && (
+                        <option value={draft.fuel_type}>Valeur existante : {draft.fuel_type}</option>
+                      )}
+                      {fuelTypes.map(({ code, label }) => (
+                        <option key={code} value={code}>{code} — {label}</option>
+                      ))}
+                    </select>
+                  </label>
                   <TextField label="Régime maximal" value={draft.max_rpm} onChange={(value) => setField('max_rpm', value)} type="number" min="0" step="1" placeholder="9000" hint="Tours par minute (tr/min)" />
                   <TextField label="Exemplaires vendus" value={draft.units_sold} onChange={(value) => setField('units_sold', value)} type="number" min="0" step="1" placeholder="9181" hint="Production réelle du modèle" />
                 </div>
@@ -429,6 +458,7 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                   acceleration_0_100={draft.acceleration_0_100 || 0}
                   weight_t={draft.weight_t || 0}
                   transmission={draft.transmission || undefined}
+                  fuel_type={draft.fuel_type || undefined}
                   country_code={draft.country_code}
                   showLevel={false}
                   onCardClick={() => {}}
@@ -467,13 +497,31 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                     key={card.id}
                     type="button"
                     onClick={() => selectCard(card)}
-                    className={`group flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition ${selectedId === card.id ? 'border-cyan-400/30 bg-cyan-400/[0.07]' : 'border-transparent hover:border-white/[0.08] hover:bg-white/[0.03]'}`}
+                    className={`group flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition ${
+                      card.is_active === false
+                        ? selectedId === card.id
+                          ? 'border-red-400/40 bg-red-400/[0.09]'
+                          : 'border-red-400/15 bg-red-400/[0.035] hover:border-red-400/30 hover:bg-red-400/[0.06]'
+                        : selectedId === card.id
+                          ? 'border-cyan-400/30 bg-cyan-400/[0.07]'
+                          : 'border-transparent hover:border-white/[0.08] hover:bg-white/[0.03]'
+                    }`}
                   >
                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: getRarityColor(card.rarity) }} />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-xs font-bold text-slate-100">{card.make} {card.model}</span>
-                      <span className="mt-1 block text-[10px] text-slate-500">
-                        {card.year} · {card.rarity}{card.is_active === false ? ' · Désactivée' : card.booster_enabled === false ? ' · Hors boosters' : ''}
+                      <span className={`block truncate text-xs font-bold ${card.is_active === false ? 'text-red-100/80' : 'text-slate-100'}`}>{card.make} {card.model}</span>
+                      <span className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] text-slate-500">
+                        <span>{card.year} · {card.rarity}</span>
+                        {card.is_active === false && (
+                          <span className="inline-flex items-center gap-1 rounded-md border border-red-400/25 bg-red-400/10 px-1.5 py-0.5 font-black uppercase tracking-wide text-red-300">
+                            <Ban size={10} /> Désactivée
+                          </span>
+                        )}
+                        {card.is_active !== false && card.booster_enabled === false && (
+                          <span className="rounded-md border border-amber-400/20 bg-amber-400/[0.07] px-1.5 py-0.5 font-bold text-amber-300">
+                            Hors boosters
+                          </span>
+                        )}
                       </span>
                     </span>
                     {selectedId === card.id ? <Check size={15} className="text-cyan-300" /> : <ChevronRight size={15} className="text-slate-600 transition group-hover:text-slate-300" />}

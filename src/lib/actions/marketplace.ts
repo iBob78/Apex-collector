@@ -81,7 +81,7 @@ export async function createListing(sellerId: string, cardId: string, price: num
         // Pour l'instant on laisse comme ça, mais idéalement on "bloque" la carte.
 
         // 4. Update Quest Progress
-        updateQuestProgress(sellerId, 'marketplace_sell');
+        await updateQuestProgress(sellerId, 'marketplace_sell');
 
         return { success: true };
     } catch (err: any) {
