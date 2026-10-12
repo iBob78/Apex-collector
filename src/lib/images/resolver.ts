@@ -20,8 +20,20 @@ export function getPublicImage(key?: string | null): string | undefined {
     const trimmed = key.trim();
     if (trimmed === '') return undefined;
 
-    // 1. Si c'est déjà une URL complète, on la retourne
+    // 1. Preserve absolute URLs and repair the common truncated Supabase "public" segment.
     if (/^https?:\/\//i.test(trimmed)) {
+        try {
+            const url = new URL(trimmed);
+            if (
+                url.hostname.endsWith('.supabase.co') &&
+                url.pathname.includes('/storage/v1/object/publi/')
+            ) {
+                url.pathname = url.pathname.replace('/storage/v1/object/publi/', '/storage/v1/object/public/');
+                return url.toString();
+            }
+        } catch {
+            return trimmed;
+        }
         return trimmed;
     }
 

@@ -87,7 +87,7 @@ The card admin studio supports vehicle specification fields, including power in 
 
 Vehicle cards also support transmission, new price in euros, fuel type, maximum RPM, and units sold. Migration `007_vehicle_card_specs.sql` adds these optional columns to `public.cards`.
 
-Circuit images use the same Supabase Storage image resolver as vehicle cards. Enter a storage key such as `assets/cards/circuit/spa-francorchamps-2012.jpg`, a full public URL, or a local path beginning with `/`; the Card Studio preview resolves the storage key and shows a country flag for a country code such as `BE`.
+Circuit images use the same Supabase Storage image resolver as vehicle cards. Enter a storage key such as `assets/cards/circuit/spa-francorchamps-2012.jpg`, a full public URL, or a local path beginning with `/`; the Card Studio preview resolves the storage key and shows a country flag for a country code such as `BE`. Supabase URLs with the truncated `/storage/v1/object/publi/` segment are normalized to `/storage/v1/object/public/` for image display.
 
 The Card Studio fuel selector supports the acronyms ES, GO, EL, EE, EH, GL, GH, E85, ET, GP, GN, H2, EG, EN, FG, and FL. Recognized fuel types appear as a compact badge below the vehicle's performance-index badge; existing common values such as “Diesel” and “Essence” are recognized too.
 
@@ -230,7 +230,7 @@ L’atelier d’administration des cartes prend en charge les caractéristiques 
 
 Les cartes de véhicules prennent aussi en charge la transmission, le prix neuf en euros, le type de carburant, le régime maximal et le nombre d’exemplaires vendus. La migration `007_vehicle_card_specs.sql` ajoute ces colonnes facultatives à `public.cards`.
 
-Les images de circuit utilisent le même résolveur d’images Supabase Storage que les cartes véhicule. Renseigne une clé de stockage comme `assets/cards/circuit/spa-francorchamps-2012.jpg`, une URL publique complète ou un chemin local commençant par `/` ; l’aperçu du Card Studio résout la clé et affiche le drapeau du pays à partir d’un code comme `BE`.
+Les images de circuit utilisent le même résolveur d’images Supabase Storage que les cartes véhicule. Renseigne une clé de stockage comme `assets/cards/circuit/spa-francorchamps-2012.jpg`, une URL publique complète ou un chemin local commençant par `/` ; l’aperçu du Card Studio résout la clé et affiche le drapeau du pays à partir d’un code comme `BE`. Les URL Supabase comportant le segment tronqué `/storage/v1/object/publi/` sont normalisées en `/storage/v1/object/public/` pour l’affichage des images.
 
 Le sélecteur de carburant du Card Studio propose les acronymes ES, GO, EL, EE, EH, GL, GH, E85, ET, GP, GN, H2, EG, EN, FG et FL. Les carburants reconnus apparaissent dans un petit badge sous le badge d’indice de performance ; les anciennes valeurs courantes comme « Diesel » et « Essence » sont également reconnues.
 

@@ -22,6 +22,14 @@ describe('Image Resolver', () => {
             expect(getPublicImage(url)).toBe(url);
         });
 
+        it('repairs Supabase Storage URLs with a truncated public path segment', () => {
+            expect(getPublicImage(
+                'https://project.supabase.co/storage/v1/object/publi/assets/cards/circuit/spa-francorchamps-1950.jpg',
+            )).toBe(
+                'https://project.supabase.co/storage/v1/object/public/assets/cards/circuit/spa-francorchamps-1950.jpg',
+            );
+        });
+
         it('should return local paths starting with / as is', () => {
             const path = '/local/image.png';
             expect(getPublicImage(path)).toBe(path);
