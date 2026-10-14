@@ -1,0 +1,152 @@
+Dans ce second code source (carte Dania Vega), la carte utilise le système .wrapper-card.common.shimmy.fused.fused-active. Il combine une aura néon électrique en défilement, un voile holographique irisé, des scintillements animés, une oscillation 3D et une animation de rotation 1080°.
+
+
+Paillettes Scintillantes (.fused-active:after + @keyframes holosparkle)
+Une nappe d'étoiles scintillantes (sparklez.gif) avec mix-blend-mode: color-dodge qui respire avec des variations d'opacité entre 50% et 85%.
+
+
+Balancement 3D & Rayon de Lumière (.shimmy + .shine)
+La carte oscille doucement dans l'espace 3D (rotateY(18deg) skewX(2.5deg)), pendant qu'un rayon lumineux blanc (.shine) traverse la carte toutes les 6 secondes.
+
+
+Transformation 3D Spin 1080° (.spinincard1080deg)
+Déclenchée au clic (bouton ci-dessus) : la carte réalise 3 tours complets à 360° (1080°) en perspective 3D sur 2 secondes pour révéler son déverrouillage ou son skin Fullart.
+
+
+<!-- Structure HTML Carte Fused -->
+<div class="card-fused shimmy">
+  <div class="card-inner">
+    <img src="votre-image.webp" class="card-photo" alt="Carte">
+    <div class="shine"></div>
+    <div class="card-content">
+      <h3>Titre de la Carte</h3>
+      <span>Fused Edition</span>
+    </div>
+  </div>
+</div>
+
+<style>
+:root {
+  --radius-card: 16px;
+  --border-card: 3px;
+}
+
+/* 1. Cadre principal & oscillation 3D */
+.card-fused {
+  position: relative;
+  width: 260px;
+  height: 390px;
+  border-radius: var(--radius-card);
+  user-select: none;
+  transform-style: preserve-3d;
+}
+
+.card-fused.shimmy {
+  animation: shimmy 6s ease-in-out infinite;
+}
+
+@keyframes shimmy {
+  0%, 100% { transform: rotateY(1deg) skewX(1deg); }
+  50%      { transform: rotateY(18deg) skewX(2.5deg); }
+}
+
+/* 2. Contour & Halo Néon Défilant (Steam) */
+.card-fused::before,
+.card-fused::after {
+  content: '';
+  position: absolute;
+  left: calc(0px - var(--border-card));
+  top: calc(0px - var(--border-card));
+  width: calc(100% + (var(--border-card) * 2));
+  height: calc(100% + (var(--border-card) * 2));
+  /* Dégradé néon (ici vert fluo - adaptable selon rareté) */
+  background-image: linear-gradient(45deg, #D4FFA7, #77E203, #1E0322, #6EFF78, #15C421);
+  background-size: 400%;
+  border-radius: var(--radius-card);
+  z-index: -1;
+  animation: steam 20s linear infinite;
+}
+
+/* La couche ::after crée le halo lumineux en étant floutée */
+.card-fused::after {
+  filter: blur(1.2em);
+  opacity: 0.85;
+}
+
+@keyframes steam {
+  0%, 100% { background-position: 0 0; }
+  50%      { background-position: 400% 0; }
+}
+
+/* 3. Intérieur de la carte */
+.card-inner {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: #140826;
+}
+
+.card-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 4. Voile holographique irisé (Color Dodge) */
+.card-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgb(0, 231, 255) 30%,
+    rgb(255, 0, 231) 70%,
+    transparent 100%
+  );
+  background-size: 300% 300%;
+  mix-blend-mode: color-dodge;
+  opacity: 0;
+  z-index: 5;
+  animation: hologradient 6s ease infinite;
+  pointer-events: none;
+}
+
+@keyframes hologradient {
+  3%   { opacity: 0; }
+  10%  { background-position: 0% 0%; }
+  30%  { opacity: 0.6; }
+  35%  { background-position: 100% 100%; }
+  40%  { opacity: 0; }
+  60%  { opacity: 0; background-position: 100% 100%; }
+  70%  { opacity: 0.4; }
+  90%  { opacity: 0; background-position: 0% 0%; }
+}
+
+/* 5. Rayon de lumière oblique */
+.shine {
+  position: absolute;
+  width: 35em;
+  height: 4em;
+  transform: rotate(30deg);
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.25), transparent);
+  animation: shine 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 6;
+}
+
+@keyframes shine {
+  0%, 100% { margin-top: -6em; }
+  50%      { margin-top: 35em; }
+}
+
+.card-content {
+  position: absolute;
+  bottom: 1.2rem;
+  left: 1.2rem;
+  z-index: 10;
+  color: #fff;
+}
+</style>
