@@ -1,0 +1,62 @@
+<!-- Structure HTML -->
+<div class="tourbillon-card">
+  <div class="tourbillon-anim"></div>
+  <div class="card-content">
+    <h3>Mon Titre</h3>
+    <p>Contenu par-dessus le tourbillon</p>
+  </div>
+</div>
+
+<style>
+/* 1. Cadre parent */
+.tourbillon-card {
+  position: relative;
+  width: 250px;
+  height: 350px;
+  border-radius: 16px;
+  overflow: hidden; /* Découpe l'image agrandie */
+  background: #140826;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+}
+
+/* 2. Couche interne agrandie à 400% */
+.tourbillon-anim {
+  position: absolute;
+  width: 400%;
+  aspect-ratio: 1 / 1;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tourbillon-anim::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  /* Image texture du tourbillon multicolore */
+  background-image: url('spectral-fx2.jpg');
+  /* Animation CSS originale */
+  animation: spectral 10s linear infinite;
+}
+
+/* 3. L'animation CSS originale avec rotation + scale */
+@keyframes spectral {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.8); }
+  25%  { transform: translate3d(0, 0, 0) rotate(90deg) scale(2); }
+  50%  { transform: translate3d(0, 0, 0) rotate(180deg) scale(0.8); }
+  75%  { transform: translate3d(0, 0, 0) rotate(270deg) scale(2); }
+  100% { transform: translate3d(0, 0, 0) rotate(360deg) scale(0.8); }
+}
+
+/* 4. Contenu par-dessus */
+.card-content {
+  position: relative;
+  z-index: 10;
+  color: #fff;
+  padding: 1.5rem;
+}
+</style>
