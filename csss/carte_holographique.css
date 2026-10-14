@@ -1,0 +1,164 @@
+/* ==========================================================================
+   EFFET CARTE HOLOGRAPHIQUE FOIL (BOOBYLEGENDS - KENDRA SUNDERLAND)
+   ========================================================================== */
+
+:root {
+  --radius-card: 16px;
+  --border-card: 4px;
+}
+
+/* 1. CONTENEUR CARTE & OSCILLATION 3D */
+.card-holographic {
+  position: relative;
+  width: 260px;
+  height: 390px;
+  border-radius: var(--radius-card);
+  background-color: #6b5dbf;
+  border: var(--border-card) solid #6b5dbf;
+  transform-style: preserve-3d;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 25px rgba(107, 93, 191, 0.4);
+}
+
+.card-holographic.shimmy {
+  animation: shimmy 6s ease-in-out infinite;
+}
+
+@keyframes shimmy {
+  0%, 100% {
+    transform: rotateY(1deg) skewX(1deg);
+  }
+  50% {
+    transform: rotateY(18deg) skewX(2.5deg);
+  }
+}
+
+.front {
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--radius-card) - 4px);
+  overflow: hidden;
+  background-color: #6b5dbf;
+}
+
+/* 2. MOTIFS FOIL (TEXTURE DE FLEURS/FEUILLES IRISÉES) */
+.inner-motifs {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-size: 105% auto;
+  background-position: center;
+  background-image: url('assets/holographic-motifs.png');
+  mix-blend-mode: overlay;
+  opacity: 0.95;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* 3. DOUBLE DÉGRADÉ ANIMÉ HOLOGRAPHIQUE EN CONTRE-DÉFILEMENT */
+.inner-anim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Couche 1 : Dégradé Holographique Direct */
+.inner-anim::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(135deg, 
+    #FFFFF4 0%, #FFFFFF 2%, #F7A9DD 4%, #6F5BBC00 6%, #6959BB00 22%, 
+    #6656B510 26%, #FFA2FC 28%, #FFABFF 30%, #6959BB00 33%, #6356B200 49%, 
+    #F2AABE 52%, #F9FEB6 54%, #FEFECA 56%, #FFFFFF 57%, #6C5DC200 58%, 
+    #6A5EC300 75%, #6A5EC200 78%, #FCE927A1 80%, #00DCFF 82%, #6A5EC100 84%, 
+    #6B5DBF00 93%, #FF9B2E26 94%, #FFFFC5 96%, #FFF6C7 96%, #FDF6BE7D 97%, 
+    #6F5FBC00 99%, #FFFFFF 100%
+  );
+  background-size: 200%;
+  animation: holographic 5s linear infinite;
+  mix-blend-mode: hard-light;
+  opacity: 0.9;
+}
+
+/* Couche 2 : Dégradé Holographique Inversé */
+.inner-anim::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(135deg, 
+    #6959BB00 0%, #6F5BBC00 6%, #F3FEFF 9%, #D5FEFE 11%, #D6FEFE 13%, 
+    #D5D0FED1 15%, #FFF8FF 17%, #EF88FF 18%, #6959BB00 22%, #6656B510 26%, 
+    #6959BB00 33%, #1EFF008C 35%, #77DDEE 37%, #9748FF85 39%, #FAA2CA 41%, 
+    #FEFBE5 43%, #FEFFFB 44%, #E662B7 45%, #B16BC4 46%, #6356B200 49%, 
+    #6C5DC200 58%, #6A5CBD00 65%, #F7E1DF 67%, #FFFFFF 68%, #FFFFFFE4 72%, 
+    #C08CDE 73%, #6A5EC300 75%, #6A5EC200 78%, #6A5EC100 84%, #F97EFC 90%, 
+    #6B5DBF00 93%, #6F5FBC00 99%, #6F5FBC00 100%
+  );
+  background-size: 200%;
+  animation: holographic-reverse 5s linear infinite;
+  mix-blend-mode: color-dodge;
+  opacity: 0.85;
+}
+
+@keyframes holographic {
+  0%, 100% {
+    background-position: 0% 0;
+  }
+  50% {
+    background-position: 100% 0;
+  }
+}
+
+@keyframes holographic-reverse {
+  0%, 100% {
+    background-position: 100% 0;
+  }
+  50% {
+    background-position: 0% 0;
+  }
+}
+
+/* 4. DÉGRADÉ DE BASE INFÉRIEUR (CACHE) */
+.cache {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(206, 0, 255, 0.4) 75%, #6600FF 100%);
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* 5. RAYON LUMINEUX OBLIQUE (SHINE) */
+.shine-wrapper {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.shine {
+  position: absolute;
+  width: 35em;
+  height: 4em;
+  transform: rotate(30deg);
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.35), transparent);
+  animation: shine 6s ease-in-out infinite;
+}
+
+@keyframes shine {
+  0%, 100% { margin-top: -6em; }
+  50%      {{ margin-top: 35em; }}
+}
+
+/* 6. IMAGE DU PERSONNAGE (PNG TRANSPARENT) */
+.img-pornstar {
+  position: absolute;
+  inset: 0;
+  background-image: url('assets/kendra.png');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  z-index: 4;
+  pointer-events: none;
+}

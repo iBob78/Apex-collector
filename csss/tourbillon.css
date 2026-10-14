@@ -1,0 +1,155 @@
+/* ==========================================================================
+   EFFET TOURBILLON MULTICOULEUR (EFFET "SPECTRAL" DU CODE SOURCE)
+   ========================================================================== */
+
+/* 1. CONTENEUR PRINCIPAL (ex: carte, encadré, avatar, bannière) */
+.tourbillon-card {
+  position: relative;
+  width: 250px;
+  height: 350px;
+  border-radius: 16px;
+  overflow: hidden; /* INDISPENSABLE : découpe le tourbillon agrandi */
+  background: #140826;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(162, 0, 255, 0.2);
+}
+
+/* 2. COUCHE D'ANIMATION CENTRÉE & AGRANDIE (400%) */
+.tourbillon-anim {
+  position: absolute;
+  width: 400%;
+  aspect-ratio: 1 / 1;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 0;
+  pointer-events: none;
+}
+
+/* 3. COUCHE DE FOND AVEC LA TEXTURE TOURBILLON */
+.tourbillon-anim::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  /* Image texture du tourbillon multicolore */
+  background-image: url('assets/spectral-fx2.jpg');
+  /* Animation CSS originale */
+  animation: spectral 10s linear infinite;
+}
+
+/* 4. KEYFRAMES CSS D'ORIGINE : ROTATION 360° + PULSATION D'ÉCHELLE (0.8 à 2.0) */
+@keyframes spectral {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.8);
+  }
+  25% {
+    transform: translate3d(0, 0, 0) rotate(90deg) scale(2);
+  }
+  50% {
+    transform: translate3d(0, 0, 0) rotate(180deg) scale(0.8);
+  }
+  75% {
+    transform: translate3d(0, 0, 0) rotate(270deg) scale(2);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(360deg) scale(0.8);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   VARIANTE 2 : DOUBLE TOURBILLON CONTRE-ROTATIF (MIX-BLEND-MODE)
+   -------------------------------------------------------------------------- */
+.tourbillon-dual {
+  position: absolute;
+  width: 400%;
+  aspect-ratio: 1 / 1;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.tourbillon-dual::before,
+.tourbillon-dual::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-image: url('assets/spectral-fx2.jpg');
+}
+
+.tourbillon-dual::before {
+  animation: spectral 10s linear infinite;
+  opacity: 0.85;
+}
+
+.tourbillon-dual::after {
+  animation: spectral-reverse 14s linear infinite;
+  mix-blend-mode: screen;
+  opacity: 0.75;
+}
+
+@keyframes spectral-reverse {
+  0%   { transform: translate3d(0, 0, 0) rotate(360deg) scale(1.6); }
+  50%  { transform: translate3d(0, 0, 0) rotate(180deg) scale(0.9); }
+  100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1.6); }
+}
+
+/* --------------------------------------------------------------------------
+   VARIANTE 3 : VERSION 100% CSS PUR (SANS FICHIER IMAGE)
+   -------------------------------------------------------------------------- */
+.tourbillon-pure-css {
+  position: absolute;
+  width: 320%;
+  aspect-ratio: 1 / 1;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #ff0080,
+    #7928ca,
+    #0070f3,
+    #00dfd8,
+    #43e97b,
+    #fa709a,
+    #fee140,
+    #ff0080
+  );
+  filter: blur(28px) saturate(190%);
+  animation: pure-spin 8s linear infinite, pure-hue 12s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pure-spin {
+  0%   { transform: translate(-50%, -50%) rotate(0deg) scale(0.9); }
+  50%  { transform: translate(-50%, -50%) rotate(180deg) scale(1.3); }
+  100% { transform: translate(-50%, -50%) rotate(360deg) scale(0.9); }
+}
+
+@keyframes pure-hue {
+  0%, 100% { filter: blur(28px) saturate(190%) hue-rotate(0deg); }
+  50%      { filter: blur(22px) saturate(230%) hue-rotate(90deg); }
+}
+
+/* --------------------------------------------------------------------------
+   CONTENU PAR-DESSUS LE TOURBILLON
+   -------------------------------------------------------------------------- */
+.tourbillon-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #ffffff;
+  padding: 1.5rem;
+  text-align: center;
+}
