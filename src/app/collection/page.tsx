@@ -25,12 +25,16 @@ export default function CollectionPage() {
   const [userCardLevels, setUserCardLevels] = useState<Record<string, number>>({});
   const [upgradingCardId, setUpgradingCardId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(24);
 
   // Filters
   const [activeTab, setActiveTab] = useState<'all' | 'vehicle' | 'circuit'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [rarityFilter, setRarityFilter] = useState<Rarity | 'All'>('All');
   const [sortBy, setSortBy] = useState<'name' | 'make-asc' | 'make-desc' | 'ip-desc' | 'ip-asc' | 'level-asc' | 'level-desc' | 'rarity' | 'newest'>('name');
+
+  // Keep the initial card grid light on smartphones when filters change.
+  useEffect(() => setVisibleCount(24), [activeTab, searchQuery, rarityFilter, sortBy]);
 
   // Authentification
   useEffect(() => {
@@ -320,13 +324,14 @@ export default function CollectionPage() {
               <p className="font-mono text-sm uppercase tracking-widest">{t('Initialisation du garage...')}</p>
             </div>
           ) : (
+            <>
             <AnimatePresence mode="popLayout">
               {filteredCards.length > 0 ? (
                 <motion.div
                   layout
                   className="grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(min(100%,14rem),1fr))] sm:gap-6"
                 >
-                  {filteredCards.map((card, index) => {
+                  {filteredCards.slice(0, visibleCount).map((card) => {
                     const cid = String((card as any).card_id || card.id).toLowerCase().trim();
                     const c = userCards[cid] || 0;
                     const currentLevel = userCardLevels[cid] || 0;
@@ -362,6 +367,18 @@ export default function CollectionPage() {
                 </div>
               )}
             </AnimatePresence>
+            {visibleCount < filteredCards.length && (
+              <div className="mt-8 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount((count) => count + 24)}
+                  className="min-h-12 rounded-xl border border-blue-400/40 bg-blue-500/15 px-6 py-3 text-sm font-bold text-blue-200 transition hover:bg-blue-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                >
+                  {t('Afficher plus')} ({Math.min(visibleCount, filteredCards.length)}/{filteredCards.length})
+                </button>
+              </div>
+            )}
+            </>
           )}
         </div>
       </main>
