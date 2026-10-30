@@ -46,11 +46,11 @@ export default function BoostersPage() {
   return (
     <div className="flex min-h-screen bg-[#050505] text-white">
       <Sidebar />
-      <main className="flex-1 flex flex-col">
-        <div className="p-8 flex-1">
+      <main className="min-w-0 flex-1 flex flex-col">
+        <div className="p-4 sm:p-6 lg:p-8 flex-1">
           <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <h1 className="text-4xl font-black uppercase italic tracking-tighter bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent mb-2">
+              <h1 className="text-3xl sm:text-4xl font-black uppercase italic tracking-tighter bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent mb-2">
                 {t('Boutique Officielle')}
               </h1>
               <p className="text-gray-500 font-mono text-sm">{t('Débloquez de nouvelles mécaniques et agrandissez votre garage.')}</p>
@@ -69,7 +69,7 @@ export default function BoostersPage() {
             )}
           </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 py-4">
             {Object.values(PACKS).map((pack, i) => (
               <motion.div
                 key={pack.slug}
@@ -81,7 +81,7 @@ export default function BoostersPage() {
                 {/* Glow Effect */}
                 <div className={`absolute -inset-0.5 bg-gradient-to-r ${pack.color} rounded-2xl blur opacity-20 group-hover:opacity-100 transition duration-500`}></div>
 
-                <div className="relative bg-[#0a0a0a] border border-white/10 rounded-2xl p-6 h-full flex flex-col overflow-hidden">
+                <div className="relative bg-[#0a0a0a] border border-white/10 rounded-2xl p-4 sm:p-6 h-full flex flex-col overflow-hidden">
                   {/* Decorative Gradient Top */}
                   <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${pack.color}`}></div>
 

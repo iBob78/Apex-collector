@@ -72,29 +72,29 @@ export default function ProfilePage() {
   return (
     <div className="flex min-h-screen bg-[#050505] text-white">
       <Sidebar />
-      <main className="flex-1 flex flex-col">
+      <main className="min-w-0 flex-1 flex flex-col">
         <div className="p-4 md:p-12 flex-1">
           {/* Header Profile Section */}
-          <div className="relative mb-12">
+          <div className="relative mb-20 sm:mb-12">
             <div className="h-48 w-full bg-gradient-to-r from-blue-900 to-indigo-900 rounded-3xl overflow-hidden opacity-30 shadow-2xl border border-white/5">
               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
             </div>
 
-            <div className="absolute -bottom-10 left-10 flex items-end gap-6">
-              <div className="w-32 h-32 rounded-3xl bg-[#0a0a0a] border-4 border-[#050505] shadow-2xl flex items-center justify-center overflow-hidden">
+            <div className="absolute -bottom-14 left-4 sm:-bottom-10 sm:left-10 flex items-end gap-3 sm:gap-6">
+              <div className="w-20 h-20 sm:w-32 sm:h-32 shrink-0 rounded-3xl bg-[#0a0a0a] border-4 border-[#050505] shadow-2xl flex items-center justify-center overflow-hidden">
                 <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-4xl font-black italic">
                   {user.email?.[0].toUpperCase()}
                 </div>
               </div>
               <div className="mb-4">
-                <h1 className="text-3xl font-black uppercase italic tracking-tighter">
+                <h1 className="text-xl sm:text-3xl font-black uppercase italic tracking-tighter">
                   {profile?.username || user.email?.split('@')[0]}
                 </h1>
                 <p className="text-blue-500 font-mono text-xs tracking-widest uppercase">{t('PILOTE OFFICIEL APEX')}</p>
               </div>
             </div>
 
-            <div className="absolute bottom-4 right-8 flex gap-4">
+            <div className="absolute top-3 right-3 sm:top-auto sm:bottom-4 sm:right-8 flex gap-4">
               <button
                 onClick={() => router.push('/settings')}
                 className="bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-3 rounded-xl flex items-center gap-3 transition-all text-xs font-black uppercase tracking-widest"

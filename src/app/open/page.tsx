@@ -328,14 +328,14 @@ function OpenContent() {
             </button>
 
             <div className="mb-12 w-full max-w-[1400px]">
-              <div className="flex flex-wrap items-stretch justify-center gap-4 px-2">
+              <div className="grid grid-cols-2 justify-items-center gap-3 px-1 sm:flex sm:flex-wrap sm:items-stretch sm:justify-center sm:gap-4 sm:px-2">
                 {drawnCards.map((card, idx) => (
                   <motion.div
                     key={`${card.id}-${idx}`}
                     initial={{ y: 30, opacity: 0, scale: 0.8 }}
                     animate={{ y: 0, opacity: 1, scale: 1 }}
                     transition={{ delay: idx * 0.1, type: 'spring', damping: 15 }}
-                    className="w-[160px] shrink-0 sm:w-[180px] lg:w-[200px]"
+                    className="w-full min-w-0 max-w-[200px] sm:w-[180px] sm:shrink-0 lg:w-[200px]"
                   >
                     <motion.div
                       animate={{ rotateY: flippedCards.has(idx) ? 180 : 0 }}

@@ -59,7 +59,7 @@ function LoginForm() {
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-md"
     >
-      <div className="bg-[#0a0a0a] border border-white/10 rounded-[32px] p-10 shadow-2xl relative overflow-hidden">
+      <div className="bg-[#0a0a0a] border border-white/10 rounded-[24px] sm:rounded-[32px] p-5 sm:p-10 shadow-2xl relative overflow-hidden">
         {/* Background Gradients */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[80px] -mr-10 -mt-10" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 blur-[80px] -ml-10 -mb-10" />
@@ -145,7 +145,7 @@ function LoginForm() {
 export default function LoginPage() {
   const { t } = useSitePreferences();
   return (
-    <main className="flex items-center justify-center min-h-screen bg-[#050505] text-white p-6 relative overflow-hidden">
+    <main className="flex items-center justify-center min-h-screen bg-[#050505] text-white p-4 sm:p-6 relative overflow-hidden">
       {/* Dynamic Background Elements */}
       <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-blue-600/5 blur-[150px] rounded-full animate-pulse" />
       <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-indigo-600/5 blur-[150px] rounded-full animate-pulse delay-1000" />
