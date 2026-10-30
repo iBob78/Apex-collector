@@ -12,6 +12,8 @@ import {
   Layers3Icon,
   CrownIcon,
   LockIcon,
+  MenuIcon,
+  XIcon,
   MapIcon,
   WrenchIcon,
   StarIcon,
@@ -40,6 +42,7 @@ export default function Sidebar() {
   const supabase = useMemo(() => createClient(), []);
   const [user, setUser] = useState<any>(null);
   const [authLoaded, setAuthLoaded] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -73,8 +76,37 @@ export default function Sidebar() {
     };
   }, [supabase]);
 
+  useEffect(() => {
+    document.body.classList.add('apex-mobile-app');
+    return () => document.body.classList.remove('apex-mobile-app');
+  }, []);
+
+  useEffect(() => setMobileMenuOpen(false), [pathname]);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [mobileMenuOpen]);
+
+  const isActivePath = (href: string) =>
+    pathname === href || pathname.startsWith(href + '/') || (href === '/boosters' && pathname === '/open');
+
+  const extraItems = [
+    ...navItems.slice(4),
+    ...(user ? [
+      { href: '/admin/cards', label: 'ATELIER CARTES', icon: WrenchIcon },
+      { href: '/admin/circuits', label: 'ATELIER CIRCUITS', icon: MapIcon },
+      { href: '/admin/objectives', label: 'ATELIER OBJECTIFS', icon: ClipboardListIcon },
+    ] : []),
+  ];
+
   return (
-    <aside className="w-[280px] h-screen bg-[#080808] border-r border-white/5 p-8 flex flex-col gap-10 sticky top-0 z-50">
+    <>
+      <aside className="hidden w-[280px] shrink-0 h-screen bg-[#080808] border-r border-white/5 p-8 flex-col gap-10 sticky top-0 z-50 lg:flex">
       {/* Brand Logo */}
       <div className="flex flex-col">
         <h1 className="text-2xl font-black uppercase italic tracking-tighter leading-none">
@@ -93,7 +125,7 @@ export default function Sidebar() {
           { href: '/admin/circuits', label: 'ATELIER CIRCUITS', icon: MapIcon },
           { href: '/admin/objectives', label: 'ATELIER OBJECTIFS', icon: ClipboardListIcon },
         ] : [])].map(({ href, label, icon: Icon }) => {
-          const isActive = pathname === href;
+          const isActive = isActivePath(href);
           const isLocked = authLoaded && !user && href !== '/login';
 
           return (
@@ -161,6 +193,56 @@ export default function Sidebar() {
           <div className="text-[9px] font-medium opacity-70 mt-1">{t('Rejoignez l\'élite Apex')}</div>
         </Link>
       )}
-    </aside>
+      </aside>
+
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-[55] lg:hidden">
+          <button type="button" aria-label={t('Fermer le menu')} onClick={() => setMobileMenuOpen(false)} className="absolute inset-0 bg-black/75" />
+          <nav id="apex-mobile-more-menu" aria-label={t('Navigation secondaire')} className="absolute inset-x-3 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-h-[75dvh] overflow-y-auto rounded-2xl border border-white/15 bg-[#0e111a] p-3 shadow-2xl">
+            <div className="flex items-center justify-between px-3 pb-3 pt-1">
+              <span className="text-sm font-black uppercase tracking-widest">{t('Plus')}</span>
+              <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label={t('Fermer le menu')} className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
+                <XIcon size={22} />
+              </button>
+            </div>
+            {extraItems.map(({ href, label, icon: Icon }) => {
+              const active = isActivePath(href);
+              const locked = authLoaded && !user;
+              return (
+                <Link key={href} href={locked ? '/login' : href} aria-current={active ? 'page' : undefined} onClick={() => setMobileMenuOpen(false)}
+                  className={`flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${active ? 'bg-blue-500/15 text-blue-300' : 'text-gray-200 hover:bg-white/10'}`}>
+                  <Icon size={20} aria-hidden="true" />
+                  <span>{t(label)}</span>
+                  {locked && <LockIcon className="ml-auto text-gray-500" size={15} aria-hidden="true" />}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      )}
+
+      <nav aria-label={t('Navigation principale')} className="fixed inset-x-0 bottom-0 z-[60] border-t border-white/10 bg-[#080b11]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_25px_rgba(0,0,0,0.35)] backdrop-blur-lg lg:hidden">
+        <div className="mx-auto flex h-16 max-w-md items-stretch px-1">
+          {navItems.slice(0, 4).map(({ href, label, icon: Icon }) => {
+            const active = isActivePath(href);
+            const locked = authLoaded && !user;
+            const shortLabel = label === 'ACCUEIL' ? 'Accueil' : label === 'MA COLLECTION' ? 'Collection' : label === 'BOUTIQUE PACKS' ? 'Boosters' : 'Marché';
+            return (
+              <Link key={href} href={locked ? '/login' : href} aria-current={active ? 'page' : undefined}
+                className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1 text-[10px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${active ? 'text-blue-400' : 'text-gray-400'}`}>
+                <Icon size={21} aria-hidden="true" />
+                <span className="truncate">{t(shortLabel)}</span>
+              </Link>
+            );
+          })}
+          <button type="button" aria-label={t('Plus')} aria-controls="apex-mobile-more-menu" aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1 text-[10px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${mobileMenuOpen || extraItems.some(({ href }) => isActivePath(href)) ? 'text-blue-400' : 'text-gray-400'}`}>
+            <MenuIcon size={21} aria-hidden="true" />
+            <span>{t('Plus')}</span>
+          </button>
+        </div>
+      </nav>
+    </>
   );
 }

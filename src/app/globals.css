@@ -493,3 +493,7 @@ html, body {
 .animate-fade-in {
   animation: fade-in 0.5s ease-out;
 }
+/* Keep mobile content clear of the fixed bottom navigation and device safe area. */
+@media (max-width: 1023px) {
+  body.apex-mobile-app { padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px)); }
+}

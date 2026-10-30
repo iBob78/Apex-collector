@@ -74,11 +74,11 @@ export default function MarketplacePage() {
   return (
     <div className="flex min-h-screen bg-[#050505] text-white">
       <Sidebar />
-      <main className="flex-1 flex flex-col">
+      <main className="min-w-0 flex-1 flex flex-col">
         <div className="p-4 md:p-8 flex-1">
           {/* Header */}
           <header className="mb-10">
-            <h1 className="text-4xl font-black uppercase italic tracking-tighter bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">
+            <h1 className="bg-gradient-to-r from-white to-gray-500 bg-clip-text text-3xl font-black uppercase italic tracking-tighter text-transparent sm:text-4xl">
               Marketplace
             </h1>
             <p className="text-gray-500 font-mono text-sm mt-1">
@@ -108,14 +108,14 @@ export default function MarketplacePage() {
 
           {/* Filters Bar */}
           <div className="bg-[#0a0a0a] border border-white/5 rounded-2xl p-4 flex flex-wrap items-center gap-4 mb-8">
-            <div className="flex-1 min-w-[300px] relative">
+            <div className="relative w-full min-w-0 flex-1 sm:min-w-[240px]">
               <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
               <input
                 type="text"
                 placeholder={t('Rechercher une rareté, une marque...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:border-blue-500/50 transition-colors"
+                className="min-h-11 w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-12 pr-4 text-base transition-colors focus:border-blue-500/50 focus:outline-none sm:text-sm"
               />
             </div>
 
@@ -182,7 +182,7 @@ export default function MarketplacePage() {
           )}
         </div>
         {profile && (
-          <div className="fixed bottom-8 right-8 z-[100]">
+          <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-3 z-40 lg:bottom-8 lg:right-8">
             <div className="bg-blue-600 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-blue-400/30">
               <CoinsIcon size={24} className="text-blue-100" />
               <div>
@@ -197,7 +197,7 @@ export default function MarketplacePage() {
       {/* SELL MODAL */}
       <AnimatePresence>
         {isSellModalOpen && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-0 sm:p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -210,20 +210,20 @@ export default function MarketplacePage() {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-4xl bg-[#0a0a0a] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+              className="relative flex h-[100dvh] max-h-[100dvh] w-full max-w-4xl flex-col overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-2xl sm:h-auto sm:max-h-[90dvh] sm:rounded-[32px]"
             >
-              <div className="p-8 border-b border-white/5 flex items-center justify-between">
+              <div className="flex items-center justify-between border-b border-white/5 p-4 sm:p-8">
                 <div>
                   <h2 className="text-2xl font-black uppercase italic tracking-tighter">{t('Mettre en vente')}</h2>
                   <p className="text-gray-500 text-xs font-mono uppercase tracking-widest mt-1">{t('Sélectionnez une pièce de votre garage')}</p>
                 </div>
-                <button onClick={() => setIsSellModalOpen(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+                <button onClick={() => setIsSellModalOpen(false)} aria-label={t('Fermer')} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/5">
                   <XIcon size={24} />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-8">
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+              <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-8">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-6 md:grid-cols-4">
                   {userCards.map((uc) => (
                     <SellCardItem
                       key={uc.id}
@@ -303,7 +303,7 @@ function SellCardItem({ userCard, onSelect }: { userCard: any, onSelect: (price:
       </div>
       <button
         onClick={() => setIsSettingPrice(true)}
-        className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
+        className="absolute inset-0 flex items-center justify-center rounded-lg bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-100 transition-opacity sm:bg-black/60 sm:opacity-0 sm:group-hover:opacity-100"
       >
         <div className="bg-white text-black p-3 rounded-2xl shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform">
           <PlusIcon size={24} />

@@ -52,12 +52,12 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen bg-[#050505] text-white">
       <Sidebar />
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <div className="p-8 flex-1 overflow-y-auto">
+      <main className="min-w-0 flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 p-4 sm:p-6 lg:p-8">
           {/* Header section with User Profile Link */}
-          <div className="flex justify-between items-center mb-12">
+          <div className="mb-7 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">
+              <h1 className="bg-gradient-to-r from-white to-gray-500 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl">
                 {t('Tableau de bord')}
               </h1>
               <p className="text-gray-500 mt-1">{t('Gérez votre écurie et vos actifs.')}</p>
@@ -65,7 +65,7 @@ export default function DashboardPage() {
             {user && (
               <button
                 onClick={() => router.push('/profile')}
-                className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-all group"
+                className="flex min-h-11 items-center gap-3 self-start rounded-full border border-white/10 bg-white/5 px-4 py-2 transition-all hover:bg-white/10 sm:self-auto"
               >
                 <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold">
                   {user.email?.[0].toUpperCase()}
@@ -79,7 +79,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="mb-9 grid grid-cols-2 gap-3 sm:mb-12 sm:gap-6 lg:grid-cols-4">
             <StatCard label={t('Cartes totales')} value={stats.totalCards} sub={t('Dans votre collection')} color="blue" />
             <StatCard label={t('Modèles uniques')} value={stats.uniqueCards} sub={t('Garage distinct')} color="purple" />
             <StatCard label={t('Balance AP')} value={profile?.ap || 0} sub={t('Disponibles')} color="green" />
@@ -98,7 +98,7 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
               {Object.values(PACKS).map((pack) => (
                 <div
                   key={pack.slug}
@@ -106,7 +106,7 @@ export default function DashboardPage() {
                   className="group relative cursor-pointer"
                 >
                   <div className={`absolute -inset-0.5 bg-gradient-to-r ${pack.color} rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500`}></div>
-                  <div className="relative bg-white/5 border border-white/5 rounded-2xl p-6 flex items-center gap-4 hover:bg-white/10 transition-colors">
+                  <div className="relative flex min-h-20 items-center gap-4 rounded-2xl border border-white/5 bg-white/5 p-4 transition-colors hover:bg-white/10 sm:p-6">
                     <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${pack.color} flex items-center justify-center text-xl`}>
                       🎁
                     </div>
@@ -121,7 +121,7 @@ export default function DashboardPage() {
           </section>
 
           {/* Recent Activity / Tips */}
-          <div className="bg-gradient-to-r from-blue-900/20 to-transparent border-l-4 border-blue-500 p-6 rounded-r-xl">
+          <div className="rounded-r-xl border-l-4 border-blue-500 bg-gradient-to-r from-blue-900/20 to-transparent p-4 sm:p-6">
             <h3 className="font-bold mb-2">{t('Conseil du jour')}</h3>
             <p className="text-sm text-gray-400 leading-relaxed">
               {t('Les cartes de rareté')} <span className="text-yellow-400">Legend</span> {t('Il y a 20% de chance dans le')} Pack Légendaire.
@@ -143,9 +143,9 @@ function StatCard({ label, value, sub, color }: any) {
   };
 
   return (
-    <div className={`bg-gradient-to-br ${colors[color]} border rounded-2xl p-6`}>
+    <div className={`min-w-0 rounded-2xl border bg-gradient-to-br p-3 sm:p-6 ${colors[color]}`}>
       <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">{label}</p>
-      <p className="text-3xl font-mono font-bold mb-2">{value}</p>
+      <p className="mb-2 break-words font-mono text-2xl font-bold sm:text-3xl">{value}</p>
       <p className="text-[10px] text-gray-400">{sub}</p>
     </div>
   );
