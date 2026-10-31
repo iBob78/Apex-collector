@@ -266,7 +266,7 @@ export default function Card(props: CardProps) {
             <div className={clsx(
               "grid w-full grid-cols-2 text-center text-gray-200",
               mobileGrid
-                ? "mb-0 grid-rows-2 items-center gap-x-1 gap-y-1 px-0 [&_svg]:h-2 [&_svg]:w-2 sm:mb-2 sm:grid-rows-none sm:gap-x-1.5 sm:gap-y-1 sm:px-2 sm:[&_svg]:h-4 sm:[&_svg]:w-4"
+                ? "mb-0 grid-rows-2 items-center gap-x-1 gap-y-1 px-0 [&_svg]:h-[7px] [&_svg]:w-[7px] sm:mb-2 sm:grid-rows-none sm:gap-x-1.5 sm:gap-y-1 sm:px-2 sm:[&_svg]:h-4 sm:[&_svg]:w-4"
                 : compact ? "mb-1.5 gap-x-1.5 gap-y-1 px-0" : "mb-2 gap-x-1.5 gap-y-1 px-2",
             )}>
               <div className="min-w-0">
@@ -274,7 +274,7 @@ export default function Card(props: CardProps) {
                   <VehicleStatIcon kind="engine" />
                   <div className="min-w-0 text-left">
                     <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Puissance')}</p>
-                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate whitespace-nowrap text-[6px] leading-[8px] tabular-nums tracking-tight sm:whitespace-normal sm:text-[11px] sm:leading-normal sm:normal-nums" : compact ? "text-[9px]" : "text-[11px]")}>
+                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate whitespace-nowrap text-[5px] leading-[7px] tabular-nums tracking-tight sm:whitespace-normal sm:text-[11px] sm:leading-normal sm:normal-nums" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatPower(power_hp, units, language, Number((props as any).power_kw) || undefined)}
                     </p>
                   </div>
@@ -285,7 +285,7 @@ export default function Card(props: CardProps) {
                   <VehicleStatIcon kind="torque" />
                   <div className="min-w-0 text-left">
                     <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Couple')}</p>
-                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate whitespace-nowrap text-[6px] leading-[8px] tabular-nums tracking-tight sm:whitespace-normal sm:text-[11px] sm:leading-normal sm:normal-nums" : compact ? "text-[9px]" : "text-[11px]")}>
+                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate whitespace-nowrap text-[5px] leading-[7px] tabular-nums tracking-tight sm:whitespace-normal sm:text-[11px] sm:leading-normal sm:normal-nums" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatTorque(torque_nm, units, language)}
                     </p>
                   </div>
@@ -296,7 +296,7 @@ export default function Card(props: CardProps) {
                   <VehicleStatIcon kind="acceleration" />
                   <div className="min-w-0 text-left">
                     <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('0 à 100 km/h')}</p>
-                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate whitespace-nowrap text-[6px] leading-[8px] tabular-nums tracking-tight sm:whitespace-normal sm:text-[11px] sm:leading-normal sm:normal-nums" : compact ? "text-[9px]" : "text-[11px]")}>
+                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate whitespace-nowrap text-[5px] leading-[7px] tabular-nums tracking-tight sm:whitespace-normal sm:text-[11px] sm:leading-normal sm:normal-nums" : compact ? "text-[9px]" : "text-[11px]")}>
                       {acceleration !== null && acceleration !== undefined ? `${acceleration} s` : '—'}
                     </p>
                   </div>
@@ -307,7 +307,7 @@ export default function Card(props: CardProps) {
                   <VehicleStatIcon kind="weight" />
                   <div className="min-w-0 text-left">
                     <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Poids')}</p>
-                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate whitespace-nowrap text-[6px] leading-[8px] tabular-nums tracking-tight sm:whitespace-normal sm:text-[11px] sm:leading-normal sm:normal-nums" : compact ? "text-[9px]" : "text-[11px]")}>
+                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate whitespace-nowrap text-[5px] leading-[7px] tabular-nums tracking-tight sm:whitespace-normal sm:text-[11px] sm:leading-normal sm:normal-nums" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatWeight(rawWeight, units, language)}
                     </p>
                   </div>
@@ -361,7 +361,7 @@ export default function Card(props: CardProps) {
               width={compact ? 54 : 68}
               height={compact ? 28 : 36}
               showPlaceholderOnError={false}
-              className={clsx("h-auto drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]", mobileGrid ? "w-4 sm:w-[68px]" : compact ? "w-[54px]" : "w-[68px]")}
+              className={clsx("h-auto drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]", mobileGrid ? "w-6 sm:w-[68px]" : compact ? "w-[54px]" : "w-[68px]")}
             />
           </div>
         )}
