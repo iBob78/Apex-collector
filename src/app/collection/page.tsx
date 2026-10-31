@@ -10,10 +10,17 @@ import { Rarity } from '@/types/game';
 import { getNextLevelUnlock } from '@/lib/level';
 import { purchaseCardUpgrade } from '@/lib/actions/card-upgrades';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
+import { Star } from 'lucide-react';
 
-interface UserCardData {
-  card_id: string;
-  count: number;
+type FavoriteCategory = 'vehicle' | 'circuit';
+
+function getCardId(card: any): string {
+  return String(card.category === 'circuit' ? (card.id || card.circuit_id) : (card.card_id || card.id)).toLowerCase().trim();
+}
+
+function getFavoriteKey(card: any): string {
+  const category: FavoriteCategory = card.category === 'circuit' ? 'circuit' : 'vehicle';
+  return `${category}:${getCardId(card)}`;
 }
 
 export default function CollectionPage() {
@@ -26,6 +33,10 @@ export default function CollectionPage() {
   const [upgradingCardId, setUpgradingCardId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(24);
+  const [favoriteKeys, setFavoriteKeys] = useState<Set<string>>(() => new Set());
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [favoritePendingKey, setFavoritePendingKey] = useState<string | null>(null);
+  const [favoritesError, setFavoritesError] = useState<string | null>(null);
 
   // Filters
   const [activeTab, setActiveTab] = useState<'all' | 'vehicle' | 'circuit'>('all');
@@ -34,7 +45,7 @@ export default function CollectionPage() {
   const [sortBy, setSortBy] = useState<'name' | 'make-asc' | 'make-desc' | 'ip-desc' | 'ip-asc' | 'level-asc' | 'level-desc' | 'rarity' | 'newest'>('name');
 
   // Keep the initial card grid light on smartphones when filters change.
-  useEffect(() => setVisibleCount(24), [activeTab, searchQuery, rarityFilter, sortBy]);
+  useEffect(() => setVisibleCount(24), [activeTab, searchQuery, rarityFilter, sortBy, favoritesOnly]);
 
   // Authentification
   useEffect(() => {
@@ -66,14 +77,27 @@ export default function CollectionPage() {
         if (!user) {
           setCards(combinedBase);
           setUserCardLevels({});
+          setFavoriteKeys(new Set());
           setLoading(false);
           return;
         }
 
-        const [userCardsRes, userCircuitsRes] = await Promise.all([
+        const [userCardsRes, userCircuitsRes, favoritesRes] = await Promise.all([
           supabase.from('user_cards').select('*').eq('user_id', user.id),
-          supabase.from('user_circuits').select('*').eq('user_id', user.id)
+          supabase.from('user_circuits').select('*').eq('user_id', user.id),
+          supabase.from('card_favorites').select('category,card_id').eq('user_id', user.id),
         ]);
+
+        if (userCardsRes.error) throw userCardsRes.error;
+        if (userCircuitsRes.error) throw userCircuitsRes.error;
+
+        if (favoritesRes.error) {
+          console.error('[CollectionPage] Erreur favoris:', favoritesRes.error);
+          setFavoritesError(t('Impossible de charger les favoris.'));
+        } else {
+          setFavoritesError(null);
+          setFavoriteKeys(new Set((favoritesRes.data || []).map((item) => `${item.category}:${String(item.card_id).toLowerCase()}`)));
+        }
 
         let ownedMap: Record<string, number> = {};
         let levelMap: Record<string, number> = {};
@@ -110,7 +134,7 @@ export default function CollectionPage() {
     };
 
     fetchData();
-  }, [user]);
+  }, [user, t]);
 
   // Logique de filtrage et tri
   const filteredCards = useMemo(() => {
@@ -119,6 +143,10 @@ export default function CollectionPage() {
     // Onglets (Catégorie)
     if (activeTab !== 'all') {
       result = result.filter(c => (c.category || 'vehicle') === activeTab);
+    }
+
+    if (favoritesOnly) {
+      result = result.filter((card) => favoriteKeys.has(getFavoriteKey(card)));
     }
 
     // Recherche
@@ -174,7 +202,7 @@ export default function CollectionPage() {
     });
 
     return result;
-  }, [cards, activeTab, searchQuery, rarityFilter, sortBy, userCardLevels]);
+  }, [cards, activeTab, searchQuery, rarityFilter, sortBy, userCardLevels, favoritesOnly, favoriteKeys]);
 
   // Statistiques
   const stats = useMemo(() => {
@@ -193,6 +221,38 @@ export default function CollectionPage() {
 
     return { total, owned, percentage, totalCopies };
   }, [cards, userCards]);
+
+  const handleToggleFavorite = async () => {
+    if (!user || !selectedCard || favoritePendingKey) return;
+    const category: FavoriteCategory = selectedCard.category === 'circuit' ? 'circuit' : 'vehicle';
+    const cardId = getCardId(selectedCard);
+    const key = getFavoriteKey(selectedCard);
+    if ((userCards[cardId] || 0) <= 0) return;
+
+    setFavoritePendingKey(key);
+    setFavoritesError(null);
+
+    try {
+      const isFavorite = favoriteKeys.has(key);
+      const query = isFavorite
+        ? supabase.from('card_favorites').delete().eq('user_id', user.id).eq('category', category).eq('card_id', cardId)
+        : supabase.from('card_favorites').insert({ user_id: user.id, category, card_id: cardId });
+      const { error } = await query;
+      if (error) throw error;
+
+      setFavoriteKeys((previous) => {
+        const updated = new Set(previous);
+        if (isFavorite) updated.delete(key);
+        else updated.add(key);
+        return updated;
+      });
+    } catch (error) {
+      console.error('[CollectionPage] Enregistrement favori impossible:', error);
+      setFavoritesError(t('Impossible d’enregistrer ce favori. Réessayez.'));
+    } finally {
+      setFavoritePendingKey(null);
+    }
+  };
 
   const handleUpgrade = async (card: any) => {
     if (!user || upgradingCardId) return;
@@ -272,6 +332,16 @@ export default function CollectionPage() {
                 ))}
               </div>
 
+              <button
+                type="button"
+                aria-pressed={favoritesOnly}
+                onClick={() => setFavoritesOnly((current) => !current)}
+                className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${favoritesOnly ? 'border-amber-400/70 bg-amber-400/20 text-amber-200' : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'}`}
+              >
+                <Star size={18} fill={favoritesOnly ? 'currentColor' : 'none'} aria-hidden="true" />
+                {t('Favoris')} ({favoriteKeys.size})
+              </button>
+
               {/* Search */}
               <div className="w-full min-w-0 flex-1 sm:min-w-[200px]">
                 <input
@@ -315,6 +385,11 @@ export default function CollectionPage() {
                 <option value="newest">{t('Plus récent')}</option>
               </select>
             </div>
+            {favoritesError && (
+              <p role="alert" className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-200">
+                {favoritesError}
+              </p>
+            )}
           </header>
 
           {/* Grid of Cards */}
@@ -329,10 +404,10 @@ export default function CollectionPage() {
               {filteredCards.length > 0 ? (
                 <motion.div
                   layout
-                  className="grid grid-cols-4 gap-1.5 sm:grid-cols-[repeat(auto-fill,minmax(min(100%,14rem),1fr))] sm:gap-6"
+                  className="grid grid-cols-4 gap-x-1.5 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(min(100%,14rem),1fr))] sm:gap-x-6 sm:gap-y-8"
                 >
                   {filteredCards.slice(0, visibleCount).map((card) => {
-                    const cid = String((card as any).card_id || card.id).toLowerCase().trim();
+                    const cid = getCardId(card);
                     const c = userCards[cid] || 0;
                     const currentLevel = userCardLevels[cid] || 0;
                     const levelUnlock = getNextLevelUnlock(c, currentLevel);
@@ -349,6 +424,7 @@ export default function CollectionPage() {
                         <Card
                           {...card}
                           mobileGrid
+                          isFavorite={favoriteKeys.has(getFavoriteKey(card))}
                           owned={c > 0}
                           count={c}
                           upgradeLevel={currentLevel}
@@ -385,10 +461,12 @@ export default function CollectionPage() {
       </main>
       <CardDetailsModal
         card={selectedCard}
-        ownedCount={selectedCard ? userCards[String(selectedCard.card_id || selectedCard.id).toLowerCase().trim()] || 0 : 0}
-        upgradeLevel={selectedCard ? userCardLevels[String(selectedCard.card_id || selectedCard.id).toLowerCase().trim()] || 0 : 0}
-        upgradePending={upgradingCardId === selectedCard?.card_id?.toLowerCase().trim()
-          || upgradingCardId === selectedCard?.id?.toLowerCase().trim()}
+        ownedCount={selectedCard ? userCards[getCardId(selectedCard)] || 0 : 0}
+        upgradeLevel={selectedCard ? userCardLevels[getCardId(selectedCard)] || 0 : 0}
+        upgradePending={upgradingCardId === (selectedCard ? getCardId(selectedCard) : null)}
+        isFavorite={selectedCard ? favoriteKeys.has(getFavoriteKey(selectedCard)) : false}
+        favoritePending={selectedCard ? favoritePendingKey === getFavoriteKey(selectedCard) : false}
+        onToggleFavorite={() => void handleToggleFavorite()}
         onUpgrade={() => selectedCard && handleUpgrade(selectedCard)}
         onClose={() => setSelectedCard(null)}
       />

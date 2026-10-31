@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Star } from 'lucide-react';
 import SafeImage from '@/components/SafeImage';
 import VehicleStatIcon from '@/components/VehicleStatIcon';
 import { IMAGE_PATHS, resolveBrandLogo, resolveCardImage, resolveCountryFlag, resolveDrivetrainLayoutIcon } from '@/lib/images';
@@ -17,6 +17,9 @@ interface CardDetailsModalProps {
   ownedCount: number;
   upgradeLevel: number;
   upgradePending: boolean;
+  isFavorite: boolean;
+  favoritePending: boolean;
+  onToggleFavorite: () => void;
   onUpgrade: () => void;
   onClose: () => void;
 }
@@ -26,6 +29,9 @@ export default function CardDetailsModal({
   ownedCount,
   upgradeLevel,
   upgradePending,
+  isFavorite,
+  favoritePending,
+  onToggleFavorite,
   onUpgrade,
   onClose,
 }: CardDetailsModalProps) {
@@ -182,6 +188,19 @@ export default function CardDetailsModal({
                   <span>{ownedCount} {t(ownedCount > 1 ? 'exemplaires' : 'exemplaire')} {t(ownedCount > 1 ? 'possédés' : 'possédé')}</span>
                 </div>
               </div>
+
+              {ownedCount > 0 && (
+                <button
+                  type="button"
+                  disabled={favoritePending}
+                  aria-pressed={isFavorite}
+                  onClick={onToggleFavorite}
+                  className={`mb-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 disabled:opacity-50 ${isFavorite ? 'border-amber-400/60 bg-amber-400/15 text-amber-200' : 'border-white/15 bg-white/5 text-gray-200 hover:bg-white/10'}`}
+                >
+                  <Star size={18} fill={isFavorite ? 'currentColor' : 'none'} aria-hidden="true" />
+                  {favoritePending ? t('Enregistrement…') : isFavorite ? t('Retirer des favoris') : t('Ajouter aux favoris')}
+                </button>
+              )}
 
               {nextLevelUnlock && (
                 <section className="mb-6 rounded-xl border border-cyan-300/15 bg-cyan-300/[0.05] p-4">

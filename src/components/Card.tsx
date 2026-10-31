@@ -7,7 +7,7 @@ import VehicleStatIcon from './VehicleStatIcon';
 import { resolveCardImage, resolveBrandLogo, resolveCountryFlag, resolveDrivetrainLayoutIcon, IMAGE_PATHS } from '@/lib/images';
 import type { AnyCard } from '@/types/game';
 import { useRouter } from 'next/navigation';
-import { Wind, ArrowUpCircle, Compass, MoveRight } from 'lucide-react';
+import { Wind, ArrowUpCircle, Compass, MoveRight, ChevronRight, Star } from 'lucide-react';
 import { getRarityBorderClass } from '@/lib/rarity';
 import { calculateVehicleIP } from '@/lib/vehicleStats';
 import { formatDistance, formatPower, formatTorque, formatWeight } from '@/lib/preferences';
@@ -22,6 +22,7 @@ type CardProps = AnyCard & {
   compact?: boolean;
   /** Four-column phone collection: compact artwork + name, full detail on tap. */
   mobileGrid?: boolean;
+  isFavorite?: boolean;
   upgradeLevel?: number;
   upgradePrice?: number;
   upgradeAvailable?: boolean;
@@ -43,6 +44,7 @@ export default function Card(props: CardProps) {
     showLevel = true,
     compact = false,
     mobileGrid = false,
+    isFavorite = false,
     count = 0,
     upgradeLevel = 0,
     upgradePrice,
@@ -210,13 +212,17 @@ export default function Card(props: CardProps) {
 
         {/* IP Badge - Top Left */}
         {isVehicle && (ip > 0 || fuelType) && (
-          <div className={clsx("absolute top-3 left-3 z-20 flex origin-top-left flex-col items-start gap-1", mobileGrid && "hidden sm:flex")}>
+          <div className={clsx(
+              "absolute top-3 left-3 z-20 flex origin-top-left flex-col items-start gap-1",
+              mobileGrid && "left-0.5 top-0.5 scale-[0.62] sm:left-3 sm:top-3 sm:scale-100",
+              mobileGrid && ip <= 0 && "hidden sm:flex",
+            )}>
             {ip > 0 && <IPBadge value={ip} size="sm" />}
             {fuelType && (
               <span
                 aria-label={`Carburant : ${fuelType.label}`}
                 title={fuelType.label}
-                className="inline-flex min-w-8 items-center justify-center rounded-md border border-sky-200/75 bg-[#061a2e]/90 px-1.5 py-0.5 text-[10px] font-black leading-none tracking-wide text-white shadow-sm shadow-black/40"
+                className={clsx("inline-flex min-w-8 items-center justify-center rounded-md border border-sky-200/75 bg-[#061a2e]/90 px-1.5 py-0.5 text-[10px] font-black leading-none tracking-wide text-white shadow-sm shadow-black/40", mobileGrid && "hidden sm:inline-flex")}
               >
                 {fuelType.code}
               </span>
@@ -228,9 +234,9 @@ export default function Card(props: CardProps) {
             #{collectionNumber}
           </div>
         )}
-        {mobileGrid && owned && count > 0 && (
-          <span aria-label={t('{count} exemplaires', { count })} className="absolute right-1 top-1 z-20 rounded bg-black/85 px-1 py-0.5 text-[9px] font-bold tabular-nums text-white sm:hidden">
-            ×{count}
+        {mobileGrid && isFavorite && (
+          <span className="absolute right-1 top-1 z-20 rounded-full bg-black/75 p-0.5 text-amber-400 sm:hidden" aria-label={t('Favori')}>
+            <Star size={12} fill="currentColor" aria-hidden="true" />
           </span>
         )}
 
@@ -349,6 +355,40 @@ export default function Card(props: CardProps) {
           </div>
         )}
       </div>
+
+      {/* On phones, a separate collection badge shows copies and opens the level action. */}
+      {mobileGrid && (
+        <div className="flex min-h-9 w-full items-start justify-center sm:hidden">
+          {owned && count > 0 ? (
+            <button
+              type="button"
+              disabled={upgradePending}
+              onClick={(event) => {
+                event.stopPropagation();
+                if (isVehicle && upgradeAvailable && onUpgrade) onUpgrade();
+                else handleCardClick();
+              }}
+              aria-label={isVehicle
+                ? upgradeAvailable && onUpgrade && upgradePrice !== undefined
+                  ? `${count} ${t('Exemplaires')}, ${t('Niveau')} ${level}. ${t('Acheter le niveau {level} pour {price} AP', { level: level + 1, price: upgradePrice })}`
+                  : `${count} ${t('Exemplaires')}, ${t('Niveau')} ${level}. ${t('Voir les détails')}`
+                : `${count} ${t('Exemplaires')}. ${t('Voir les détails')}`}
+              className={clsx(
+                "flex min-h-8 w-full min-w-0 items-center justify-between gap-0.5 rounded-md border px-1 py-1 text-[10px] font-black tabular-nums transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:opacity-60",
+                isVehicle && upgradeAvailable && onUpgrade
+                  ? "border-cyan-400/70 bg-cyan-500/25 text-cyan-100"
+                  : "border-blue-500/25 bg-blue-600/20 text-blue-100",
+              )}
+            >
+              <span className="min-w-0 truncate">×{count}</span>
+              {isVehicle && <span className="shrink-0 text-[9px]">N{level}</span>}
+              {isVehicle && upgradeAvailable && onUpgrade
+                ? <ArrowUpCircle size={13} className="shrink-0 text-cyan-300" aria-hidden="true" />
+                : <ChevronRight size={12} className="shrink-0 text-blue-300" aria-hidden="true" />}
+            </button>
+          ) : <span className="min-h-8 w-full" aria-hidden="true" />}
+        </div>
+      )}
 
       {/* Discrete Level Below Card */}
       {showLevel && isVehicle && owned && (
