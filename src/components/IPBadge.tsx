@@ -1,5 +1,6 @@
-// Use a local/system font to keep the badge available even without Google Fonts at build time.
-const badgeFont = 'Arial, Helvetica, sans-serif';
+// Keep the original Exo styling, with a local fallback if the browser is offline.
+// Exo is loaded at runtime so next build does not need to fetch Google Fonts.
+const badgeFont = '"Exo", Arial, Helvetica, sans-serif';
 
 export default function IPBadge({ value, size = "md" }: { value: number, size?: "sm" | "md" | "lg" }) {
   // Compact scaling
