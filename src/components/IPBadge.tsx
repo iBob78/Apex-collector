@@ -1,6 +1,5 @@
-import { Exo } from 'next/font/google';
-
-const exo = Exo({ subsets: ['latin'], weight: ['700', '800', '900'] });
+// Use a local/system font to keep the badge available even without Google Fonts at build time.
+const badgeFont = 'Arial, Helvetica, sans-serif';
 
 export default function IPBadge({ value, size = "md" }: { value: number, size?: "sm" | "md" | "lg" }) {
   // Compact scaling
@@ -29,12 +28,12 @@ export default function IPBadge({ value, size = "md" }: { value: number, size?: 
 
         {/* Class label header */}
         <path d="M 2 23 L 48 23" stroke="white" strokeWidth="1" strokeOpacity="0.7" />
-        <text className={exo.className} x="25" y="19" textAnchor="middle" fill="#FFFFFF" fontSize="17" fontWeight="900" style={{ letterSpacing: '0.5px' }}>
+        <text fontFamily={badgeFont} x="25" y="19" textAnchor="middle" fill="#FFFFFF" fontSize="17" fontWeight="900" style={{ letterSpacing: '0.5px' }}>
           {ipClass}
         </text>
 
         {/* Value Display */}
-        <text className={exo.className} x="25" y="40" textAnchor="middle" fill="white" fontSize="16" fontWeight="700">
+        <text fontFamily={badgeFont} x="25" y="40" textAnchor="middle" fill="white" fontSize="16" fontWeight="700">
           {value}
         </text>
       </svg>
