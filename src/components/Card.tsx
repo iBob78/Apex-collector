@@ -118,7 +118,7 @@ export default function Card(props: CardProps) {
   };
 
   return (
-    <div className={clsx("flex w-full min-w-0 flex-col gap-2 group/card", mobileGrid && "gap-1 sm:gap-2", className)}>
+    <div className={clsx("flex w-full min-w-0 flex-col group/card", mobileGrid ? "gap-1 sm:gap-2" : "gap-2", className)}>
       <div
         className={clsx(
           "relative w-full min-w-0 cursor-pointer transition-all duration-300",
@@ -241,11 +241,11 @@ export default function Card(props: CardProps) {
         )}>
 
           {/* Title Section */}
-          <div className={clsx("min-w-0 w-full text-center", compact ? "mb-2" : "mb-3", mobileGrid && "mb-0 sm:mb-3")}>
-            <h3 className={clsx("font-bold text-white uppercase tracking-wider leading-tight", compact ? "text-sm" : "text-lg", mobileGrid && "truncate text-[9px] leading-tight tracking-normal sm:whitespace-normal sm:text-lg sm:tracking-wider")}>
+          <div className={clsx("min-w-0 w-full text-center", mobileGrid ? "mb-0 sm:mb-3" : compact ? "mb-2" : "mb-3")}>
+            <h3 className={clsx("font-bold text-white uppercase leading-tight", mobileGrid ? "truncate text-[9px] tracking-normal sm:whitespace-normal sm:text-lg sm:tracking-wider" : compact ? "text-sm tracking-wider" : "text-lg tracking-wider")}>
               {isVehicle ? (props as any).make : (props as any).name}
             </h3>
-            <p className={clsx("text-gray-300 font-medium tracking-wide", compact ? "text-[10px]" : "text-xs", mobileGrid && "truncate text-[8px] tracking-normal sm:whitespace-normal sm:text-xs sm:tracking-wide")}>
+            <p className={clsx("text-gray-300 font-medium", mobileGrid ? "truncate text-[8px] tracking-normal sm:whitespace-normal sm:text-xs sm:tracking-wide" : compact ? "text-[10px] tracking-wide" : "text-xs tracking-wide")}>
               {isVehicle ? (
                 <>
                   {(props as any).model} · {(props as any).year}
