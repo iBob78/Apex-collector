@@ -20,7 +20,7 @@ type CardProps = AnyCard & {
   count?: number;
   showLevel?: boolean;
   compact?: boolean;
-  /** Four-column phone collection: compact artwork + name, full detail on tap. */
+  /** Four-column phone collection with all original card information. */
   mobileGrid?: boolean;
   isFavorite?: boolean;
   upgradeLevel?: number;
@@ -78,8 +78,8 @@ export default function Card(props: CardProps) {
   const hasCollectionNumber = isVehicle && Number.isFinite(collectionNumber) && collectionNumber > 0;
   const contentPadding = mobileGrid
     ? hasCollectionNumber
-      ? 'p-1 pb-1.5 sm:p-4 sm:pb-10'
-      : 'p-1 pb-1.5 sm:p-4'
+      ? 'px-0.5 pb-2.5 pt-0.5 sm:p-4 sm:pb-10'
+      : 'px-0.5 pb-2 pt-0.5 sm:p-4'
     : compact
       ? hasCollectionNumber ? 'p-2 pb-7' : 'p-2'
       : hasCollectionNumber ? 'p-4 pb-10' : 'p-4';
@@ -174,9 +174,9 @@ export default function Card(props: CardProps) {
 
         {/* Top Right Logo / Flag */}
         {isVehicle && ((props as any).make || vehicleFlag) && (
-          <div className={clsx("absolute top-3 right-3 z-10 flex flex-col items-center gap-1", mobileGrid && "hidden sm:flex")}>
+          <div className={clsx("absolute top-3 right-3 z-10 flex flex-col items-center gap-1", mobileGrid && "right-0.5 top-0.5 gap-0 sm:right-3 sm:top-3 sm:gap-1")}>
             {(props as any).make && (
-              <div className="relative h-7 w-7">
+              <div className={clsx("relative h-7 w-7", mobileGrid && "h-3.5 w-3.5 sm:h-7 sm:w-7")}>
                 <SafeImage
                   src={resolveBrandLogo((props as any).make)}
                   alt={(props as any).make}
@@ -186,7 +186,7 @@ export default function Card(props: CardProps) {
               </div>
             )}
             {vehicleFlag && (
-              <div className="relative h-[11px] w-4 overflow-hidden rounded-[1px] border border-white/30 bg-black/40">
+              <div className={clsx("relative h-[11px] w-4 overflow-hidden rounded-[1px] border border-white/30 bg-black/40", mobileGrid && "h-[7px] w-3 sm:h-[11px] sm:w-4")}>
                 <SafeImage
                   src={vehicleFlag}
                   alt={vehicleCountry}
@@ -200,7 +200,7 @@ export default function Card(props: CardProps) {
         )}
 
         {isCircuit && ((props as any).country_code || (props as any).country) && (
-          <div className={clsx("absolute top-3 right-3 z-10 w-8 h-8 bg-black/40 backdrop-blur-sm rounded-full overflow-hidden border border-white/10", mobileGrid && "hidden sm:block")}>
+          <div className={clsx("absolute top-3 right-3 z-10 w-8 h-8 bg-black/40 backdrop-blur-sm rounded-full overflow-hidden border border-white/10", mobileGrid && "right-0.5 top-0.5 h-4 w-4 sm:right-3 sm:top-3 sm:h-8 sm:w-8")}>
             <SafeImage
               src={resolveCountryFlag((props as any).country_code || (props as any).country)}
               alt={(props as any).country || 'Circuit'}
@@ -222,7 +222,7 @@ export default function Card(props: CardProps) {
               <span
                 aria-label={`Carburant : ${fuelType.label}`}
                 title={fuelType.label}
-                className={clsx("inline-flex min-w-8 items-center justify-center rounded-md border border-sky-200/75 bg-[#061a2e]/90 px-1.5 py-0.5 text-[10px] font-black leading-none tracking-wide text-white shadow-sm shadow-black/40", mobileGrid && "hidden sm:inline-flex")}
+                className={clsx("inline-flex min-w-8 items-center justify-center rounded-md border border-sky-200/75 bg-[#061a2e]/90 px-1.5 py-0.5 text-[10px] font-black leading-none tracking-wide text-white shadow-sm shadow-black/40", mobileGrid && "min-w-0 rounded-sm px-0.5 py-0 text-[8px] sm:min-w-8 sm:rounded-md sm:px-1.5 sm:py-0.5 sm:text-[10px]")}
               >
                 {fuelType.code}
               </span>
@@ -230,12 +230,12 @@ export default function Card(props: CardProps) {
           </div>
         )}
         {hasCollectionNumber && (
-          <div className={clsx("absolute bottom-2 left-2 z-20 rounded-md border border-white/15 bg-black/70 px-1.5 py-0.5 text-[9px] font-bold tabular-nums text-white/90", mobileGrid && "hidden sm:block")}>
+          <div className={clsx("absolute bottom-2 left-2 z-20 rounded-md border border-white/15 bg-black/70 px-1.5 py-0.5 text-[9px] font-bold tabular-nums text-white/90", mobileGrid && "bottom-0.5 left-0.5 px-0.5 py-0 text-[6px] sm:bottom-2 sm:left-2 sm:px-1.5 sm:py-0.5 sm:text-[9px]")}>
             #{collectionNumber}
           </div>
         )}
         {mobileGrid && isFavorite && (
-          <span className="absolute right-1 top-1 z-20 rounded-full bg-black/75 p-0.5 text-amber-400 sm:hidden" aria-label={t('Favori')}>
+          <span className="absolute left-1/2 top-0.5 z-20 -translate-x-1/2 rounded-full bg-black/75 p-0.5 text-amber-400 sm:hidden" aria-label={t('Favori')}>
             <Star size={12} fill="currentColor" aria-hidden="true" />
           </span>
         )}
@@ -248,10 +248,10 @@ export default function Card(props: CardProps) {
 
           {/* Title Section */}
           <div className={clsx("min-w-0 w-full text-center", mobileGrid ? "mb-0 sm:mb-3" : compact ? "mb-2" : "mb-3")}>
-            <h3 className={clsx("font-bold text-white uppercase leading-tight", mobileGrid ? "truncate text-[9px] tracking-normal sm:whitespace-normal sm:text-lg sm:tracking-wider" : compact ? "text-sm tracking-wider" : "text-lg tracking-wider")}>
+            <h3 className={clsx("font-bold text-white uppercase leading-tight", mobileGrid ? "line-clamp-2 text-[8px] leading-[9px] tracking-normal sm:line-clamp-none sm:text-lg sm:leading-tight sm:tracking-wider" : compact ? "text-sm tracking-wider" : "text-lg tracking-wider")}>
               {isVehicle ? (props as any).make : (props as any).name}
             </h3>
-            <p className={clsx("text-gray-300 font-medium", mobileGrid ? "truncate text-[8px] tracking-normal sm:whitespace-normal sm:text-xs sm:tracking-wide" : compact ? "text-[10px] tracking-wide" : "text-xs tracking-wide")}>
+            <p className={clsx("text-gray-300 font-medium", mobileGrid ? "truncate text-[7px] leading-[8px] tracking-normal sm:whitespace-normal sm:text-xs sm:leading-normal sm:tracking-wide" : compact ? "text-[10px] tracking-wide" : "text-xs tracking-wide")}>
               {isVehicle ? (
                 <>
                   {(props as any).model} · {(props as any).year}
@@ -262,46 +262,51 @@ export default function Card(props: CardProps) {
 
           {/* Vehicle stats */}
           {isVehicle && (
-            <div className={clsx(mobileGrid ? "hidden sm:grid" : "grid", "grid-cols-2 gap-x-1.5 gap-y-1 text-center text-gray-200 w-full", compact ? "mb-1.5 px-0" : "mb-2 px-2")}>
+            <div className={clsx(
+              "grid w-full grid-cols-2 text-center text-gray-200",
+              mobileGrid
+                ? "mb-0 gap-x-0 gap-y-0.5 px-0 [&_svg]:h-2 [&_svg]:w-2 sm:mb-2 sm:gap-x-1.5 sm:gap-y-1 sm:px-2 sm:[&_svg]:h-4 sm:[&_svg]:w-4"
+                : compact ? "mb-1.5 gap-x-1.5 gap-y-1 px-0" : "mb-2 gap-x-1.5 gap-y-1 px-2",
+            )}>
               <div className="min-w-0">
-                <div className="flex items-center justify-center gap-1">
+                <div className={clsx("flex items-center justify-center gap-1", mobileGrid && "gap-0 sm:gap-1")}>
                   <VehicleStatIcon kind="engine" />
                   <div className="min-w-0 text-left">
-                    <p className="text-[8px] font-medium uppercase tracking-wide text-gray-400">{t('Puissance')}</p>
-                    <p className={clsx("font-semibold", compact ? "text-[9px]" : "text-[11px]")}>
+                    <p className={clsx("text-[8px] font-medium uppercase tracking-wide text-gray-400", mobileGrid && "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide")}>{t('Puissance')}</p>
+                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatPower(power_hp, units, language, Number((props as any).power_kw) || undefined)}
                     </p>
                   </div>
                 </div>
               </div>
               <div className="min-w-0">
-                <div className="flex items-center justify-center gap-1">
+                <div className={clsx("flex items-center justify-center gap-1", mobileGrid && "gap-0 sm:gap-1")}>
                   <VehicleStatIcon kind="torque" />
                   <div className="min-w-0 text-left">
-                    <p className="text-[8px] font-medium uppercase tracking-wide text-gray-400">{t('Couple')}</p>
-                    <p className={clsx("font-semibold", compact ? "text-[9px]" : "text-[11px]")}>
+                    <p className={clsx("text-[8px] font-medium uppercase tracking-wide text-gray-400", mobileGrid && "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide")}>{t('Couple')}</p>
+                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatTorque(torque_nm, units, language)}
                     </p>
                   </div>
                 </div>
               </div>
               <div className="min-w-0">
-                <div className="flex items-center justify-center gap-1">
+                <div className={clsx("flex items-center justify-center gap-1", mobileGrid && "gap-0 sm:gap-1")}>
                   <VehicleStatIcon kind="acceleration" />
                   <div className="min-w-0 text-left">
-                    <p className="text-[8px] font-medium uppercase tracking-wide text-gray-400">{t('0 à 100 km/h')}</p>
-                    <p className={clsx("font-semibold", compact ? "text-[9px]" : "text-[11px]")}>
+                    <p className={clsx("text-[8px] font-medium uppercase tracking-wide text-gray-400", mobileGrid && "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide")}>{t('0 à 100 km/h')}</p>
+                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
                       {acceleration !== null && acceleration !== undefined ? `${acceleration} s` : '—'}
                     </p>
                   </div>
                 </div>
               </div>
               <div className="min-w-0">
-                <div className="flex items-center justify-center gap-1">
+                <div className={clsx("flex items-center justify-center gap-1", mobileGrid && "gap-0 sm:gap-1")}>
                   <VehicleStatIcon kind="weight" />
                   <div className="min-w-0 text-left">
-                    <p className="text-[8px] font-medium uppercase tracking-wide text-gray-400">{t('Poids')}</p>
-                    <p className={clsx("font-semibold", compact ? "text-[9px]" : "text-[11px]")}>
+                    <p className={clsx("text-[8px] font-medium uppercase tracking-wide text-gray-400", mobileGrid && "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide")}>{t('Poids')}</p>
+                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatWeight(rawWeight, units, language)}
                     </p>
                   </div>
@@ -312,20 +317,25 @@ export default function Card(props: CardProps) {
 
           {/* Stats Grid 2x2 for Circuits */}
           {isCircuit && (
-            <div className={clsx(mobileGrid ? "hidden sm:grid" : "grid", "grid-cols-2 gap-y-2 font-semibold text-gray-200 w-full", compact ? "gap-x-1 text-[10px] mb-2 px-0" : "gap-x-6 text-xs mb-3 px-2")}>
-              <div className="flex items-center gap-1.5 justify-end">
+            <div className={clsx(
+              "grid w-full grid-cols-2 font-semibold text-gray-200",
+              mobileGrid
+                ? "mb-0 gap-x-0 gap-y-0.5 px-0 text-[6px] leading-[8px] [&_svg]:h-2 [&_svg]:w-2 sm:mb-3 sm:gap-x-6 sm:gap-y-2 sm:px-2 sm:text-xs sm:leading-normal sm:[&_svg]:h-[14px] sm:[&_svg]:w-[14px]"
+                : compact ? "mb-2 gap-x-1 gap-y-2 px-0 text-[10px]" : "mb-3 gap-x-6 gap-y-2 px-2 text-xs",
+            )}>
+              <div className="flex items-center gap-0.5 sm:gap-1.5 justify-end">
                 <MoveRight size={14} className="text-blue-400" />
                 <span>{formatDistance(Number(length_km) || 0, units, language)}</span>
               </div>
-              <div className="flex items-center gap-1.5 justify-start">
+              <div className="flex items-center gap-0.5 sm:gap-1.5 justify-start">
                 <Compass size={14} className="text-green-400" />
                 <span>{turns} {t('virages')}</span>
               </div>
-              <div className="flex items-center gap-1.5 justify-end">
+              <div className="flex items-center gap-0.5 sm:gap-1.5 justify-end">
                 <ArrowUpCircle size={14} className="text-yellow-400" />
                 <span>{formatDistance(Number(straight_km) || 0, units, language)} {t('ligne')}</span>
               </div>
-              <div className="flex items-center gap-1.5 justify-start">
+              <div className="flex items-center gap-0.5 sm:gap-1.5 justify-start">
                 <Wind size={14} className="text-orange-400" />
                 <span>{circuit_type}</span>
               </div>
@@ -335,7 +345,7 @@ export default function Card(props: CardProps) {
         </div>
         {isVehicle && drivetrainLayoutIcon && (
           <div
-            className={clsx("absolute bottom-2 right-2 z-20 cursor-help", mobileGrid && "hidden sm:block")}
+            className={clsx("absolute bottom-2 right-2 z-20 cursor-help", mobileGrid && "bottom-0.5 right-0.5 sm:bottom-2 sm:right-2")}
             title={drivetrainLayoutDescription
               ? `${drivetrainLayout}: ${drivetrainLayoutDescription}`
               : `Configuration moteur et transmission ${drivetrainLayout}`}
@@ -350,7 +360,7 @@ export default function Card(props: CardProps) {
               width={compact ? 54 : 68}
               height={compact ? 28 : 36}
               showPlaceholderOnError={false}
-              className={clsx("h-auto drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]", compact ? "w-[54px]" : "w-[68px]")}
+              className={clsx("h-auto drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]", mobileGrid ? "w-4 sm:w-[68px]" : compact ? "w-[54px]" : "w-[68px]")}
             />
           </div>
         )}
@@ -374,17 +384,17 @@ export default function Card(props: CardProps) {
                   : `${count} ${t('Exemplaires')}, ${t('Niveau')} ${level}. ${t('Voir les détails')}`
                 : `${count} ${t('Exemplaires')}. ${t('Voir les détails')}`}
               className={clsx(
-                "flex min-h-8 w-full min-w-0 items-center justify-between gap-0.5 rounded-md border px-1 py-1 text-[10px] font-black tabular-nums transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:opacity-60",
+                "flex min-h-8 w-full min-w-0 items-center justify-between gap-0.5 rounded-md border px-0.5 py-1 text-[9px] font-black tabular-nums transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:opacity-60",
                 isVehicle && upgradeAvailable && onUpgrade
                   ? "border-cyan-400/70 bg-cyan-500/25 text-cyan-100"
                   : "border-blue-500/25 bg-blue-600/20 text-blue-100",
               )}
             >
               <span className="min-w-0 truncate">×{count}</span>
-              {isVehicle && <span className="shrink-0 text-[9px]">N{level}</span>}
+              {isVehicle && <span className="shrink-0 text-[8px] leading-tight">{t('Niveau')} {level}</span>}
               {isVehicle && upgradeAvailable && onUpgrade
-                ? <ArrowUpCircle size={13} className="shrink-0 text-cyan-300" aria-hidden="true" />
-                : <ChevronRight size={12} className="shrink-0 text-blue-300" aria-hidden="true" />}
+                ? <ArrowUpCircle size={10} className="shrink-0 text-cyan-300" aria-hidden="true" />
+                : <ChevronRight size={10} className="shrink-0 text-blue-300" aria-hidden="true" />}
             </button>
           ) : <span className="min-h-8 w-full" aria-hidden="true" />}
         </div>
