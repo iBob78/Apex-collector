@@ -12,9 +12,13 @@ CREATE INDEX IF NOT EXISTS card_favorites_recent_idx
 
 ALTER TABLE public.card_favorites ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Players read own favorites" ON public.card_favorites;
+
 CREATE POLICY "Players read own favorites"
   ON public.card_favorites FOR SELECT TO authenticated
   USING ((select auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "Players favorite only owned cards" ON public.card_favorites;
 
 CREATE POLICY "Players favorite only owned cards"
   ON public.card_favorites FOR INSERT TO authenticated
@@ -36,6 +40,8 @@ CREATE POLICY "Players favorite only owned cards"
       ))
     )
   );
+
+DROP POLICY IF EXISTS "Players remove own favorites" ON public.card_favorites;
 
 CREATE POLICY "Players remove own favorites"
   ON public.card_favorites FOR DELETE TO authenticated
