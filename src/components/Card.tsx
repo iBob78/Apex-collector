@@ -174,7 +174,7 @@ export default function Card(props: CardProps) {
 
         {/* Top Right Logo / Flag */}
         {isVehicle && ((props as any).make || vehicleFlag) && (
-          <div className={clsx("absolute z-10 flex flex-col items-center", mobileGrid ? "right-0.5 top-0.5 gap-0 sm:right-3 sm:top-3 sm:gap-1" : "right-3 top-3 gap-1")}>
+          <div className={clsx("absolute z-10 flex flex-col items-center", mobileGrid ? "right-0.5 top-0.5 gap-0.5 sm:right-3 sm:top-3 sm:gap-1" : "right-3 top-3 gap-1")}>
             {(props as any).make && (
               <div className={clsx("relative", mobileGrid ? "h-3.5 w-3.5 sm:h-7 sm:w-7" : "h-7 w-7")}>
                 <SafeImage
@@ -272,7 +272,7 @@ export default function Card(props: CardProps) {
                 <div className={clsx("flex items-center justify-center", mobileGrid ? "gap-0 sm:gap-1" : "gap-1")}>
                   <VehicleStatIcon kind="engine" />
                   <div className="min-w-0 text-left">
-                    <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Puissance')}</p>
+                    <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Puissance')}</p>
                     <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatPower(power_hp, units, language, Number((props as any).power_kw) || undefined)}
                     </p>
@@ -283,7 +283,7 @@ export default function Card(props: CardProps) {
                 <div className={clsx("flex items-center justify-center", mobileGrid ? "gap-0 sm:gap-1" : "gap-1")}>
                   <VehicleStatIcon kind="torque" />
                   <div className="min-w-0 text-left">
-                    <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Couple')}</p>
+                    <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Couple')}</p>
                     <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatTorque(torque_nm, units, language)}
                     </p>
@@ -294,7 +294,7 @@ export default function Card(props: CardProps) {
                 <div className={clsx("flex items-center justify-center", mobileGrid ? "gap-0 sm:gap-1" : "gap-1")}>
                   <VehicleStatIcon kind="acceleration" />
                   <div className="min-w-0 text-left">
-                    <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('0 à 100 km/h')}</p>
+                    <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('0 à 100 km/h')}</p>
                     <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
                       {acceleration !== null && acceleration !== undefined ? `${acceleration} s` : '—'}
                     </p>
@@ -305,7 +305,7 @@ export default function Card(props: CardProps) {
                 <div className={clsx("flex items-center justify-center", mobileGrid ? "gap-0 sm:gap-1" : "gap-1")}>
                   <VehicleStatIcon kind="weight" />
                   <div className="min-w-0 text-left">
-                    <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Poids')}</p>
+                    <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Poids')}</p>
                     <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatWeight(rawWeight, units, language)}
                     </p>
@@ -368,7 +368,7 @@ export default function Card(props: CardProps) {
 
       {/* On phones, a separate collection badge shows copies and opens the level action. */}
       {mobileGrid && (
-        <div className="flex min-h-9 w-full items-start justify-center sm:hidden">
+        <div className="flex min-h-[25px] w-full items-start justify-center sm:hidden">
           {owned && count > 0 ? (
             <button
               type="button"
@@ -384,7 +384,7 @@ export default function Card(props: CardProps) {
                   : `${count} ${t('Exemplaires')}, ${t('Niveau')} ${level}. ${t('Voir les détails')}`
                 : `${count} ${t('Exemplaires')}. ${t('Voir les détails')}`}
               className={clsx(
-                "flex min-h-8 w-full min-w-0 items-center justify-between gap-0.5 rounded-md border px-0.5 py-1 text-[9px] font-black tabular-nums transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:opacity-60",
+                "flex h-[23px] w-full min-w-0 items-center justify-between gap-0.5 rounded-md border px-0.5 py-0 text-[9px] font-black tabular-nums transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:opacity-60",
                 isVehicle && upgradeAvailable && onUpgrade
                   ? "border-cyan-400/70 bg-cyan-500/25 text-cyan-100"
                   : "border-blue-500/25 bg-blue-600/20 text-blue-100",
@@ -396,7 +396,7 @@ export default function Card(props: CardProps) {
                 ? <ArrowUpCircle size={10} className="shrink-0 text-cyan-300" aria-hidden="true" />
                 : <ChevronRight size={10} className="shrink-0 text-blue-300" aria-hidden="true" />}
             </button>
-          ) : <span className="min-h-8 w-full" aria-hidden="true" />}
+          ) : <span className="h-[23px] w-full" aria-hidden="true" />}
         </div>
       )}
 
