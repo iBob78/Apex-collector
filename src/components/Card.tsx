@@ -270,7 +270,7 @@ export default function Card(props: CardProps) {
                 : compact ? "mb-1.5 gap-x-1.5 gap-y-1 px-0" : "mb-2 gap-x-1.5 gap-y-1 px-2",
             )}>
               <div className="min-w-0">
-                <div className={clsx("flex items-center", mobileGrid ? "translate-x-[3px] justify-end gap-0.5 sm:translate-x-0 sm:justify-center sm:gap-1" : "justify-center gap-1")}>
+                <div className={clsx("flex items-center", mobileGrid ? "translate-x-px justify-end gap-0.5 sm:translate-x-0 sm:justify-center sm:gap-1" : "justify-center gap-1")}>
                   <VehicleStatIcon kind="engine" />
                   <div className="min-w-0 text-left">
                     <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Puissance')}</p>
@@ -292,7 +292,7 @@ export default function Card(props: CardProps) {
                 </div>
               </div>
               <div className="min-w-0">
-                <div className={clsx("flex items-center", mobileGrid ? "translate-x-[3px] justify-end gap-0.5 sm:translate-x-0 sm:justify-center sm:gap-1" : "justify-center gap-1")}>
+                <div className={clsx("flex items-center", mobileGrid ? "justify-end gap-0.5 sm:justify-center sm:gap-1" : "justify-center gap-1")}>
                   <VehicleStatIcon kind="acceleration" />
                   <div className="min-w-0 text-left">
                     <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('0 à 100 km/h')}</p>
