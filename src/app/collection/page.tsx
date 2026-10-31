@@ -329,7 +329,7 @@ export default function CollectionPage() {
               {filteredCards.length > 0 ? (
                 <motion.div
                   layout
-                  className="grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(min(100%,14rem),1fr))] sm:gap-6"
+                  className="grid grid-cols-4 gap-1.5 sm:grid-cols-[repeat(auto-fill,minmax(min(100%,14rem),1fr))] sm:gap-6"
                 >
                   {filteredCards.slice(0, visibleCount).map((card) => {
                     const cid = String((card as any).card_id || card.id).toLowerCase().trim();
@@ -348,6 +348,7 @@ export default function CollectionPage() {
                       >
                         <Card
                           {...card}
+                          mobileGrid
                           owned={c > 0}
                           count={c}
                           upgradeLevel={currentLevel}

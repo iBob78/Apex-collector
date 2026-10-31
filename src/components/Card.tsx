@@ -20,6 +20,8 @@ type CardProps = AnyCard & {
   count?: number;
   showLevel?: boolean;
   compact?: boolean;
+  /** Four-column phone collection: compact artwork + name, full detail on tap. */
+  mobileGrid?: boolean;
   upgradeLevel?: number;
   upgradePrice?: number;
   upgradeAvailable?: boolean;
@@ -40,6 +42,8 @@ export default function Card(props: CardProps) {
     owned = true,
     showLevel = true,
     compact = false,
+    mobileGrid = false,
+    count = 0,
     upgradeLevel = 0,
     upgradePrice,
     upgradeAvailable = false,
@@ -70,9 +74,13 @@ export default function Card(props: CardProps) {
   const rawWeight = isVehicle ? Number((props as any).weight_t) || 0 : 0;
   const collectionNumber = Number((props as any).collection_number);
   const hasCollectionNumber = isVehicle && Number.isFinite(collectionNumber) && collectionNumber > 0;
-  const contentPadding = compact
-    ? hasCollectionNumber ? 'p-2 pb-7' : 'p-2'
-    : hasCollectionNumber ? 'p-4 pb-10' : 'p-4';
+  const contentPadding = mobileGrid
+    ? hasCollectionNumber
+      ? 'p-1 pb-1.5 sm:p-4 sm:pb-10'
+      : 'p-1 pb-1.5 sm:p-4'
+    : compact
+      ? hasCollectionNumber ? 'p-2 pb-7' : 'p-2'
+      : hasCollectionNumber ? 'p-4 pb-10' : 'p-4';
   const level = Math.max(0, Math.min(9, Math.floor(Number(upgradeLevel) || 0)));
   const levelEffectClass = level >= 2 ? `card-upgrade-effect-${level}` : null;
   const drivetrainLayout = isVehicle ? (props as any).transmission : undefined;
@@ -110,12 +118,12 @@ export default function Card(props: CardProps) {
   };
 
   return (
-    <div className={clsx("flex w-full min-w-0 flex-col gap-2 group/card", className)}>
+    <div className={clsx("flex w-full min-w-0 flex-col gap-2 group/card", mobileGrid && "gap-1 sm:gap-2", className)}>
       <div
         className={clsx(
           "relative w-full min-w-0 cursor-pointer transition-all duration-300",
           "aspect-[2/3] rounded-xl overflow-hidden bg-[#0a0a0a]",
-          "border-[3px] shadow-[0_12px_30px_rgba(0,0,0,0.35)]",
+          mobileGrid ? "border-2 sm:border-[3px] shadow-[0_6px_16px_rgba(0,0,0,0.35)] sm:shadow-[0_12px_30px_rgba(0,0,0,0.35)]" : "border-[3px] shadow-[0_12px_30px_rgba(0,0,0,0.35)]",
           getRarityBorderClass(rarity),
           !owned && "grayscale opacity-60 hover:grayscale-0 hover:opacity-100"
         )}
@@ -164,7 +172,7 @@ export default function Card(props: CardProps) {
 
         {/* Top Right Logo / Flag */}
         {isVehicle && ((props as any).make || vehicleFlag) && (
-          <div className="absolute top-3 right-3 z-10 flex flex-col items-center gap-1">
+          <div className={clsx("absolute top-3 right-3 z-10 flex flex-col items-center gap-1", mobileGrid && "hidden sm:flex")}>
             {(props as any).make && (
               <div className="relative h-7 w-7">
                 <SafeImage
@@ -190,7 +198,7 @@ export default function Card(props: CardProps) {
         )}
 
         {isCircuit && ((props as any).country_code || (props as any).country) && (
-          <div className="absolute top-3 right-3 z-10 w-8 h-8 bg-black/40 backdrop-blur-sm rounded-full overflow-hidden border border-white/10">
+          <div className={clsx("absolute top-3 right-3 z-10 w-8 h-8 bg-black/40 backdrop-blur-sm rounded-full overflow-hidden border border-white/10", mobileGrid && "hidden sm:block")}>
             <SafeImage
               src={resolveCountryFlag((props as any).country_code || (props as any).country)}
               alt={(props as any).country || 'Circuit'}
@@ -202,7 +210,7 @@ export default function Card(props: CardProps) {
 
         {/* IP Badge - Top Left */}
         {isVehicle && (ip > 0 || fuelType) && (
-          <div className="absolute top-3 left-3 z-20 flex origin-top-left flex-col items-start gap-1">
+          <div className={clsx("absolute top-3 left-3 z-20 flex origin-top-left flex-col items-start gap-1", mobileGrid && "hidden sm:flex")}>
             {ip > 0 && <IPBadge value={ip} size="sm" />}
             {fuelType && (
               <span
@@ -216,10 +224,16 @@ export default function Card(props: CardProps) {
           </div>
         )}
         {hasCollectionNumber && (
-          <div className="absolute bottom-2 left-2 z-20 rounded-md border border-white/15 bg-black/70 px-1.5 py-0.5 text-[9px] font-bold tabular-nums text-white/90">
+          <div className={clsx("absolute bottom-2 left-2 z-20 rounded-md border border-white/15 bg-black/70 px-1.5 py-0.5 text-[9px] font-bold tabular-nums text-white/90", mobileGrid && "hidden sm:block")}>
             #{collectionNumber}
           </div>
         )}
+        {mobileGrid && owned && count > 0 && (
+          <span aria-label={t('{count} exemplaires', { count })} className="absolute right-1 top-1 z-20 rounded bg-black/85 px-1 py-0.5 text-[9px] font-bold tabular-nums text-white sm:hidden">
+            ×{count}
+          </span>
+        )}
+
         {/* Content Container */}
         <div className={clsx(
           "absolute bottom-0 inset-x-0 z-10 flex flex-col items-center",
@@ -227,11 +241,11 @@ export default function Card(props: CardProps) {
         )}>
 
           {/* Title Section */}
-          <div className={clsx("text-center", compact ? "mb-2" : "mb-3")}>
-            <h3 className={clsx("font-bold text-white uppercase tracking-wider leading-tight", compact ? "text-sm" : "text-lg")}>
+          <div className={clsx("min-w-0 w-full text-center", compact ? "mb-2" : "mb-3", mobileGrid && "mb-0 sm:mb-3")}>
+            <h3 className={clsx("font-bold text-white uppercase tracking-wider leading-tight", compact ? "text-sm" : "text-lg", mobileGrid && "truncate text-[9px] leading-tight tracking-normal sm:whitespace-normal sm:text-lg sm:tracking-wider")}>
               {isVehicle ? (props as any).make : (props as any).name}
             </h3>
-            <p className={clsx("text-gray-300 font-medium tracking-wide", compact ? "text-[10px]" : "text-xs")}>
+            <p className={clsx("text-gray-300 font-medium tracking-wide", compact ? "text-[10px]" : "text-xs", mobileGrid && "truncate text-[8px] tracking-normal sm:whitespace-normal sm:text-xs sm:tracking-wide")}>
               {isVehicle ? (
                 <>
                   {(props as any).model} · {(props as any).year}
@@ -242,7 +256,7 @@ export default function Card(props: CardProps) {
 
           {/* Vehicle stats */}
           {isVehicle && (
-            <div className={clsx("grid grid-cols-2 gap-x-1.5 gap-y-1 text-center text-gray-200 w-full", compact ? "mb-1.5 px-0" : "mb-2 px-2")}>
+            <div className={clsx(mobileGrid ? "hidden sm:grid" : "grid", "grid-cols-2 gap-x-1.5 gap-y-1 text-center text-gray-200 w-full", compact ? "mb-1.5 px-0" : "mb-2 px-2")}>
               <div className="min-w-0">
                 <div className="flex items-center justify-center gap-1">
                   <VehicleStatIcon kind="engine" />
@@ -292,7 +306,7 @@ export default function Card(props: CardProps) {
 
           {/* Stats Grid 2x2 for Circuits */}
           {isCircuit && (
-            <div className={clsx("grid grid-cols-2 gap-y-2 font-semibold text-gray-200 w-full", compact ? "gap-x-1 text-[10px] mb-2 px-0" : "gap-x-6 text-xs mb-3 px-2")}>
+            <div className={clsx(mobileGrid ? "hidden sm:grid" : "grid", "grid-cols-2 gap-y-2 font-semibold text-gray-200 w-full", compact ? "gap-x-1 text-[10px] mb-2 px-0" : "gap-x-6 text-xs mb-3 px-2")}>
               <div className="flex items-center gap-1.5 justify-end">
                 <MoveRight size={14} className="text-blue-400" />
                 <span>{formatDistance(Number(length_km) || 0, units, language)}</span>
@@ -315,7 +329,7 @@ export default function Card(props: CardProps) {
         </div>
         {isVehicle && drivetrainLayoutIcon && (
           <div
-            className="absolute bottom-2 right-2 z-20 cursor-help"
+            className={clsx("absolute bottom-2 right-2 z-20 cursor-help", mobileGrid && "hidden sm:block")}
             title={drivetrainLayoutDescription
               ? `${drivetrainLayout}: ${drivetrainLayoutDescription}`
               : `Configuration moteur et transmission ${drivetrainLayout}`}
@@ -338,7 +352,7 @@ export default function Card(props: CardProps) {
 
       {/* Discrete Level Below Card */}
       {showLevel && isVehicle && owned && (
-        <div className="flex items-center gap-2">
+        <div className={clsx("items-center gap-2", mobileGrid ? "hidden sm:flex" : "flex")}>
           {upgradeAvailable && upgradePrice !== undefined && onUpgrade ? (
             <button
               type="button"
