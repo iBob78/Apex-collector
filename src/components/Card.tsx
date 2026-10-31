@@ -174,9 +174,9 @@ export default function Card(props: CardProps) {
 
         {/* Top Right Logo / Flag */}
         {isVehicle && ((props as any).make || vehicleFlag) && (
-          <div className={clsx("absolute top-3 right-3 z-10 flex flex-col items-center gap-1", mobileGrid && "right-0.5 top-0.5 gap-0 sm:right-3 sm:top-3 sm:gap-1")}>
+          <div className={clsx("absolute z-10 flex flex-col items-center", mobileGrid ? "right-0.5 top-0.5 gap-0 sm:right-3 sm:top-3 sm:gap-1" : "right-3 top-3 gap-1")}>
             {(props as any).make && (
-              <div className={clsx("relative h-7 w-7", mobileGrid && "h-3.5 w-3.5 sm:h-7 sm:w-7")}>
+              <div className={clsx("relative", mobileGrid ? "h-3.5 w-3.5 sm:h-7 sm:w-7" : "h-7 w-7")}>
                 <SafeImage
                   src={resolveBrandLogo((props as any).make)}
                   alt={(props as any).make}
@@ -186,7 +186,7 @@ export default function Card(props: CardProps) {
               </div>
             )}
             {vehicleFlag && (
-              <div className={clsx("relative h-[11px] w-4 overflow-hidden rounded-[1px] border border-white/30 bg-black/40", mobileGrid && "h-[7px] w-3 sm:h-[11px] sm:w-4")}>
+              <div className={clsx("relative overflow-hidden rounded-[1px] border border-white/30 bg-black/40", mobileGrid ? "h-[7px] w-3 sm:h-[11px] sm:w-4" : "h-[11px] w-4")}>
                 <SafeImage
                   src={vehicleFlag}
                   alt={vehicleCountry}
@@ -200,7 +200,7 @@ export default function Card(props: CardProps) {
         )}
 
         {isCircuit && ((props as any).country_code || (props as any).country) && (
-          <div className={clsx("absolute top-3 right-3 z-10 w-8 h-8 bg-black/40 backdrop-blur-sm rounded-full overflow-hidden border border-white/10", mobileGrid && "right-0.5 top-0.5 h-4 w-4 sm:right-3 sm:top-3 sm:h-8 sm:w-8")}>
+          <div className={clsx("absolute z-10 bg-black/40 backdrop-blur-sm rounded-full overflow-hidden border border-white/10", mobileGrid ? "right-0.5 top-0.5 h-4 w-4 sm:right-3 sm:top-3 sm:h-8 sm:w-8" : "right-3 top-3 h-8 w-8")}>
             <SafeImage
               src={resolveCountryFlag((props as any).country_code || (props as any).country)}
               alt={(props as any).country || 'Circuit'}
@@ -213,8 +213,8 @@ export default function Card(props: CardProps) {
         {/* IP Badge - Top Left */}
         {isVehicle && (ip > 0 || fuelType) && (
           <div className={clsx(
-              "absolute top-3 left-3 z-20 flex origin-top-left flex-col items-start gap-1",
-              mobileGrid && "left-0.5 top-0.5 scale-[0.62] sm:left-3 sm:top-3 sm:scale-100",
+              "absolute z-20 flex origin-top-left flex-col items-start gap-1",
+              mobileGrid ? "left-0.5 top-0.5 scale-[0.62] sm:left-3 sm:top-3 sm:scale-100" : "left-3 top-3",
               mobileGrid && ip <= 0 && "hidden sm:flex",
             )}>
             {ip > 0 && <IPBadge value={ip} size="sm" />}
@@ -222,7 +222,7 @@ export default function Card(props: CardProps) {
               <span
                 aria-label={`Carburant : ${fuelType.label}`}
                 title={fuelType.label}
-                className={clsx("inline-flex min-w-8 items-center justify-center rounded-md border border-sky-200/75 bg-[#061a2e]/90 px-1.5 py-0.5 text-[10px] font-black leading-none tracking-wide text-white shadow-sm shadow-black/40", mobileGrid && "min-w-0 rounded-sm px-0.5 py-0 text-[8px] sm:min-w-8 sm:rounded-md sm:px-1.5 sm:py-0.5 sm:text-[10px]")}
+                className={clsx("inline-flex items-center justify-center border border-sky-200/75 bg-[#061a2e]/90 font-black leading-none tracking-wide text-white shadow-sm shadow-black/40", mobileGrid ? "min-w-0 rounded-sm px-0.5 py-0 text-[8px] sm:min-w-8 sm:rounded-md sm:px-1.5 sm:py-0.5 sm:text-[10px]" : "min-w-8 rounded-md px-1.5 py-0.5 text-[10px]")}
               >
                 {fuelType.code}
               </span>
@@ -230,7 +230,7 @@ export default function Card(props: CardProps) {
           </div>
         )}
         {hasCollectionNumber && (
-          <div className={clsx("absolute bottom-2 left-2 z-20 rounded-md border border-white/15 bg-black/70 px-1.5 py-0.5 text-[9px] font-bold tabular-nums text-white/90", mobileGrid && "bottom-0.5 left-0.5 px-0.5 py-0 text-[6px] sm:bottom-2 sm:left-2 sm:px-1.5 sm:py-0.5 sm:text-[9px]")}>
+          <div className={clsx("absolute z-20 rounded-md border border-white/15 bg-black/70 font-bold tabular-nums text-white/90", mobileGrid ? "bottom-0.5 left-0.5 px-0.5 py-0 text-[6px] sm:bottom-2 sm:left-2 sm:px-1.5 sm:py-0.5 sm:text-[9px]" : "bottom-2 left-2 px-1.5 py-0.5 text-[9px]")}>
             #{collectionNumber}
           </div>
         )}
@@ -248,7 +248,7 @@ export default function Card(props: CardProps) {
 
           {/* Title Section */}
           <div className={clsx("min-w-0 w-full text-center", mobileGrid ? "mb-0 sm:mb-3" : compact ? "mb-2" : "mb-3")}>
-            <h3 className={clsx("font-bold text-white uppercase leading-tight", mobileGrid ? "line-clamp-2 text-[8px] leading-[9px] tracking-normal sm:line-clamp-none sm:text-lg sm:leading-tight sm:tracking-wider" : compact ? "text-sm tracking-wider" : "text-lg tracking-wider")}>
+            <h3 className={clsx("font-bold text-white uppercase", mobileGrid ? "line-clamp-2 text-[8px] leading-[9px] tracking-normal sm:line-clamp-none sm:text-lg sm:leading-tight sm:tracking-wider" : compact ? "text-sm leading-tight tracking-wider" : "text-lg leading-tight tracking-wider")}>
               {isVehicle ? (props as any).make : (props as any).name}
             </h3>
             <p className={clsx("text-gray-300 font-medium", mobileGrid ? "truncate text-[7px] leading-[8px] tracking-normal sm:whitespace-normal sm:text-xs sm:leading-normal sm:tracking-wide" : compact ? "text-[10px] tracking-wide" : "text-xs tracking-wide")}>
@@ -269,10 +269,10 @@ export default function Card(props: CardProps) {
                 : compact ? "mb-1.5 gap-x-1.5 gap-y-1 px-0" : "mb-2 gap-x-1.5 gap-y-1 px-2",
             )}>
               <div className="min-w-0">
-                <div className={clsx("flex items-center justify-center gap-1", mobileGrid && "gap-0 sm:gap-1")}>
+                <div className={clsx("flex items-center justify-center", mobileGrid ? "gap-0 sm:gap-1" : "gap-1")}>
                   <VehicleStatIcon kind="engine" />
                   <div className="min-w-0 text-left">
-                    <p className={clsx("text-[8px] font-medium uppercase tracking-wide text-gray-400", mobileGrid && "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide")}>{t('Puissance')}</p>
+                    <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Puissance')}</p>
                     <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatPower(power_hp, units, language, Number((props as any).power_kw) || undefined)}
                     </p>
@@ -280,10 +280,10 @@ export default function Card(props: CardProps) {
                 </div>
               </div>
               <div className="min-w-0">
-                <div className={clsx("flex items-center justify-center gap-1", mobileGrid && "gap-0 sm:gap-1")}>
+                <div className={clsx("flex items-center justify-center", mobileGrid ? "gap-0 sm:gap-1" : "gap-1")}>
                   <VehicleStatIcon kind="torque" />
                   <div className="min-w-0 text-left">
-                    <p className={clsx("text-[8px] font-medium uppercase tracking-wide text-gray-400", mobileGrid && "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide")}>{t('Couple')}</p>
+                    <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Couple')}</p>
                     <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatTorque(torque_nm, units, language)}
                     </p>
@@ -291,10 +291,10 @@ export default function Card(props: CardProps) {
                 </div>
               </div>
               <div className="min-w-0">
-                <div className={clsx("flex items-center justify-center gap-1", mobileGrid && "gap-0 sm:gap-1")}>
+                <div className={clsx("flex items-center justify-center", mobileGrid ? "gap-0 sm:gap-1" : "gap-1")}>
                   <VehicleStatIcon kind="acceleration" />
                   <div className="min-w-0 text-left">
-                    <p className={clsx("text-[8px] font-medium uppercase tracking-wide text-gray-400", mobileGrid && "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide")}>{t('0 à 100 km/h')}</p>
+                    <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('0 à 100 km/h')}</p>
                     <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
                       {acceleration !== null && acceleration !== undefined ? `${acceleration} s` : '—'}
                     </p>
@@ -302,10 +302,10 @@ export default function Card(props: CardProps) {
                 </div>
               </div>
               <div className="min-w-0">
-                <div className={clsx("flex items-center justify-center gap-1", mobileGrid && "gap-0 sm:gap-1")}>
+                <div className={clsx("flex items-center justify-center", mobileGrid ? "gap-0 sm:gap-1" : "gap-1")}>
                   <VehicleStatIcon kind="weight" />
                   <div className="min-w-0 text-left">
-                    <p className={clsx("text-[8px] font-medium uppercase tracking-wide text-gray-400", mobileGrid && "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide")}>{t('Poids')}</p>
+                    <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Poids')}</p>
                     <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatWeight(rawWeight, units, language)}
                     </p>
@@ -345,7 +345,7 @@ export default function Card(props: CardProps) {
         </div>
         {isVehicle && drivetrainLayoutIcon && (
           <div
-            className={clsx("absolute bottom-2 right-2 z-20 cursor-help", mobileGrid && "bottom-0.5 right-0.5 sm:bottom-2 sm:right-2")}
+            className={clsx("absolute z-20 cursor-help", mobileGrid ? "bottom-0.5 right-0.5 sm:bottom-2 sm:right-2" : "bottom-2 right-2")}
             title={drivetrainLayoutDescription
               ? `${drivetrainLayout}: ${drivetrainLayoutDescription}`
               : `Configuration moteur et transmission ${drivetrainLayout}`}
