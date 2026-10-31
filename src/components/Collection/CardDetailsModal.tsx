@@ -10,6 +10,7 @@ import { drivetrainLayoutDescriptions } from '@/lib/drivetrain';
 import { calculateVehicleIP } from '@/lib/vehicleStats';
 import { formatDistance, formatPower, formatSpeed, formatTorque, formatWeight } from '@/lib/preferences';
 import { getNextLevelUnlock } from '@/lib/level';
+import { getRarityColor } from '@/lib/rarity';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 interface CardDetailsModalProps {
@@ -157,6 +158,12 @@ export default function CardDetailsModal({
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
+              {/* Mobile only: rarity-colored photo outline; desktop photo stays unchanged. */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 z-10 border-[3px] sm:hidden"
+                style={{ borderColor: getRarityColor(String(card.rarity || 'Common')) }}
+              />
             </div>
 
             <div className="relative min-h-0 overflow-y-auto p-5 sm:p-7">
@@ -182,7 +189,22 @@ export default function CardDetailsModal({
                   )}
                 </h2>
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-gray-400">
-                  {card.rarity && <span className="rounded border border-white/10 px-2 py-1">{card.rarity}</span>}
+                  {card.rarity && (
+                    <>
+                      <span
+                        className="rounded border px-2 py-1 font-bold sm:hidden"
+                        style={{
+                          color: getRarityColor(String(card.rarity)),
+                          borderColor: getRarityColor(String(card.rarity)),
+                        }}
+                      >
+                        {card.rarity}
+                      </span>
+                      <span className="hidden rounded border border-white/10 px-2 py-1 sm:inline">
+                        {card.rarity}
+                      </span>
+                    </>
+                  )}
                   {isVehicle && card.year && <span>{card.year}</span>}
                   {card.country && <span>{card.country}</span>}
                   <span>{ownedCount} {t(ownedCount > 1 ? 'exemplaires' : 'exemplaire')} {t(ownedCount > 1 ? 'possédés' : 'possédé')}</span>

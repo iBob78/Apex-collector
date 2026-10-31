@@ -242,7 +242,8 @@ export default function Card(props: CardProps) {
 
         {/* Content Container */}
         <div className={clsx(
-          "absolute bottom-0 inset-x-0 z-10 flex flex-col items-center",
+          "absolute inset-x-0 z-10 flex flex-col items-center",
+          mobileGrid ? "bottom-[7%] sm:bottom-0" : "bottom-0",
           contentPadding,
         )}>
 
@@ -265,48 +266,48 @@ export default function Card(props: CardProps) {
             <div className={clsx(
               "grid w-full grid-cols-2 text-center text-gray-200",
               mobileGrid
-                ? "mb-0 gap-x-0 gap-y-0.5 px-0 [&_svg]:h-2 [&_svg]:w-2 sm:mb-2 sm:gap-x-1.5 sm:gap-y-1 sm:px-2 sm:[&_svg]:h-4 sm:[&_svg]:w-4"
+                ? "mb-0 grid-rows-2 items-center gap-x-1 gap-y-1 px-0 [&_svg]:h-2 [&_svg]:w-2 sm:mb-2 sm:grid-rows-none sm:gap-x-1.5 sm:gap-y-1 sm:px-2 sm:[&_svg]:h-4 sm:[&_svg]:w-4"
                 : compact ? "mb-1.5 gap-x-1.5 gap-y-1 px-0" : "mb-2 gap-x-1.5 gap-y-1 px-2",
             )}>
               <div className="min-w-0">
-                <div className={clsx("flex items-center justify-center", mobileGrid ? "gap-0 sm:gap-1" : "gap-1")}>
+                <div className={clsx("flex items-center", mobileGrid ? "justify-start gap-0.5 sm:justify-center sm:gap-1" : "justify-center gap-1")}>
                   <VehicleStatIcon kind="engine" />
                   <div className="min-w-0 text-left">
                     <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Puissance')}</p>
-                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
+                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate whitespace-nowrap text-[6px] leading-[8px] tabular-nums tracking-tight sm:whitespace-normal sm:text-[11px] sm:leading-normal sm:normal-nums" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatPower(power_hp, units, language, Number((props as any).power_kw) || undefined)}
                     </p>
                   </div>
                 </div>
               </div>
               <div className="min-w-0">
-                <div className={clsx("flex items-center justify-center", mobileGrid ? "gap-0 sm:gap-1" : "gap-1")}>
+                <div className={clsx("flex items-center", mobileGrid ? "justify-start gap-0.5 sm:justify-center sm:gap-1" : "justify-center gap-1")}>
                   <VehicleStatIcon kind="torque" />
                   <div className="min-w-0 text-left">
                     <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Couple')}</p>
-                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
+                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate whitespace-nowrap text-[6px] leading-[8px] tabular-nums tracking-tight sm:whitespace-normal sm:text-[11px] sm:leading-normal sm:normal-nums" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatTorque(torque_nm, units, language)}
                     </p>
                   </div>
                 </div>
               </div>
               <div className="min-w-0">
-                <div className={clsx("flex items-center justify-center", mobileGrid ? "gap-0 sm:gap-1" : "gap-1")}>
+                <div className={clsx("flex items-center", mobileGrid ? "justify-start gap-0.5 sm:justify-center sm:gap-1" : "justify-center gap-1")}>
                   <VehicleStatIcon kind="acceleration" />
                   <div className="min-w-0 text-left">
                     <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('0 à 100 km/h')}</p>
-                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
+                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate whitespace-nowrap text-[6px] leading-[8px] tabular-nums tracking-tight sm:whitespace-normal sm:text-[11px] sm:leading-normal sm:normal-nums" : compact ? "text-[9px]" : "text-[11px]")}>
                       {acceleration !== null && acceleration !== undefined ? `${acceleration} s` : '—'}
                     </p>
                   </div>
                 </div>
               </div>
               <div className="min-w-0">
-                <div className={clsx("flex items-center justify-center", mobileGrid ? "gap-0 sm:gap-1" : "gap-1")}>
+                <div className={clsx("flex items-center", mobileGrid ? "justify-start gap-0.5 sm:justify-center sm:gap-1" : "justify-center gap-1")}>
                   <VehicleStatIcon kind="weight" />
                   <div className="min-w-0 text-left">
                     <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('Poids')}</p>
-                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate text-[7px] leading-[8px] tracking-tight sm:text-[11px] sm:leading-normal" : compact ? "text-[9px]" : "text-[11px]")}>
+                    <p className={clsx("font-semibold", mobileGrid ? "max-w-full truncate whitespace-nowrap text-[6px] leading-[8px] tabular-nums tracking-tight sm:whitespace-normal sm:text-[11px] sm:leading-normal sm:normal-nums" : compact ? "text-[9px]" : "text-[11px]")}>
                       {formatWeight(rawWeight, units, language)}
                     </p>
                   </div>
@@ -320,24 +321,24 @@ export default function Card(props: CardProps) {
             <div className={clsx(
               "grid w-full grid-cols-2 font-semibold text-gray-200",
               mobileGrid
-                ? "mb-0 gap-x-0 gap-y-0.5 px-0 text-[6px] leading-[8px] [&_svg]:h-2 [&_svg]:w-2 sm:mb-3 sm:gap-x-6 sm:gap-y-2 sm:px-2 sm:text-xs sm:leading-normal sm:[&_svg]:h-[14px] sm:[&_svg]:w-[14px]"
+                ? "mb-0 grid-rows-2 items-center gap-x-1 gap-y-1 px-0 text-[6px] leading-[8px] [&_svg]:h-2 [&_svg]:w-2 sm:mb-3 sm:grid-rows-none sm:gap-x-6 sm:gap-y-2 sm:px-2 sm:text-xs sm:leading-normal sm:[&_svg]:h-[14px] sm:[&_svg]:w-[14px]"
                 : compact ? "mb-2 gap-x-1 gap-y-2 px-0 text-[10px]" : "mb-3 gap-x-6 gap-y-2 px-2 text-xs",
             )}>
-              <div className="flex items-center gap-0.5 sm:gap-1.5 justify-end">
+              <div className={clsx("flex min-w-0 items-center", mobileGrid ? "justify-start gap-0.5 overflow-hidden sm:justify-end sm:gap-1.5 sm:overflow-visible" : "justify-end gap-0.5 sm:gap-1.5")}>
                 <MoveRight size={14} className="text-blue-400" />
-                <span>{formatDistance(Number(length_km) || 0, units, language)}</span>
+                <span className={clsx(mobileGrid && "min-w-0 truncate sm:overflow-visible")}>{formatDistance(Number(length_km) || 0, units, language)}</span>
               </div>
-              <div className="flex items-center gap-0.5 sm:gap-1.5 justify-start">
+              <div className={clsx("flex min-w-0 items-center", mobileGrid ? "justify-start gap-0.5 overflow-hidden sm:gap-1.5 sm:overflow-visible" : "justify-start gap-0.5 sm:gap-1.5")}>
                 <Compass size={14} className="text-green-400" />
-                <span>{turns} {t('virages')}</span>
+                <span className={clsx(mobileGrid && "min-w-0 truncate sm:overflow-visible")}>{turns} {t('virages')}</span>
               </div>
-              <div className="flex items-center gap-0.5 sm:gap-1.5 justify-end">
+              <div className={clsx("flex min-w-0 items-center", mobileGrid ? "justify-start gap-0.5 overflow-hidden sm:justify-end sm:gap-1.5 sm:overflow-visible" : "justify-end gap-0.5 sm:gap-1.5")}>
                 <ArrowUpCircle size={14} className="text-yellow-400" />
-                <span>{formatDistance(Number(straight_km) || 0, units, language)} {t('ligne')}</span>
+                <span className={clsx(mobileGrid && "min-w-0 truncate sm:overflow-visible")}>{formatDistance(Number(straight_km) || 0, units, language)} {t('ligne')}</span>
               </div>
-              <div className="flex items-center gap-0.5 sm:gap-1.5 justify-start">
+              <div className={clsx("flex min-w-0 items-center", mobileGrid ? "justify-start gap-0.5 overflow-hidden sm:gap-1.5 sm:overflow-visible" : "justify-start gap-0.5 sm:gap-1.5")}>
                 <Wind size={14} className="text-orange-400" />
-                <span>{circuit_type}</span>
+                <span className={clsx(mobileGrid && "min-w-0 truncate sm:overflow-visible")}>{circuit_type}</span>
               </div>
             </div>
           )}
