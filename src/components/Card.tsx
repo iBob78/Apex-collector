@@ -248,7 +248,7 @@ export default function Card(props: CardProps) {
         )}>
 
           {/* Title Section */}
-          <div className={clsx("min-w-0 w-full text-center", mobileGrid ? "mb-0 sm:mb-3" : compact ? "mb-2" : "mb-3")}>
+          <div className={clsx("min-w-0 w-full text-center", mobileGrid && isVehicle ? "relative -top-1 mb-0 sm:static sm:mb-3" : mobileGrid ? "mb-0 sm:mb-3" : compact ? "mb-2" : "mb-3")}>
             <h3 className={clsx("font-bold text-white uppercase", mobileGrid ? "line-clamp-2 text-[8px] leading-[9px] tracking-normal sm:line-clamp-none sm:text-lg sm:leading-tight sm:tracking-wider" : compact ? "text-sm leading-tight tracking-wider" : "text-lg leading-tight tracking-wider")}>
               {isVehicle ? (props as any).make : (props as any).name}
             </h3>
@@ -346,7 +346,7 @@ export default function Card(props: CardProps) {
         </div>
         {isVehicle && drivetrainLayoutIcon && (
           <div
-            className={clsx("absolute z-20 cursor-help", mobileGrid ? "bottom-0.5 right-0.5 sm:bottom-2 sm:right-2" : "bottom-2 right-2")}
+            className={clsx("absolute z-20 cursor-help", mobileGrid ? "bottom-1.5 right-1.5 sm:bottom-2 sm:right-2" : "bottom-2 right-2")}
             title={drivetrainLayoutDescription
               ? `${drivetrainLayout}: ${drivetrainLayoutDescription}`
               : `Configuration moteur et transmission ${drivetrainLayout}`}
