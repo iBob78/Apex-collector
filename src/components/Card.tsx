@@ -292,7 +292,7 @@ export default function Card(props: CardProps) {
                 </div>
               </div>
               <div className="min-w-0">
-                <div className={clsx("flex items-center", mobileGrid ? "-translate-x-0.5 justify-end gap-0.5 sm:translate-x-0 sm:justify-center sm:gap-1" : "justify-center gap-1")}>
+                <div className={clsx("flex items-center", mobileGrid ? "-translate-x-1 justify-end gap-0.5 sm:translate-x-0 sm:justify-center sm:gap-1" : "justify-center gap-1")}>
                   <VehicleStatIcon kind="acceleration" />
                   <div className="min-w-0 text-left">
                     <p className={clsx("font-medium uppercase text-gray-400", mobileGrid ? "sr-only max-w-full truncate text-[5px] leading-[7px] tracking-tight sm:not-sr-only sm:text-[8px] sm:leading-normal sm:tracking-wide" : "text-[8px] tracking-wide")}>{t('0 à 100 km/h')}</p>
