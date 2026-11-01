@@ -177,13 +177,11 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1 }}
-            className="absolute bottom-20 left-1/2 -translate-x-1/2 hidden md:flex items-center gap-12 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl px-10 py-6"
+            className="relative mx-auto mt-10 grid w-full max-w-3xl grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-[#0d1420]/90 p-2 shadow-[0_10px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl sm:mt-14 sm:grid-cols-3 sm:gap-3 sm:p-3"
           >
             <StatItem value="500+" label={t('Cartes Uniques')} />
-            <div className="w-px h-12 bg-white/10" />
             <StatItem value="∞" label={t('Possibilités')} />
-            <div className="w-px h-12 bg-white/10" />
-            <StatItem value="24/7" label={t('Marketplace')} />
+            <StatItem value="24/7" label={t('Marketplace')} className="col-span-2 sm:col-span-1" />
           </motion.div>
         </motion.section>
 
@@ -302,11 +300,11 @@ export default function LandingPage() {
   );
 }
 
-function StatItem({ value, label }: { value: string; label: string }) {
+function StatItem({ value, label, className = '' }: { value: string; label: string; className?: string }) {
   return (
-    <div className="text-center">
-      <div className="text-3xl font-black text-white mb-1">{value}</div>
-      <div className="text-xs font-bold uppercase tracking-widest text-gray-500">{label}</div>
+    <div className={'flex min-w-0 flex-col items-center justify-center rounded-xl border border-white/5 bg-white/[0.03] px-3 py-4 text-center sm:px-4 sm:py-5 ' + className}>
+      <div className="font-mono text-2xl font-black tabular-nums text-white sm:text-3xl">{value}</div>
+      <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400 sm:text-xs">{label}</div>
     </div>
   );
 }
