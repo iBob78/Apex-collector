@@ -64,7 +64,10 @@ export default function DashboardPage() {
           {/* Main dashboard header and existing profile shortcut. */}
           <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="bg-gradient-to-r from-white to-slate-400 bg-clip-text text-3xl font-black uppercase italic tracking-tight text-transparent sm:text-4xl">
+              <h1
+                className="bg-gradient-to-r from-white to-slate-400 bg-clip-text text-3xl font-normal uppercase not-italic tracking-[0.035em] text-transparent sm:text-4xl"
+                style={{ fontFamily: '"Bebas Neue", Impact, "Arial Narrow", sans-serif' }}
+              >
                 {t('Tableau de bord')}
               </h1>
               <p className="mt-2 text-sm text-gray-400 sm:text-base">
