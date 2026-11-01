@@ -106,7 +106,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="hidden w-[280px] shrink-0 h-screen bg-[#080808] border-r border-white/5 p-8 flex-col gap-10 sticky top-0 z-50 lg:flex">
+      <aside className="hidden w-[280px] shrink-0 h-screen bg-[#080808] border-r border-white/5 p-8 flex-col gap-10 sticky top-0 z-50 md:flex">
       {/* Brand Logo */}
       <div className="flex flex-col">
         <h1 className="text-2xl font-black uppercase italic tracking-tighter leading-none">
@@ -196,7 +196,7 @@ export default function Sidebar() {
       </aside>
 
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-[55] lg:hidden">
+        <div className="fixed inset-0 z-[55] md:hidden">
           <button type="button" aria-label={t('Fermer le menu')} onClick={() => setMobileMenuOpen(false)} className="absolute inset-0 bg-black/75" />
           <nav id="apex-mobile-more-menu" aria-label={t('Navigation secondaire')} className="absolute inset-x-3 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-h-[75dvh] overflow-y-auto rounded-2xl border border-white/15 bg-[#0e111a] p-3 shadow-2xl">
             <div className="flex items-center justify-between px-3 pb-3 pt-1">
@@ -221,7 +221,7 @@ export default function Sidebar() {
         </div>
       )}
 
-      <nav aria-label={t('Navigation principale')} className="fixed inset-x-0 bottom-0 z-[60] border-t border-white/10 bg-[#080b11]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_25px_rgba(0,0,0,0.35)] backdrop-blur-lg lg:hidden">
+      <nav aria-label={t('Navigation principale')} className="fixed inset-x-0 bottom-0 z-[60] border-t border-white/10 bg-[#080b11]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_25px_rgba(0,0,0,0.35)] backdrop-blur-lg md:hidden">
         <div className="mx-auto flex h-16 max-w-md items-stretch px-1">
           {navItems.slice(0, 4).map(({ href, label, icon: Icon }) => {
             const active = isActivePath(href);
