@@ -367,8 +367,8 @@ export default function Card(props: CardProps) {
         )}
       </div>
 
-      {/* On phones, a separate collection badge shows copies and opens the level action. */}
-      {mobileGrid && (
+      {/* This collection-only badge must respect showLevel (booster draws hide levels). */}
+      {mobileGrid && showLevel && (
         <div className="flex min-h-[25px] w-full items-start justify-center sm:hidden">
           {owned && count > 0 ? (
             <button
