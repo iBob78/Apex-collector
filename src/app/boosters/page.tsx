@@ -96,7 +96,7 @@ export default function BoostersPage() {
                       <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent`}></div>
                     </div>
 
-                    <h2 className="mb-1 min-h-8 text-[13px] font-bold leading-4 sm:mb-2 sm:min-h-0 sm:text-2xl sm:leading-normal">{t(pack.name)}</h2>
+                    <h2 className="mb-1 min-h-8 text-[13px] font-normal leading-4 sm:mb-2 sm:min-h-0 sm:text-2xl sm:leading-normal" style={{ fontFamily: '"Bebas Neue", Impact, "Arial Narrow", sans-serif' }}>{t(pack.name)}</h2>
                     <p className="mb-2 text-[10px] leading-[1.35] text-gray-400 sm:mb-6 sm:text-sm sm:leading-relaxed">
                       <span className="line-clamp-2 sm:line-clamp-none">{t(pack.description)}</span>
                       <span className="mt-1 block text-[9px] italic text-white/60 sm:mt-2 sm:text-xs">
