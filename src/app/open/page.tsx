@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense, type CSSProperties } from 'react';
 import type { PointerEvent as ReactPointerEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
@@ -12,6 +12,7 @@ import Card from '@/components/Card';
 import SafeImage from '@/components/SafeImage';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
+import { getRarityColor } from '@/lib/rarity';
 
 function OpenContent() {
   const { t } = useSitePreferences();
@@ -28,10 +29,21 @@ function OpenContent() {
   const [showCards, setShowCards] = useState(false);
   const [drawnCards, setDrawnCards] = useState<any[]>([]);
   const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set());
+  const [useCompactPhoneCards, setUseCompactPhoneCards] = useState(false);
   const [loading, setLoading] = useState(true);
   const packRef = useRef<HTMLDivElement>(null);
   const tearStartX = useRef<number | null>(null);
   const tearProgressRef = useRef(0);
+
+  // Match Card's sm: breakpoint: use the compact collection rendering only on phones.
+  // This preserves the existing desktop booster card appearance.
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 639px)');
+    const syncLayout = () => setUseCompactPhoneCards(media.matches);
+    syncLayout();
+    media.addEventListener('change', syncLayout);
+    return () => media.removeEventListener('change', syncLayout);
+  }, []);
 
   // 1. AuthService Check
   useEffect(() => {
@@ -328,20 +340,27 @@ function OpenContent() {
             </button>
 
             <div className="mb-12 w-full max-w-[1400px]">
-              <div className="grid grid-cols-2 justify-items-center gap-3 px-1 sm:flex sm:flex-wrap sm:items-stretch sm:justify-center sm:gap-4 sm:px-2">
+              <div className="grid grid-cols-3 justify-items-center gap-2 px-1 sm:flex sm:flex-wrap sm:items-stretch sm:justify-center sm:gap-4 sm:px-2">
                 {drawnCards.map((card, idx) => (
                   <motion.div
                     key={`${card.id}-${idx}`}
                     initial={{ y: 30, opacity: 0, scale: 0.8 }}
                     animate={{ y: 0, opacity: 1, scale: 1 }}
                     transition={{ delay: idx * 0.1, type: 'spring', damping: 15 }}
-                    className="w-full min-w-0 max-w-[200px] sm:w-[180px] sm:shrink-0 lg:w-[200px]"
+                    className="relative isolate w-full min-w-0 max-w-[200px] sm:w-[180px] sm:shrink-0 lg:w-[200px]"
                   >
+                    {flippedCards.has(idx) && (
+                      <div
+                        aria-hidden="true"
+                        className="booster-reveal-halo pointer-events-none absolute -inset-[3px] rounded-xl"
+                        style={{ '--booster-rarity-glow': getRarityColor(String(card.rarity || 'Common')) } as CSSProperties}
+                      />
+                    )}
                     <motion.div
                       animate={{ rotateY: flippedCards.has(idx) ? 180 : 0 }}
                       transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
                       style={{ transformStyle: 'preserve-3d' }}
-                      className="relative aspect-[2/3] w-full"
+                      className="relative z-10 aspect-[2/3] w-full"
                     >
                       <button
                         type="button"
@@ -373,6 +392,7 @@ function OpenContent() {
                           count={1}
                           showLevel={false}
                           compact
+                          mobileGrid={useCompactPhoneCards}
                           className="h-full"
                           onCardClick={() => flipCard(idx)}
                         />

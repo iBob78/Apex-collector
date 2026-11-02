@@ -499,3 +499,25 @@ html, body {
 @media (max-width: 767px) {
   body.apex-mobile-app { padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px)); }
 }
+
+/* Booster reveal: a low-key rarity-colored aura outside the rotating card. */
+.booster-reveal-halo {
+  border: 1px solid var(--booster-rarity-glow, #fff);
+  box-shadow:
+    0 0 7px var(--booster-rarity-glow, #fff),
+    0 0 18px 2px var(--booster-rarity-glow, #fff);
+  opacity: 0;
+  animation: booster-reveal-glow 2.5s ease-in-out 0.65s infinite alternate;
+}
+
+@keyframes booster-reveal-glow {
+  from { opacity: 0.23; transform: scale(0.995); }
+  to { opacity: 0.5; transform: scale(1.012); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .booster-reveal-halo {
+    animation: none;
+    opacity: 0.35;
+  }
+}
