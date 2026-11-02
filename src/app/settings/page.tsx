@@ -23,13 +23,13 @@ export default function SettingsPage() {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 p-8 overflow-y-auto space-y-6">
+      <main className="min-w-0 flex-1 p-4 sm:p-8 space-y-6">
         <header className="space-y-2">
           <h1 className="text-3xl font-bold">{t('Réglages')}</h1>
           <p className="text-sm text-gray-400">{t('Les préférences sont enregistrées sur votre profil.')}</p>
         </header>
 
-        <section className="max-w-2xl space-y-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+        <section className="max-w-2xl space-y-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-6">
           <div className="space-y-2">
             <label htmlFor="site-language" className="block text-sm font-semibold">{t('Langue')}</label>
             <select

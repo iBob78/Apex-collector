@@ -80,7 +80,7 @@ export default function LandingPage() {
       <motion.header
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative z-50 flex justify-between items-center px-8 py-6 backdrop-blur-xl bg-black/20 border-b border-white/5"
+        className="relative z-50 flex justify-between items-center gap-2 px-4 sm:px-8 py-5 sm:py-6 backdrop-blur-xl bg-black/20 border-b border-white/5"
       >
         <div className="flex items-center gap-3">
           <motion.div
@@ -104,7 +104,7 @@ export default function LandingPage() {
         {/* Hero Section */}
         <motion.section
           style={{ y: heroY, opacity: heroOpacity }}
-          className="min-h-screen flex flex-col justify-center items-center px-8 relative"
+          className="min-h-[85dvh] sm:min-h-screen flex flex-col justify-center items-center px-4 sm:px-8 py-16 sm:py-0 relative"
         >
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -131,7 +131,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-8xl font-black uppercase italic tracking-tighter mb-8 leading-none"
+              className="text-[clamp(2.25rem,9vw,6rem)] font-black uppercase italic tracking-tighter mb-6 leading-tight sm:mb-8"
             >
               <span className="bg-gradient-to-r from-white via-blue-200 to-indigo-300 bg-clip-text text-transparent">
                 {t('Collectionnez')}
@@ -146,7 +146,7 @@ export default function LandingPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-2xl text-gray-400 max-w-3xl mx-auto mb-16 leading-relaxed font-light"
+              className="text-base sm:text-2xl text-gray-400 max-w-3xl mx-auto mb-8 sm:mb-16 leading-relaxed font-light"
             >
               {t('Ouvrez des packs premium, construisez votre garage légendaire et dominez le marché mondial. Chaque carte est une icône automobile rare.')}
             </motion.p>
@@ -159,7 +159,7 @@ export default function LandingPage() {
             >
               <Link
                 href="/login"
-                className="group relative bg-blue-600 hover:bg-blue-500 px-10 py-5 rounded-2xl text-sm font-black uppercase tracking-[0.2em] transition-all shadow-2xl shadow-blue-500/40 flex items-center gap-4 overflow-hidden"
+                className="group relative bg-blue-600 hover:bg-blue-500 px-6 sm:px-10 py-4 sm:py-5 rounded-2xl text-sm font-black uppercase tracking-[0.2em] transition-all shadow-2xl shadow-blue-500/40 flex items-center gap-4 overflow-hidden"
               >
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 opacity-0 group-hover:opacity-20"
@@ -177,13 +177,11 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1 }}
-            className="absolute bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-12 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl px-10 py-6"
+            className="relative mx-auto mt-10 grid w-full max-w-3xl grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-[#0d1420]/90 p-2 shadow-[0_10px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl sm:mt-14 sm:grid-cols-3 sm:gap-3 sm:p-3"
           >
             <StatItem value="500+" label={t('Cartes Uniques')} />
-            <div className="w-px h-12 bg-white/10" />
             <StatItem value="∞" label={t('Possibilités')} />
-            <div className="w-px h-12 bg-white/10" />
-            <StatItem value="24/7" label={t('Marketplace')} />
+            <StatItem value="24/7" label={t('Marketplace')} className="col-span-2 sm:col-span-1" />
           </motion.div>
         </motion.section>
 
@@ -196,7 +194,7 @@ export default function LandingPage() {
               viewport={{ once: true }}
               className="text-center mb-20"
             >
-              <h3 className="text-5xl font-black uppercase italic tracking-tighter mb-4">
+              <h3 className="text-3xl sm:text-5xl font-black uppercase italic tracking-tighter mb-4">
                 <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                   {t('Trois Piliers d’Excellence')}
                 </span>
@@ -263,7 +261,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="relative bg-gradient-to-br from-blue-600/20 via-indigo-600/20 to-purple-600/20 border border-white/10 rounded-[40px] p-16 text-center overflow-hidden"
+              className="relative bg-gradient-to-br from-blue-600/20 via-indigo-600/20 to-purple-600/20 border border-white/10 rounded-[28px] sm:rounded-[40px] p-6 sm:p-16 text-center overflow-hidden"
             >
               <motion.div
                 animate={{ rotate: 360 }}
@@ -277,7 +275,7 @@ export default function LandingPage() {
               />
 
               <div className="relative z-10">
-                <h3 className="text-5xl font-black uppercase italic tracking-tighter mb-6">
+                <h3 className="text-3xl sm:text-5xl font-black uppercase italic tracking-tighter mb-6">
                   <span className="bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
                     {t('Rejoignez l’Élite')}
                   </span>
@@ -302,11 +300,11 @@ export default function LandingPage() {
   );
 }
 
-function StatItem({ value, label }: { value: string; label: string }) {
+function StatItem({ value, label, className = '' }: { value: string; label: string; className?: string }) {
   return (
-    <div className="text-center">
-      <div className="text-3xl font-black text-white mb-1">{value}</div>
-      <div className="text-xs font-bold uppercase tracking-widest text-gray-500">{label}</div>
+    <div className={'flex min-w-0 flex-col items-center justify-center rounded-xl border border-white/5 bg-white/[0.03] px-3 py-4 text-center sm:px-4 sm:py-5 ' + className}>
+      <div className="font-mono text-2xl font-black tabular-nums text-white sm:text-3xl">{value}</div>
+      <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400 sm:text-xs">{label}</div>
     </div>
   );
 }

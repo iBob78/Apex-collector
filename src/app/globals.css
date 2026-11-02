@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Exo:wght@700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -492,4 +494,30 @@ html, body {
 
 .animate-fade-in {
   animation: fade-in 0.5s ease-out;
+}
+/* Keep mobile content clear of the fixed bottom navigation and device safe area. */
+@media (max-width: 767px) {
+  body.apex-mobile-app { padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* Booster reveal: a low-key rarity-colored aura outside the rotating card. */
+.booster-reveal-halo {
+  border: 1px solid var(--booster-rarity-glow, #fff);
+  box-shadow:
+    0 0 7px var(--booster-rarity-glow, #fff),
+    0 0 18px 2px var(--booster-rarity-glow, #fff);
+  opacity: 0.35;
+  animation: booster-reveal-glow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes booster-reveal-glow {
+  from { opacity: 0.35; transform: scale(1); }
+  to { opacity: 0.55; transform: scale(1.012); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .booster-reveal-halo {
+    animation: none;
+    opacity: 0.35;
+  }
 }

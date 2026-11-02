@@ -1,4 +1,4 @@
-import { drawBoosterCards, PACKS, getPackImageUrl } from '../boosters';
+import { drawBoosterCards, PACKS, getPackImageUrl, getFirstTimeBoosterCardIndices } from '../boosters';
 
 describe('Booster pack assets', () => {
   it('uses the Supabase booster asset paths and includes the expected pack slugs', () => {
@@ -77,5 +77,48 @@ describe('Booster card draws', () => {
     expect(cards).toHaveLength(6);
     expect(cards.every((card) => card.category === 'circuit')).toBe(true);
     expect(cards.some((card) => card.id === 'booster-disabled-vehicle')).toBe(false);
+  });
+});
+
+describe('First-time booster discoveries', () => {
+  it('marks only the first copy absent from the collection, including circuits', () => {
+    const cards = [
+      { card_id: 'NEW-CAR', id: 'db-car', category: 'vehicle' },
+      { card_id: 'new-car', id: 'db-car', category: 'vehicle' },
+      { id: 'EXISTING-CAR', category: 'vehicle' },
+      { id: 'NEW-TRACK', category: 'circuit' },
+      { id: 'existing-track', category: 'circuit' },
+    ];
+    expect([...getFirstTimeBoosterCardIndices(
+      cards,
+      [{ card_id: 'existing-car', count: 2 }],
+      [{ circuit_id: 'EXISTING-TRACK', count: 1 }],
+      [true, true, true, true, true],
+    )]).toEqual([0, 3]);
+  });
+
+  it('does not label failed additions or extra copies from the same booster', () => {
+    const cards = [
+      { id: 'same', category: 'vehicle' },
+      { id: 'same', category: 'vehicle' },
+      { id: 'same', category: 'vehicle' },
+      { id: 'unsaved-circuit', category: 'circuit' },
+    ];
+    expect([...getFirstTimeBoosterCardIndices(
+      cards, [], [], [false, true, true, false],
+    )]).toEqual([1]);
+  });
+
+  it('recognizes zero-count cards as new and separates circuit from vehicle IDs', () => {
+    const cards = [
+      { id: 'shared-id', category: 'vehicle' },
+      { id: 'shared-id', category: 'circuit' },
+      { id: 'zero-vehicle', category: 'vehicle' },
+    ];
+    expect([...getFirstTimeBoosterCardIndices(
+      cards,
+      [{ card_id: 'shared-id', count: 1 }, { card_id: 'zero-vehicle', count: 0 }],
+      [], [true, true, true],
+    )]).toEqual([1, 2]);
   });
 });

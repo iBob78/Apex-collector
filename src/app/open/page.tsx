@@ -1,17 +1,18 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense, type CSSProperties } from 'react';
 import type { PointerEvent as ReactPointerEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { ajouterCarteAuJoueur, ajouterCircuitAuJoueur } from '@/lib/actions/carte';
 import { deductAP } from '@/lib/actions/profile';
 import { updateQuestProgress } from '@/lib/actions/quests';
-import { drawBoosterCards, PACKS } from '@/lib/boosters';
+import { drawBoosterCards, getFirstTimeBoosterCardIndices, PACKS } from '@/lib/boosters';
 import Card from '@/components/Card';
 import SafeImage from '@/components/SafeImage';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
+import { getRarityColor } from '@/lib/rarity';
 
 function OpenContent() {
   const { t } = useSitePreferences();
@@ -27,11 +28,23 @@ function OpenContent() {
   const [tearProgress, setTearProgress] = useState(0);
   const [showCards, setShowCards] = useState(false);
   const [drawnCards, setDrawnCards] = useState<any[]>([]);
+  const [firstTimeCardIndices, setFirstTimeCardIndices] = useState<Set<number>>(() => new Set());
   const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set());
+  const [useCompactPhoneCards, setUseCompactPhoneCards] = useState(false);
   const [loading, setLoading] = useState(true);
   const packRef = useRef<HTMLDivElement>(null);
   const tearStartX = useRef<number | null>(null);
   const tearProgressRef = useRef(0);
+
+  // Match Card's sm: breakpoint: use the compact collection rendering only on phones.
+  // This preserves the existing desktop booster card appearance.
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 639px)');
+    const syncLayout = () => setUseCompactPhoneCards(media.matches);
+    syncLayout();
+    media.addEventListener('change', syncLayout);
+    return () => media.removeEventListener('change', syncLayout);
+  }, []);
 
   // 1. AuthService Check
   useEffect(() => {
@@ -68,6 +81,25 @@ function OpenContent() {
         pack.cardCount
       );
 
+      // Read ownership BEFORE saving: "NEW!" must mean absent from the original collection.
+      // If a read fails, suppress the cosmetic badge without blocking the booster opening.
+      const vehicleIds = results.filter((card) => card.category !== 'circuit')
+        .map((card) => String(card.card_id || card.id));
+      const circuitIds = results.filter((card) => card.category === 'circuit')
+        .map((card) => String(card.card_id || card.id));
+      const [ownedVehiclesResult, ownedCircuitsResult] = await Promise.all([
+        vehicleIds.length
+          ? supabase.from('user_cards').select('card_id, count').eq('user_id', userId).in('card_id', vehicleIds)
+          : Promise.resolve({ data: [], error: null }),
+        circuitIds.length
+          ? supabase.from('user_circuits').select('circuit_id, count').eq('user_id', userId).in('circuit_id', circuitIds)
+          : Promise.resolve({ data: [], error: null }),
+      ]);
+      const ownershipVerified = !ownedVehiclesResult.error && !ownedCircuitsResult.error;
+      if (!ownershipVerified) {
+        console.warn('[Booster] Impossible de vérifier les premières découvertes.', ownedVehiclesResult.error || ownedCircuitsResult.error);
+      }
+
       // 1. Déduire les AP après avoir confirmé qu'un tirage est possible.
       const deduction = await deductAP(userId, pack.price);
 
@@ -78,7 +110,7 @@ function OpenContent() {
       }
 
       // 2. Sauvegarde dans la collection du joueur
-      await Promise.all(
+      const additions = await Promise.all(
         results.map(async (card) => {
           const isCircuit = (card.category === 'circuit') || (card.type === 'Circuit') || (card.track_name != null);
           const uniqueId = String((card as any).card_id || card.id);
@@ -91,6 +123,14 @@ function OpenContent() {
         })
       );
 
+      setFirstTimeCardIndices(ownershipVerified
+        ? getFirstTimeBoosterCardIndices(
+            results,
+            ownedVehiclesResult.data || [],
+            ownedCircuitsResult.data || [],
+            additions.map((addition) => addition.success),
+          )
+        : new Set());
       setDrawnCards(results);
 
       // 3. Mettre à jour la progression des quêtes
@@ -328,20 +368,27 @@ function OpenContent() {
             </button>
 
             <div className="mb-12 w-full max-w-[1400px]">
-              <div className="flex flex-wrap items-stretch justify-center gap-4 px-2">
+              <div className="grid grid-cols-3 justify-items-center gap-2 px-1 sm:flex sm:flex-wrap sm:items-stretch sm:justify-center sm:gap-4 sm:px-2">
                 {drawnCards.map((card, idx) => (
                   <motion.div
                     key={`${card.id}-${idx}`}
                     initial={{ y: 30, opacity: 0, scale: 0.8 }}
                     animate={{ y: 0, opacity: 1, scale: 1 }}
                     transition={{ delay: idx * 0.1, type: 'spring', damping: 15 }}
-                    className="w-[160px] shrink-0 sm:w-[180px] lg:w-[200px]"
+                    className="relative isolate w-full min-w-0 max-w-[200px] sm:w-[180px] sm:shrink-0 lg:w-[200px]"
                   >
+                    {flippedCards.has(idx) && (
+                      <div
+                        aria-hidden="true"
+                        className="booster-reveal-halo pointer-events-none absolute -inset-[3px] rounded-xl"
+                        style={{ '--booster-rarity-glow': getRarityColor(String(card.rarity || 'Common')) } as CSSProperties}
+                      />
+                    )}
                     <motion.div
                       animate={{ rotateY: flippedCards.has(idx) ? 180 : 0 }}
                       transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
                       style={{ transformStyle: 'preserve-3d' }}
-                      className="relative aspect-[2/3] w-full"
+                      className="relative z-10 aspect-[2/3] w-full"
                     >
                       <button
                         type="button"
@@ -373,9 +420,19 @@ function OpenContent() {
                           count={1}
                           showLevel={false}
                           compact
+                          mobileGrid={useCompactPhoneCards}
+                          boosterReveal
                           className="h-full"
                           onCardClick={() => flipCard(idx)}
                         />
+                        {firstTimeCardIndices.has(idx) && (
+                          <span
+                            aria-label={t('Nouvelle Carte')}
+                            className="pointer-events-none absolute left-1/2 top-1 z-30 -translate-x-1/2 rounded-md border border-lime-100/80 bg-lime-300 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-[#092210] shadow-[0_0_14px_rgba(163,230,53,0.5)] sm:top-2 sm:px-2 sm:py-1 sm:text-xs"
+                          >
+                            NEW!
+                          </span>
+                        )}
                       </div>
                     </motion.div>
                   </motion.div>

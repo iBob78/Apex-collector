@@ -283,3 +283,40 @@ export function drawBoosterCards(
 
     return results;
 }
+
+/** Mark first successful acquisitions only, using ownership before the booster was saved. */
+export function getFirstTimeBoosterCardIndices(
+    drawnCards: readonly BoosterCatalogCard[],
+    ownedVehicles: readonly { card_id?: string | null; count?: number | null }[],
+    ownedCircuits: readonly { circuit_id?: string | null; count?: number | null }[],
+    savedSuccessfully: readonly boolean[],
+): Set<number> {
+    const keyFor = (category: 'vehicle' | 'circuit', id: unknown): string | null => {
+        const idText = String(id ?? '').trim().toLowerCase();
+        return idText ? `${category}:${idText}` : null;
+    };
+    const seen = new Set<string>();
+
+    for (const row of ownedVehicles) {
+        const key = keyFor('vehicle', row.card_id);
+        if (key && Number(row.count ?? 1) > 0) seen.add(key);
+    }
+    for (const row of ownedCircuits) {
+        const key = keyFor('circuit', row.circuit_id);
+        if (key && Number(row.count ?? 1) > 0) seen.add(key);
+    }
+
+    const firstTimeIndices = new Set<number>();
+    drawnCards.forEach((card, index) => {
+        if (!savedSuccessfully[index]) return;
+
+        const isCircuit = card.category === 'circuit' || card.type === 'Circuit' || card.track_name != null;
+        const key = keyFor(isCircuit ? 'circuit' : 'vehicle', card.card_id || card.id);
+        if (!key) return;
+
+        if (!seen.has(key)) firstTimeIndices.add(index);
+        seen.add(key);
+    });
+
+    return firstTimeIndices;
+}

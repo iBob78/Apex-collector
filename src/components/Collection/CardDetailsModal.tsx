@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Star } from 'lucide-react';
 import SafeImage from '@/components/SafeImage';
 import VehicleStatIcon from '@/components/VehicleStatIcon';
 import { IMAGE_PATHS, resolveBrandLogo, resolveCardImage, resolveCountryFlag, resolveDrivetrainLayoutIcon } from '@/lib/images';
@@ -10,6 +10,7 @@ import { drivetrainLayoutDescriptions } from '@/lib/drivetrain';
 import { calculateVehicleIP } from '@/lib/vehicleStats';
 import { formatDistance, formatPower, formatSpeed, formatTorque, formatWeight } from '@/lib/preferences';
 import { getNextLevelUnlock } from '@/lib/level';
+import { getRarityColor } from '@/lib/rarity';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 interface CardDetailsModalProps {
@@ -17,6 +18,9 @@ interface CardDetailsModalProps {
   ownedCount: number;
   upgradeLevel: number;
   upgradePending: boolean;
+  isFavorite: boolean;
+  favoritePending: boolean;
+  onToggleFavorite: () => void;
   onUpgrade: () => void;
   onClose: () => void;
 }
@@ -26,6 +30,9 @@ export default function CardDetailsModal({
   ownedCount,
   upgradeLevel,
   upgradePending,
+  isFavorite,
+  favoritePending,
+  onToggleFavorite,
   onUpgrade,
   onClose,
 }: CardDetailsModalProps) {
@@ -125,7 +132,7 @@ export default function CardDetailsModal({
       {card && (
         <motion.div
           key={String(card.card_id || card.id)}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-0 backdrop-blur-sm sm:p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -135,14 +142,14 @@ export default function CardDetailsModal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="card-details-title"
-            className="grid max-h-[90vh] w-full max-w-4xl grid-cols-1 overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] text-white shadow-2xl md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]"
+            className="grid h-[100dvh] max-h-[100dvh] w-full max-w-4xl grid-cols-1 grid-rows-[32dvh_minmax(0,1fr)] overflow-hidden border border-white/10 bg-[#0a0a0a] text-white shadow-2xl sm:h-auto sm:max-h-[90dvh] sm:grid-rows-[minmax(0,auto)_minmax(0,1fr)] sm:rounded-2xl md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:grid-rows-1"
             initial={{ opacity: 0, scale: 0.94, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 12 }}
             transition={{ duration: 0.22, ease: 'easeOut' }}
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="relative aspect-[4/3] min-h-0 bg-black md:aspect-auto md:min-h-[32rem]">
+            <div className="relative min-h-0 bg-black md:min-h-[32rem]">
               <SafeImage
                 src={image}
                 fallback={isVehicle ? IMAGE_PATHS.PLACEHOLDERS.VEHICLE_CARD : IMAGE_PATHS.PLACEHOLDERS.CIRCUIT_CARD}
@@ -151,6 +158,12 @@ export default function CardDetailsModal({
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
+              {/* Mobile only: rarity-colored photo outline; desktop photo stays unchanged. */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 z-10 border-[3px] sm:hidden"
+                style={{ borderColor: getRarityColor(String(card.rarity || 'Common')) }}
+              />
             </div>
 
             <div className="relative min-h-0 overflow-y-auto p-5 sm:p-7">
@@ -158,7 +171,7 @@ export default function CardDetailsModal({
                 type="button"
                 aria-label={t('Fermer les détails')}
                 onClick={onClose}
-                className="absolute right-4 top-4 z-10 rounded-md border border-white/10 bg-black/50 p-2 text-gray-300 transition-colors hover:text-white"
+                className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-black/70 text-gray-200 transition-colors hover:text-white"
               >
                 <X size={18} />
               </button>
@@ -176,12 +189,40 @@ export default function CardDetailsModal({
                   )}
                 </h2>
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-gray-400">
-                  {card.rarity && <span className="rounded border border-white/10 px-2 py-1">{card.rarity}</span>}
+                  {card.rarity && (
+                    <>
+                      <span
+                        className="rounded border px-2 py-1 font-bold sm:hidden"
+                        style={{
+                          color: getRarityColor(String(card.rarity)),
+                          borderColor: getRarityColor(String(card.rarity)),
+                        }}
+                      >
+                        {card.rarity}
+                      </span>
+                      <span className="hidden rounded border border-white/10 px-2 py-1 sm:inline">
+                        {card.rarity}
+                      </span>
+                    </>
+                  )}
                   {isVehicle && card.year && <span>{card.year}</span>}
                   {card.country && <span>{card.country}</span>}
                   <span>{ownedCount} {t(ownedCount > 1 ? 'exemplaires' : 'exemplaire')} {t(ownedCount > 1 ? 'possédés' : 'possédé')}</span>
                 </div>
               </div>
+
+              {ownedCount > 0 && (
+                <button
+                  type="button"
+                  disabled={favoritePending}
+                  aria-pressed={isFavorite}
+                  onClick={onToggleFavorite}
+                  className={`mb-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 disabled:opacity-50 ${isFavorite ? 'border-amber-400/60 bg-amber-400/15 text-amber-200' : 'border-white/15 bg-white/5 text-gray-200 hover:bg-white/10'}`}
+                >
+                  <Star size={18} fill={isFavorite ? 'currentColor' : 'none'} aria-hidden="true" />
+                  {favoritePending ? t('Enregistrement…') : isFavorite ? t('Retirer des favoris') : t('Ajouter aux favoris')}
+                </button>
+              )}
 
               {nextLevelUnlock && (
                 <section className="mb-6 rounded-xl border border-cyan-300/15 bg-cyan-300/[0.05] p-4">

@@ -82,13 +82,13 @@ export default function ObjectiveBoard({
   return (
     <div className="flex min-h-screen bg-[#050505] text-white">
       <Sidebar />
-      <main className="flex-1">
-        <div className="p-6 md:p-12">
+      <main className="min-w-0 flex-1">
+        <div className="p-4 sm:p-6 md:p-12">
           <header className="mb-9">
             <p className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.25em] text-blue-400">
               <Trophy size={14} /> Apex Collector
             </p>
-            <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t(title)}</h1>
+            <h1 className="text-3xl sm:text-4xl font-black uppercase italic tracking-tighter">{t(title)}</h1>
             <p className="mt-2 max-w-2xl text-sm text-gray-500">{t(subtitle)}</p>
           </header>
 
