@@ -23,8 +23,8 @@ Le créateur du projet n'est pas développeur. Être concret et compréhensible,
 
 - Lire ce fichier et les fichiers concernés avant de modifier quoi que ce soit.
 - Pour le fonctionnement réel, **le code, les migrations et package.json priment** sur les descriptions du README ou les anciennes réponses d'agents.
-- Le README contient des notes historiques (en français et en anglais) : ne pas les confondre avec une implémentation garantie.
-- Exemple concret : le README indique encore Next.js 14 ; **package.json déclare Next.js ^15.5.27**. Ne pas rétrograder la version pour s'aligner sur le README.
+- Le `README.md` est une présentation publique simplifiée ; ce fichier `AGENTS.md` regroupe les consignes de travail. Les autres docs peuvent contenir des informations historiques : vérifier le code avant de les appliquer.
+- `package.json` déclare **Next.js ^15.5.27**. Vérifier la version déclarée avant toute mise à jour ; ne pas suivre un numéro de version provenant d'une ancienne documentation.
 - Les effets, taux de boosters et prix sont définis dans le code et/ou Supabase ; les textes promotionnels ne font pas autorité.
 - Avant un changement d'architecture, inspecter les routes, les actions serveur, les tests et les migrations existants.
 - Mettre à jour le README et/ou ce fichier lorsqu'une modification change durablement une règle du projet ; ne pas ajouter de descriptions spéculatives.
@@ -54,7 +54,10 @@ Le créateur du projet n'est pas développeur. Être concret et compréhensible,
 | Couleurs et styles de rareté | `src/lib/rarity.ts` |
 | Niveaux et seuils d'amélioration | `src/lib/level.ts` |
 | Achat des améliorations | `src/lib/actions/card-upgrades.ts` |
-| Boutique, prix et probabilités des packs | `src/lib/boosters.ts` |
+| Boutique de boosters (cartes, grille, prix affichés) | `src/app/boosters/page.tsx` |
+| Ouverture et révélation des cartes des boosters | `src/app/open/page.tsx` |
+| Animations et halo de révélation | `src/app/globals.css` (`.booster-reveal-halo`) |
+| Configuration, prix et probabilités des packs | `src/lib/boosters.ts` |
 | Contrats et succès | `src/lib/actions/objectives.ts` |
 | Images et icônes | `src/lib/images/` ; `src/components/SafeImage.tsx` |
 | Conversions et statistiques véhicules | `src/lib/vehicleStats.ts` |
@@ -69,7 +72,7 @@ Le dossier `src/app/` définit les autres routes : `/boosters`, `/open`, `/marke
 **Direction artistique :** noir/anthracite, accents bleus, matériaux premium, automobiles et sport mécanique. Les textures (holographique, carbone, Kevlar, titane, etc.) décrites dans le README sont une inspiration ; certaines existent déjà et d'autres restent des idées.
 
 **Toujours contrôler :**
-- **Smartphone (< 768 px)** : navigation fixe en bas et menu « Plus ». La collection doit conserver **4 cartes par ligne** sur les petits écrans.
+- **Smartphone (< 768 px)** : navigation fixe en bas et menu « Plus ». La collection (`/collection`) doit conserver **4 cartes par ligne** sur les petits écrans ; **ne pas confondre** avec les grilles de boosters, qui suivent d'autres règles.
 - **À partir de 768 px** : sidebar latérale visible ; la navigation mobile est masquée. Ne pas faire disparaître la sidebar lorsque la fenêtre PC est réduite.
 - Les règles de cartes mobiles utilisent notamment `mobileGrid` et des classes Tailwind `sm:`. **Ne pas modifier leurs équivalents desktop par accident**.
 - Les cartes véhicules et circuits doivent conserver leur logo/drapeau, badge IP, rareté, données lisibles et comportements d'ouverture de détail.
@@ -80,7 +83,7 @@ Le dossier `src/app/` définit les autres routes : `/boosters`, `/open`, `/marke
 
 **Polices spécifiques :**
 - **Exo**, chargée via Google Fonts en CSS, est utilisée pour le badge IP dans `src/components/IPBadge.tsx`. Ne pas la remplacer.
-- **Bebas Neue** est utilisée pour le titre « Tableau de bord » dans `src/app/dashboard/page.tsx`. Ne pas l'appliquer globalement sans demande.
+- **Bebas Neue** est utilisée pour le titre « Tableau de bord » dans `src/app/dashboard/page.tsx` **et les noms des packs** dans `src/app/boosters/page.tsx`. Ne pas l'appliquer globalement sans demande.
 - Les polices sont importées dans `src/app/globals.css` ; préserver les solutions de repli.
 
 **Tableau de bord connecté :**
@@ -127,6 +130,16 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
 - Un éventuel **showroom public** est une idée future, **pas une permission de rendre tous les favoris ou inventaires publics**. Prévoir une sélection explicite, des données filtrées et une autorisation adaptée avant toute implémentation.
 - Dans Card Studio, un véhicule peut avoir un numéro permanent, être **désactivé** sans être supprimé, ou être **exclu des tirages de boosters**. « Désactivé » et « exclu des boosters » ne sont pas synonymes.
 - Les probabilités, coûts, quantités et exclusions des packs sont à vérifier dans `src/lib/boosters.ts` et les fonctions réelles d'ouverture ; ne pas déduire des taux à partir de textes marketing.
+
+**Présentation des boosters et révélation des cartes (règles validées) :**
+- **Boutique `/boosters` : 2 packs par ligne sur smartphone**. Les visuels, titres, descriptions, prix AP et boutons d'achat sont compacts sur mobile ; l'affichage ordinateur conserve jusqu'à **3 packs par ligne**. Les noms de packs utilisent **Bebas Neue**. Ne pas confondre la boutique avec l'écran de tirage.
+- **Après ouverture `/open` : 3 cartes par ligne uniquement sur smartphone** (grille `grid-cols-3` avant le breakpoint `sm` à 640 px). Sur les écrans plus larges, préserver la disposition `sm:flex sm:flex-wrap` et les dimensions desktop existantes.
+- Les cartes révélées sont rendues par `src/components/Card.tsx` avec `compact`, `showLevel={false}`, et `mobileGrid={useCompactPhoneCards}` pour le petit écran. Le mode `mobileGrid` est activé par `matchMedia('(max-width: 639px)')` ; ne pas l'appliquer à la version PC.
+- **Un tirage de booster ne doit jamais afficher de niveau, ni de badge « Niveau 0 », ni de badge d'exemplaires/niveau sous la carte.** Dans `Card.tsx`, les badges de niveau desktop **et** le badge mobile de collection sont conditionnés par `showLevel` (`mobileGrid && showLevel`). Préserver ce garde-fou : le badge reste utile dans la **collection** mais pas dans un tirage.
+- **Au retournement d'une carte**, afficher immédiatement un **halo extérieur discret** correspondant à sa rareté, sur **smartphone et PC**. Utiliser `getRarityColor()` de `src/lib/rarity.ts` plutôt qu'une liste de couleurs dupliquée. L'élément `.booster-reveal-halo` est un frère du conteneur rotatif, derrière la carte, pour ne pas recouvrir l'image et les statistiques.
+- **Aucune latence dans le halo** : l'animation CSS `booster-reveal-glow` de `src/app/globals.css` démarre **sans délai** et avec une opacité non nulle dès que l'état `flippedCards` passe à révélé. Préserver l'animation de retournement 3D et l'action « Retourner toutes les cartes ».
+- Respecter `prefers-reduced-motion` : le halo reste visible mais immobile. Conserver les effets holographiques de rareté préexistants ; ne pas les remplacer par l'aura de révélation.
+- Ne modifier **ni la dépense AP, ni les tirages, ni l'enregistrement des cartes** pour une demande de changement visuel sur `/boosters` ou `/open`.
 - Les contrats et succès sont administrés dans `/admin/objectives` : objectifs, cibles, rareté éventuelle, AP à réclamer, activation et progression.
 - Événements connus : ouverture de boosters, collection de véhicules ou circuits, rareté, annonce de marché, connexion sur différents jours.
 - Une récompense n'est pas acquise avant la réclamation prévue par le système ; respecter les fonctions RPC atomiques et la progression sauvegardée.
@@ -177,7 +190,7 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
 
 ## 12. Documentation complémentaire
 
-- `README.md` : présentation, inspirations, spécifications, notes historiques des agents, niveaux et administration (sections françaises et anglaises).
+- `README.md` : présentation publique simplifiée du jeu, fonctionnalités, installation, technologies, licence et contribution. Les règles destinées aux agents sont ici, dans `AGENTS.md`.
 - `docs/SETUP.md` : installation locale, variables d'environnement et Supabase (certaines sections sont anciennes : vérifier le dépôt).
 - `SUPABASE_STORAGE_STRUCTURE.md` : structure du bucket, chemins et conventions d'images.
 - `supabase/migrations/` : historique SQL réel ; vérifier l'état de la base avant de l'utiliser.
