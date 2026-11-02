@@ -69,7 +69,7 @@ export default function BoostersPage() {
             )}
           </header>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 py-4">
+          <div className="grid grid-cols-2 gap-x-2 gap-y-3 py-3 sm:grid-cols-2 sm:gap-6 sm:py-4 xl:grid-cols-3">
             {Object.values(PACKS).map((pack, i) => (
               <motion.div
                 key={pack.slug}
@@ -81,12 +81,12 @@ export default function BoostersPage() {
                 {/* Glow Effect */}
                 <div className={`absolute -inset-0.5 bg-gradient-to-r ${pack.color} rounded-2xl blur opacity-20 group-hover:opacity-100 transition duration-500`}></div>
 
-                <div className="relative bg-[#0a0a0a] border border-white/10 rounded-2xl p-4 sm:p-6 h-full flex flex-col overflow-hidden">
+                <div className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0a0a0a] p-2.5 sm:rounded-2xl sm:p-6">
                   {/* Decorative Gradient Top */}
                   <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${pack.color}`}></div>
 
                   <div className="flex-1">
-                    <div className="relative w-[50%] mx-auto aspect-[3/4] rounded-xl overflow-hidden mb-6 shadow-2xl group-hover:scale-[1.02] transition-transform duration-500">
+                    <div className="relative mx-auto mb-2.5 aspect-[3/4] w-[62%] overflow-hidden rounded-lg shadow-2xl transition-transform duration-500 group-hover:scale-[1.02] sm:mb-6 sm:w-[50%] sm:rounded-xl">
                       <SafeImage
                         src={pack.imageUrl}
                         alt={pack.name}
@@ -96,28 +96,27 @@ export default function BoostersPage() {
                       <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent`}></div>
                     </div>
 
-                    <h2 className="text-2xl font-bold mb-2">{t(pack.name)}</h2>
-                    <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-                      {t(pack.description)}
-                      <br />
-                      <span className="text-white/60 text-xs italic mt-2 block">
+                    <h2 className="mb-1 min-h-8 text-[13px] font-bold leading-4 sm:mb-2 sm:min-h-0 sm:text-2xl sm:leading-normal">{t(pack.name)}</h2>
+                    <p className="mb-2 text-[10px] leading-[1.35] text-gray-400 sm:mb-6 sm:text-sm sm:leading-relaxed">
+                      <span className="line-clamp-2 sm:line-clamp-none">{t(pack.description)}</span>
+                      <span className="mt-1 block text-[9px] italic text-white/60 sm:mt-2 sm:text-xs">
                         {t('Contient')} {pack.cardCount} {t('cartes aléatoires')}
                       </span>
                     </p>
                   </div>
 
-                  <div className="mt-8">
-                    <div className="flex items-center justify-between mb-4 px-2">
-                      <span className="text-2xl font-black italic tracking-tighter">
-                        <span className="text-blue-500 not-italic mr-1 text-base">▲</span>{pack.price}
+                  <div className="mt-2 sm:mt-8">
+                    <div className="mb-2 flex min-w-0 items-center justify-between gap-1 sm:mb-4 sm:px-2">
+                      <span className="whitespace-nowrap text-base font-black italic tracking-tighter sm:text-2xl">
+                        <span className="mr-0.5 text-xs not-italic text-blue-500 sm:mr-1 sm:text-base">▲</span>{pack.price}<span className="ml-1 text-[9px] not-italic text-blue-400 sm:hidden">AP</span>
                       </span>
-                      <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-600">{t('Apex Points')}</span>
+                      <span className="hidden text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600 sm:inline">{t('Apex Points')}</span>
                     </div>
 
                     <button
                       disabled={profile && profile.ap < pack.price}
                       onClick={() => router.push(`/open?pack=${pack.slug}`)}
-                      className={`w-full py-4 rounded-xl font-black text-xs tracking-[0.2em] uppercase transition-all duration-300 shadow-lg shadow-black/40 
+                      className={`min-h-10 w-full rounded-lg px-1 py-2 text-[9px] font-black uppercase leading-tight tracking-normal shadow-lg shadow-black/40 transition-all duration-300 sm:rounded-xl sm:py-4 sm:text-xs sm:tracking-[0.2em] 
                         ${profile && profile.ap < pack.price
                           ? 'bg-gray-800 text-gray-600 grayscale cursor-not-allowed border border-white/5'
                           : `bg-gradient-to-r ${pack.color} text-white hover:scale-[1.02] active:scale-[0.98] hover:shadow-2xl hover:shadow-black/50`
