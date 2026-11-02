@@ -22,6 +22,8 @@ type CardProps = AnyCard & {
   compact?: boolean;
   /** Four-column phone collection with all original card information. */
   mobileGrid?: boolean;
+  /** Lift the vehicle name slightly on booster reveal cards only. */
+  boosterReveal?: boolean;
   isFavorite?: boolean;
   upgradeLevel?: number;
   upgradePrice?: number;
@@ -44,6 +46,7 @@ export default function Card(props: CardProps) {
     showLevel = true,
     compact = false,
     mobileGrid = false,
+    boosterReveal = false,
     isFavorite = false,
     count = 0,
     upgradeLevel = 0,
@@ -248,7 +251,11 @@ export default function Card(props: CardProps) {
         )}>
 
           {/* Title Section */}
-          <div className={clsx("min-w-0 w-full text-center", mobileGrid && isVehicle ? "relative -top-1 mb-0 sm:static sm:mb-3" : mobileGrid ? "mb-0 sm:mb-3" : compact ? "mb-2" : "mb-3")}>
+          <div className={clsx(
+            "min-w-0 w-full text-center",
+            mobileGrid && isVehicle ? "relative -top-1 mb-0 sm:static sm:mb-3" : mobileGrid ? "mb-0 sm:mb-3" : compact ? "mb-2" : "mb-3",
+            boosterReveal && isVehicle && "relative -translate-y-1",
+          )}>
             <h3 className={clsx("font-bold text-white uppercase", mobileGrid ? "line-clamp-2 text-[8px] leading-[9px] tracking-normal sm:line-clamp-none sm:text-lg sm:leading-tight sm:tracking-wider" : compact ? "text-sm leading-tight tracking-wider" : "text-lg leading-tight tracking-wider")}>
               {isVehicle ? (props as any).make : (props as any).name}
             </h3>

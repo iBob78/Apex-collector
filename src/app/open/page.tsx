@@ -393,6 +393,7 @@ function OpenContent() {
                           showLevel={false}
                           compact
                           mobileGrid={useCompactPhoneCards}
+                          boosterReveal
                           className="h-full"
                           onCardClick={() => flipCard(idx)}
                         />
