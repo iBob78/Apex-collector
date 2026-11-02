@@ -56,7 +56,6 @@ export default function DashboardPage() {
   const apBalance = Number(profile?.ap) || 0;
   const duplicateCards = Math.max(0, stats.totalCards - stats.uniqueCards);
   const averageCopies = stats.uniqueCards > 0 ? stats.totalCards / stats.uniqueCards : 0;
-  const modelsUntilNextLevel = 10 - progressCount;
   const formatNumber = (value: number) => new Intl.NumberFormat(language).format(value);
   const formatAverage = (value: number) => new Intl.NumberFormat(language, { maximumFractionDigits: 1 }).format(value);
 
@@ -82,12 +81,12 @@ export default function DashboardPage() {
             <div className="flex shrink-0 items-center gap-2">
               <div
                 aria-label={t('Balance AP')}
-                className="flex min-h-10 flex-col justify-center rounded-xl border border-emerald-400/25 bg-[#0e1a17] px-3 py-1.5 text-right shadow-[0_1px_16px_rgba(0,0,0,0.18)]"
+                className="flex min-h-9 flex-col justify-center rounded-lg border border-emerald-400/25 bg-[#0e1a17] px-2 py-1 text-right shadow-[0_1px_16px_rgba(0,0,0,0.18)]"
               >
-                <span className="text-[9px] font-bold uppercase leading-tight tracking-wider text-emerald-200/70">
+                <span className="text-[8px] font-bold uppercase leading-tight tracking-normal text-emerald-200/70">
                   {t('Balance AP')}
                 </span>
-                <span className="max-w-[42vw] truncate font-mono text-sm font-black leading-tight tabular-nums text-emerald-200 sm:text-base" title={formatNumber(apBalance) + ' AP'}>
+                <span className="max-w-[35vw] truncate font-mono text-xs font-black leading-tight tabular-nums text-emerald-200 sm:max-w-[12rem] sm:text-sm" title={formatNumber(apBalance) + ' AP'}>
                   ▲ {formatNumber(apBalance)} AP
                 </span>
               </div>
@@ -164,32 +163,31 @@ export default function DashboardPage() {
                 </div>
               </article>
 
-              <article className="col-span-2 flex min-w-0 flex-col rounded-2xl border border-amber-400/15 bg-[#171610] p-4 sm:p-5 lg:col-span-1">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-amber-200 sm:text-xs">
-                    {t('Niveau écurie')}
-                  </h3>
-                  <Gauge size={20} className="shrink-0 text-amber-300" aria-hidden="true" />
+              <article className="col-span-2 min-w-0 self-start rounded-2xl border border-amber-400/15 bg-[#171610] p-3 sm:p-4 lg:col-span-1">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <Gauge size={17} className="shrink-0 text-amber-300" aria-hidden="true" />
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-amber-200 sm:text-xs">
+                      {t('Niveau écurie')}
+                    </h3>
+                  </div>
+                  <strong className="font-mono text-xl font-black tabular-nums text-white sm:text-2xl">
+                    {garageLevel}
+                  </strong>
                 </div>
-                <p className="mt-3 font-mono text-3xl font-black tabular-nums text-white sm:text-4xl">
-                  {garageLevel}
-                </p>
-                <p className="mt-1 text-xs text-gray-400">{t('Vers le prochain niveau')}</p>
-                <div className="mt-auto border-t border-white/10 pt-3 sm:mt-5">
-                  <div className="flex items-center justify-between gap-3 text-xs text-gray-400">
-                    <span>{modelsUntilNextLevel} {t('modèles avant le prochain niveau')}</span>
-                    <span className="shrink-0 font-mono tabular-nums text-amber-200">{progressCount}/10</span>
-                  </div>
-                  <div
-                    role="progressbar"
-                    aria-label={t('Vers le prochain niveau')}
-                    aria-valuemin={0}
-                    aria-valuemax={10}
-                    aria-valuenow={progressCount}
-                    className="mt-2 h-2 overflow-hidden rounded-full bg-white/10"
-                  >
-                    <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-200" style={{ width: progressPercent + '%' }} />
-                  </div>
+                <div className="mt-3 flex items-center justify-between gap-3 text-[11px] text-gray-400">
+                  <span>{t('Vers le prochain niveau')}</span>
+                  <span className="shrink-0 font-mono tabular-nums text-amber-200">{progressCount}/10</span>
+                </div>
+                <div
+                  role="progressbar"
+                  aria-label={t('Vers le prochain niveau')}
+                  aria-valuemin={0}
+                  aria-valuemax={10}
+                  aria-valuenow={progressCount}
+                  className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/10"
+                >
+                  <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-200" style={{ width: progressPercent + '%' }} />
                 </div>
               </article>
             </div>
