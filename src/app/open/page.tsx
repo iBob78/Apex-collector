@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { ajouterCarteAuJoueur, ajouterCircuitAuJoueur } from '@/lib/actions/carte';
 import { deductAP } from '@/lib/actions/profile';
 import { updateQuestProgress } from '@/lib/actions/quests';
-import { drawBoosterCards, PACKS } from '@/lib/boosters';
+import { drawBoosterCards, getFirstTimeBoosterCardIndices, PACKS } from '@/lib/boosters';
 import Card from '@/components/Card';
 import SafeImage from '@/components/SafeImage';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,6 +28,7 @@ function OpenContent() {
   const [tearProgress, setTearProgress] = useState(0);
   const [showCards, setShowCards] = useState(false);
   const [drawnCards, setDrawnCards] = useState<any[]>([]);
+  const [firstTimeCardIndices, setFirstTimeCardIndices] = useState<Set<number>>(() => new Set());
   const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set());
   const [useCompactPhoneCards, setUseCompactPhoneCards] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -80,6 +81,25 @@ function OpenContent() {
         pack.cardCount
       );
 
+      // Read ownership BEFORE saving: "NEW!" must mean absent from the original collection.
+      // If a read fails, suppress the cosmetic badge without blocking the booster opening.
+      const vehicleIds = results.filter((card) => card.category !== 'circuit')
+        .map((card) => String(card.card_id || card.id));
+      const circuitIds = results.filter((card) => card.category === 'circuit')
+        .map((card) => String(card.card_id || card.id));
+      const [ownedVehiclesResult, ownedCircuitsResult] = await Promise.all([
+        vehicleIds.length
+          ? supabase.from('user_cards').select('card_id, count').eq('user_id', userId).in('card_id', vehicleIds)
+          : Promise.resolve({ data: [], error: null }),
+        circuitIds.length
+          ? supabase.from('user_circuits').select('circuit_id, count').eq('user_id', userId).in('circuit_id', circuitIds)
+          : Promise.resolve({ data: [], error: null }),
+      ]);
+      const ownershipVerified = !ownedVehiclesResult.error && !ownedCircuitsResult.error;
+      if (!ownershipVerified) {
+        console.warn('[Booster] Impossible de vérifier les premières découvertes.', ownedVehiclesResult.error || ownedCircuitsResult.error);
+      }
+
       // 1. Déduire les AP après avoir confirmé qu'un tirage est possible.
       const deduction = await deductAP(userId, pack.price);
 
@@ -90,7 +110,7 @@ function OpenContent() {
       }
 
       // 2. Sauvegarde dans la collection du joueur
-      await Promise.all(
+      const additions = await Promise.all(
         results.map(async (card) => {
           const isCircuit = (card.category === 'circuit') || (card.type === 'Circuit') || (card.track_name != null);
           const uniqueId = String((card as any).card_id || card.id);
@@ -103,6 +123,14 @@ function OpenContent() {
         })
       );
 
+      setFirstTimeCardIndices(ownershipVerified
+        ? getFirstTimeBoosterCardIndices(
+            results,
+            ownedVehiclesResult.data || [],
+            ownedCircuitsResult.data || [],
+            additions.map((addition) => addition.success),
+          )
+        : new Set());
       setDrawnCards(results);
 
       // 3. Mettre à jour la progression des quêtes
@@ -397,6 +425,14 @@ function OpenContent() {
                           className="h-full"
                           onCardClick={() => flipCard(idx)}
                         />
+                        {firstTimeCardIndices.has(idx) && (
+                          <span
+                            aria-label={t('Nouvelle Carte')}
+                            className="pointer-events-none absolute left-1/2 top-1 z-30 -translate-x-1/2 rounded-md border border-lime-100/80 bg-lime-300 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-[#092210] shadow-[0_0_14px_rgba(163,230,53,0.5)] sm:top-2 sm:px-2 sm:py-1 sm:text-xs"
+                          >
+                            NEW!
+                          </span>
+                        )}
                       </div>
                     </motion.div>
                   </motion.div>
