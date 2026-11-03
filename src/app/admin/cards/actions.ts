@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
 import { isAdminEmail } from '@/lib/admin';
+import { findCollectionNumberGap } from '@/lib/collectionNumber';
 
 const rarities = ['Common', 'Uncommon', 'Atypique', 'Rare', 'Very rare', 'Epic', 'Legend', 'Mythic', 'Icon'] as const;
 const draftFields: (keyof CardDraft)[] = [
@@ -251,6 +252,37 @@ async function getAdminClient(): Promise<
   return { client, error: null };
 }
 
+const COLLECTION_NUMBER_PAGE_SIZE = 500;
+
+async function findNextMissingCollectionNumber(
+  client: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+): Promise<{ number: number | null; error: string | null }> {
+  let nextExpected = 1;
+
+  // Le catalogue peut dépasser la limite de lignes renvoyées par Supabase.
+  for (let offset = 0; ; offset += COLLECTION_NUMBER_PAGE_SIZE) {
+    const { data, error } = await client
+      .from('cards')
+      .select('collection_number')
+      .order('collection_number', { ascending: true })
+      .range(offset, offset + COLLECTION_NUMBER_PAGE_SIZE - 1);
+
+    if (error) {
+      return { number: null, error: `Impossible de vérifier les numéros de collection : ${error.message}` };
+    }
+
+    const numbers = (data ?? []).map(({ collection_number }) => Number(collection_number));
+    const scan = findCollectionNumberGap(numbers, nextExpected);
+    if (scan.missing !== null) return { number: scan.missing, error: null };
+    nextExpected = scan.nextExpected;
+
+    if (numbers.length < COLLECTION_NUMBER_PAGE_SIZE) {
+      // Pas de trou : laisser la séquence en base gérer le prochain numéro.
+      return { number: null, error: null };
+    }
+  }
+}
+
 function revalidateCardPages() {
   revalidatePath('/admin/cards');
   revalidatePath('/cards');
@@ -265,15 +297,36 @@ export async function createCard(draft: CardDraft): Promise<SaveResult> {
   const parsed = parseCardDraft(draft);
   if (!('data' in parsed)) return { success: false, error: parsed.error };
 
-  const { data, error } = await authorization.client
-    .from('cards')
-    .insert({ ...parsed.data, card_id: crypto.randomUUID() })
-    .select('*')
-    .single();
+  const cardId = crypto.randomUUID();
 
-  if (error) return { success: false, error: `La carte n’a pas pu être créée : ${error.message}` };
-  revalidateCardPages();
-  return { success: true, card: data as CardData };
+  // Deux créations simultanées peuvent identifier le même trou. La contrainte
+  // unique en base protège le catalogue ; on relit les numéros si elle intervient.
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const available = await findNextMissingCollectionNumber(authorization.client);
+    if (available.error) return { success: false, error: available.error };
+
+    const { data, error } = await authorization.client
+      .from('cards')
+      .insert({
+        ...parsed.data,
+        card_id: cardId,
+        ...(available.number !== null ? { collection_number: available.number } : {}),
+      })
+      .select('*')
+      .single();
+
+    if (!error) {
+      revalidateCardPages();
+      return { success: true, card: data as CardData };
+    }
+
+    const numberAlreadyTaken = error.code === '23505' && /collection_number/i.test(error.message);
+    if (!numberAlreadyTaken || attempt === 2) {
+      return { success: false, error: `La carte n’a pas pu être créée : ${error.message}` };
+    }
+  }
+
+  return { success: false, error: 'Impossible de réserver un numéro de collection disponible.' };
 }
 
 export async function updateCard(id: string, draft: CardDraft): Promise<SaveResult> {
