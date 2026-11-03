@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { fetchAllPages } from '@/lib/fetchAllPages';
 import Sidebar from '@/components/Sidebar';
 import Card from '@/components/Card';
 import CardDetailsModal from '@/components/Collection/CardDetailsModal';
@@ -60,17 +61,16 @@ export default function CollectionPage() {
       setLoading(true);
       try {
         // 1. Récupérer toutes les bases (Véhicules ET Circuits)
-        const [cardsRes, circuitsRes] = await Promise.all([
-          supabase.from('cards').select('*').eq('is_active', true),
-          supabase.from('circuits').select('*')
+        const [vehicleRows, circuitRows] = await Promise.all([
+          fetchAllPages((from, to) => supabase.from('cards')
+            .select('*').eq('is_active', true).order('id').range(from, to)),
+          fetchAllPages((from, to) => supabase.from('circuits')
+            .select('*').order('id').range(from, to)),
         ]);
 
-        if (cardsRes.error) throw cardsRes.error;
-        if (circuitsRes.error) throw circuitsRes.error;
-
         // Normalisation : On injecte la catégorie explicitement
-        const allVehicles = (cardsRes.data || []).map(c => ({ ...c, category: 'vehicle' }));
-        const allCircuits = (circuitsRes.data || []).map(c => ({ ...c, category: 'circuit' }));
+        const allVehicles = vehicleRows.map(c => ({ ...c, category: 'vehicle' }));
+        const allCircuits = circuitRows.map(c => ({ ...c, category: 'circuit' }));
         const combinedBase = [...allVehicles, ...allCircuits];
 
         // 2. Récupérer la collection (UserCards ET UserCircuits)
@@ -82,28 +82,32 @@ export default function CollectionPage() {
           return;
         }
 
-        const [userCardsRes, userCircuitsRes, favoritesRes] = await Promise.all([
-          supabase.from('user_cards').select('*').eq('user_id', user.id),
-          supabase.from('user_circuits').select('*').eq('user_id', user.id),
-          supabase.from('card_favorites').select('category,card_id').eq('user_id', user.id),
+        const [ownedVehicles, ownedCircuits, favorites] = await Promise.all([
+          fetchAllPages((from, to) => supabase.from('user_cards')
+            .select('*').eq('user_id', user.id).order('id').range(from, to)),
+          fetchAllPages((from, to) => supabase.from('user_circuits')
+            .select('*').eq('user_id', user.id).order('id').range(from, to)),
+          fetchAllPages((from, to) => supabase.from('card_favorites')
+            .select('category,card_id').eq('user_id', user.id)
+            .order('category').order('card_id').range(from, to))
+            .catch((error) => {
+              // Les favoris restent optionnels : un échec ne masque pas le catalogue.
+              console.error('[CollectionPage] Erreur favoris:', error);
+              setFavoritesError(t('Impossible de charger les favoris.'));
+              return null;
+            }),
         ]);
 
-        if (userCardsRes.error) throw userCardsRes.error;
-        if (userCircuitsRes.error) throw userCircuitsRes.error;
-
-        if (favoritesRes.error) {
-          console.error('[CollectionPage] Erreur favoris:', favoritesRes.error);
-          setFavoritesError(t('Impossible de charger les favoris.'));
-        } else {
+        if (favorites !== null) {
           setFavoritesError(null);
-          setFavoriteKeys(new Set((favoritesRes.data || []).map((item) => `${item.category}:${String(item.card_id).toLowerCase()}`)));
+          setFavoriteKeys(new Set(favorites.map((item) => `${item.category}:${String(item.card_id).toLowerCase()}`)));
         }
 
         let ownedMap: Record<string, number> = {};
         let levelMap: Record<string, number> = {};
 
         // Mapping des véhicules
-        userCardsRes.data?.forEach((item: any) => {
+        ownedVehicles.forEach((item: any) => {
           const val = Number(item.count ?? item.quantity ?? 1);
           const rawCid = item.card_id || item.id;
           if (rawCid) {
@@ -114,7 +118,7 @@ export default function CollectionPage() {
         });
 
         // Mapping des circuits
-        userCircuitsRes.data?.forEach((item: any) => {
+        ownedCircuits.forEach((item: any) => {
           const val = Number(item.count ?? 1);
           const cid = item.circuit_id || item.id; // Dans user_circuits, c'est souvent circuit_id
           if (cid) {
