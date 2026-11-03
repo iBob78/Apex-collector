@@ -200,7 +200,12 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
     });
     setSelectedId(result.card.id);
     setDraft(toDraft(result.card));
-    setFeedback({ type: 'success', text: selectedId ? 'Modifications enregistrées.' : 'Carte créée dans le catalogue.' });
+    setFeedback({
+      type: 'success',
+      text: selectedId
+        ? 'Modifications enregistrées.'
+        : `Carte n°${result.card.collection_number} créée dans le catalogue.`,
+    });
   };
 
   return (
@@ -251,6 +256,11 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                     {selectedCard ? `Édition · ${selectedCard.id.slice(0, 8)}` : 'Nouvelle fiche'}
                   </p>
                   <h2 className="mt-1 text-xl font-black">{selectedCard ? 'Modifier la carte' : 'Identité du véhicule'}</h2>
+                  <p className="mt-2 text-xs text-slate-500">
+                    {selectedCard
+                      ? `Collection n°${selectedCard.collection_number} · numéro conservé à la modification`
+                      : 'Le numéro de collection est attribué à la création, en comblant d’abord les numéros manquants.'}
+                  </p>
                 </div>
                 {selectedCard && (
                   <button type="button" onClick={startNewCard} className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-slate-400 hover:bg-white/5 hover:text-white">
@@ -511,7 +521,7 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                     <span className="min-w-0 flex-1">
                       <span className={`block truncate text-xs font-bold ${card.is_active === false ? 'text-red-100/80' : 'text-slate-100'}`}>{card.make} {card.model}</span>
                       <span className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] text-slate-500">
-                        <span>{card.year} · {card.rarity}</span>
+                        <span>N°{card.collection_number} · {card.year} · {card.rarity}</span>
                         {card.is_active === false && (
                           <span className="inline-flex items-center gap-1 rounded-md border border-red-400/25 bg-red-400/10 px-1.5 py-0.5 font-black uppercase tracking-wide text-red-300">
                             <Ban size={10} /> Désactivée
