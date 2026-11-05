@@ -96,7 +96,7 @@ export default function Card(props: CardProps) {
       ? hasCollectionNumber ? 'p-2 pb-7' : 'p-2'
       : hasCollectionNumber ? 'p-4 pb-10' : 'p-4';
   const level = Math.max(0, Math.min(9, Math.floor(Number(upgradeLevel) || 0)));
-  const levelEffectClass = level >= 2 ? `card-upgrade-effect-${level}` : null;
+  const levelEffectClass = level >= 1 ? `card-upgrade-effect-${level}` : null;
   const drivetrainLayout = isVehicle ? (props as any).transmission : undefined;
   const drivetrainLayoutIcon = resolveDrivetrainLayoutIcon(drivetrainLayout);
   const drivetrainLayoutDescription = typeof drivetrainLayout === 'string'
