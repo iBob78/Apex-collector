@@ -2,8 +2,10 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ArrowLeft, ShieldAlert } from 'lucide-react';
 import { isAdminEmail } from '@/lib/admin';
+import { fetchAllPages } from '@/lib/fetchAllPages';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
 import CardStudio from './CardStudio';
+import type { CardData } from './actions';
 
 export default async function AdminCardsPage() {
   const supabase = await createServerSupabaseClient();
@@ -40,20 +42,24 @@ export default async function AdminCardsPage() {
     );
   }
 
-  const { data: cards, error } = await supabase
-    .from('cards')
-    .select('*')
-    .order('make', { ascending: true });
-
-  if (error) {
+  let cards: CardData[];
+  try {
+    cards = await fetchAllPages((from, to) => supabase
+      .from('cards')
+      .select('*')
+      .order('id')
+      .range(from, to)) as CardData[];
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Erreur Supabase inconnue.';
+    console.error('[AdminCardsPage] Impossible de charger le catalogue complet:', message);
     return (
       <main className="min-h-screen bg-[#07090d] px-5 py-12 text-white md:px-10">
         <p role="alert" className="mx-auto max-w-3xl rounded-2xl border border-red-400/20 bg-red-400/10 p-5 text-red-200">
-          Impossible de charger le catalogue : {error.message}
+          Impossible de charger le catalogue : {message}
         </p>
       </main>
     );
   }
 
-  return <CardStudio initialCards={cards ?? []} />;
+  return <CardStudio initialCards={cards} />;
 }

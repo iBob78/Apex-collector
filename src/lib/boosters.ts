@@ -5,9 +5,12 @@ type BoosterRarity = 'Common' | 'Uncommon' | 'Rare' | 'Epic' | 'Legend' | 'Icon'
 export interface BoosterCatalogCard {
     id?: string;
     card_id?: string;
+    circuit_id?: string;
+    driver_id?: string;
     rarity?: string | null;
     is_active?: boolean;
     booster_enabled?: boolean;
+    category?: 'vehicle' | 'circuit' | 'driver';
     [key: string]: unknown;
 }
 
@@ -201,37 +204,17 @@ export function drawBoosterCards(
     vehicleCards: BoosterCatalogCard[],
     circuitCards: BoosterCatalogCard[],
     count = (PACKS[packSlug] || PACKS.common).cardCount,
-    random = Math.random
+    random = Math.random,
+    driverCards: BoosterCatalogCard[] = [],
 ): BoosterCatalogCard[] {
     const pack = PACKS[packSlug] || PACKS.common;
     if (count <= 0) return [];
     vehicleCards = vehicleCards.filter((card) => card.is_active !== false && card.booster_enabled !== false);
+    driverCards = driverCards.filter((card) => card.is_active !== false && card.booster_enabled !== false);
 
     const supportedRarities = (Object.keys(pack.probabilities) as BoosterRarity[]).filter(
         (rarity) => pack.probabilities[rarity] > 0
     );
-    const unclassifiedCircuits = circuitCards.filter(
-        (card) => !supportedRarities.includes(card.rarity as BoosterRarity)
-    );
-    const circuitsForRarity = (rarity: BoosterRarity) => [
-        ...circuitCards.filter((card) => card.rarity === rarity),
-        ...unclassifiedCircuits
-    ];
-    const availableRarities = supportedRarities.filter(
-        (rarity) => pack.probabilities[rarity] > 0 &&
-            (vehicleCards.some((card) => card.rarity === rarity) || circuitsForRarity(rarity).length > 0)
-    );
-
-    if (availableRarities.length === 0) {
-        throw new Error('Aucune carte disponible dans le catalogue du booster.');
-    }
-
-    const circuitRarities = availableRarities.filter((rarity) => circuitsForRarity(rarity).length > 0);
-
-    if (circuitRarities.length === 0) {
-        throw new Error('Aucune carte circuit disponible dans le catalogue du booster.');
-    }
-
     const drawRarityFrom = (rarities: BoosterRarity[]) => {
         const totalWeight = rarities.reduce((sum, rarity) => sum + pack.probabilities[rarity], 0);
         let rarityRoll = random() * totalWeight;
@@ -248,6 +231,37 @@ export function drawBoosterCards(
         return selectedRarity;
     };
 
+    const assignMissingRarities = (cards: BoosterCatalogCard[]) => cards.map((card) => ({
+        ...card,
+        rarity: supportedRarities.includes(card.rarity as BoosterRarity)
+            ? card.rarity
+            : drawRarityFrom(supportedRarities),
+    }));
+    const classifiedVehicles = assignMissingRarities(vehicleCards);
+    const classifiedCircuits = assignMissingRarities(circuitCards);
+    const classifiedDrivers = assignMissingRarities(driverCards);
+    const vehiclesForRarity = (rarity: BoosterRarity) =>
+        classifiedVehicles.filter((card) => card.rarity === rarity);
+    const circuitsForRarity = (rarity: BoosterRarity) =>
+        classifiedCircuits.filter((card) => card.rarity === rarity);
+    const driversForRarity = (rarity: BoosterRarity) =>
+        classifiedDrivers.filter((card) => card.rarity === rarity);
+    const availableRarities = supportedRarities.filter(
+        (rarity) => vehiclesForRarity(rarity).length > 0
+            || circuitsForRarity(rarity).length > 0
+            || driversForRarity(rarity).length > 0
+    );
+
+    if (availableRarities.length === 0) {
+        throw new Error('Aucune carte disponible dans le catalogue du booster.');
+    }
+
+    const circuitRarities = availableRarities.filter((rarity) => circuitsForRarity(rarity).length > 0);
+
+    if (circuitRarities.length === 0) {
+        throw new Error('Aucune carte circuit disponible dans le catalogue du booster.');
+    }
+
     const results: BoosterCatalogCard[] = [];
     const guaranteedCircuitRarity = drawRarityFrom(circuitRarities);
     const guaranteedCircuitPool = circuitsForRarity(guaranteedCircuitRarity);
@@ -263,21 +277,39 @@ export function drawBoosterCards(
     while (results.length < count) {
         const rarity = drawRarityFrom(availableRarities);
 
-        const vehicles = vehicleCards.filter((card) => card.rarity === rarity);
+        const vehicles = vehiclesForRarity(rarity);
         const circuits = circuitsForRarity(rarity);
-        let source = vehicles;
+        const drivers = driversForRarity(rarity);
+        const sourceOptions = [
+            { category: 'circuit' as const, cards: circuits, weight: circuits.length ? pack.circuitDropRate : 0 },
+            { category: 'driver' as const, cards: drivers, weight: drivers.length ? pack.circuitDropRate : 0 },
+            {
+                category: 'vehicle' as const,
+                cards: vehicles,
+                weight: vehicles.length
+                    ? Math.max(0, 1
+                        - (circuits.length ? pack.circuitDropRate : 0)
+                        - (drivers.length ? pack.circuitDropRate : 0))
+                    : 0,
+            },
+        ].filter((option) => option.cards.length > 0 && option.weight > 0);
 
-        if (vehicles.length > 0 && circuits.length > 0) {
-            source = random() < pack.circuitDropRate ? circuits : vehicles;
-        } else if (circuits.length > 0) {
-            source = circuits;
+        const totalWeight = sourceOptions.reduce((sum, option) => sum + option.weight, 0);
+        let sourceRoll = random() * totalWeight;
+        let selectedSource = sourceOptions[sourceOptions.length - 1];
+        for (const option of sourceOptions) {
+            sourceRoll -= option.weight;
+            if (sourceRoll < 0) {
+                selectedSource = option;
+                break;
+            }
         }
 
-        const selected = source[Math.floor(random() * source.length)];
+        const selected = selectedSource.cards[Math.floor(random() * selectedSource.cards.length)];
         results.push({
             ...selected,
             rarity: supportedRarities.includes(selected.rarity as BoosterRarity) ? selected.rarity : rarity,
-            category: source === circuits ? 'circuit' : 'vehicle'
+            category: selectedSource.category,
         });
     }
 
@@ -290,8 +322,9 @@ export function getFirstTimeBoosterCardIndices(
     ownedVehicles: readonly { card_id?: string | null; count?: number | null }[],
     ownedCircuits: readonly { circuit_id?: string | null; count?: number | null }[],
     savedSuccessfully: readonly boolean[],
+    ownedDrivers: readonly { driver_id?: string | null; count?: number | null }[] = [],
 ): Set<number> {
-    const keyFor = (category: 'vehicle' | 'circuit', id: unknown): string | null => {
+    const keyFor = (category: 'vehicle' | 'circuit' | 'driver', id: unknown): string | null => {
         const idText = String(id ?? '').trim().toLowerCase();
         return idText ? `${category}:${idText}` : null;
     };
@@ -305,13 +338,26 @@ export function getFirstTimeBoosterCardIndices(
         const key = keyFor('circuit', row.circuit_id);
         if (key && Number(row.count ?? 1) > 0) seen.add(key);
     }
+    for (const row of ownedDrivers) {
+        const key = keyFor('driver', row.driver_id);
+        if (key && Number(row.count ?? 1) > 0) seen.add(key);
+    }
 
     const firstTimeIndices = new Set<number>();
     drawnCards.forEach((card, index) => {
         if (!savedSuccessfully[index]) return;
 
-        const isCircuit = card.category === 'circuit' || card.type === 'Circuit' || card.track_name != null;
-        const key = keyFor(isCircuit ? 'circuit' : 'vehicle', card.card_id || card.id);
+        const category = card.category === 'driver' || card.driver_id != null
+            ? 'driver'
+            : card.category === 'circuit' || card.type === 'Circuit' || card.track_name != null
+                ? 'circuit'
+                : 'vehicle';
+        const cardId = category === 'driver'
+            ? card.driver_id || card.id
+            : category === 'circuit'
+                ? card.circuit_id || card.id
+                : card.card_id || card.id;
+        const key = keyFor(category, cardId);
         if (!key) return;
 
         if (!seen.has(key)) firstTimeIndices.add(index);

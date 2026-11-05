@@ -12,6 +12,7 @@ import { formatDistance, formatPower, formatSpeed, formatTorque, formatWeight } 
 import { getNextLevelUnlock } from '@/lib/level';
 import { getRarityColor } from '@/lib/rarity';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
+import { getDriverAgeAtCardYear } from '@/lib/driverCards';
 
 interface CardDetailsModalProps {
   card: any | null;
@@ -55,14 +56,15 @@ export default function CardDetailsModal({
   }, [card, onClose]);
 
   const isVehicle = card ? card.category === 'vehicle' || 'make' in card : false;
+  const isDriver = card ? card.category === 'driver' || 'driver_id' in card : false;
   const title = card
     ? isVehicle
       ? `${card.make || ''} ${card.model || ''}`.trim()
-      : card.name || 'Circuit'
+      : card.name || (isDriver ? 'Pilote' : 'Circuit')
     : '';
   const image = card
     ? resolveCardImage({
-        category: isVehicle ? 'vehicle' : 'circuit',
+        category: isDriver ? 'driver' : isVehicle ? 'vehicle' : 'circuit',
         make: card.make,
         model: card.model,
         year: card.year,
@@ -126,6 +128,17 @@ export default function CardDetailsModal({
           { label: t('Pays'), value: card.country || card.country_code || null },
           { label: t('Année'), value: card.year || null },
         ];
+  const cardDetails = isDriver && card
+    ? [
+        { label: t('Date de naissance'), value: card.birth_date || null },
+        { label: t('Âge sur cette carte'), value: getDriverAgeAtCardYear(card.birth_date, card.year) },
+        { label: t('Pays d’origine'), value: card.country || card.country_code || null },
+        { label: t('Titres de champion du monde'), value: card.world_championships ?? 0 },
+        { label: t('Grand Prix de Monaco remporté'), value: card.won_monaco_gp ? t('Oui') : t('Non') },
+        { label: t('500 miles d’Indianapolis remportés'), value: card.won_indy_500 ? t('Oui') : t('Non') },
+        { label: t('24 Heures du Mans remportées'), value: card.won_24h_le_mans ? t('Oui') : t('Non') },
+      ]
+    : details;
 
   return (
     <AnimatePresence>
@@ -152,7 +165,7 @@ export default function CardDetailsModal({
             <div className="relative min-h-0 bg-black md:min-h-[32rem]">
               <SafeImage
                 src={image}
-                fallback={isVehicle ? IMAGE_PATHS.PLACEHOLDERS.VEHICLE_CARD : IMAGE_PATHS.PLACEHOLDERS.CIRCUIT_CARD}
+                fallback={isVehicle ? IMAGE_PATHS.PLACEHOLDERS.VEHICLE_CARD : isDriver ? IMAGE_PATHS.PLACEHOLDERS.PILOT_CARD : IMAGE_PATHS.PLACEHOLDERS.CIRCUIT_CARD}
                 alt={title}
                 fill
                 className="object-cover"
@@ -177,7 +190,7 @@ export default function CardDetailsModal({
               </button>
 
               <div className="mb-6 pr-10">
-                <p className="mb-2 text-xs font-bold uppercase text-blue-400">{t(isVehicle ? 'Véhicule' : 'Circuit')}</p>
+                <p className="mb-2 text-xs font-bold uppercase text-blue-400">{t(isVehicle ? 'Véhicule' : isDriver ? 'Pilote' : 'Circuit')}</p>
                 <h2 id="card-details-title" className="text-2xl uppercase italic leading-tight sm:text-3xl">
                   {isVehicle ? (
                     <>
@@ -205,7 +218,12 @@ export default function CardDetailsModal({
                       </span>
                     </>
                   )}
-                  {isVehicle && card.year && <span>{card.year}</span>}
+                  {Number.isFinite(Number(card.collection_number)) && Number(card.collection_number) > 0 && (
+                    <span className="rounded border border-white/10 px-2 py-1 tabular-nums">
+                      #{Number(card.collection_number)}
+                    </span>
+                  )}
+                  {(isVehicle || isDriver) && card.year && <span>{card.year}</span>}
                   {card.country && <span>{card.country}</span>}
                   <span>{ownedCount} {t(ownedCount > 1 ? 'exemplaires' : 'exemplaire')} {t(ownedCount > 1 ? 'possédés' : 'possédé')}</span>
                 </div>
@@ -261,9 +279,9 @@ export default function CardDetailsModal({
                 </p>
               )}
 
-              {details.length > 0 && (
+              {cardDetails.length > 0 && (
                 <dl className="grid grid-cols-2 gap-2">
-                  {details.map(({ label, value }) => (
+                  {cardDetails.map(({ label, value }) => (
                     <div key={label} className="min-w-0 border-t border-white/10 py-3">
                       <dt className="text-[10px] font-bold uppercase text-gray-500">{label}</dt>
                       <dd className="mt-1 break-words text-sm font-semibold text-gray-100">

@@ -18,6 +18,7 @@ import {
   WrenchIcon,
   StarIcon,
   ClipboardListIcon,
+  AwardIcon,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabaseBrowser';
@@ -100,6 +101,7 @@ export default function Sidebar() {
     ...(user ? [
       { href: '/admin/cards', label: 'ATELIER CARTES', icon: WrenchIcon },
       { href: '/admin/circuits', label: 'ATELIER CIRCUITS', icon: MapIcon },
+      { href: '/admin/drivers', label: 'ATELIER PILOTES', icon: AwardIcon },
       { href: '/admin/objectives', label: 'ATELIER OBJECTIFS', icon: ClipboardListIcon },
     ] : []),
   ];
@@ -123,6 +125,7 @@ export default function Sidebar() {
         {[...navItems, ...(user ? [
           { href: '/admin/cards', label: 'ATELIER CARTES', icon: WrenchIcon },
           { href: '/admin/circuits', label: 'ATELIER CIRCUITS', icon: MapIcon },
+          { href: '/admin/drivers', label: 'ATELIER PILOTES', icon: AwardIcon },
           { href: '/admin/objectives', label: 'ATELIER OBJECTIFS', icon: ClipboardListIcon },
         ] : [])].map(({ href, label, icon: Icon }) => {
           const isActive = isActivePath(href);

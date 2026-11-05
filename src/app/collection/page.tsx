@@ -13,15 +13,28 @@ import { purchaseCardUpgrade } from '@/lib/actions/card-upgrades';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 import { Star } from 'lucide-react';
 
-type FavoriteCategory = 'vehicle' | 'circuit';
+type FavoriteCategory = 'vehicle' | 'circuit' | 'driver';
+
+function getCardCategory(card: any): FavoriteCategory {
+  return card.category === 'circuit' || card.category === 'driver' ? card.category : 'vehicle';
+}
+
+function getCardEntityId(card: any): string {
+  const category = getCardCategory(card);
+  const id = category === 'circuit'
+    ? card.circuit_id || card.id
+    : category === 'driver'
+      ? card.driver_id || card.id
+      : card.card_id || card.id;
+  return String(id).toLowerCase().trim();
+}
 
 function getCardId(card: any): string {
-  return String(card.category === 'circuit' ? (card.id || card.circuit_id) : (card.card_id || card.id)).toLowerCase().trim();
+  return `${getCardCategory(card)}:${getCardEntityId(card)}`;
 }
 
 function getFavoriteKey(card: any): string {
-  const category: FavoriteCategory = card.category === 'circuit' ? 'circuit' : 'vehicle';
-  return `${category}:${getCardId(card)}`;
+  return `${getCardCategory(card)}:${getCardEntityId(card)}`;
 }
 
 export default function CollectionPage() {
@@ -40,7 +53,7 @@ export default function CollectionPage() {
   const [favoritesError, setFavoritesError] = useState<string | null>(null);
 
   // Filters
-  const [activeTab, setActiveTab] = useState<'all' | 'vehicle' | 'circuit'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'vehicle' | 'circuit' | 'driver'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [rarityFilter, setRarityFilter] = useState<Rarity | 'All'>('All');
   const [sortBy, setSortBy] = useState<'name' | 'make-asc' | 'make-desc' | 'ip-desc' | 'ip-asc' | 'level-asc' | 'level-desc' | 'rarity' | 'newest'>('name');
@@ -60,20 +73,23 @@ export default function CollectionPage() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // 1. Récupérer toutes les bases (Véhicules ET Circuits)
-        const [vehicleRows, circuitRows] = await Promise.all([
+        // 1. Récupérer tous les catalogues disponibles.
+        const [vehicleRows, circuitRows, driverRows] = await Promise.all([
           fetchAllPages((from, to) => supabase.from('cards')
             .select('*').eq('is_active', true).order('id').range(from, to)),
           fetchAllPages((from, to) => supabase.from('circuits')
             .select('*').order('id').range(from, to)),
+          fetchAllPages((from, to) => supabase.from('drivers')
+            .select('*').eq('is_active', true).order('id').range(from, to)),
         ]);
 
         // Normalisation : On injecte la catégorie explicitement
         const allVehicles = vehicleRows.map(c => ({ ...c, category: 'vehicle' }));
         const allCircuits = circuitRows.map(c => ({ ...c, category: 'circuit' }));
-        const combinedBase = [...allVehicles, ...allCircuits];
+        const allDrivers = driverRows.map(c => ({ ...c, category: 'driver' }));
+        const combinedBase = [...allVehicles, ...allCircuits, ...allDrivers];
 
-        // 2. Récupérer la collection (UserCards ET UserCircuits)
+        // 2. Récupérer les cartes possédées et les favoris du joueur.
         if (!user) {
           setCards(combinedBase);
           setUserCardLevels({});
@@ -82,10 +98,12 @@ export default function CollectionPage() {
           return;
         }
 
-        const [ownedVehicles, ownedCircuits, favorites] = await Promise.all([
+        const [ownedVehicles, ownedCircuits, ownedDrivers, favorites] = await Promise.all([
           fetchAllPages((from, to) => supabase.from('user_cards')
             .select('*').eq('user_id', user.id).order('id').range(from, to)),
           fetchAllPages((from, to) => supabase.from('user_circuits')
+            .select('*').eq('user_id', user.id).order('id').range(from, to)),
+          fetchAllPages((from, to) => supabase.from('user_drivers')
             .select('*').eq('user_id', user.id).order('id').range(from, to)),
           fetchAllPages((from, to) => supabase.from('card_favorites')
             .select('category,card_id').eq('user_id', user.id)
@@ -111,7 +129,7 @@ export default function CollectionPage() {
           const val = Number(item.count ?? item.quantity ?? 1);
           const rawCid = item.card_id || item.id;
           if (rawCid) {
-            const cid = String(rawCid).toLowerCase().trim();
+            const cid = `vehicle:${String(rawCid).toLowerCase().trim()}`;
             ownedMap[cid] = (ownedMap[cid] || 0) + val;
             levelMap[cid] = Math.max(levelMap[cid] || 0, Number(item.upgrade_level) || 0);
           }
@@ -122,7 +140,16 @@ export default function CollectionPage() {
           const val = Number(item.count ?? 1);
           const cid = item.circuit_id || item.id; // Dans user_circuits, c'est souvent circuit_id
           if (cid) {
-            const key = String(cid).toLowerCase().trim();
+            const key = `circuit:${String(cid).toLowerCase().trim()}`;
+            ownedMap[key] = (ownedMap[key] || 0) + val;
+          }
+        });
+
+        ownedDrivers.forEach((item: any) => {
+          const val = Number(item.count ?? 1);
+          const driverId = item.driver_id || item.id;
+          if (driverId) {
+            const key = `driver:${String(driverId).toLowerCase().trim()}`;
             ownedMap[key] = (ownedMap[key] || 0) + val;
           }
         });
@@ -159,6 +186,7 @@ export default function CollectionPage() {
       result = result.filter(c =>
         (c.make?.toLowerCase().includes(q)) ||
         (c.model?.toLowerCase().includes(q)) ||
+        (c.country?.toLowerCase().includes(q)) ||
         (c.name?.toLowerCase().includes(q))
       );
     }
@@ -194,8 +222,8 @@ export default function CollectionPage() {
         return direction * (getIp(a) - getIp(b));
       }
       if (sortBy === 'level-asc' || sortBy === 'level-desc') {
-        const cardIdA = String(a.card_id || a.id).toLowerCase().trim();
-        const cardIdB = String(b.card_id || b.id).toLowerCase().trim();
+        const cardIdA = getCardId(a);
+        const cardIdB = getCardId(b);
         const levelDifference = (userCardLevels[cardIdA] || 0) - (userCardLevels[cardIdB] || 0);
         return sortBy === 'level-asc' ? levelDifference : -levelDifference;
       }
@@ -212,15 +240,11 @@ export default function CollectionPage() {
   const stats = useMemo(() => {
     const total = cards.length;
     // Utilisation de userCards normalisée
-    const activeVehicleIds = new Set(cards.filter((card) => card.category === 'vehicle').map((card) =>
-      String(card.card_id || card.id).toLowerCase().trim(),
-    ));
-    const owned = Object.keys(userCards).filter((cardId) => activeVehicleIds.has(cardId)).length;
+    const activeCardIds = new Set(cards.map(getCardId));
+    const owned = Object.keys(userCards).filter((cardId) => activeCardIds.has(cardId)).length;
     const percentage = total > 0 ? Math.round((owned / total) * 100) : 0;
     const totalCopies = Object.entries(userCards)
-      .filter(([cardId]) => activeVehicleIds.has(cardId) || cards.some((card) =>
-        card.category === 'circuit' && String(card.circuit_id || card.id).toLowerCase().trim() === cardId,
-      ))
+      .filter(([cardId]) => activeCardIds.has(cardId))
       .reduce((totalCount, [, count]) => totalCount + count, 0);
 
     return { total, owned, percentage, totalCopies };
@@ -228,10 +252,10 @@ export default function CollectionPage() {
 
   const handleToggleFavorite = async () => {
     if (!user || !selectedCard || favoritePendingKey) return;
-    const category: FavoriteCategory = selectedCard.category === 'circuit' ? 'circuit' : 'vehicle';
-    const cardId = getCardId(selectedCard);
+    const category = getCardCategory(selectedCard);
+    const cardId = getCardEntityId(selectedCard);
     const key = getFavoriteKey(selectedCard);
-    if ((userCards[cardId] || 0) <= 0) return;
+    if ((userCards[getCardId(selectedCard)] || 0) <= 0) return;
 
     setFavoritePendingKey(key);
     setFavoritesError(null);
@@ -262,7 +286,7 @@ export default function CollectionPage() {
     if (!user || upgradingCardId) return;
 
     const cardId = String(card.card_id || card.id);
-    const normalizedId = cardId.toLowerCase().trim();
+    const normalizedId = getCardId(card);
     const currentLevel = userCardLevels[normalizedId] || 0;
     const unlock = getNextLevelUnlock(userCards[normalizedId] || 0, currentLevel);
     if (!unlock?.unlocked) return;
@@ -310,7 +334,7 @@ export default function CollectionPage() {
                   {t('Mon Garage')}
                 </h1>
                 <p className="text-gray-500 font-mono text-sm mt-1">
-                  {t('Collection complète des véhicules et circuits d’exception.')}
+                  {t('Collection complète des véhicules, circuits et pilotes d’exception.')}
                 </p>
               </div>
 
@@ -323,15 +347,15 @@ export default function CollectionPage() {
             {/* Barre de Filtres */}
             <div className="flex flex-col gap-3 rounded-2xl border border-white/5 bg-[#0a0a0a] p-3 shadow-2xl sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 sm:p-4">
               {/* Tabs */}
-              <div className="grid w-full grid-cols-3 rounded-xl bg-white/5 p-1 sm:flex sm:w-auto">
-                {(['all', 'vehicle', 'circuit'] as const).map((tab) => (
+              <div className="grid w-full grid-cols-4 rounded-xl bg-white/5 p-1 sm:flex sm:w-auto">
+                {(['all', 'vehicle', 'circuit', 'driver'] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`min-h-11 rounded-lg px-2 py-2 text-[11px] font-bold uppercase tracking-wide transition-all sm:px-4 sm:text-xs sm:tracking-widest ${activeTab === tab ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
+                    className={`min-h-11 rounded-lg px-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all sm:px-4 sm:text-xs sm:tracking-widest ${activeTab === tab ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
                       }`}
                   >
-                    {t(tab === 'all' ? 'Tous' : tab === 'vehicle' ? 'Véhicules' : 'Circuits')}
+                    {t(tab === 'all' ? 'Tous' : tab === 'vehicle' ? 'Véhicules' : tab === 'circuit' ? 'Circuits' : 'Pilotes')}
                   </button>
                 ))}
               </div>

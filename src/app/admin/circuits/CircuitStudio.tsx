@@ -204,6 +204,7 @@ export default function CircuitStudio({ initialCircuits }: { initialCircuits: Ci
         <div className="mb-6 flex flex-wrap gap-2">
           <Link href="/admin/cards" className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-bold text-slate-400 transition hover:bg-white/5 hover:text-white">Cartes véhicule</Link>
           <Link href="/admin/circuits" className="rounded-xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-2.5 text-xs font-bold text-cyan-200">Cartes circuit</Link>
+          <Link href="/admin/drivers" className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-bold text-slate-400 transition hover:bg-white/5 hover:text-white">Cartes pilote</Link>
           <Link href="/admin/objectives" className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-bold text-slate-400 transition hover:bg-white/5 hover:text-white">Succès & contrats</Link>
         </div>
 
@@ -213,7 +214,7 @@ export default function CircuitStudio({ initialCircuits }: { initialCircuits: Ci
               <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-                    {selectedCircuit ? `Édition · ${selectedCircuit.id.slice(0, 8)}` : 'Nouvelle fiche'}
+                    {selectedCircuit ? `#${selectedCircuit.collection_number} · Édition` : 'Numéro attribué automatiquement à la création'}
                   </p>
                   <h2 className="mt-1 text-xl font-black">{selectedCircuit ? 'Modifier le circuit' : 'Identité du circuit'}</h2>
                 </div>
@@ -343,7 +344,11 @@ export default function CircuitStudio({ initialCircuits }: { initialCircuits: Ci
                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: getRarityColor(circuit.rarity) }} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-xs font-bold text-slate-100">{circuit.name}</span>
-                      <span className="mt-1 block truncate text-[10px] text-slate-500">{circuit.country || circuit.country_code || 'Pays non défini'} · {circuit.type || circuit.rarity}</span>
+                      <span className="mt-1 block truncate text-[10px] text-slate-500">
+                        {[`#${circuit.collection_number}`, circuit.country || circuit.country_code || 'Pays non défini', circuit.year, circuit.type || circuit.rarity]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </span>
                     </span>
                     {selectedId === circuit.id ? <Check size={15} className="text-cyan-300" /> : <ChevronRight size={15} className="text-slate-600 transition group-hover:text-slate-300" />}
                   </button>

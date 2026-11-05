@@ -118,10 +118,16 @@ export function resolveCardImage(params: CardImageParams): string | undefined {
         const normalizedYear = year || 'unknown';
         const key = `${IMAGE_PATHS.CIRCUIT_CARD}/${normalizedName}-${normalizedYear}.jpg`;
         return getPublicImage(key);
-    } else {
-        // Défaut: véhicule
-        return getPublicImage(buildVehicleKey({ make, model, year }));
     }
+
+    if (category === 'driver') {
+        const normalizedName = normalize(name);
+        const normalizedYear = year || 'unknown';
+        const key = `${IMAGE_PATHS.DRIVER_CARD}/${normalizedName}-${normalizedYear}.jpg`;
+        return getPublicImage(key);
+    }
+
+    return getPublicImage(buildVehicleKey({ make, model, year }));
 }
 
 /**
