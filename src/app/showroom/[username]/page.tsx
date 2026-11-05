@@ -17,11 +17,16 @@ import type { VehicleCard } from '@/types/game';
 type PublicShowroom = {
   username: string;
   isPublic: boolean;
+  hasCollectionHighlights: boolean;
   vehicles: Array<VehicleCard & { position: number }>;
+  topUpgrades: Array<VehicleCard & { upgradeLevel: number }>;
+  achievements: Array<{ title: string; description: string }>;
   stats: {
     totalCards: number;
     legendaryCards: number;
     manufacturers: number;
+    boosterOpens: number;
+    cardsAcquired: number;
   } | null;
 };
 
@@ -54,7 +59,33 @@ export default function ShowroomPage() {
         console.error('[ShowroomPage] Impossible de charger le showroom:', error.message);
         if (active) setLoadError(true);
       } else if (active && data) {
-        setShowroom(data as PublicShowroom);
+        const response = data as Partial<PublicShowroom> & {
+          stats?: Partial<NonNullable<PublicShowroom['stats']>> | null;
+        };
+        const hasCollectionHighlights = Boolean(
+          response.stats &&
+          typeof response.stats.boosterOpens === 'number' &&
+          typeof response.stats.cardsAcquired === 'number' &&
+          Array.isArray(response.topUpgrades) &&
+          Array.isArray(response.achievements),
+        );
+        setShowroom({
+          username: response.username || username,
+          isPublic: Boolean(response.isPublic),
+          hasCollectionHighlights,
+          vehicles: Array.isArray(response.vehicles) ? response.vehicles : [],
+          topUpgrades: Array.isArray(response.topUpgrades) ? response.topUpgrades : [],
+          achievements: Array.isArray(response.achievements) ? response.achievements : [],
+          stats: response.stats
+            ? {
+                totalCards: Number(response.stats.totalCards) || 0,
+                legendaryCards: Number(response.stats.legendaryCards) || 0,
+                manufacturers: Number(response.stats.manufacturers) || 0,
+                boosterOpens: Number(response.stats.boosterOpens) || 0,
+                cardsAcquired: Number(response.stats.cardsAcquired ?? response.stats.totalCards) || 0,
+              }
+            : null,
+        });
       }
       if (active) setLoading(false);
     };
@@ -95,7 +126,9 @@ export default function ShowroomPage() {
                 <Link href="/marketplace" className="mb-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-400 transition hover:text-white">
                   <ArrowLeft size={15} /> {t('Retour au marché')}
                 </Link>
-                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-red-400">{t('Showroom public')}</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-red-400">
+                  {showroom.isPublic ? t('Showroom public') : t('Showroom privé')}
+                </p>
                 <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tight sm:text-4xl">
                   {t('Showroom de {username}', { username: showroom.username })}
                 </h1>
@@ -165,10 +198,87 @@ export default function ShowroomPage() {
               )}
 
               {showroom.isPublic && showroom.stats && (
-                <section className="mt-6 grid gap-3 sm:grid-cols-3" aria-label={t('Statistiques du showroom')}>
-                  <ShowroomStat language={language} label={t('Cartes possédées')} value={showroom.stats.totalCards} icon={<CarFront size={18} />} />
+                <section className={`mt-6 grid grid-cols-2 gap-3 ${showroom.hasCollectionHighlights ? 'sm:grid-cols-4' : 'sm:grid-cols-3'}`} aria-label={t('Statistiques du showroom')}>
+                  {showroom.hasCollectionHighlights && (
+                    <>
+                      <ShowroomStat language={language} label={t('Boosters ouverts')} value={showroom.stats.boosterOpens} icon={<Medal size={18} />} />
+                      <ShowroomStat language={language} label={t('Cartes en collection')} value={showroom.stats.cardsAcquired} icon={<CarFront size={18} />} />
+                    </>
+                  )}
                   <ShowroomStat language={language} label={t('Cartes légendaires')} value={showroom.stats.legendaryCards} icon={<Medal size={18} />} />
                   <ShowroomStat language={language} label={t('Constructeurs collectionnés')} value={showroom.stats.manufacturers} icon={<Users size={18} />} />
+                  {!showroom.hasCollectionHighlights && (
+                    <ShowroomStat language={language} label={t('Cartes possédées')} value={showroom.stats.totalCards} icon={<CarFront size={18} />} />
+                  )}
+                </section>
+              )}
+
+              {showroom.isPublic && showroom.hasCollectionHighlights && showroom.stats && (
+                <p className="mt-2 text-[11px] text-gray-500">
+                  {t('Le compteur de boosters commence avec l’activation de cette fonctionnalité. Les cartes indiquées sont les exemplaires actuellement en collection.')}
+                </p>
+              )}
+
+              {showroom.isPublic && !showroom.hasCollectionHighlights && (
+                <p role="status" className="mt-4 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4 text-sm text-amber-100">
+                  {t('Les nouvelles statistiques du showroom seront disponibles après l’application de la migration 026.')}
+                </p>
+              )}
+
+              {showroom.isPublic && showroom.hasCollectionHighlights && (
+                <section className="mt-8">
+                  <div className="mb-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300">{t('Améliorations de la collection')}</p>
+                    <h2 className="mt-1 text-xl font-black uppercase italic">{t('Cartes aux niveaux les plus élevés')}</h2>
+                  </div>
+                  {showroom.topUpgrades.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5">
+                      {showroom.topUpgrades.map((vehicle) => (
+                        <Card
+                          key={vehicle.id}
+                          {...vehicle}
+                          category="vehicle"
+                          owned
+                          count={1}
+                          showLevel
+                          upgradeLevel={vehicle.upgradeLevel}
+                          compact
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 text-sm text-gray-400">
+                      {t('Aucune carte véhicule améliorée pour le moment.')}
+                    </p>
+                  )}
+                </section>
+              )}
+
+              {showroom.isPublic && showroom.hasCollectionHighlights && (
+                <section className="mt-8">
+                  <div className="mb-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-300">{t('Palmarès du pilote')}</p>
+                    <h2 className="mt-1 text-xl font-black uppercase italic">{t('Succès débloqués')}</h2>
+                  </div>
+                  {showroom.achievements.length > 0 ? (
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {showroom.achievements.map((achievement, index) => (
+                        <article key={`${achievement.title}-${index}`} className="rounded-2xl border border-purple-400/20 bg-purple-400/[0.06] p-4">
+                          <div className="flex items-center gap-2 text-sm font-bold text-purple-100">
+                            <Medal size={16} className="shrink-0 text-purple-300" />
+                            <span>{t(achievement.title)}</span>
+                          </div>
+                          {achievement.description && (
+                            <p className="mt-2 text-xs leading-relaxed text-gray-400">{t(achievement.description)}</p>
+                          )}
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 text-sm text-gray-400">
+                      {t('Aucun succès réclamé pour le moment.')}
+                    </p>
+                  )}
                 </section>
               )}
 

@@ -502,7 +502,7 @@ export default function ProfilePage() {
               <div>
                 <p className="text-sm font-bold">{t('Visibilité du showroom')}</p>
                 <p className="mt-1 text-xs text-gray-500">
-                  {t('Seules les voitures choisies ci-dessus et quelques statistiques de collection seront partagées.')}
+                  {t('Si votre showroom est public, les voitures choisies, les statistiques de collection, vos véhicules améliorés et vos succès réclamés seront visibles.')}
                 </p>
               </div>
               <button

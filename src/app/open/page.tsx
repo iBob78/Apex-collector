@@ -6,7 +6,6 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { ajouterCarteAuJoueur, ajouterCircuitAuJoueur, ajouterPiloteAuJoueur } from '@/lib/actions/carte';
 import { deductAP } from '@/lib/actions/profile';
-import { updateQuestProgress } from '@/lib/actions/quests';
 import { drawBoosterCards, getBoosterCardIdentity, getFirstTimeBoosterCardIndices, PACKS } from '@/lib/boosters';
 import { fetchAllPages } from '@/lib/fetchAllPages';
 import Card from '@/components/Card';
@@ -31,6 +30,7 @@ function OpenContent() {
   const [drawnCards, setDrawnCards] = useState<any[]>([]);
   const [firstTimeCardIndices, setFirstTimeCardIndices] = useState<Set<number>>(() => new Set());
   const [discoverySaveError, setDiscoverySaveError] = useState<string | null>(null);
+  const [boosterStatsSaveError, setBoosterStatsSaveError] = useState<string | null>(null);
   const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set());
   const [useCompactPhoneCards, setUseCompactPhoneCards] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -66,6 +66,7 @@ function OpenContent() {
 
     setIsOpening(true);
     setDiscoverySaveError(null);
+    setBoosterStatsSaveError(null);
 
     try {
       // Charger les catalogues avant paiement évite de débiter si le tirage est impossible.
@@ -189,7 +190,15 @@ function OpenContent() {
       setDrawnCards(results);
 
       // 3. Mettre à jour la progression des quêtes
-      await updateQuestProgress(userId, 'booster_open');
+      const { error: boosterProgressError } = await supabase.rpc('record_objective_progress', {
+        p_objective_type: 'booster_open',
+        p_amount: 1,
+        p_rarity: null,
+      });
+      if (boosterProgressError) {
+        console.error('[Booster] Impossible d’enregistrer le tirage du booster:', boosterProgressError.message);
+        setBoosterStatsSaveError(t('Impossible d’enregistrer ce tirage dans les statistiques du showroom.'));
+      }
 
       // Délai pour l'animation de "déchirure" du pack
       setIsPrepared(true);
@@ -413,6 +422,11 @@ function OpenContent() {
               {discoverySaveError && (
                 <p role="alert" className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
                   {discoverySaveError}
+                </p>
+              )}
+              {boosterStatsSaveError && (
+                <p role="alert" className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
+                  {boosterStatsSaveError}
                 </p>
               )}
             </header>
