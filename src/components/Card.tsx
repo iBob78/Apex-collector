@@ -25,6 +25,8 @@ type CardProps = AnyCard & {
   mobileGrid?: boolean;
   /** Tilt the card toward the pointer in the collection. */
   pointerTilt?: boolean;
+  /** Conceal unowned cards without revealing their identity or opening their details. */
+  hideUnownedContent?: boolean;
   /** Lift the vehicle name slightly on booster reveal cards only. */
   boosterReveal?: boolean;
   isFavorite?: boolean;
@@ -50,6 +52,7 @@ export default function Card(props: CardProps) {
     compact = false,
     mobileGrid = false,
     pointerTilt = false,
+    hideUnownedContent = false,
     boosterReveal = false,
     isFavorite = false,
     count = 0,
@@ -101,6 +104,12 @@ export default function Card(props: CardProps) {
   const level = Math.max(0, Math.min(9, Math.floor(Number(upgradeLevel) || 0)));
   const levelEffectClass = level >= 1 ? `card-upgrade-effect-${level}` : null;
   const canTiltToPointer = pointerTilt && owned;
+  const isConcealed = hideUnownedContent && !owned;
+  const cardWrapperClassName = clsx("flex w-full min-w-0 flex-col group/card", mobileGrid ? "gap-1 sm:gap-2" : "gap-2", className);
+  const cardFrameClassName = clsx(
+    "relative w-full min-w-0 aspect-[2/3] rounded-xl overflow-hidden bg-[#0a0a0a]",
+    mobileGrid ? "border-2 sm:border-[3px] shadow-[0_6px_16px_rgba(0,0,0,0.35)] sm:shadow-[0_12px_30px_rgba(0,0,0,0.35)]" : "border-[3px] shadow-[0_12px_30px_rgba(0,0,0,0.35)]",
+  );
   const drivetrainLayout = isVehicle ? (props as any).transmission : undefined;
   const drivetrainLayoutIcon = resolveDrivetrainLayoutIcon(drivetrainLayout);
   const drivetrainLayoutDescription = typeof drivetrainLayout === 'string'
@@ -128,6 +137,8 @@ export default function Card(props: CardProps) {
   const fuelType = isVehicle ? getFuelTypeInfo((props as any).fuel_type) : null;
 
   const handleCardClick = () => {
+    if (isConcealed) return;
+
     if (onCardClick) {
       onCardClick();
       return;
@@ -136,13 +147,37 @@ export default function Card(props: CardProps) {
     router.push(`/collection/${id}`);
   };
 
+  if (isConcealed) {
+    return (
+      <div className={cardWrapperClassName}>
+        <div
+          role="img"
+          aria-label={t('Carte non découverte')}
+          className={clsx(cardFrameClassName, "cursor-default border-white/10")}
+        >
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(ellipse_at_center,_rgba(148,163,184,0.13),_transparent_70%)]"
+          >
+            <div className="absolute inset-2 rounded-lg border border-dashed border-white/10 sm:inset-4" />
+            <span className="font-black text-4xl text-white/20 sm:text-6xl">?</span>
+          </div>
+        </div>
+        {mobileGrid && showLevel && (
+          <div className="flex min-h-[25px] w-full items-start justify-center sm:hidden">
+            <span className="h-[23px] w-full" aria-hidden="true" />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div className={clsx("flex w-full min-w-0 flex-col group/card", mobileGrid ? "gap-1 sm:gap-2" : "gap-2", className)}>
+    <div className={cardWrapperClassName}>
       <div
         className={clsx(
-          "relative w-full min-w-0 cursor-pointer transition-all duration-300",
-          "aspect-[2/3] rounded-xl overflow-hidden bg-[#0a0a0a]",
-          mobileGrid ? "border-2 sm:border-[3px] shadow-[0_6px_16px_rgba(0,0,0,0.35)] sm:shadow-[0_12px_30px_rgba(0,0,0,0.35)]" : "border-[3px] shadow-[0_12px_30px_rgba(0,0,0,0.35)]",
+          cardFrameClassName,
+          "cursor-pointer transition-all duration-300",
           getRarityBorderClass(rarity),
           canTiltToPointer && "card-pointer-tilt",
           !owned && "grayscale opacity-60"

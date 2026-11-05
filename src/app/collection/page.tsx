@@ -453,6 +453,7 @@ export default function CollectionPage() {
                           {...card}
                           mobileGrid
                           pointerTilt
+                          hideUnownedContent
                           isFavorite={favoriteKeys.has(getFavoriteKey(card))}
                           owned={c > 0}
                           count={c}

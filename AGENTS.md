@@ -77,10 +77,10 @@ Le dossier `src/app/` définit les autres routes : `/boosters`, `/open`, `/marke
 
 **Toujours contrôler :**
 - **Smartphone (< 768 px)** : navigation fixe en bas et menu « Plus ». La collection (`/collection`) doit conserver **4 cartes par ligne** sur les petits écrans ; **ne pas confondre** avec les grilles de boosters, qui suivent d'autres règles.
-- Dans la collection, l'inclinaison 3D au pointeur est réservée aux cartes possédées (`owned`) via `pointerTilt` de `Card.tsx`. Les cartes verrouillées restent en niveaux de gris et à opacité réduite ; ne pas leur appliquer de transition, lueur, inclinaison ou restauration de couleur au survol. Elles peuvent garder l'ouverture des détails au clic. L'effet pointeur ne s'active pas au toucher et doit respecter `prefers-reduced-motion`.
+- Dans la collection, l'inclinaison 3D au pointeur est réservée aux cartes possédées (`owned`) via `pointerTilt` de `Card.tsx`. Les cartes non possédées utilisent `hideUnownedContent` : elles gardent leur place dans la grille, mais leur identité, leur image et leur rareté sont masquées ; elles ne réagissent pas au pointeur et n'ouvrent pas la modale. L'effet pointeur ne s'active pas au toucher et doit respecter `prefers-reduced-motion`.
 - **À partir de 768 px** : sidebar latérale visible ; la navigation mobile est masquée. Ne pas faire disparaître la sidebar lorsque la fenêtre PC est réduite.
 - Les règles de cartes mobiles utilisent notamment `mobileGrid` et des classes Tailwind `sm:`. **Ne pas modifier leurs équivalents desktop par accident**.
-- Les cartes véhicules, circuits et pilotes doivent conserver leur logo/drapeau, rareté, données lisibles et comportements d'ouverture de détail. L'IP concerne les véhicules uniquement.
+- Les cartes possédées de véhicules, circuits et pilotes doivent conserver leur logo/drapeau, rareté, données lisibles et comportements d'ouverture de détail. Les cartes non possédées de la collection restent des cartes mystère sans détail identifiable. L'IP concerne les véhicules uniquement.
 - Sur mobile, l'interaction avec une carte ouvre les détails ; favoris et amélioration restent accessibles. Préserver aussi les interactions de bureau.
 - Respecter les zones de sécurité et la barre de navigation inférieure ; éviter le débordement horizontal, les textes tronqués et les recouvrements d'icônes.
 - Tester les états vides, les valeurs numériques longues, les textes traduits, les différents niveaux de carte et l'absence d'image.
