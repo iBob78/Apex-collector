@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, ArrowRight, CarFront, Medal, Users } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CarFront, LockKeyhole, Medal, Users } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import Card from '@/components/Card';
 import SafeImage from '@/components/SafeImage';
@@ -16,12 +16,13 @@ import type { VehicleCard } from '@/types/game';
 
 type PublicShowroom = {
   username: string;
+  isPublic: boolean;
   vehicles: Array<VehicleCard & { position: number }>;
   stats: {
     totalCards: number;
     legendaryCards: number;
     manufacturers: number;
-  };
+  } | null;
 };
 
 export default function ShowroomPage() {
@@ -101,7 +102,15 @@ export default function ShowroomPage() {
                 <p className="mt-1 text-sm text-gray-400">{t('Sa passion automobile, en un coup d’œil')}</p>
               </header>
 
-              {featuredVehicle ? (
+              {!showroom.isPublic ? (
+                <section className="rounded-3xl border border-white/10 bg-[#0a0a0a] px-6 py-12 text-center sm:px-10">
+                  <LockKeyhole className="mx-auto text-gray-400" size={32} />
+                  <h2 className="mt-4 text-xl font-black uppercase">{t('Showroom privé')}</h2>
+                  <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-gray-400">
+                    {t('Ce pilote apparaît au classement, mais a choisi de ne pas partager ses voitures ni les statistiques de sa collection.')}
+                  </p>
+                </section>
+              ) : featuredVehicle ? (
                 <section className="relative isolate min-h-[430px] overflow-hidden rounded-[2rem] border border-white/10 bg-[#090b10] sm:min-h-[520px]">
                   <SafeImage
                     src={resolveCardImage({
@@ -155,13 +164,15 @@ export default function ShowroomPage() {
                 </div>
               )}
 
-              <section className="mt-6 grid gap-3 sm:grid-cols-3" aria-label={t('Statistiques du showroom')}>
-                <ShowroomStat language={language} label={t('Cartes possédées')} value={showroom.stats.totalCards} icon={<CarFront size={18} />} />
-                <ShowroomStat language={language} label={t('Cartes légendaires')} value={showroom.stats.legendaryCards} icon={<Medal size={18} />} />
-                <ShowroomStat language={language} label={t('Constructeurs collectionnés')} value={showroom.stats.manufacturers} icon={<Users size={18} />} />
-              </section>
+              {showroom.isPublic && showroom.stats && (
+                <section className="mt-6 grid gap-3 sm:grid-cols-3" aria-label={t('Statistiques du showroom')}>
+                  <ShowroomStat language={language} label={t('Cartes possédées')} value={showroom.stats.totalCards} icon={<CarFront size={18} />} />
+                  <ShowroomStat language={language} label={t('Cartes légendaires')} value={showroom.stats.legendaryCards} icon={<Medal size={18} />} />
+                  <ShowroomStat language={language} label={t('Constructeurs collectionnés')} value={showroom.stats.manufacturers} icon={<Users size={18} />} />
+                </section>
+              )}
 
-              {showroom.vehicles.length > 0 && (
+              {showroom.isPublic && showroom.vehicles.length > 0 && (
                 <section id="collection-exposee" className="mt-8 scroll-mt-6">
                   <div className="mb-4 flex items-end justify-between gap-3">
                     <div>

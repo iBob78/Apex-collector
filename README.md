@@ -17,6 +17,7 @@ L'univers visuel s'inspire du sport automobile, de l'esthétique *gentleman driv
 - **Contrats et succès** : objectifs à accomplir et récompenses à réclamer.
 - **Profil et tableau de bord** : consultation du garage, de la progression et du solde AP.
 - **Showroom joueur** : exposition publique facultative de trois véhicules choisis et de statistiques de collection.
+- **Classement des joueurs** : classement de tous les joueurs par nombre de cartes ; les showrooms privés ne révèlent pas leurs voitures ni leurs statistiques détaillées.
 - **Interface responsive** : navigation adaptée au smartphone et à l'ordinateur.
 - **Langues et unités** : français, anglais, espagnol ; système métrique ou impérial.
 
