@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { ajouterCarteAuJoueur, ajouterCircuitAuJoueur, ajouterPiloteAuJoueur } from '@/lib/actions/carte';
 import { deductAP } from '@/lib/actions/profile';
 import { updateQuestProgress } from '@/lib/actions/quests';
-import { drawBoosterCards, getFirstTimeBoosterCardIndices, PACKS } from '@/lib/boosters';
+import { drawBoosterCards, getBoosterCardIdentity, getFirstTimeBoosterCardIndices, PACKS } from '@/lib/boosters';
 import { fetchAllPages } from '@/lib/fetchAllPages';
 import Card from '@/components/Card';
 import SafeImage from '@/components/SafeImage';
@@ -30,6 +30,7 @@ function OpenContent() {
   const [showCards, setShowCards] = useState(false);
   const [drawnCards, setDrawnCards] = useState<any[]>([]);
   const [firstTimeCardIndices, setFirstTimeCardIndices] = useState<Set<number>>(() => new Set());
+  const [discoverySaveError, setDiscoverySaveError] = useState<string | null>(null);
   const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set());
   const [useCompactPhoneCards, setUseCompactPhoneCards] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -64,6 +65,7 @@ function OpenContent() {
     if (!userId || isOpening || isPrepared) return;
 
     setIsOpening(true);
+    setDiscoverySaveError(null);
 
     try {
       // Charger les catalogues avant paiement évite de débiter si le tirage est impossible.
@@ -95,7 +97,7 @@ function OpenContent() {
 
       // Read ownership BEFORE saving: "NEW!" must mean absent from the original collection.
       // If a read fails, suppress the cosmetic badge without blocking the booster opening.
-      const vehicleIds = results.filter((card) => card.category !== 'circuit')
+      const vehicleIds = results.filter((card) => card.category !== 'circuit' && card.category !== 'driver')
         .map((card) => String(card.card_id || card.id));
       const circuitIds = results.filter((card) => card.category === 'circuit')
         .map((card) => String(card.circuit_id || card.id));
@@ -153,7 +155,7 @@ function OpenContent() {
         })
       );
 
-      setFirstTimeCardIndices(ownershipVerified
+      const firstTimeIndices = ownershipVerified
         ? getFirstTimeBoosterCardIndices(
             results,
             ownedVehiclesResult.data || [],
@@ -161,7 +163,29 @@ function OpenContent() {
             additions.map((addition) => addition.success),
             ownedDriversResult.data || [],
           )
-        : new Set());
+        : new Set<number>();
+      setFirstTimeCardIndices(firstTimeIndices);
+      if (firstTimeIndices.size > 0) {
+        const discoveries = Array.from(firstTimeIndices).flatMap((index) => {
+          const identity = getBoosterCardIdentity(results[index]);
+          return identity
+            ? [{ user_id: userId, category: identity.category, card_id: identity.cardId }]
+            : [];
+        });
+
+        if (discoveries.length > 0) {
+          const { error } = await supabase
+            .from('user_card_discoveries')
+            .upsert(discoveries, {
+              onConflict: 'user_id,category,card_id',
+              ignoreDuplicates: true,
+            });
+          if (error) {
+            console.error('[Booster] Impossible d’enregistrer les nouvelles cartes:', error);
+            setDiscoverySaveError(t('Impossible de sauvegarder les nouvelles cartes du tirage.'));
+          }
+        }
+      }
       setDrawnCards(results);
 
       // 3. Mettre à jour la progression des quêtes
@@ -386,6 +410,11 @@ function OpenContent() {
                 {t('Tes cartes sont là !')}
               </motion.h2>
               <p className="mt-2 text-gray-500">{t('Clique sur une carte pour la retourner, ou révèle-les toutes.')}</p>
+              {discoverySaveError && (
+                <p role="alert" className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
+                  {discoverySaveError}
+                </p>
+              )}
             </header>
 
             <button

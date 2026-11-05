@@ -14,6 +14,27 @@ export interface BoosterCatalogCard {
     [key: string]: unknown;
 }
 
+export type BoosterCardCategory = 'vehicle' | 'circuit' | 'driver';
+
+export function getBoosterCardIdentity(card: BoosterCatalogCard): {
+    category: BoosterCardCategory;
+    cardId: string;
+} | null {
+    const category: BoosterCardCategory = card.category === 'driver' || card.driver_id != null
+        ? 'driver'
+        : card.category === 'circuit' || card.type === 'Circuit' || card.track_name != null
+            ? 'circuit'
+            : 'vehicle';
+    const rawId = category === 'driver'
+        ? card.driver_id || card.id
+        : category === 'circuit'
+            ? card.circuit_id || card.id
+            : card.card_id || card.id;
+    const cardId = String(rawId ?? '').trim().toLowerCase();
+
+    return cardId ? { category, cardId } : null;
+}
+
 export interface PackConfig {
     slug: string;
     name: string;
@@ -347,17 +368,9 @@ export function getFirstTimeBoosterCardIndices(
     drawnCards.forEach((card, index) => {
         if (!savedSuccessfully[index]) return;
 
-        const category = card.category === 'driver' || card.driver_id != null
-            ? 'driver'
-            : card.category === 'circuit' || card.type === 'Circuit' || card.track_name != null
-                ? 'circuit'
-                : 'vehicle';
-        const cardId = category === 'driver'
-            ? card.driver_id || card.id
-            : category === 'circuit'
-                ? card.circuit_id || card.id
-                : card.card_id || card.id;
-        const key = keyFor(category, cardId);
+        const identity = getBoosterCardIdentity(card);
+        if (!identity) return;
+        const key = keyFor(identity.category, identity.cardId);
         if (!key) return;
 
         if (!seen.has(key)) firstTimeIndices.add(index);

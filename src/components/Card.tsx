@@ -8,6 +8,7 @@ import { resolveCardImage, resolveBrandLogo, resolveCountryFlag, resolveDrivetra
 import type { AnyCard } from '@/types/game';
 import { useRouter } from 'next/navigation';
 import { Wind, ArrowUpCircle, Check, Compass, MoveRight, ChevronRight, Star, Trophy } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { getRarityBorderClass } from '@/lib/rarity';
 import { calculateVehicleIP } from '@/lib/vehicleStats';
 import { formatDistance, formatPower, formatTorque, formatWeight } from '@/lib/preferences';
@@ -27,6 +28,8 @@ type CardProps = AnyCard & {
   pointerTilt?: boolean;
   /** Conceal unowned cards without revealing their identity or opening their details. */
   hideUnownedContent?: boolean;
+  /** Show the persisted NEW state and its one-time reveal animation in the collection. */
+  newlyAcquired?: boolean;
   /** Lift the vehicle name slightly on booster reveal cards only. */
   boosterReveal?: boolean;
   isFavorite?: boolean;
@@ -53,6 +56,7 @@ export default function Card(props: CardProps) {
     mobileGrid = false,
     pointerTilt = false,
     hideUnownedContent = false,
+    newlyAcquired = false,
     boosterReveal = false,
     isFavorite = false,
     count = 0,
@@ -64,6 +68,7 @@ export default function Card(props: CardProps) {
     className,
     onCardClick,
   } = props;
+  const reduceMotion = useReducedMotion();
 
   // ID ROBUSTE : card_id d'abord (CSV), puis id
   const isDriver = (props as any).category === 'driver' || 'driver_id' in props;
@@ -212,6 +217,30 @@ export default function Card(props: CardProps) {
         role="button"
         tabIndex={0}
       >
+        {newlyAcquired && !reduceMotion && (
+          <motion.div
+            aria-hidden="true"
+            initial={{ rotateY: 0 }}
+            animate={{ rotateY: -180 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
+            className="pointer-events-none absolute inset-0 z-[25] flex items-center justify-center overflow-hidden rounded-[inherit] border-2 border-white/20 bg-gradient-to-br from-slate-950 via-slate-800 to-black"
+          >
+            <div className="absolute inset-2 rounded-lg border border-dashed border-white/15 sm:inset-4" />
+            <span className="font-black text-4xl text-white/30 sm:text-6xl">?</span>
+          </motion.div>
+        )}
+        {newlyAcquired && (
+          <motion.span
+            aria-label={t('Nouvelle Carte')}
+            initial={reduceMotion ? false : { opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: reduceMotion ? 0 : 0.65, duration: 0.2 }}
+            className="collection-new-badge pointer-events-none absolute left-1/2 top-1 z-30 -translate-x-1/2 rounded-md border border-lime-100/80 bg-lime-300 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-[#092210] shadow-[0_0_14px_rgba(163,230,53,0.5)] sm:top-2 sm:px-2 sm:py-1 sm:text-xs"
+          >
+            NEW!
+          </motion.span>
+        )}
         {/* Image Background */}
         <div className="absolute inset-0 z-0">
           <SafeImage

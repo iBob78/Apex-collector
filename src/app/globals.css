@@ -258,6 +258,19 @@ html, body {
   box-shadow: 0 20px 42px rgba(0, 0, 0, 0.5);
 }
 
+.collection-new-badge {
+  animation: card-new-badge-glow 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes card-new-badge-glow {
+  from {
+    box-shadow: 0 0 8px rgba(163, 230, 53, 0.35);
+  }
+  to {
+    box-shadow: 0 0 18px rgba(163, 230, 53, 0.75);
+  }
+}
+
 .card-upgrade-effect-1 {
   backdrop-filter: grayscale(0.18) contrast(1.08) brightness(1.06);
   background:
@@ -489,6 +502,10 @@ html, body {
   .card-pointer-tilt:hover {
     transform: none;
     transition: none;
+  }
+
+  .collection-new-badge {
+    animation: none;
   }
 
   .card-upgrade-effect-5,
