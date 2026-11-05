@@ -204,6 +204,7 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
   - `021` : numérotation permanente des catalogues circuits et pilotes.
   - `022` : statut privé des nouvelles découvertes de cartes, avec RLS ; ne pas appliquer sans autorisation explicite.
   - `023` : publication facultative des showrooms de joueurs ; les données exposées sont limitées par une fonction RPC et la publication reste désactivée par défaut.
+  - `024` : correction des compteurs d'inventaire utilisés par le RPC de showroom public.
 - **Ne pas supposer** qu'une migration est absente ou non appliquée parce qu'elle existe dans le dépôt. Inspecter l'état réel de la base et demander l'autorisation avant toute migration, modification de schéma ou backfill.
 - Ne pas supprimer, réinitialiser ou modifier des données de joueurs pour résoudre un problème d'affichage.
 

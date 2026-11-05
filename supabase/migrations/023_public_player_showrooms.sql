@@ -69,7 +69,7 @@ BEGIN
   WHERE showcase.user_id = v_user_id;
 
   SELECT
-    COALESCE(SUM(COALESCE(owned.count, owned.quantity, 1)), 0),
+    COALESCE(SUM(COALESCE(owned.count, 1)), 0),
     COUNT(DISTINCT catalog.id) FILTER (WHERE lower(catalog.rarity) IN ('legend', 'legendary')),
     COUNT(DISTINCT lower(catalog.make)) FILTER (WHERE NULLIF(trim(catalog.make), '') IS NOT NULL)
   INTO v_total_cards, v_legendary_cards, v_manufacturers
@@ -77,7 +77,7 @@ BEGIN
   LEFT JOIN public.cards AS catalog
     ON owned.card_id::TEXT IN (catalog.id::TEXT, catalog.card_id::TEXT)
   WHERE owned.user_id = v_user_id
-    AND COALESCE(owned.count, owned.quantity, 1) > 0;
+    AND COALESCE(owned.count, 1) > 0;
 
   SELECT COALESCE(SUM(owned.count), 0)
   INTO v_circuit_cards
