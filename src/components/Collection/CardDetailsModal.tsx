@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Star } from 'lucide-react';
 import SafeImage from '@/components/SafeImage';
+import { supabase } from '@/lib/supabaseClient';
 import VehicleStatIcon from '@/components/VehicleStatIcon';
 import { IMAGE_PATHS, resolveBrandLogo, resolveCardImage, resolveCountryFlag, resolveDrivetrainLayoutIcon } from '@/lib/images';
 import { drivetrainLayoutDescriptions } from '@/lib/drivetrain';
@@ -26,6 +28,11 @@ interface CardDetailsModalProps {
   onClose: () => void;
 }
 
+type TopCardOwner = {
+  username: string;
+  owned_count: number;
+};
+
 export default function CardDetailsModal({
   card,
   ownedCount,
@@ -38,6 +45,9 @@ export default function CardDetailsModal({
   onClose,
 }: CardDetailsModalProps) {
   const { language, units, t } = useSitePreferences();
+  const [topCardOwner, setTopCardOwner] = useState<TopCardOwner | null>(null);
+  const [topCardOwnerLoading, setTopCardOwnerLoading] = useState(false);
+  const [topCardOwnerError, setTopCardOwnerError] = useState(false);
   useEffect(() => {
     if (!card) return;
 
@@ -57,6 +67,66 @@ export default function CardDetailsModal({
 
   const isVehicle = card ? card.category === 'vehicle' || 'make' in card : false;
   const isDriver = card ? card.category === 'driver' || 'driver_id' in card : false;
+  const cardCategory = card
+    ? isDriver
+      ? 'driver'
+      : isVehicle
+        ? 'vehicle'
+        : 'circuit'
+    : null;
+  const cardEntityId = card
+    ? String(
+        cardCategory === 'driver'
+          ? card.driver_id || card.id
+          : cardCategory === 'circuit'
+            ? card.circuit_id || card.id
+            : card.card_id || card.id,
+      )
+    : null;
+
+  useEffect(() => {
+    if (!card || !cardCategory || !cardEntityId) {
+      setTopCardOwner(null);
+      setTopCardOwnerError(false);
+      setTopCardOwnerLoading(false);
+      return;
+    }
+
+    let active = true;
+    setTopCardOwner(null);
+    setTopCardOwnerError(false);
+    setTopCardOwnerLoading(true);
+
+    const fetchTopCardOwner = async () => {
+      try {
+        const { data, error } = await supabase.rpc('get_top_card_owner', {
+          p_category: cardCategory,
+          p_card_id: cardEntityId,
+        });
+
+        if (error) {
+          console.error('[CardDetailsModal] Impossible de charger le détenteur principal:', error.message);
+          if (active) setTopCardOwnerError(true);
+        } else if (active) {
+          const owner = Array.isArray(data) ? data[0] : null;
+          setTopCardOwner(owner?.username
+            ? { username: owner.username, owned_count: Number(owner.owned_count) || 0 }
+            : null);
+        }
+      } catch (error) {
+        console.error('[CardDetailsModal] Erreur pendant la recherche du détenteur principal:', error);
+        if (active) setTopCardOwnerError(true);
+      } finally {
+        if (active) setTopCardOwnerLoading(false);
+      }
+    };
+
+    void fetchTopCardOwner();
+    return () => {
+      active = false;
+    };
+  }, [card, cardCategory, cardEntityId]);
+
   const title = card
     ? isVehicle
       ? `${card.make || ''} ${card.model || ''}`.trim()
@@ -228,6 +298,35 @@ export default function CardDetailsModal({
                   <span>{ownedCount} {t(ownedCount > 1 ? 'exemplaires' : 'exemplaire')} {t(ownedCount > 1 ? 'possédés' : 'possédé')}</span>
                 </div>
               </div>
+
+              {card && (
+                <section aria-live="polite" className="mb-5 rounded-xl border border-amber-300/15 bg-amber-300/[0.04] p-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-amber-200">
+                    {t('Plus grand détenteur de cette carte')}
+                  </p>
+                  {topCardOwnerLoading ? (
+                    <p className="mt-2 text-sm text-gray-400">{t('Recherche du collectionneur…')}</p>
+                  ) : topCardOwnerError ? (
+                    <p role="status" className="mt-2 text-sm text-amber-100">
+                      {t('Impossible de charger le détenteur principal. Réessayez en rouvrant la carte.')}
+                    </p>
+                  ) : topCardOwner ? (
+                    <p className="mt-2 text-sm text-gray-300">
+                      <Link
+                        href={`/showroom/${encodeURIComponent(topCardOwner.username)}`}
+                        className="font-bold text-white underline decoration-amber-300/60 underline-offset-4 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+                      >
+                        @{topCardOwner.username}
+                      </Link>
+                      <span className="ml-2 text-gray-400">
+                        · {new Intl.NumberFormat(language).format(topCardOwner.owned_count)} {t(topCardOwner.owned_count === 1 ? 'exemplaire' : 'exemplaires')}
+                      </span>
+                    </p>
+                  ) : (
+                    <p className="mt-2 text-sm text-gray-400">{t('Aucun joueur ne possède cette carte pour le moment.')}</p>
+                  )}
+                </section>
+              )}
 
               {ownedCount > 0 && (
                 <button

@@ -9,7 +9,7 @@ L'univers visuel s'inspire du sport automobile, de l'esthétique *gentleman driv
 ## Fonctionnalités
 
 - **Collection automobile** : cartes de véhicules, de circuits et de pilotes à retrouver dans un garage personnel.
-- **Cartes détaillées** : caractéristiques techniques, indice de performance, rareté, badges et effets visuels.
+- **Cartes détaillées** : caractéristiques techniques, indice de performance, rareté, badges et effets visuels, ainsi que le pseudo du joueur qui en possède le plus d'exemplaires.
 - **Boosters** : packs permettant d'enrichir sa collection.
 - **Favoris et filtres** : recherche, tri et consultation des cartes possédées.
 - **Amélioration des cartes** : les exemplaires en double débloquent des niveaux achetables en Apex Points (AP).
