@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { fetchAllPages } from '@/lib/fetchAllPages';
 import Sidebar from '@/components/Sidebar';
 import Card from '@/components/Card';
+import SafeImage from '@/components/SafeImage';
 import CardDetailsModal from '@/components/Collection/CardDetailsModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Rarity } from '@/types/game';
@@ -12,6 +13,7 @@ import { getNextLevelUnlock } from '@/lib/level';
 import { purchaseCardUpgrade } from '@/lib/actions/card-upgrades';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 import { Star } from 'lucide-react';
+import { resolveBrandLogo } from '@/lib/images';
 
 type FavoriteCategory = 'vehicle' | 'circuit' | 'driver';
 
@@ -225,6 +227,9 @@ export default function CollectionPage() {
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }
       if (sortBy === 'make-asc' || sortBy === 'make-desc') {
+        const isVehicleA = getCardCategory(a) === 'vehicle';
+        const isVehicleB = getCardCategory(b) === 'vehicle';
+        if (isVehicleA !== isVehicleB) return isVehicleA ? -1 : 1;
         const makeA = a.make || a.manufacturer || a.name || '';
         const makeB = b.make || b.manufacturer || b.name || '';
         const direction = sortBy === 'make-asc' ? 1 : -1;
@@ -485,13 +490,22 @@ export default function CollectionPage() {
                   layout
                   className="grid grid-cols-4 gap-x-1.5 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(min(100%,14rem),1fr))] sm:gap-x-6 sm:gap-y-8"
                 >
-                  {filteredCards.slice(0, visibleCount).map((card) => {
+                  {filteredCards.slice(0, visibleCount).flatMap((card, index, visibleCards) => {
                     const cid = getCardId(card);
                     const c = userCards[cid] || 0;
                     const currentLevel = userCardLevels[cid] || 0;
                     const levelUnlock = getNextLevelUnlock(c, currentLevel);
-
-                    return (
+                    const make = getCardCategory(card) === 'vehicle'
+                      ? String(card.make || card.manufacturer || '').trim()
+                      : '';
+                    const previousCard = visibleCards[index - 1];
+                    const previousMake = previousCard && getCardCategory(previousCard) === 'vehicle'
+                      ? String(previousCard.make || previousCard.manufacturer || '').trim()
+                      : '';
+                    const startsMakeGroup = (sortBy === 'make-asc' || sortBy === 'make-desc')
+                      && make
+                      && make.toLocaleLowerCase() !== previousMake.toLocaleLowerCase();
+                    const cardElement = (
                       <motion.div
                         key={cid}
                         layout
@@ -518,6 +532,41 @@ export default function CollectionPage() {
                         />
                       </motion.div>
                     );
+
+                    if (!startsMakeGroup) return [cardElement];
+
+                    const logo = resolveBrandLogo(make);
+                    return [
+                      <motion.div
+                        key={`brand-${make.toLocaleLowerCase()}`}
+                        layout
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="col-span-full flex min-w-0 items-center gap-3 pt-3 first:pt-0 sm:gap-4 sm:pt-5"
+                      >
+                        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] sm:h-12 sm:w-12">
+                          <span aria-hidden="true" className="text-sm font-black text-white/60 sm:text-base">
+                            {make.slice(0, 2).toUpperCase()}
+                          </span>
+                          {logo && (
+                            <SafeImage
+                              src={logo}
+                              alt=""
+                              fill
+                              showPlaceholderOnError={false}
+                              className="object-contain p-1.5"
+                            />
+                          )}
+                        </div>
+                        <h2 className="shrink-0 text-xs font-black uppercase tracking-[0.18em] text-slate-200 sm:text-sm sm:tracking-[0.22em]">
+                          {make}
+                        </h2>
+                        <div aria-hidden="true" className="h-px min-w-0 flex-1 bg-gradient-to-r from-cyan-300/50 via-white/15 to-transparent" />
+                      </motion.div>,
+                      cardElement,
+                    ];
                   })}
                 </motion.div>
               ) : (
