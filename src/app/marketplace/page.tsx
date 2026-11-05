@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Sidebar from '@/components/Sidebar';
 import Card from '@/components/Card';
 import { supabase } from '@/lib/supabaseClient';
@@ -153,12 +154,16 @@ export default function MarketplacePage() {
                   </div>
 
                   <div className="flex items-center justify-between mb-4 px-2">
-                    <div className="flex items-center gap-2">
+                    <Link
+                      href={`/showroom/${encodeURIComponent(item.seller.username)}`}
+                      className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                      aria-label={t('Voir le showroom de {username}', { username: item.seller.username })}
+                    >
                       <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold">
                         {item.seller.username[0]}
                       </div>
                       <span className="text-[11px] text-gray-400 font-mono">@{item.seller.username}</span>
-                    </div>
+                    </Link>
                     <div className="text-[10px] text-gray-600 font-mono">{t('il y a 2h')}</div>
                   </div>
 

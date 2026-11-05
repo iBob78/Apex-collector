@@ -16,6 +16,7 @@ L'univers visuel s'inspire du sport automobile, de l'esthétique *gentleman driv
 - **Marketplace** : achat et vente de cartes entre joueurs.
 - **Contrats et succès** : objectifs à accomplir et récompenses à réclamer.
 - **Profil et tableau de bord** : consultation du garage, de la progression et du solde AP.
+- **Showroom joueur** : exposition publique facultative de trois véhicules choisis et de statistiques de collection.
 - **Interface responsive** : navigation adaptée au smartphone et à l'ordinateur.
 - **Langues et unités** : français, anglais, espagnol ; système métrique ou impérial.
 

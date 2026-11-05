@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   CalendarDays,
   CarFront,
@@ -53,7 +54,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const { language, t } = useSitePreferences();
   const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<{ username?: string; ap?: number } | null>(null);
+  const [profile, setProfile] = useState<{ username?: string; ap?: number; showroom_public?: boolean } | null>(null);
   const [stats, setStats] = useState(EMPTY_STATS);
   const [vehicles, setVehicles] = useState<VehicleCard[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
@@ -61,10 +62,12 @@ export default function ProfilePage() {
   const [savedShowcase, setSavedShowcase] = useState<string[]>(EMPTY_SHOWCASE);
   const [loading, setLoading] = useState(true);
   const [savingGarage, setSavingGarage] = useState(false);
+  const [savingShowroomVisibility, setSavingShowroomVisibility] = useState(false);
   const [garageError, setGarageError] = useState<string | null>(null);
   const [pageError, setPageError] = useState<string | null>(null);
   const [achievementError, setAchievementError] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [showroomMessage, setShowroomMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -84,7 +87,7 @@ export default function ProfilePage() {
         loadingStage = 'profil joueur';
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('username, ap')
+          .select('username, ap, showroom_public')
           .eq('id', currentUser.id)
           .single();
         if (profileError) throw profileError;
@@ -279,13 +282,31 @@ export default function ProfilePage() {
       p_card_ids: selectedIds,
     });
     if (error) {
-      console.error('[ProfilePage] Impossible d’enregistrer le garage:', error.message);
-      setSaveMessage(t('Impossible d’enregistrer le garage. Vérifiez que les voitures vous appartiennent.'));
+      console.error('[ProfilePage] Impossible d’enregistrer le showroom:', error.message);
+      setSaveMessage(t('Impossible d’enregistrer le showroom. Vérifiez que les voitures vous appartiennent.'));
     } else {
       setSavedShowcase(showcase);
-      setSaveMessage(t('Garage enregistré.'));
+      setSaveMessage(t('Showroom enregistré.'));
     }
     setSavingGarage(false);
+  };
+
+  const setShowroomVisibility = async (isPublic: boolean) => {
+    setSavingShowroomVisibility(true);
+    setShowroomMessage(null);
+    const { error } = await supabase.rpc('set_user_showroom_public', {
+      p_is_public: isPublic,
+    });
+    if (error) {
+      console.error('[ProfilePage] Impossible de modifier la visibilité du showroom:', error.message);
+      setShowroomMessage(t('Impossible de modifier la visibilité du showroom.'));
+    } else {
+      setProfile((current) => current ? { ...current, showroom_public: isPublic } : current);
+      setShowroomMessage(isPublic
+        ? t('Votre showroom est maintenant visible par les autres joueurs.')
+        : t('Votre showroom est maintenant privé.'));
+    }
+    setSavingShowroomVisibility(false);
   };
 
   const signOut = async () => {
@@ -410,18 +431,28 @@ export default function ProfilePage() {
           <section className="rounded-3xl border border-white/10 bg-[#0a0a0a] p-5 sm:p-7">
             <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">{t('Espace personnel')}</p>
-                <h2 className="mt-1 text-xl font-black uppercase italic tracking-tight sm:text-2xl">{t('Mon garage')}</h2>
-                <p className="mt-1 text-xs text-gray-500">{t('Choisissez jusqu’à trois voitures à exposer dans votre garage privé.')}</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">{t('Espace showroom')}</p>
+                <h2 className="mt-1 text-xl font-black uppercase italic tracking-tight sm:text-2xl">{t('Mon showroom')}</h2>
+                <p className="mt-1 text-xs text-gray-500">{t('Choisissez jusqu’à trois voitures à exposer. La publication est désactivée par défaut.')}</p>
               </div>
-              <button
-                type="button"
-                onClick={() => void saveGarage()}
-                disabled={!hasGarageChanges || savingGarage || Boolean(garageError)}
-                className="min-h-10 rounded-xl bg-blue-600 px-4 text-xs font-black uppercase tracking-wider text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                {savingGarage ? t('Enregistrement…') : t('Enregistrer le garage')}
-              </button>
+              <div className="flex flex-wrap gap-2">
+                {profile?.showroom_public && profile.username && (
+                  <Link
+                    href={`/showroom/${encodeURIComponent(profile.username)}`}
+                    className="inline-flex min-h-10 items-center rounded-xl border border-white/10 px-4 text-xs font-black uppercase tracking-wider text-white transition hover:bg-white/10"
+                  >
+                    {t('Voir mon showroom')}
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  onClick={() => void saveGarage()}
+                  disabled={!hasGarageChanges || savingGarage || Boolean(garageError)}
+                  className="min-h-10 rounded-xl bg-blue-600 px-4 text-xs font-black uppercase tracking-wider text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {savingGarage ? t('Enregistrement…') : t('Enregistrer le showroom')}
+                </button>
+              </div>
             </div>
 
             {garageError && (
@@ -466,6 +497,31 @@ export default function ProfilePage() {
             </div>
 
             {saveMessage && <p role="status" className="mt-4 text-sm text-blue-200">{saveMessage}</p>}
+
+            <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-bold">{t('Visibilité du showroom')}</p>
+                <p className="mt-1 text-xs text-gray-500">
+                  {t('Seules les voitures choisies ci-dessus et quelques statistiques de collection seront partagées.')}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void setShowroomVisibility(!profile?.showroom_public)}
+                disabled={savingShowroomVisibility || Boolean(garageError)}
+                aria-pressed={Boolean(profile?.showroom_public)}
+                className={`min-h-10 shrink-0 rounded-xl px-4 text-xs font-black uppercase tracking-wider transition disabled:opacity-50 ${
+                  profile?.showroom_public
+                    ? 'border border-emerald-400/30 bg-emerald-400/10 text-emerald-200 hover:bg-emerald-400/20'
+                    : 'border border-white/10 bg-white/5 text-gray-200 hover:bg-white/10'
+                }`}
+              >
+                {savingShowroomVisibility
+                  ? t('Enregistrement…')
+                  : profile?.showroom_public ? t('Public') : t('Rendre public')}
+              </button>
+            </div>
+            {showroomMessage && <p role="status" className="mt-3 text-sm text-blue-200">{showroomMessage}</p>}
 
             {selectedVehicles.length > 0 ? (
               <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
