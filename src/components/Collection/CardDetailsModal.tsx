@@ -288,6 +288,11 @@ export default function CardDetailsModal({
                       </span>
                     </>
                   )}
+                  {card.variant_of_card_id && (
+                    <span className="rounded border border-fuchsia-300/30 bg-fuchsia-300/[0.08] px-2 py-1 font-black uppercase tracking-wide text-fuchsia-200">
+                      Alt Art
+                    </span>
+                  )}
                   {Number.isFinite(Number(card.collection_number)) && Number(card.collection_number) > 0 && (
                     <span className="rounded border border-white/10 px-2 py-1 tabular-nums">
                       #{Number(card.collection_number)}

@@ -9,6 +9,7 @@ L'univers visuel s'inspire du sport automobile, de l'esthétique *gentleman driv
 ## Fonctionnalités
 
 - **Collection automobile** : cartes de véhicules, de circuits et de pilotes à retrouver dans un garage personnel.
+- **Alternative arts** : variantes de cartes véhicule avec un visuel et un numéro distincts, collectionnables séparément sans changer les caractéristiques d’origine.
 - **Cartes détaillées** : caractéristiques techniques, indice de performance, rareté, badges et effets visuels, ainsi que le pseudo du joueur qui en possède le plus d'exemplaires.
 - **Boosters** : packs permettant d'enrichir sa collection.
 - **Favoris et filtres** : recherche, tri et consultation des cartes possédées.

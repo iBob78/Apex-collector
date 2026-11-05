@@ -22,6 +22,7 @@ export type Database = {
           is_holographic: boolean;
           price_eur: number;
           collection_number: number;
+          variant_of_card_id: string | null;
           is_active: boolean;
           booster_enabled: boolean;
           total_in_collection: number;

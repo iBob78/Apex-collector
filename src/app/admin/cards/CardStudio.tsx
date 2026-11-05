@@ -22,7 +22,7 @@ import { drivetrainLayoutDescriptions, drivetrainLayouts } from '@/lib/drivetrai
 import { getRarityColor } from '@/lib/rarity';
 import { getIncompleteVehicleCardFields } from '@/lib/card-completeness';
 import { fuelTypes, getFuelTypeInfo } from '@/lib/fuelTypes';
-import { createCard, updateCard, type CardData, type CardDraft } from './actions';
+import { createAlternativeArt, createCard, updateCard, type CardData, type CardDraft } from './actions';
 
 const rarities = ['Common', 'Uncommon', 'Atypique', 'Rare', 'Very rare', 'Epic', 'Legend', 'Mythic', 'Icon'];
 const CUSTOM_MAKE = '__custom_make__';
@@ -141,6 +141,7 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
   const [isCustomMake, setIsCustomMake] = useState(false);
   const [filter, setFilter] = useState('');
   const [saving, setSaving] = useState(false);
+  const [alternativeArtImage, setAlternativeArtImage] = useState('');
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => setCards(initialCards), [initialCards]);
@@ -172,6 +173,7 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
   const startNewCard = () => {
     setSelectedId(null);
     setDraft(emptyDraft);
+    setAlternativeArtImage('');
     setIsCustomMake(false);
     setFeedback(null);
   };
@@ -179,6 +181,7 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
   const selectCard = (card: CardData) => {
     setSelectedId(card.id);
     setDraft(toDraft(card));
+    setAlternativeArtImage('');
     setIsCustomMake(false);
     setFeedback(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -208,6 +211,23 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
     setSelectedId(result.card.id);
     setDraft(toDraft(result.card));
     setFeedback({ type: 'success', text: selectedId ? 'Modifications enregistrées.' : 'Carte créée dans le catalogue.' });
+  };
+
+  const handleCreateAlternativeArt = async () => {
+    if (!selectedCard || saving) return;
+    setSaving(true);
+    setFeedback(null);
+    const result = await createAlternativeArt(selectedCard.id, alternativeArtImage);
+    setSaving(false);
+    if (!result.success) {
+      setFeedback({ type: 'error', text: result.error });
+      return;
+    }
+
+    setCards((current) => [result.card, ...current]);
+    setAlternativeArtImage('');
+    selectCard(result.card);
+    setFeedback({ type: 'success', text: 'Alternative art créée avec un nouveau numéro de collection.' });
   };
 
   return (
@@ -297,6 +317,33 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                     </p>
                   </div>
                 </div>
+              )}
+
+              {selectedCard && !selectedCard.variant_of_card_id && (
+                <section className="mb-8 rounded-2xl border border-fuchsia-300/20 bg-fuchsia-300/[0.05] p-4 sm:p-5">
+                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-fuchsia-200">Alternative art</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-400">
+                    Crée une version collectionnable séparément, avec un numéro propre. Ses caractéristiques sont copiées et elle n’est pas incluse dans les boosters par défaut.
+                  </p>
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                    <input
+                      aria-label="Image de l’alternative art"
+                      className="min-w-0 flex-1 rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-fuchsia-300/70"
+                      value={alternativeArtImage}
+                      onChange={(event) => setAlternativeArtImage(event.target.value)}
+                      placeholder="Clé Storage, URL ou chemin d’image"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void handleCreateAlternativeArt()}
+                      disabled={saving || !alternativeArtImage.trim()}
+                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-fuchsia-300/30 bg-fuchsia-300/10 px-4 py-3 text-xs font-black text-fuchsia-100 transition hover:bg-fuchsia-300/20 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {saving ? <LoaderCircle className="animate-spin" size={15} /> : <Plus size={15} />}
+                      Créer l’alternative art
+                    </button>
+                  </div>
+                </section>
               )}
 
               <SectionHeading eyebrow="01 — identité" title="Informations générales" />
@@ -474,6 +521,7 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                 <Card
                   id={selectedId ?? 'card-preview'}
                   collection_number={selectedCard?.collection_number}
+                  variant_of_card_id={selectedCard?.variant_of_card_id}
                   category="vehicle"
                   make={draft.make || 'Marque'}
                   model={draft.model || 'Modèle'}
@@ -541,6 +589,11 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                       <span className={`block truncate text-xs font-bold ${card.is_active === false ? 'text-red-100/80' : 'text-slate-100'}`}>{card.make} {card.model}</span>
                       <span className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] text-slate-500">
                         <span>{card.year} · {card.rarity}</span>
+                        {card.variant_of_card_id && (
+                          <span className="rounded-md border border-fuchsia-300/25 bg-fuchsia-300/[0.08] px-1.5 py-0.5 font-black uppercase tracking-wide text-fuchsia-200">
+                            Alt art · #{card.collection_number}
+                          </span>
+                        )}
                         {card.is_active === false && (
                           <span className="inline-flex items-center gap-1 rounded-md border border-red-400/25 bg-red-400/10 px-1.5 py-0.5 font-black uppercase tracking-wide text-red-300">
                             <Ban size={10} /> Désactivée

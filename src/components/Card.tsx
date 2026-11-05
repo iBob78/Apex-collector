@@ -76,6 +76,7 @@ export default function Card(props: CardProps) {
 
   const isVehicle = (props as any).category === 'vehicle' || ((props as any).category == null && 'make' in props);
   const isCircuit = (props as any).category === 'circuit' || ((props as any).category == null && 'country' in props);
+  const isAlternativeArt = Boolean((props as any).variant_of_card_id);
 
   // Extraction sécurisée des données avec valeurs par défaut
   const power_hp = isVehicle ? Number((props as any).power_hp) || 0 : 0;
@@ -184,6 +185,7 @@ export default function Card(props: CardProps) {
           cardFrameClassName,
           "cursor-pointer transition-all duration-300",
           getRarityBorderClass(rarity),
+          isAlternativeArt && "shadow-[0_0_18px_rgba(217,70,239,0.2)]",
           newlyAcquired && "collection-new-card",
           canTiltToPointer && "card-pointer-tilt",
           !owned && "grayscale opacity-60"
@@ -237,7 +239,10 @@ export default function Card(props: CardProps) {
             initial={reduceMotion ? false : { opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: reduceMotion ? 0 : 0.65, duration: 0.2 }}
-            className="collection-new-badge pointer-events-none absolute left-1/2 top-1 z-30 -translate-x-1/2 rounded-md border-2 border-lime-50 bg-gradient-to-b from-lime-200 to-lime-400 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-[#092210] shadow-[0_0_18px_rgba(163,230,53,0.8)] sm:top-2 sm:px-3 sm:py-1.5 sm:text-sm"
+            className={clsx(
+              "collection-new-badge pointer-events-none absolute left-1/2 z-30 -translate-x-1/2 rounded-md border-2 border-lime-50 bg-gradient-to-b from-lime-200 to-lime-400 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-[#092210] shadow-[0_0_18px_rgba(163,230,53,0.8)] sm:px-3 sm:py-1.5 sm:text-sm",
+              isAlternativeArt ? "top-10 sm:top-16" : "top-1 sm:top-2",
+            )}
           >
             NEW!
           </motion.span>
@@ -336,6 +341,16 @@ export default function Card(props: CardProps) {
           <div aria-label={`Numéro de collection ${collectionNumber}`} className={clsx("absolute z-20 rounded-md border border-white/15 bg-black/70 font-bold tabular-nums text-white/90", mobileGrid ? "bottom-0.5 left-0.5 px-0.5 py-0 text-[6px] sm:bottom-2 sm:left-2 sm:px-1.5 sm:py-0.5 sm:text-[9px]" : "bottom-2 left-2 px-1.5 py-0.5 text-[9px]")}>
             #{collectionNumber}
           </div>
+        )}
+        {isAlternativeArt && (
+          <span
+            className={clsx(
+              "absolute z-20 rounded-md border border-fuchsia-200/50 bg-fuchsia-950/85 font-black uppercase tracking-wider text-fuchsia-100 shadow-[0_0_12px_rgba(217,70,239,0.3)]",
+              mobileGrid ? "left-1/2 top-5 -translate-x-1/2 px-1 py-0.5 text-[5px] sm:top-12 sm:px-2 sm:text-[9px]" : "left-1/2 top-12 -translate-x-1/2 px-2 py-1 text-[9px]",
+            )}
+          >
+            Alt Art
+          </span>
         )}
         {mobileGrid && isFavorite && (
           <span className="absolute left-1/2 top-0.5 z-20 -translate-x-1/2 rounded-full bg-black/75 p-0.5 text-amber-400 sm:hidden" aria-label={t('Favori')}>

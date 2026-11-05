@@ -41,6 +41,7 @@ export type CardDraft = {
 export type CardData = {
   id: string;
   card_id: string;
+  variant_of_card_id: string | null;
   name: string;
   make: string;
   model: string;
@@ -256,6 +257,7 @@ function revalidateCardPages() {
   revalidatePath('/admin/cards');
   revalidatePath('/cards');
   revalidatePath('/collection');
+  revalidatePath('/open');
   revalidatePath('/collection/[id]', 'page');
 }
 
@@ -277,6 +279,68 @@ export async function createCard(draft: CardDraft): Promise<SaveResult> {
   return { success: true, card: data as CardData };
 }
 
+export async function createAlternativeArt(cardRowId: string, imageUrl: string): Promise<SaveResult> {
+  if (typeof cardRowId !== 'string' || !cardRowId.trim()) {
+    return { success: false, error: 'Carte d’origine introuvable.' };
+  }
+  if (typeof imageUrl !== 'string' || !imageUrl.trim()) {
+    return { success: false, error: 'Ajoute une image pour créer l’alternative art.' };
+  }
+
+  const authorization = await getAdminClient();
+  if (!authorization.client) return { success: false, error: authorization.error ?? 'Accès administrateur refusé.' };
+
+  const { data: source, error: sourceError } = await authorization.client
+    .from('cards')
+    .select('*')
+    .eq('id', cardRowId)
+    .single();
+
+  if (sourceError || !source) {
+    return { success: false, error: `La carte d’origine n’a pas pu être chargée${sourceError ? ` : ${sourceError.message}` : '.'}` };
+  }
+  if (source.variant_of_card_id) {
+    return { success: false, error: 'Une alternative art ne peut pas servir de carte d’origine.' };
+  }
+
+  const { data, error } = await authorization.client
+    .from('cards')
+    .insert({
+      name: source.name,
+      make: source.make,
+      model: source.model,
+      year: source.year,
+      rarity: source.rarity,
+      is_active: source.is_active !== false,
+      booster_enabled: false,
+      image_url: imageUrl.trim(),
+      description: source.description,
+      power_hp: source.power_hp,
+      power_kw: source.power_kw,
+      torque_nm: source.torque_nm,
+      max_speed_kmh: source.max_speed_kmh,
+      weight_t: source.weight_t,
+      acceleration_0_100: source.acceleration_0_100,
+      engine_size: source.engine_size,
+      cylinder: source.cylinder,
+      boost: source.boost,
+      country_code: source.country_code,
+      transmission: source.transmission,
+      new_price_eur: source.new_price_eur,
+      fuel_type: source.fuel_type,
+      max_rpm: source.max_rpm,
+      units_sold: source.units_sold,
+      card_id: crypto.randomUUID(),
+      variant_of_card_id: source.card_id,
+    })
+    .select('*')
+    .single();
+
+  if (error) return { success: false, error: `L’alternative art n’a pas pu être créée : ${error.message}` };
+  revalidateCardPages();
+  return { success: true, card: data as CardData };
+}
+
 export async function updateCard(id: string, draft: CardDraft): Promise<SaveResult> {
   if (typeof id !== 'string' || !id.trim()) return { success: false, error: 'Identifiant de carte manquant.' };
 
@@ -286,9 +350,56 @@ export async function updateCard(id: string, draft: CardDraft): Promise<SaveResu
   const parsed = parseCardDraft(draft);
   if (!('data' in parsed)) return { success: false, error: parsed.error };
 
+  const { data: currentCard, error: currentCardError } = await authorization.client
+    .from('cards')
+    .select('variant_of_card_id')
+    .eq('id', id)
+    .single();
+
+  if (currentCardError || !currentCard) {
+    return { success: false, error: `La carte à modifier n’a pas pu être chargée${currentCardError ? ` : ${currentCardError.message}` : '.'}` };
+  }
+
+  let sourceOverrides: Partial<typeof parsed.data> = {};
+  if (currentCard.variant_of_card_id) {
+    const { data: source, error: sourceError } = await authorization.client
+      .from('cards')
+      .select('*')
+      .eq('card_id', currentCard.variant_of_card_id)
+      .single();
+
+    if (sourceError || !source) {
+      return { success: false, error: `La carte d’origine de cette alternative art n’a pas pu être chargée${sourceError ? ` : ${sourceError.message}` : '.'}` };
+    }
+
+    sourceOverrides = {
+      name: source.name,
+      make: source.make,
+      model: source.model,
+      year: source.year,
+      rarity: source.rarity,
+      description: source.description,
+      power_hp: source.power_hp,
+      power_kw: source.power_kw,
+      torque_nm: source.torque_nm,
+      max_speed_kmh: source.max_speed_kmh,
+      weight_t: source.weight_t,
+      acceleration_0_100: source.acceleration_0_100,
+      engine_size: source.engine_size,
+      cylinder: source.cylinder,
+      boost: source.boost,
+      country_code: source.country_code,
+      transmission: source.transmission,
+      new_price_eur: source.new_price_eur,
+      fuel_type: source.fuel_type,
+      max_rpm: source.max_rpm,
+      units_sold: source.units_sold,
+    };
+  }
+
   const { data, error } = await authorization.client
     .from('cards')
-    .update(parsed.data)
+    .update({ ...parsed.data, ...sourceOverrides })
     .eq('id', id)
     .select('*')
     .single();

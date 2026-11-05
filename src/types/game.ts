@@ -16,6 +16,7 @@ export interface BaseCard {
     created_at?: string;
     description?: string;
     collection_number?: number;
+    variant_of_card_id?: string | null;
     is_active?: boolean;
     upgrade_level?: number;
 }
