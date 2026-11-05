@@ -244,6 +244,96 @@ html, body {
   mix-blend-mode: screen;
 }
 
+.card-pointer-tilt {
+  transform: perspective(900px) rotateX(var(--card-rotate-x, 0deg)) rotateY(var(--card-rotate-y, 0deg));
+  transform-style: preserve-3d;
+  transition:
+    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 180ms ease;
+}
+
+.card-pointer-tilt:hover {
+  z-index: 20;
+  transform: perspective(900px) rotateX(var(--card-rotate-x, 0deg)) rotateY(var(--card-rotate-y, 0deg)) scale(1.035);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.5);
+}
+
+.collection-new-card {
+  animation: collection-new-card-glow 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes collection-new-card-glow {
+  from {
+    box-shadow:
+      0 0 0 1px rgba(217, 249, 157, 0.75),
+      0 0 12px 2px rgba(163, 230, 53, 0.45),
+      0 12px 30px rgba(0, 0, 0, 0.35);
+  }
+  to {
+    box-shadow:
+      0 0 0 2px rgba(236, 252, 203, 0.95),
+      0 0 26px 8px rgba(163, 230, 53, 0.8),
+      0 12px 30px rgba(0, 0, 0, 0.35);
+  }
+}
+
+.collection-new-badge {
+  animation: card-new-badge-glow 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes card-new-badge-glow {
+  from {
+    box-shadow: 0 0 8px rgba(163, 230, 53, 0.35);
+  }
+  to {
+    box-shadow: 0 0 18px rgba(163, 230, 53, 0.75);
+  }
+}
+
+.card-upgrade-effect-1 {
+  backdrop-filter: grayscale(0.18) contrast(1.08) brightness(1.06);
+  background:
+    linear-gradient(115deg, rgba(226, 232, 240, 0.14), rgba(51, 65, 85, 0.04) 42%, rgba(248, 250, 252, 0.12));
+  box-shadow:
+    inset 0 0 0 2px rgba(241, 245, 249, 0.7),
+    inset 0 0 0 5px rgba(15, 23, 42, 0.28),
+    inset 0 0 24px rgba(226, 232, 240, 0.16);
+}
+
+.card-upgrade-effect-1::before,
+.card-upgrade-effect-1::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+
+.card-upgrade-effect-1::before {
+  background:
+    repeating-linear-gradient(
+      176deg,
+      rgba(255, 255, 255, 0.14) 0 1px,
+      rgba(15, 23, 42, 0.07) 1px 2px,
+      transparent 2px 5px
+    ),
+    linear-gradient(90deg, rgba(248, 250, 252, 0.1), transparent 24%, rgba(15, 23, 42, 0.06) 52%, transparent 76%, rgba(248, 250, 252, 0.08));
+  mix-blend-mode: soft-light;
+  opacity: 0.62;
+}
+
+.card-upgrade-effect-1::after {
+  background:
+    radial-gradient(
+      ellipse at var(--card-pointer-x, 50%) var(--card-pointer-y, 42%),
+      rgba(255, 255, 255, 0.3),
+      rgba(226, 232, 240, 0.12) 22%,
+      transparent 52%
+    ),
+    linear-gradient(115deg, transparent 39%, rgba(255, 255, 255, 0.18) 49%, transparent 59%);
+  mix-blend-mode: screen;
+  opacity: 0.58;
+  transition: opacity 180ms ease;
+}
+
 .card-upgrade-effect-2::before,
 .card-upgrade-effect-3::before,
 .card-upgrade-effect-4::before,
@@ -427,6 +517,24 @@ html, body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .card-pointer-tilt,
+  .card-pointer-tilt:hover {
+    transform: none;
+    transition: none;
+  }
+
+  .collection-new-badge {
+    animation: none;
+  }
+
+  .collection-new-card {
+    animation: none;
+    box-shadow:
+      0 0 0 2px rgba(236, 252, 203, 0.9),
+      0 0 18px 4px rgba(163, 230, 53, 0.65),
+      0 12px 30px rgba(0, 0, 0, 0.35);
+  }
+
   .card-upgrade-effect-5,
   .card-upgrade-effect-6,
   .card-upgrade-effect-7,
@@ -455,6 +563,10 @@ html, body {
   .card-upgrade-effect-3::after,
   .card-upgrade-effect-4::after {
     display: none;
+  }
+
+  .card-upgrade-effect-1::after {
+    transition: none;
   }
 }
 

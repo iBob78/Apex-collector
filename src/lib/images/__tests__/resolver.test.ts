@@ -1,4 +1,4 @@
-import { getPublicImage, normalize, buildVehicleKey, resolveCardImage, resolveCountryFlag, resolveDrivetrainLayoutIcon } from '../resolver';
+import { getPublicImage, normalize, buildVehicleKey, resolveBrandLogo, resolveCardImage, resolveCountryFlag, resolveDrivetrainLayoutIcon } from '../resolver';
 import { IMAGE_PATHS } from '../paths';
 
 describe('Image Resolver', () => {
@@ -77,6 +77,10 @@ describe('Image Resolver', () => {
 
     it('should resolve the Belgium country code to its flag asset', () => {
         expect(resolveCountryFlag('BE')).toContain('logos/country/be.png');
+    });
+
+    it('resolves Mercedes-Benz to the existing Mercedes brand logo', () => {
+        expect(resolveBrandLogo('Mercedes-Benz')).toContain('logos/brand/mercedes.png');
     });
 
     describe('resolveDrivetrainLayoutIcon', () => {

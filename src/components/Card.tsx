@@ -8,6 +8,7 @@ import { resolveCardImage, resolveBrandLogo, resolveCountryFlag, resolveDrivetra
 import type { AnyCard } from '@/types/game';
 import { useRouter } from 'next/navigation';
 import { Wind, ArrowUpCircle, Check, Compass, MoveRight, ChevronRight, Star, Trophy } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { getRarityBorderClass } from '@/lib/rarity';
 import { calculateVehicleIP } from '@/lib/vehicleStats';
 import { formatDistance, formatPower, formatTorque, formatWeight } from '@/lib/preferences';
@@ -23,6 +24,12 @@ type CardProps = AnyCard & {
   compact?: boolean;
   /** Four-column phone collection with all original card information. */
   mobileGrid?: boolean;
+  /** Tilt the card toward the pointer in the collection. */
+  pointerTilt?: boolean;
+  /** Conceal unowned cards without revealing their identity or opening their details. */
+  hideUnownedContent?: boolean;
+  /** Show the persisted NEW state and its one-time reveal animation in the collection. */
+  newlyAcquired?: boolean;
   /** Lift the vehicle name slightly on booster reveal cards only. */
   boosterReveal?: boolean;
   isFavorite?: boolean;
@@ -47,6 +54,9 @@ export default function Card(props: CardProps) {
     showLevel = true,
     compact = false,
     mobileGrid = false,
+    pointerTilt = false,
+    hideUnownedContent = false,
+    newlyAcquired = false,
     boosterReveal = false,
     isFavorite = false,
     count = 0,
@@ -58,6 +68,7 @@ export default function Card(props: CardProps) {
     className,
     onCardClick,
   } = props;
+  const reduceMotion = useReducedMotion();
 
   // ID ROBUSTE : card_id d'abord (CSV), puis id
   const isDriver = (props as any).category === 'driver' || 'driver_id' in props;
@@ -96,7 +107,14 @@ export default function Card(props: CardProps) {
       ? hasCollectionNumber ? 'p-2 pb-7' : 'p-2'
       : hasCollectionNumber ? 'p-4 pb-10' : 'p-4';
   const level = Math.max(0, Math.min(9, Math.floor(Number(upgradeLevel) || 0)));
-  const levelEffectClass = level >= 2 ? `card-upgrade-effect-${level}` : null;
+  const levelEffectClass = level >= 1 ? `card-upgrade-effect-${level}` : null;
+  const canTiltToPointer = pointerTilt && owned;
+  const isConcealed = hideUnownedContent && !owned;
+  const cardWrapperClassName = clsx("flex w-full min-w-0 flex-col group/card", mobileGrid ? "gap-1 sm:gap-2" : "gap-2", className);
+  const cardFrameClassName = clsx(
+    "relative w-full min-w-0 aspect-[2/3] rounded-xl overflow-hidden bg-[#0a0a0a]",
+    mobileGrid ? "border-2 sm:border-[3px] shadow-[0_6px_16px_rgba(0,0,0,0.35)] sm:shadow-[0_12px_30px_rgba(0,0,0,0.35)]" : "border-[3px] shadow-[0_12px_30px_rgba(0,0,0,0.35)]",
+  );
   const drivetrainLayout = isVehicle ? (props as any).transmission : undefined;
   const drivetrainLayoutIcon = resolveDrivetrainLayoutIcon(drivetrainLayout);
   const drivetrainLayoutDescription = typeof drivetrainLayout === 'string'
@@ -124,6 +142,8 @@ export default function Card(props: CardProps) {
   const fuelType = isVehicle ? getFuelTypeInfo((props as any).fuel_type) : null;
 
   const handleCardClick = () => {
+    if (isConcealed) return;
+
     if (onCardClick) {
       onCardClick();
       return;
@@ -132,17 +152,63 @@ export default function Card(props: CardProps) {
     router.push(`/collection/${id}`);
   };
 
+  if (isConcealed) {
+    return (
+      <div className={cardWrapperClassName}>
+        <div
+          role="img"
+          aria-label={t('Carte non découverte')}
+          className={clsx(cardFrameClassName, "cursor-default border-white/10")}
+        >
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(ellipse_at_center,_rgba(148,163,184,0.13),_transparent_70%)]"
+          >
+            <div className="absolute inset-2 rounded-lg border border-dashed border-white/10 sm:inset-4" />
+            <span className="font-black text-4xl text-white/20 sm:text-6xl">?</span>
+          </div>
+        </div>
+        {mobileGrid && showLevel && (
+          <div className="flex min-h-[25px] w-full items-start justify-center sm:hidden">
+            <span className="h-[23px] w-full" aria-hidden="true" />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div className={clsx("flex w-full min-w-0 flex-col group/card", mobileGrid ? "gap-1 sm:gap-2" : "gap-2", className)}>
+    <div className={cardWrapperClassName}>
       <div
         className={clsx(
-          "relative w-full min-w-0 cursor-pointer transition-all duration-300",
-          "aspect-[2/3] rounded-xl overflow-hidden bg-[#0a0a0a]",
-          mobileGrid ? "border-2 sm:border-[3px] shadow-[0_6px_16px_rgba(0,0,0,0.35)] sm:shadow-[0_12px_30px_rgba(0,0,0,0.35)]" : "border-[3px] shadow-[0_12px_30px_rgba(0,0,0,0.35)]",
+          cardFrameClassName,
+          "cursor-pointer transition-all duration-300",
           getRarityBorderClass(rarity),
-          !owned && "grayscale opacity-60 hover:grayscale-0 hover:opacity-100"
+          newlyAcquired && "collection-new-card",
+          canTiltToPointer && "card-pointer-tilt",
+          !owned && "grayscale opacity-60"
         )}
         onClick={handleCardClick}
+        onPointerMove={(event) => {
+          if (!owned || event.pointerType === 'touch' || (!pointerTilt && level < 1)) return;
+          const bounds = event.currentTarget.getBoundingClientRect();
+          const relativeX = (event.clientX - bounds.left) / bounds.width;
+          const relativeY = (event.clientY - bounds.top) / bounds.height;
+          const pointerX = relativeX * 100;
+          const pointerY = relativeY * 100;
+          event.currentTarget.style.setProperty('--card-pointer-x', `${pointerX}%`);
+          event.currentTarget.style.setProperty('--card-pointer-y', `${pointerY}%`);
+          if (canTiltToPointer) {
+            event.currentTarget.style.setProperty('--card-rotate-x', `${(0.5 - relativeY) * 12}deg`);
+            event.currentTarget.style.setProperty('--card-rotate-y', `${(relativeX - 0.5) * 14}deg`);
+          }
+        }}
+        onPointerLeave={(event) => {
+          event.currentTarget.style.setProperty('--card-pointer-x', '50%');
+          event.currentTarget.style.setProperty('--card-pointer-y', '42%');
+          event.currentTarget.style.setProperty('--card-rotate-x', '0deg');
+          event.currentTarget.style.setProperty('--card-rotate-y', '0deg');
+        }}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
@@ -152,6 +218,30 @@ export default function Card(props: CardProps) {
         role="button"
         tabIndex={0}
       >
+        {newlyAcquired && !reduceMotion && (
+          <motion.div
+            aria-hidden="true"
+            initial={{ rotateY: 0 }}
+            animate={{ rotateY: -180 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
+            className="pointer-events-none absolute inset-0 z-[25] flex items-center justify-center overflow-hidden rounded-[inherit] border-2 border-white/20 bg-gradient-to-br from-slate-950 via-slate-800 to-black"
+          >
+            <div className="absolute inset-2 rounded-lg border border-dashed border-white/15 sm:inset-4" />
+            <span className="font-black text-4xl text-white/30 sm:text-6xl">?</span>
+          </motion.div>
+        )}
+        {newlyAcquired && (
+          <motion.span
+            aria-label={t('Nouvelle Carte')}
+            initial={reduceMotion ? false : { opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: reduceMotion ? 0 : 0.65, duration: 0.2 }}
+            className="collection-new-badge pointer-events-none absolute left-1/2 top-1 z-30 -translate-x-1/2 rounded-md border-2 border-lime-50 bg-gradient-to-b from-lime-200 to-lime-400 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-[#092210] shadow-[0_0_18px_rgba(163,230,53,0.8)] sm:top-2 sm:px-3 sm:py-1.5 sm:text-sm"
+          >
+            NEW!
+          </motion.span>
+        )}
         {/* Image Background */}
         <div className="absolute inset-0 z-0">
           <SafeImage

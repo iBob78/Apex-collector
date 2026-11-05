@@ -1,4 +1,4 @@
-import { drawBoosterCards, PACKS, getPackImageUrl, getFirstTimeBoosterCardIndices } from '../boosters';
+import { drawBoosterCards, PACKS, getPackImageUrl, getFirstTimeBoosterCardIndices, getBoosterCardIdentity } from '../boosters';
 
 describe('Booster pack assets', () => {
   it('uses the Supabase booster asset paths and includes the expected pack slugs', () => {
@@ -160,6 +160,16 @@ describe('Booster card draws', () => {
 });
 
 describe('First-time booster discoveries', () => {
+  it('resolves collection IDs and categories for persisted discoveries', () => {
+    expect(getBoosterCardIdentity({ id: 'database-row', card_id: 'CAR-ID', category: 'vehicle' }))
+      .toEqual({ category: 'vehicle', cardId: 'car-id' });
+    expect(getBoosterCardIdentity({ id: 'database-row', circuit_id: 'TRACK-ID', category: 'circuit' }))
+      .toEqual({ category: 'circuit', cardId: 'track-id' });
+    expect(getBoosterCardIdentity({ id: 'database-row', driver_id: 'DRIVER-ID', category: 'driver' }))
+      .toEqual({ category: 'driver', cardId: 'driver-id' });
+    expect(getBoosterCardIdentity({ category: 'vehicle' })).toBeNull();
+  });
+
   it('marks only the first copy absent from the collection, including circuits', () => {
     const cards = [
       { card_id: 'NEW-CAR', id: 'db-car', category: 'vehicle' },

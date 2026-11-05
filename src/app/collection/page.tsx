@@ -51,6 +51,8 @@ export default function CollectionPage() {
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [favoritePendingKey, setFavoritePendingKey] = useState<string | null>(null);
   const [favoritesError, setFavoritesError] = useState<string | null>(null);
+  const [newCardKeys, setNewCardKeys] = useState<Set<string>>(() => new Set());
+  const [discoveryError, setDiscoveryError] = useState<string | null>(null);
 
   // Filters
   const [activeTab, setActiveTab] = useState<'all' | 'vehicle' | 'circuit' | 'driver'>('all');
@@ -72,6 +74,7 @@ export default function CollectionPage() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setDiscoveryError(null);
       try {
         // 1. Récupérer tous les catalogues disponibles.
         const [vehicleRows, circuitRows, driverRows] = await Promise.all([
@@ -94,11 +97,12 @@ export default function CollectionPage() {
           setCards(combinedBase);
           setUserCardLevels({});
           setFavoriteKeys(new Set());
+          setNewCardKeys(new Set());
           setLoading(false);
           return;
         }
 
-        const [ownedVehicles, ownedCircuits, ownedDrivers, favorites] = await Promise.all([
+        const [ownedVehicles, ownedCircuits, ownedDrivers, favorites, discoveries] = await Promise.all([
           fetchAllPages((from, to) => supabase.from('user_cards')
             .select('*').eq('user_id', user.id).order('id').range(from, to)),
           fetchAllPages((from, to) => supabase.from('user_circuits')
@@ -114,11 +118,26 @@ export default function CollectionPage() {
               setFavoritesError(t('Impossible de charger les favoris.'));
               return null;
             }),
+          fetchAllPages((from, to) => supabase.from('user_card_discoveries')
+            .select('category,card_id,seen_at').eq('user_id', user.id)
+            .order('category').order('card_id').range(from, to))
+            .catch((error) => {
+              console.error('[CollectionPage] Erreur nouvelles cartes:', error);
+              setDiscoveryError(t('Impossible de charger les nouvelles cartes.'));
+              return null;
+            }),
         ]);
 
         if (favorites !== null) {
           setFavoritesError(null);
           setFavoriteKeys(new Set(favorites.map((item) => `${item.category}:${String(item.card_id).toLowerCase()}`)));
+        }
+        if (discoveries !== null) {
+          setNewCardKeys(new Set(
+            discoveries
+              .filter((item) => !item.seen_at)
+              .map((item) => `${item.category}:${String(item.card_id).toLowerCase()}`),
+          ));
         }
 
         let ownedMap: Record<string, number> = {};
@@ -282,6 +301,33 @@ export default function CollectionPage() {
     }
   };
 
+  const handleOpenCardDetails = async (card: any) => {
+    setSelectedCard(card);
+    const key = getFavoriteKey(card);
+    if (!user || !newCardKeys.has(key)) return;
+
+    setDiscoveryError(null);
+    try {
+      const { error } = await supabase
+        .from('user_card_discoveries')
+        .update({ seen_at: new Date().toISOString() })
+        .eq('user_id', user.id)
+        .eq('category', getCardCategory(card))
+        .eq('card_id', getCardEntityId(card))
+        .is('seen_at', null);
+      if (error) throw error;
+
+      setNewCardKeys((current) => {
+        const updated = new Set(current);
+        updated.delete(key);
+        return updated;
+      });
+    } catch (error) {
+      console.error('[CollectionPage] Impossible de marquer la découverte comme vue:', error);
+      setDiscoveryError(t('Impossible d’enregistrer la découverte. Réessayez.'));
+    }
+  };
+
   const handleUpgrade = async (card: any) => {
     if (!user || upgradingCardId) return;
 
@@ -418,6 +464,11 @@ export default function CollectionPage() {
                 {favoritesError}
               </p>
             )}
+            {discoveryError && (
+              <p role="alert" className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-200">
+                {discoveryError}
+              </p>
+            )}
           </header>
 
           {/* Grid of Cards */}
@@ -452,6 +503,9 @@ export default function CollectionPage() {
                         <Card
                           {...card}
                           mobileGrid
+                          pointerTilt
+                          hideUnownedContent
+                          newlyAcquired={newCardKeys.has(getFavoriteKey(card))}
                           isFavorite={favoriteKeys.has(getFavoriteKey(card))}
                           owned={c > 0}
                           count={c}
@@ -460,7 +514,7 @@ export default function CollectionPage() {
                           upgradePrice={levelUnlock?.price}
                           upgradePending={upgradingCardId === cid}
                           onUpgrade={() => handleUpgrade(card)}
-                          onCardClick={() => setSelectedCard(card)}
+                          onCardClick={() => void handleOpenCardDetails(card)}
                         />
                       </motion.div>
                     );
