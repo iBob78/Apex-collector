@@ -452,6 +452,7 @@ export default function CollectionPage() {
                         <Card
                           {...card}
                           mobileGrid
+                          pointerTilt
                           isFavorite={favoriteKeys.has(getFavoriteKey(card))}
                           owned={c > 0}
                           count={c}

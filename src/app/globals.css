@@ -244,6 +244,20 @@ html, body {
   mix-blend-mode: screen;
 }
 
+.card-pointer-tilt {
+  transform: perspective(900px) rotateX(var(--card-rotate-x, 0deg)) rotateY(var(--card-rotate-y, 0deg));
+  transform-style: preserve-3d;
+  transition:
+    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 180ms ease;
+}
+
+.card-pointer-tilt:hover {
+  z-index: 20;
+  transform: perspective(900px) rotateX(var(--card-rotate-x, 0deg)) rotateY(var(--card-rotate-y, 0deg)) scale(1.035);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.5);
+}
+
 .card-upgrade-effect-1 {
   backdrop-filter: grayscale(0.18) contrast(1.08) brightness(1.06);
   background:
@@ -471,6 +485,12 @@ html, body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .card-pointer-tilt,
+  .card-pointer-tilt:hover {
+    transform: none;
+    transition: none;
+  }
+
   .card-upgrade-effect-5,
   .card-upgrade-effect-6,
   .card-upgrade-effect-7,

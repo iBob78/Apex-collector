@@ -23,6 +23,8 @@ type CardProps = AnyCard & {
   compact?: boolean;
   /** Four-column phone collection with all original card information. */
   mobileGrid?: boolean;
+  /** Tilt the card toward the pointer in the collection. */
+  pointerTilt?: boolean;
   /** Lift the vehicle name slightly on booster reveal cards only. */
   boosterReveal?: boolean;
   isFavorite?: boolean;
@@ -47,6 +49,7 @@ export default function Card(props: CardProps) {
     showLevel = true,
     compact = false,
     mobileGrid = false,
+    pointerTilt = false,
     boosterReveal = false,
     isFavorite = false,
     count = 0,
@@ -97,6 +100,7 @@ export default function Card(props: CardProps) {
       : hasCollectionNumber ? 'p-4 pb-10' : 'p-4';
   const level = Math.max(0, Math.min(9, Math.floor(Number(upgradeLevel) || 0)));
   const levelEffectClass = level >= 1 ? `card-upgrade-effect-${level}` : null;
+  const canTiltToPointer = pointerTilt && owned;
   const drivetrainLayout = isVehicle ? (props as any).transmission : undefined;
   const drivetrainLayoutIcon = resolveDrivetrainLayoutIcon(drivetrainLayout);
   const drivetrainLayoutDescription = typeof drivetrainLayout === 'string'
@@ -140,20 +144,29 @@ export default function Card(props: CardProps) {
           "aspect-[2/3] rounded-xl overflow-hidden bg-[#0a0a0a]",
           mobileGrid ? "border-2 sm:border-[3px] shadow-[0_6px_16px_rgba(0,0,0,0.35)] sm:shadow-[0_12px_30px_rgba(0,0,0,0.35)]" : "border-[3px] shadow-[0_12px_30px_rgba(0,0,0,0.35)]",
           getRarityBorderClass(rarity),
-          !owned && "grayscale opacity-60 hover:grayscale-0 hover:opacity-100"
+          canTiltToPointer && "card-pointer-tilt",
+          !owned && "grayscale opacity-60"
         )}
         onClick={handleCardClick}
         onPointerMove={(event) => {
-          if (level < 1 || event.pointerType === 'touch') return;
+          if (!owned || event.pointerType === 'touch' || (!pointerTilt && level < 1)) return;
           const bounds = event.currentTarget.getBoundingClientRect();
-          const pointerX = ((event.clientX - bounds.left) / bounds.width) * 100;
-          const pointerY = ((event.clientY - bounds.top) / bounds.height) * 100;
+          const relativeX = (event.clientX - bounds.left) / bounds.width;
+          const relativeY = (event.clientY - bounds.top) / bounds.height;
+          const pointerX = relativeX * 100;
+          const pointerY = relativeY * 100;
           event.currentTarget.style.setProperty('--card-pointer-x', `${pointerX}%`);
           event.currentTarget.style.setProperty('--card-pointer-y', `${pointerY}%`);
+          if (canTiltToPointer) {
+            event.currentTarget.style.setProperty('--card-rotate-x', `${(0.5 - relativeY) * 12}deg`);
+            event.currentTarget.style.setProperty('--card-rotate-y', `${(relativeX - 0.5) * 14}deg`);
+          }
         }}
         onPointerLeave={(event) => {
           event.currentTarget.style.setProperty('--card-pointer-x', '50%');
           event.currentTarget.style.setProperty('--card-pointer-y', '42%');
+          event.currentTarget.style.setProperty('--card-rotate-x', '0deg');
+          event.currentTarget.style.setProperty('--card-rotate-y', '0deg');
         }}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {

@@ -77,6 +77,7 @@ Le dossier `src/app/` définit les autres routes : `/boosters`, `/open`, `/marke
 
 **Toujours contrôler :**
 - **Smartphone (< 768 px)** : navigation fixe en bas et menu « Plus ». La collection (`/collection`) doit conserver **4 cartes par ligne** sur les petits écrans ; **ne pas confondre** avec les grilles de boosters, qui suivent d'autres règles.
+- Dans la collection, l'inclinaison 3D au pointeur est réservée aux cartes possédées (`owned`) via `pointerTilt` de `Card.tsx`. Les cartes verrouillées restent en niveaux de gris et à opacité réduite ; ne pas leur appliquer de transition, lueur, inclinaison ou restauration de couleur au survol. Elles peuvent garder l'ouverture des détails au clic. L'effet pointeur ne s'active pas au toucher et doit respecter `prefers-reduced-motion`.
 - **À partir de 768 px** : sidebar latérale visible ; la navigation mobile est masquée. Ne pas faire disparaître la sidebar lorsque la fenêtre PC est réduite.
 - Les règles de cartes mobiles utilisent notamment `mobileGrid` et des classes Tailwind `sm:`. **Ne pas modifier leurs équivalents desktop par accident**.
 - Les cartes véhicules, circuits et pilotes doivent conserver leur logo/drapeau, rareté, données lisibles et comportements d'ouverture de détail. L'IP concerne les véhicules uniquement.
