@@ -6,7 +6,7 @@
 export type Rarity = 'Common' | 'Uncommon' | 'Atypique' | 'Rare' | 'Very rare' | 'Epic' | 'Legend' | 'Mythic' | 'Icon';
 export type DrivetrainLayout = 'MR' | 'FF' | 'FR' | 'MF' | 'FA' | 'RR' | 'RA' | 'MA';
 export type Transmission = DrivetrainLayout;
-export type CardCategory = 'vehicle' | 'circuit';
+export type CardCategory = 'vehicle' | 'circuit' | 'driver';
 
 export interface BaseCard {
     id: string;
@@ -50,13 +50,29 @@ export interface CircuitCard extends BaseCard {
     category: 'circuit';
     country?: string;
     country_code?: string;
+    year?: number | string | null;
     length_km?: number;
     turns?: number;
     straight_km?: number;
     type?: 'Route' | 'Urbain' | 'Oval';
 }
 
-export type AnyCard = VehicleCard | CircuitCard;
+export interface DriverCard extends BaseCard {
+    category: 'driver';
+    driver_id: string;
+    name: string;
+    year: number;
+    birth_date: string;
+    country: string;
+    country_code?: string | null;
+    world_championships: number;
+    won_monaco_gp: boolean;
+    won_indy_500: boolean;
+    won_24h_le_mans: boolean;
+    booster_enabled?: boolean;
+}
+
+export type AnyCard = VehicleCard | CircuitCard | DriverCard;
 
 export interface UserCard {
     id: string;

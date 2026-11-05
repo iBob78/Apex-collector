@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
+  AlertTriangle,
   Ban,
   Check,
   ChevronRight,
@@ -19,6 +20,7 @@ import {
 import Card from '@/components/Card';
 import { drivetrainLayoutDescriptions, drivetrainLayouts } from '@/lib/drivetrain';
 import { getRarityColor } from '@/lib/rarity';
+import { getIncompleteVehicleCardFields } from '@/lib/card-completeness';
 import { fuelTypes, getFuelTypeInfo } from '@/lib/fuelTypes';
 import { createCard, updateCard, type CardData, type CardDraft } from './actions';
 
@@ -144,6 +146,7 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
   useEffect(() => setCards(initialCards), [initialCards]);
 
   const selectedCard = cards.find((card) => card.id === selectedId) ?? null;
+  const selectedMissingFields = selectedCard ? getIncompleteVehicleCardFields(selectedCard) : [];
   const makes = useMemo(
     () => Array.from(new Set(cards.map((card) => card.make.trim()).filter(Boolean)))
       .sort((first, second) => first.localeCompare(second, 'fr')),
@@ -156,6 +159,10 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
       `${card.make} ${card.model} ${card.year} ${card.rarity}`.toLowerCase().includes(query),
     );
   }, [cards, filter]);
+  const incompleteCardCount = useMemo(
+    () => cards.filter((card) => getIncompleteVehicleCardFields(card).length > 0).length,
+    [cards],
+  );
 
   const setField = (field: keyof CardDraft, value: string) => {
     setDraft((current) => ({ ...current, [field]: value }));
@@ -239,7 +246,18 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
         <div className="mb-6 flex flex-wrap gap-2">
           <Link href="/admin/cards" className="rounded-xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-2.5 text-xs font-bold text-cyan-200">Cartes véhicule</Link>
           <Link href="/admin/circuits" className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-bold text-slate-400 transition hover:bg-white/5 hover:text-white">Cartes circuit</Link>
+          <Link href="/admin/drivers" className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-bold text-slate-400 transition hover:bg-white/5 hover:text-white">Cartes pilote</Link>
           <Link href="/admin/objectives" className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-bold text-slate-400 transition hover:bg-white/5 hover:text-white">Succès & contrats</Link>
+        </div>
+
+        <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-4 py-3.5 text-amber-100">
+          <AlertTriangle size={18} className="mt-0.5 shrink-0 text-amber-300" />
+          <div>
+            <p className="text-sm font-bold">Mode pré-alpha : les cartes actives sont disponibles dans les boosters.</p>
+            <p className="mt-1 text-xs leading-5 text-amber-100/70">
+              Les fiches incomplètes restent testables et sont signalées dans le catalogue. {incompleteCardCount} carte{incompleteCardCount === 1 ? '' : 's'} à compléter.
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
@@ -265,6 +283,17 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                     <p className="text-sm font-black uppercase tracking-wide">Carte désactivée</p>
                     <p className="mt-1 text-xs leading-5 text-red-100/75">
                       Elle reste dans Supabase, mais est masquée dans le jeu. Les modifications de statut prennent effet après enregistrement.
+                    </p>
+                  </div>
+                </div>
+              )}
+              {selectedMissingFields.length > 0 && (
+                <div role="status" className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-4 py-3.5 text-amber-100">
+                  <AlertTriangle size={18} className="mt-0.5 shrink-0 text-amber-300" />
+                  <div>
+                    <p className="text-sm font-black">Fiche incomplète — conservée pour les tests pré-alpha.</p>
+                    <p className="mt-1 text-xs leading-5 text-amber-100/70">
+                      Données manquantes : {selectedMissingFields.join(', ')}.
                     </p>
                   </div>
                 </div>
@@ -520,6 +549,11 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                         {card.is_active !== false && card.booster_enabled === false && (
                           <span className="rounded-md border border-amber-400/20 bg-amber-400/[0.07] px-1.5 py-0.5 font-bold text-amber-300">
                             Hors boosters
+                          </span>
+                        )}
+                        {getIncompleteVehicleCardFields(card).length > 0 && (
+                          <span className="inline-flex items-center gap-1 rounded-md border border-amber-300/20 bg-amber-300/[0.06] px-1.5 py-0.5 font-bold text-amber-200">
+                            <AlertTriangle size={10} /> Fiche à compléter
                           </span>
                         )}
                       </span>

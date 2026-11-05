@@ -78,6 +78,85 @@ describe('Booster card draws', () => {
     expect(cards.every((card) => card.category === 'circuit')).toBe(true);
     expect(cards.some((card) => card.id === 'booster-disabled-vehicle')).toBe(false);
   });
+
+  it('includes vehicles without a supported rarity and assigns the rarity drawn from the pack', () => {
+    const cards = drawBoosterCards(
+      'common',
+      [{ id: 'acura-without-rarity', make: 'Acura', rarity: null }],
+      [{ id: 'circuit-common', rarity: 'Common' }],
+      2,
+      (() => {
+        const values = [0, 0, 0, 0, 0.99, 0];
+        return () => values.shift() ?? 0;
+      })(),
+    );
+
+    expect(cards).toHaveLength(2);
+    expect(cards[1]).toMatchObject({
+      id: 'acura-without-rarity',
+      make: 'Acura',
+      rarity: 'Common',
+      category: 'vehicle',
+    });
+  });
+
+  it('draws drivers at the configured per-pack circuit drop rate', () => {
+    const cards = drawBoosterCards(
+      'common',
+      [{ id: 'vehicle-common', rarity: 'Common' }],
+      [{ id: 'circuit-common', rarity: 'Common' }],
+      2,
+      (() => {
+        const values = [0, 0, 0, 0.15, 0];
+        return () => values.shift() ?? 0;
+      })(),
+      [{ id: 'driver-row', driver_id: 'driver-card', rarity: 'Common' }],
+    );
+
+    expect(cards[1]).toMatchObject({
+      driver_id: 'driver-card',
+      category: 'driver',
+      rarity: 'Common',
+    });
+  });
+
+  it('does not draw inactive or booster-disabled drivers', () => {
+    const cards = drawBoosterCards(
+      'common',
+      [{ id: 'vehicle-common', rarity: 'Common' }],
+      [{ id: 'circuit-common', rarity: 'Common' }],
+      2,
+      () => 0.15,
+      [
+        { id: 'inactive-driver', rarity: 'Common', is_active: false },
+        { id: 'excluded-driver', rarity: 'Common', booster_enabled: false },
+      ],
+    );
+
+    expect(cards[1]).toMatchObject({ id: 'vehicle-common', category: 'vehicle' });
+  });
+
+  it('assigns each unclassified vehicle to only one rarity pool per pack', () => {
+    const cards = drawBoosterCards(
+      'mythic',
+      [
+        { id: 'unclassified-acura', make: 'Acura', rarity: null },
+        { id: 'icon-ferrari', make: 'Ferrari', rarity: 'Icon' },
+      ],
+      [{ id: 'common-circuit', rarity: 'Common' }],
+      2,
+      (() => {
+        const values = [0, 0, 0, 0.99, 0];
+        return () => values.shift() ?? 0;
+      })(),
+    );
+
+    expect(cards[1]).toMatchObject({
+      id: 'icon-ferrari',
+      rarity: 'Icon',
+      category: 'vehicle',
+    });
+  });
 });
 
 describe('First-time booster discoveries', () => {
@@ -88,13 +167,16 @@ describe('First-time booster discoveries', () => {
       { id: 'EXISTING-CAR', category: 'vehicle' },
       { id: 'NEW-TRACK', category: 'circuit' },
       { id: 'existing-track', category: 'circuit' },
+      { id: 'NEW-DRIVER', driver_id: 'driver-new', category: 'driver' },
+      { id: 'existing-driver', driver_id: 'driver-owned', category: 'driver' },
     ];
     expect([...getFirstTimeBoosterCardIndices(
       cards,
       [{ card_id: 'existing-car', count: 2 }],
       [{ circuit_id: 'EXISTING-TRACK', count: 1 }],
-      [true, true, true, true, true],
-    )]).toEqual([0, 3]);
+      [true, true, true, true, true, true, true],
+      [{ driver_id: 'DRIVER-OWNED', count: 1 }],
+    )]).toEqual([0, 3, 5]);
   });
 
   it('does not label failed additions or extra copies from the same booster', () => {
@@ -120,5 +202,19 @@ describe('First-time booster discoveries', () => {
       [{ card_id: 'shared-id', count: 1 }, { card_id: 'zero-vehicle', count: 0 }],
       [], [true, true, true],
     )]).toEqual([1, 2]);
+  });
+
+  it('uses the circuit business ID rather than its database row ID for ownership', () => {
+    const cards = [
+      { id: 'database-row-owned', circuit_id: 'circuit-owned', category: 'circuit' },
+      { id: 'database-row-new', circuit_id: 'circuit-new', category: 'circuit' },
+    ];
+
+    expect([...getFirstTimeBoosterCardIndices(
+      cards,
+      [],
+      [{ circuit_id: 'circuit-owned', count: 1 }],
+      [true, true],
+    )]).toEqual([1]);
   });
 });

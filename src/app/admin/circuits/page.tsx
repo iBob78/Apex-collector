@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ArrowLeft, ShieldAlert } from 'lucide-react';
 import { isAdminEmail } from '@/lib/admin';
+import { fetchAllPages } from '@/lib/fetchAllPages';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
 import CircuitStudio from './CircuitStudio';
 import type { CircuitData } from '../cards/actions';
@@ -41,20 +42,25 @@ export default async function AdminCircuitsPage() {
     );
   }
 
-  const { data: circuits, error } = await supabase
-    .from('circuits')
-    .select('*')
-    .order('name', { ascending: true });
-
-  if (error) {
+  let circuits: CircuitData[];
+  try {
+    circuits = await fetchAllPages((from, to) => supabase
+      .from('circuits')
+      .select('*')
+      .order('name', { ascending: true })
+      .order('id', { ascending: true })
+      .range(from, to)) as CircuitData[];
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Erreur Supabase inconnue.';
+    console.error('[AdminCircuitsPage] Impossible de charger le catalogue complet:', message);
     return (
       <main className="min-h-screen bg-[#07090d] px-5 py-12 text-white md:px-10">
         <p role="alert" className="mx-auto max-w-3xl rounded-2xl border border-red-400/20 bg-red-400/10 p-5 text-red-200">
-          Impossible de charger le catalogue de circuits : {error.message}
+          Impossible de charger le catalogue de circuits : {message}
         </p>
       </main>
     );
   }
 
-  return <CircuitStudio initialCircuits={(circuits ?? []) as CircuitData[]} />;
+  return <CircuitStudio initialCircuits={circuits} />;
 }

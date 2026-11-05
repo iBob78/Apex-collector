@@ -177,3 +177,73 @@ export async function ajouterCircuitAuJoueur(user_id: string, circuit_id: string
     return { success: false, error: err.message };
   }
 }
+
+export async function ajouterPiloteAuJoueur(user_id: string, driver_id: string, source = 'booster') {
+  if (!user_id || !driver_id) {
+    console.error('[ajouterPiloteAuJoueur] Paramètres manquants:', { user_id, driver_id });
+    return { success: false, error: 'Paramètres manquants' };
+  }
+
+  try {
+    const { data: driver, error: driverError } = await supabase
+      .from('drivers')
+      .select('is_active, booster_enabled, rarity')
+      .eq('driver_id', driver_id)
+      .maybeSingle();
+
+    if (driverError) {
+      console.error('[ajouterPiloteAuJoueur] Erreur de vérification du pilote:', driverError.message);
+      return { success: false, error: driverError.message };
+    }
+    if (!driver || !driver.is_active) {
+      return { success: false, error: 'Ce pilote est désactivé ou introuvable.' };
+    }
+    if (source.startsWith('pack_') && !driver.booster_enabled) {
+      return { success: false, error: 'Ce pilote ne peut plus être obtenu dans les boosters.' };
+    }
+
+    const { data: existing, error: selectError } = await supabase
+      .from('user_drivers')
+      .select('id, count')
+      .eq('user_id', user_id)
+      .eq('driver_id', driver_id)
+      .maybeSingle();
+
+    if (selectError) {
+      console.error('[ajouterPiloteAuJoueur] Erreur de lecture user_drivers:', selectError.message);
+      return { success: false, error: selectError.message };
+    }
+
+    if (existing) {
+      const { error: updateError } = await supabase
+        .from('user_drivers')
+        .update({ count: (Number(existing.count) || 0) + 1 })
+        .eq('id', existing.id)
+        .eq('user_id', user_id);
+
+      if (updateError) {
+        console.error('[ajouterPiloteAuJoueur] Erreur update:', updateError.message);
+        return { success: false, error: updateError.message };
+      }
+    } else {
+      const { error: insertError } = await supabase
+        .from('user_drivers')
+        .insert({ user_id, driver_id, count: 1, source });
+
+      if (insertError) {
+        console.error('[ajouterPiloteAuJoueur] Erreur insert user_drivers:', insertError.message);
+        return { success: false, error: insertError.message };
+      }
+    }
+
+    await updateQuestProgress(user_id, 'collection_count');
+    await updateQuestProgress(user_id, 'rarity_card', 1, { rarity: driver.rarity ?? undefined });
+    return { success: true };
+  } catch (error) {
+    console.error('[ajouterPiloteAuJoueur] Erreur critique:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Erreur inconnue pendant l’ajout du pilote.',
+    };
+  }
+}

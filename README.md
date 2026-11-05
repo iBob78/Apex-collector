@@ -1,6 +1,6 @@
 # Apex Collector
 
-**Apex Collector** est un jeu de collection de cartes consacré à l'automobile et aux circuits. Construisez votre garage, ouvrez des boosters, collectionnez des véhicules emblématiques et progressez au fil des contrats et des succès.
+**Apex Collector** est un jeu de collection de cartes consacré à l'automobile, aux circuits et aux pilotes. Construisez votre garage, ouvrez des boosters, collectionnez des véhicules et des pilotes emblématiques, et progressez au fil des contrats et des succès.
 
 L'univers visuel s'inspire du sport automobile, de l'esthétique *gentleman driver* et des jeux de collection, avec des cartes aux raretés et aux effets distinctifs.
 
@@ -8,7 +8,7 @@ L'univers visuel s'inspire du sport automobile, de l'esthétique *gentleman driv
 
 ## Fonctionnalités
 
-- **Collection automobile** : cartes de véhicules et de circuits à retrouver dans un garage personnel.
+- **Collection automobile** : cartes de véhicules, de circuits et de pilotes à retrouver dans un garage personnel.
 - **Cartes détaillées** : caractéristiques techniques, indice de performance, rareté, badges et effets visuels.
 - **Boosters** : packs permettant d'enrichir sa collection.
 - **Favoris et filtres** : recherche, tri et consultation des cartes possédées.
@@ -21,7 +21,7 @@ L'univers visuel s'inspire du sport automobile, de l'esthétique *gentleman driv
 
 ### L'univers des cartes
 
-Les cartes de véhicule peuvent présenter la puissance, le couple, la vitesse, le poids, la transmission et d'autres données selon le modèle. Les circuits disposent de leurs propres informations et visuels.
+Les cartes de véhicule peuvent présenter la puissance, le couple, la vitesse, le poids, la transmission et d'autres données selon le modèle. Les circuits disposent de leurs propres informations et visuels. Les cartes de pilotes présentent leur année, leur âge pour cette saison, leur pays, leurs titres mondiaux et leurs victoires aux trois épreuves de la Triple Couronne.
 
 Les raretés se distinguent par leurs couleurs, matières et effets. Les cartes les plus prestigieuses et les améliorations de haut niveau peuvent bénéficier d'effets holographiques ou cristallins.
 

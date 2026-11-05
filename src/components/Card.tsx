@@ -7,13 +7,14 @@ import VehicleStatIcon from './VehicleStatIcon';
 import { resolveCardImage, resolveBrandLogo, resolveCountryFlag, resolveDrivetrainLayoutIcon, IMAGE_PATHS } from '@/lib/images';
 import type { AnyCard } from '@/types/game';
 import { useRouter } from 'next/navigation';
-import { Wind, ArrowUpCircle, Compass, MoveRight, ChevronRight, Star } from 'lucide-react';
+import { Wind, ArrowUpCircle, Check, Compass, MoveRight, ChevronRight, Star, Trophy } from 'lucide-react';
 import { getRarityBorderClass } from '@/lib/rarity';
 import { calculateVehicleIP } from '@/lib/vehicleStats';
 import { formatDistance, formatPower, formatTorque, formatWeight } from '@/lib/preferences';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 import { getFuelTypeInfo } from '@/lib/fuelTypes';
 import { drivetrainLayoutDescriptions } from '@/lib/drivetrain';
+import { getDriverAgeAtCardYear } from '@/lib/driverCards';
 
 type CardProps = AnyCard & {
   owned?: boolean;
@@ -59,10 +60,11 @@ export default function Card(props: CardProps) {
   } = props;
 
   // ID ROBUSTE : card_id d'abord (CSV), puis id
-  const id = (props as any).card_id || propId;
+  const isDriver = (props as any).category === 'driver' || 'driver_id' in props;
+  const id = (props as any).card_id || (props as any).circuit_id || (props as any).driver_id || propId;
 
-  const isVehicle = (props as any).category === 'vehicle' || 'make' in props;
-  const isCircuit = (props as any).category === 'circuit' || 'country' in props;
+  const isVehicle = (props as any).category === 'vehicle' || ((props as any).category == null && 'make' in props);
+  const isCircuit = (props as any).category === 'circuit' || ((props as any).category == null && 'country' in props);
 
   // Extraction sécurisée des données avec valeurs par défaut
   const power_hp = isVehicle ? Number((props as any).power_hp) || 0 : 0;
@@ -74,11 +76,18 @@ export default function Card(props: CardProps) {
   const turns = isCircuit ? (props as any).turns : 0;
   const straight_km = isCircuit ? (props as any).straight_km : 0;
   const circuit_type = isCircuit ? (props as any).type : '';
+  const circuitSubtitle = isCircuit
+    ? [(props as any).country, (props as any).year].filter(Boolean).join(' · ')
+    : '';
+  const driverAge = isDriver ? getDriverAgeAtCardYear((props as any).birth_date, (props as any).year) : null;
+  const driverSubtitle = isDriver
+    ? [(props as any).year, driverAge === null ? null : `${driverAge} ans`].filter(Boolean).join(' · ')
+    : '';
 
   // Correction Poids : On gère le cas où la donnée est déjà en KG (ex: 1060) ou en Tonnes (ex: 1.06)
   const rawWeight = isVehicle ? Number((props as any).weight_t) || 0 : 0;
   const collectionNumber = Number((props as any).collection_number);
-  const hasCollectionNumber = isVehicle && Number.isFinite(collectionNumber) && collectionNumber > 0;
+  const hasCollectionNumber = Number.isFinite(collectionNumber) && collectionNumber > 0;
   const contentPadding = mobileGrid
     ? hasCollectionNumber
       ? 'px-0.5 pb-2.5 pt-0.5 sm:p-4 sm:pb-10'
@@ -101,7 +110,7 @@ export default function Card(props: CardProps) {
 
   // Utilisation du resolver centralisé pour gérer les chemins complexes (véhicules vs circuits)
   const finalImage = resolveCardImage({
-    category: isVehicle ? 'vehicle' : isCircuit ? 'circuit' : 'vehicle',
+    category: isDriver ? 'driver' : isVehicle ? 'vehicle' : isCircuit ? 'circuit' : 'vehicle',
     make: (props as any).make,
     model: (props as any).model,
     year: (props as any).year,
@@ -110,6 +119,7 @@ export default function Card(props: CardProps) {
     image_url: cardImage
   });
   const vehicleCountry = (props as any).country_code || (props as any).country;
+  const cardCountry = (props as any).country_code || (props as any).country;
   const vehicleFlag = isVehicle ? resolveCountryFlag(vehicleCountry) : undefined;
   const fuelType = isVehicle ? getFuelTypeInfo((props as any).fuel_type) : null;
 
@@ -146,7 +156,7 @@ export default function Card(props: CardProps) {
         <div className="absolute inset-0 z-0">
           <SafeImage
             src={finalImage}
-            fallback={isVehicle ? IMAGE_PATHS.PLACEHOLDERS.VEHICLE_CARD : IMAGE_PATHS.PLACEHOLDERS.CIRCUIT_CARD}
+            fallback={isVehicle ? IMAGE_PATHS.PLACEHOLDERS.VEHICLE_CARD : isDriver ? IMAGE_PATHS.PLACEHOLDERS.PILOT_CARD : IMAGE_PATHS.PLACEHOLDERS.CIRCUIT_CARD}
             alt={isVehicle ? (props as any).model : (props as any).name}
             fill
             className="object-cover"
@@ -202,11 +212,11 @@ export default function Card(props: CardProps) {
           </div>
         )}
 
-        {isCircuit && ((props as any).country_code || (props as any).country) && (
+        {(isCircuit || isDriver) && cardCountry && (
           <div className={clsx("absolute z-10 bg-black/40 backdrop-blur-sm rounded-full overflow-hidden border border-white/10", mobileGrid ? "right-0.5 top-0.5 h-4 w-4 sm:right-3 sm:top-3 sm:h-8 sm:w-8" : "right-3 top-3 h-8 w-8")}>
             <SafeImage
-              src={resolveCountryFlag((props as any).country_code || (props as any).country)}
-              alt={(props as any).country || 'Circuit'}
+              src={resolveCountryFlag(cardCountry)}
+              alt={(props as any).country || (isDriver ? 'Pilote' : 'Circuit')}
               fill
               className="object-cover"
             />
@@ -233,7 +243,7 @@ export default function Card(props: CardProps) {
           </div>
         )}
         {hasCollectionNumber && (
-          <div className={clsx("absolute z-20 rounded-md border border-white/15 bg-black/70 font-bold tabular-nums text-white/90", mobileGrid ? "bottom-0.5 left-0.5 px-0.5 py-0 text-[6px] sm:bottom-2 sm:left-2 sm:px-1.5 sm:py-0.5 sm:text-[9px]" : "bottom-2 left-2 px-1.5 py-0.5 text-[9px]")}>
+          <div aria-label={`Numéro de collection ${collectionNumber}`} className={clsx("absolute z-20 rounded-md border border-white/15 bg-black/70 font-bold tabular-nums text-white/90", mobileGrid ? "bottom-0.5 left-0.5 px-0.5 py-0 text-[6px] sm:bottom-2 sm:left-2 sm:px-1.5 sm:py-0.5 sm:text-[9px]" : "bottom-2 left-2 px-1.5 py-0.5 text-[9px]")}>
             #{collectionNumber}
           </div>
         )}
@@ -264,7 +274,7 @@ export default function Card(props: CardProps) {
                 <>
                   {(props as any).model} · {(props as any).year}
                 </>
-              ) : (props as any).country}
+              ) : isDriver ? driverSubtitle : circuitSubtitle}
             </p>
           </div>
 
@@ -347,6 +357,34 @@ export default function Card(props: CardProps) {
                 <Wind size={14} className="text-orange-400" />
                 <span className={clsx(mobileGrid && "min-w-0 truncate sm:overflow-visible")}>{circuit_type}</span>
               </div>
+            </div>
+          )}
+
+          {isDriver && (
+            <div className={clsx(
+              "grid w-full grid-cols-2 font-semibold text-gray-200",
+              mobileGrid
+                ? "mb-0 grid-rows-2 items-center gap-x-1 gap-y-1 px-0 text-[6px] leading-[8px] sm:mb-3 sm:gap-x-3 sm:gap-y-2 sm:px-2 sm:text-xs sm:leading-normal"
+                : compact ? "mb-2 gap-x-2 gap-y-2 px-0 text-[10px]" : "mb-3 gap-x-3 gap-y-2 px-2 text-xs",
+            )}>
+              <div className="flex min-w-0 items-center justify-start gap-1">
+                <Trophy size={14} className="shrink-0 text-amber-300" />
+                <span className={clsx(mobileGrid && "min-w-0 truncate sm:overflow-visible")}>
+                  {(props as any).world_championships || 0} {t('titres')}
+                </span>
+              </div>
+              {[
+                ['MON', (props as any).won_monaco_gp, 'Grand Prix de Monaco'],
+                ['IND', (props as any).won_indy_500, '500 miles d’Indianapolis'],
+                ['LEM', (props as any).won_24h_le_mans, '24 Heures du Mans'],
+              ].map(([label, won, event]) => (
+                <div key={String(label)} className="flex min-w-0 items-center justify-start gap-1" title={String(event)}>
+                  {won
+                    ? <Check size={12} className="shrink-0 text-emerald-300" aria-label={`${event} remporté`} />
+                    : <span aria-hidden="true" className="w-3 shrink-0 text-center text-gray-500">—</span>}
+                  <span className={clsx(mobileGrid && "min-w-0 truncate sm:overflow-visible")}>{label}</span>
+                </div>
+              ))}
             </div>
           )}
 

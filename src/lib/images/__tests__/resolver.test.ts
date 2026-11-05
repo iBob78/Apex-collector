@@ -56,6 +56,10 @@ describe('Image Resolver', () => {
         expect(IMAGE_PATHS.PLACEHOLDERS.CIRCUIT_CARD).toBe('placeholders/circuit-default.jpg');
     });
 
+    it('uses the supplied pilot card placeholder key', () => {
+        expect(IMAGE_PATHS.PLACEHOLDERS.PILOT_CARD).toBe('assets/placeholders/pilot-default.jpg');
+    });
+
     it('should resolve a supplied Supabase Storage image key for circuit cards', () => {
         const imageKey = 'assets/cards/circuit/spa-francorchamps-2012.jpg';
         expect(resolveCardImage({
@@ -64,6 +68,11 @@ describe('Image Resolver', () => {
             year: 2012,
             image_url: imageKey,
         })).toBe(getPublicImage(imageKey));
+    });
+
+    it('resolves a driver card image from its name and year', () => {
+        expect(resolveCardImage({ category: 'driver', name: 'Ayrton Senna', year: 1991 }))
+            .toBe(getPublicImage('cards/driver/ayrton-senna-1991.jpg'));
     });
 
     it('should resolve the Belgium country code to its flag asset', () => {

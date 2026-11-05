@@ -18,6 +18,12 @@ export const IMAGE_PATHS = {
     CIRCUIT_CARD: 'cards/circuit',
 
     /**
+     * Driver card images
+     * Format: cards/driver/{name}-{year}.jpg
+     */
+    DRIVER_CARD: 'cards/driver',
+
+    /**
      * Brand/manufacturer logos
      * Path in Supabase bucket: logos/brand
      */
@@ -66,6 +72,7 @@ export const IMAGE_PATHS = {
         CARD_BACK: 'placeholders/card-back.png',
         BRAND_LOGO: 'placeholders/brand-logo.png',
         NO_IMAGE: 'placeholders/no-image.png',
+        PILOT_CARD: 'assets/placeholders/pilot-default.jpg',
         VEHICLE_CARD: 'cards/vehicle/default.jpg',
         CIRCUIT_CARD: 'placeholders/circuit-default.jpg',
     } as const,

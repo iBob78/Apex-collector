@@ -15,9 +15,12 @@ assets/
 │   ├── vehicle/
 │   │   └── {make}-{model}-{year}.jpg
 │   │   └── Example: ferrari-488-gtb-2015.jpg
-│   └── circuit/
+│   ├── circuit/
 │       └── {name}-{country}.jpg
 │       └── Example: monza-italy.jpg
+│   └── driver/
+│       └── {name}-{year}.jpg
+│       └── Example: ayrton-senna-1991.jpg
 │
 ├── logos/
 │   └── brand/
@@ -43,7 +46,8 @@ assets/
     ├── brand-logo.png
     ├── no-image.png
     ├── vehicle-placeholder.png
-    └── circuit-placeholder.png
+    ├── circuit-placeholder.png
+    └── pilot-default.jpg
 ```
 
 ## File Naming Conventions
@@ -62,6 +66,14 @@ assets/
 - **Examples**:
   - Autodromo Nazionale di Monza, Italy → `monza-italy.jpg`
   - Circuit de Spa-Francorchamps, Belgium → `spa-francorchamps-belgium.jpg`
+
+### Driver Cards
+- **Pattern**: `cards/driver/{name}-{year}.jpg`
+- **Normalization**: Lowercase, spaces → hyphens, special chars removed
+- **Examples**:
+  - Ayrton Senna 1991 → `ayrton-senna-1991.jpg`
+  - Michael Schumacher 2004 → `michael-schumacher-2004.jpg`
+- **Fallback**: `placeholders/pilot-default.jpg`
 
 ### Brand Logos
 - **Pattern**: `logos/brand/{make}.png`

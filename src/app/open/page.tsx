@@ -4,10 +4,11 @@ import { useState, useEffect, useRef, Suspense, type CSSProperties } from 'react
 import type { PointerEvent as ReactPointerEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
-import { ajouterCarteAuJoueur, ajouterCircuitAuJoueur } from '@/lib/actions/carte';
+import { ajouterCarteAuJoueur, ajouterCircuitAuJoueur, ajouterPiloteAuJoueur } from '@/lib/actions/carte';
 import { deductAP } from '@/lib/actions/profile';
 import { updateQuestProgress } from '@/lib/actions/quests';
 import { drawBoosterCards, getFirstTimeBoosterCardIndices, PACKS } from '@/lib/boosters';
+import { fetchAllPages } from '@/lib/fetchAllPages';
 import Card from '@/components/Card';
 import SafeImage from '@/components/SafeImage';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -66,19 +67,30 @@ function OpenContent() {
 
     try {
       // Charger les catalogues avant paiement évite de débiter si le tirage est impossible.
-      const [vehiclesResult, circuitsResult] = await Promise.all([
-        supabase.from('cards').select('*').eq('is_active', true),
-        supabase.from('circuits').select('*')
+      const [vehicleCards, circuitCards, driverCards] = await Promise.all([
+        fetchAllPages((from, to) => supabase.from('cards')
+          .select('*')
+          .eq('is_active', true)
+          .order('id')
+          .range(from, to)),
+        fetchAllPages((from, to) => supabase.from('circuits')
+          .select('*')
+          .order('id')
+          .range(from, to)),
+        fetchAllPages((from, to) => supabase.from('drivers')
+          .select('*')
+          .eq('is_active', true)
+          .order('id')
+          .range(from, to)),
       ]);
-
-      if (vehiclesResult.error) throw vehiclesResult.error;
-      if (circuitsResult.error) throw circuitsResult.error;
 
       const results = drawBoosterCards(
         packSlug,
-        vehiclesResult.data || [],
-        circuitsResult.data || [],
-        pack.cardCount
+        vehicleCards,
+        circuitCards,
+        pack.cardCount,
+        Math.random,
+        driverCards
       );
 
       // Read ownership BEFORE saving: "NEW!" must mean absent from the original collection.
@@ -86,18 +98,23 @@ function OpenContent() {
       const vehicleIds = results.filter((card) => card.category !== 'circuit')
         .map((card) => String(card.card_id || card.id));
       const circuitIds = results.filter((card) => card.category === 'circuit')
-        .map((card) => String(card.card_id || card.id));
-      const [ownedVehiclesResult, ownedCircuitsResult] = await Promise.all([
+        .map((card) => String(card.circuit_id || card.id));
+      const driverIds = results.filter((card) => card.category === 'driver')
+        .map((card) => String(card.driver_id || card.id));
+      const [ownedVehiclesResult, ownedCircuitsResult, ownedDriversResult] = await Promise.all([
         vehicleIds.length
           ? supabase.from('user_cards').select('card_id, count').eq('user_id', userId).in('card_id', vehicleIds)
           : Promise.resolve({ data: [], error: null }),
         circuitIds.length
           ? supabase.from('user_circuits').select('circuit_id, count').eq('user_id', userId).in('circuit_id', circuitIds)
           : Promise.resolve({ data: [], error: null }),
+        driverIds.length
+          ? supabase.from('user_drivers').select('driver_id, count').eq('user_id', userId).in('driver_id', driverIds)
+          : Promise.resolve({ data: [], error: null }),
       ]);
-      const ownershipVerified = !ownedVehiclesResult.error && !ownedCircuitsResult.error;
+      const ownershipVerified = !ownedVehiclesResult.error && !ownedCircuitsResult.error && !ownedDriversResult.error;
       if (!ownershipVerified) {
-        console.warn('[Booster] Impossible de vérifier les premières découvertes.', ownedVehiclesResult.error || ownedCircuitsResult.error);
+        console.warn('[Booster] Impossible de vérifier les premières découvertes.', ownedVehiclesResult.error || ownedCircuitsResult.error || ownedDriversResult.error);
       }
 
       // 1. Déduire les AP après avoir confirmé qu'un tirage est possible.
@@ -110,11 +127,24 @@ function OpenContent() {
       }
 
       // 2. Sauvegarde dans la collection du joueur
+      let pendingDriverAddition: Promise<void> = Promise.resolve();
       const additions = await Promise.all(
         results.map(async (card) => {
+          const isDriver = card.category === 'driver';
           const isCircuit = (card.category === 'circuit') || (card.type === 'Circuit') || (card.track_name != null);
-          const uniqueId = String((card as any).card_id || card.id);
+          const uniqueId = String(isDriver
+            ? card.driver_id || card.id
+            : isCircuit
+              ? card.circuit_id || card.id
+              : card.card_id || card.id);
 
+          if (isDriver) {
+            const addition = pendingDriverAddition.then(() =>
+              ajouterPiloteAuJoueur(userId, uniqueId, `pack_${packSlug}`),
+            );
+            pendingDriverAddition = addition.then(() => undefined);
+            return addition;
+          }
           if (isCircuit) {
             return ajouterCircuitAuJoueur(userId, uniqueId);
           }
@@ -129,6 +159,7 @@ function OpenContent() {
             ownedVehiclesResult.data || [],
             ownedCircuitsResult.data || [],
             additions.map((addition) => addition.success),
+            ownedDriversResult.data || [],
           )
         : new Set());
       setDrawnCards(results);

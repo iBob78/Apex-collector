@@ -84,6 +84,7 @@ export type CircuitDraft = {
 export type CircuitData = {
   id: string;
   circuit_id: string;
+  collection_number: number;
   name: string;
   country: string | null;
   country_code: string | null;
