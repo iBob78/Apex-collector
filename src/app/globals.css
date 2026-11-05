@@ -245,32 +245,13 @@ html, body {
 }
 
 .card-upgrade-effect-1 {
-  mix-blend-mode: normal;
-  backdrop-filter: grayscale(1) contrast(1.18) brightness(1.12);
+  backdrop-filter: grayscale(0.18) contrast(1.08) brightness(1.06);
   background:
-    linear-gradient(
-      180deg,
-      rgba(15, 17, 20, 0.24) 0%,
-      rgba(226, 232, 240, 0.46) 10%,
-      rgba(71, 75, 80, 0.38) 23%,
-      rgba(220, 224, 230, 0.48) 38%,
-      rgba(62, 66, 72, 0.42) 52%,
-      rgba(226, 232, 240, 0.5) 68%,
-      rgba(75, 79, 84, 0.36) 82%,
-      rgba(241, 245, 249, 0.46) 94%,
-      rgba(15, 17, 20, 0.28) 100%
-    ),
-    repeating-linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.2) 0 1px,
-      rgba(12, 14, 17, 0.2) 1px 2px,
-      rgba(255, 255, 255, 0.08) 2px 3px,
-      transparent 3px 5px
-    );
+    linear-gradient(115deg, rgba(226, 232, 240, 0.14), rgba(51, 65, 85, 0.04) 42%, rgba(248, 250, 252, 0.12));
   box-shadow:
-    inset 0 0 0 2px rgba(241, 245, 249, 0.84),
-    inset 0 0 0 5px rgba(15, 23, 42, 0.42),
-    inset 0 0 28px rgba(226, 232, 240, 0.38);
+    inset 0 0 0 2px rgba(241, 245, 249, 0.7),
+    inset 0 0 0 5px rgba(15, 23, 42, 0.28),
+    inset 0 0 24px rgba(226, 232, 240, 0.16);
 }
 
 .card-upgrade-effect-1::before,
@@ -282,41 +263,29 @@ html, body {
 
 .card-upgrade-effect-1::before {
   background:
-    linear-gradient(
-      180deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.24) 12%,
-      rgba(30, 41, 59, 0.16) 17%,
-      transparent 25%,
-      rgba(248, 250, 252, 0.28) 42%,
-      rgba(15, 23, 42, 0.2) 48%,
-      rgba(255, 255, 255, 0.22) 55%,
-      transparent 63%,
-      rgba(255, 255, 255, 0.26) 78%,
-      rgba(30, 41, 59, 0.18) 84%,
-      transparent 91%
-    ),
     repeating-linear-gradient(
-      178deg,
-      rgba(255, 255, 255, 0.22) 0 1px,
-      rgba(15, 23, 42, 0.16) 1px 2px,
-      transparent 2px 4px
-    );
-  opacity: 0.96;
+      176deg,
+      rgba(255, 255, 255, 0.14) 0 1px,
+      rgba(15, 23, 42, 0.07) 1px 2px,
+      transparent 2px 5px
+    ),
+    linear-gradient(90deg, rgba(248, 250, 252, 0.1), transparent 24%, rgba(15, 23, 42, 0.06) 52%, transparent 76%, rgba(248, 250, 252, 0.08));
+  mix-blend-mode: soft-light;
+  opacity: 0.62;
 }
 
 .card-upgrade-effect-1::after {
-  background: linear-gradient(
-    180deg,
-    transparent 27%,
-    rgba(226, 232, 240, 0.18) 37%,
-    rgba(255, 255, 255, 0.72) 48%,
-    rgba(203, 213, 225, 0.26) 57%,
-    transparent 71%
-  );
-  opacity: 0;
-  transform: translateY(-120%);
-  animation: card-steel-shine 4.2s ease-in-out infinite;
+  background:
+    radial-gradient(
+      ellipse at var(--card-pointer-x, 50%) var(--card-pointer-y, 42%),
+      rgba(255, 255, 255, 0.3),
+      rgba(226, 232, 240, 0.12) 22%,
+      transparent 52%
+    ),
+    linear-gradient(115deg, transparent 39%, rgba(255, 255, 255, 0.18) 49%, transparent 59%);
+  mix-blend-mode: screen;
+  opacity: 0.58;
+  transition: opacity 180ms ease;
 }
 
 .card-upgrade-effect-2::before,
@@ -501,20 +470,6 @@ html, body {
   }
 }
 
-@keyframes card-steel-shine {
-  0%, 28% {
-    transform: translateY(-120%);
-    opacity: 0;
-  }
-  42% {
-    opacity: 0.72;
-  }
-  66%, 100% {
-    transform: translateY(120%);
-    opacity: 0;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .card-upgrade-effect-5,
   .card-upgrade-effect-6,
@@ -547,9 +502,7 @@ html, body {
   }
 
   .card-upgrade-effect-1::after {
-    animation: none;
-    transform: none;
-    opacity: 0.22;
+    transition: none;
   }
 }
 

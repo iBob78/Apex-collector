@@ -143,6 +143,18 @@ export default function Card(props: CardProps) {
           !owned && "grayscale opacity-60 hover:grayscale-0 hover:opacity-100"
         )}
         onClick={handleCardClick}
+        onPointerMove={(event) => {
+          if (level < 1 || event.pointerType === 'touch') return;
+          const bounds = event.currentTarget.getBoundingClientRect();
+          const pointerX = ((event.clientX - bounds.left) / bounds.width) * 100;
+          const pointerY = ((event.clientY - bounds.top) / bounds.height) * 100;
+          event.currentTarget.style.setProperty('--card-pointer-x', `${pointerX}%`);
+          event.currentTarget.style.setProperty('--card-pointer-y', `${pointerY}%`);
+        }}
+        onPointerLeave={(event) => {
+          event.currentTarget.style.setProperty('--card-pointer-x', '50%');
+          event.currentTarget.style.setProperty('--card-pointer-y', '42%');
+        }}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
