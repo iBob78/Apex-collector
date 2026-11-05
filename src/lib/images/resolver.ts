@@ -9,6 +9,9 @@ import { getDrivetrainLayoutIcon, IMAGE_PATHS, type DrivetrainLayout } from './p
 const BUCKET_NAME = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'assets';
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '') || '';
 const STORAGE_ENDPOINT = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}`;
+const BRAND_LOGO_ALIASES: Record<string, string> = {
+    mercedesbenz: 'mercedes',
+};
 
 /**
  * Resolves an image key to a full public URL.
@@ -140,8 +143,9 @@ export function resolveBrandLogo(make?: string | null): string | undefined {
     }
 
     // On utilise normalize pour s'assurer que c'est en minuscules et sans caractères spéciaux
-    const normalized = normalize(make).replace(/-/g, ''); // On enlève aussi les tirets pour coller au format "alfaromeo"
-    return getPublicImage(`${IMAGE_PATHS.BRAND_LOGO}/${normalized}.png`);
+    const normalized = normalize(make).replace(/-/g, '');
+    const logoName = BRAND_LOGO_ALIASES[normalized] || normalized;
+    return getPublicImage(`${IMAGE_PATHS.BRAND_LOGO}/${logoName}.png`);
 }
 
 /**
