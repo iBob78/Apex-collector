@@ -12,16 +12,20 @@ import type {
   ObjectiveType,
 } from '@/lib/actions/objectives';
 
+export type ObjectiveRequirementDraft = Omit<ObjectiveRequirement, 'target_count'> & {
+  target_count: number | '';
+};
+
 export type ObjectiveDraft = {
   category: ObjectiveCategory;
   title: string;
   description: string;
   objective_type: ObjectiveType;
-  target_count: number;
+  target_count: number | '';
   required_rarity: string;
-  requirements: ObjectiveRequirement[];
+  requirements: ObjectiveRequirementDraft[];
   requirement_operator: ObjectiveRequirementOperator;
-  reward_ap: number;
+  reward_ap: number | '';
   is_active: boolean;
 };
 
@@ -68,10 +72,10 @@ function validateDraft(draft: ObjectiveDraft) {
   }
   if (!objectiveTypes.includes(draft.objective_type)) return 'Choisis un objectif valide.';
   if (draft.objective_type !== 'collection_requirement' &&
-    (!Number.isInteger(draft.target_count) || draft.target_count < 1 || draft.target_count > 1000000)) {
+    (typeof draft.target_count !== 'number' || !Number.isInteger(draft.target_count) || draft.target_count < 1 || draft.target_count > 1000000)) {
     return 'La cible doit être un entier entre 1 et 1 000 000.';
   }
-  if (!Number.isInteger(draft.reward_ap) || draft.reward_ap < 0 || draft.reward_ap > 1000000) {
+  if (typeof draft.reward_ap !== 'number' || !Number.isInteger(draft.reward_ap) || draft.reward_ap < 0 || draft.reward_ap > 1000000) {
     return 'La récompense doit être un entier entre 0 et 1 000 000 AP.';
   }
   if (draft.objective_type === 'rarity_card' && !rarities.includes(draft.required_rarity)) {
@@ -98,7 +102,7 @@ function validateDraft(draft: ObjectiveDraft) {
       if (requirement.count_mode !== 'copies' && requirement.count_mode !== 'unique') {
         return 'Choisis un mode de comptage valide.';
       }
-      if (!Number.isInteger(requirement.target_count) || requirement.target_count < 1 || requirement.target_count > 1000000) {
+      if (typeof requirement.target_count !== 'number' || !Number.isInteger(requirement.target_count) || requirement.target_count < 1 || requirement.target_count > 1000000) {
         return 'La quantité de chaque condition doit être un entier entre 1 et 1 000 000.';
       }
       if (requirement.year && !/^\d{4}$/.test(requirement.year)) {
@@ -117,6 +121,7 @@ function toPayload(draft: ObjectiveDraft) {
   const requirements = draft.objective_type === 'collection_requirement'
     ? draft.requirements.map((requirement) => ({
         ...requirement,
+        target_count: Number(requirement.target_count),
         card_id: requirement.card_id || '',
         item_label: requirement.item_label.trim(),
         make: requirement.make.trim(),
@@ -136,11 +141,11 @@ function toPayload(draft: ObjectiveDraft) {
     objective_type: draft.objective_type,
     target_count: draft.objective_type === 'collection_requirement'
       ? draft.requirement_operator === 'any' ? 1 : requirements.length
-      : draft.target_count,
+      : Number(draft.target_count),
     required_rarity: draft.objective_type === 'rarity_card' ? draft.required_rarity : null,
     requirements,
     requirement_operator: draft.objective_type === 'collection_requirement' ? draft.requirement_operator : 'all',
-    reward_ap: draft.reward_ap,
+    reward_ap: Number(draft.reward_ap),
     is_active: draft.is_active,
   };
 }

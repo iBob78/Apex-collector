@@ -7,7 +7,6 @@ import {
   type ObjectiveCardCategory,
   type ObjectiveCategory,
   type ObjectiveDefinition,
-  type ObjectiveRequirement,
   type ObjectiveRequirementOperator,
   type ObjectiveType,
 } from '@/lib/actions/objectives';
@@ -16,6 +15,7 @@ import {
   setObjectiveActive,
   updateObjective,
   type ObjectiveDraft,
+  type ObjectiveRequirementDraft,
 } from './actions';
 
 const rarities = ['Common', 'Uncommon', 'Atypique', 'Rare', 'Very rare', 'Epic', 'Legend', 'Mythic', 'Icon'];
@@ -34,7 +34,7 @@ export type ObjectiveCatalogs = {
   drivers: { driver_id: string; name: string; year: number; country: string; rarity: string; collection_number: number }[];
 };
 
-const emptyRequirement = (category: ObjectiveCardCategory = 'vehicle'): ObjectiveRequirement => ({
+const emptyRequirement = (category: ObjectiveCardCategory = 'vehicle'): ObjectiveRequirementDraft => ({
   category,
   card_id: '',
   item_label: '',
@@ -83,7 +83,7 @@ function uniqueOptions(values: (string | number | null | undefined)[]) {
     .sort((left, right) => left.localeCompare(right, 'fr', { numeric: true }));
 }
 
-function requirementLabel(requirement: ObjectiveRequirement) {
+function requirementLabel(requirement: ObjectiveRequirementDraft) {
   const category = requirement.category === 'vehicle' ? 'Véhicules' : requirement.category === 'circuit' ? 'Circuits' : 'Pilotes';
   const details = [
     requirement.item_label,
@@ -143,10 +143,10 @@ export default function ObjectiveStudio({
     setFeedback(null);
   };
 
-  const updateRequirement = <K extends keyof ObjectiveRequirement>(
+  const updateRequirement = <K extends keyof ObjectiveRequirementDraft>(
     index: number,
     field: K,
-    value: ObjectiveRequirement[K],
+    value: ObjectiveRequirementDraft[K],
   ) => {
     setDraft((current) => ({
       ...current,
@@ -180,7 +180,7 @@ export default function ObjectiveStudio({
     }));
   };
 
-  const requirementOptions = (requirement: ObjectiveRequirement, field: 'make' | 'model' | 'year' | 'rarity' | 'country' | 'type' | 'fuel_type' | 'transmission') => {
+  const requirementOptions = (requirement: ObjectiveRequirementDraft, field: 'make' | 'model' | 'year' | 'rarity' | 'country' | 'type' | 'fuel_type' | 'transmission') => {
     if (requirement.category === 'vehicle') {
       const vehicles = catalogs.vehicles.filter((card) => !requirement.make || card.make === requirement.make);
       if (field === 'make') return uniqueOptions(catalogs.vehicles.map((card) => card.make));
@@ -206,7 +206,7 @@ export default function ObjectiveStudio({
 
   const renderRequirementFilter = (
     index: number,
-    requirement: ObjectiveRequirement,
+    requirement: ObjectiveRequirementDraft,
     field: 'make' | 'model' | 'year' | 'rarity' | 'country' | 'type' | 'fuel_type' | 'transmission',
     label: string,
   ) => (
@@ -381,7 +381,7 @@ export default function ObjectiveStudio({
               </label>
               {draft.objective_type !== 'collection_requirement' && <label className="block">
                 <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Nombre à atteindre</span>
-                <input type="number" min={1} max={1000000} step={1} required value={draft.target_count} onChange={(event) => updateDraft('target_count', Number(event.target.value))} className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm outline-none focus:border-cyan-400/70" />
+                <input type="number" min={1} max={1000000} step={1} required value={draft.target_count} onChange={(event) => updateDraft('target_count', event.target.value === '' ? '' : Number(event.target.value))} className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm outline-none focus:border-cyan-400/70" />
               </label>}
               {draft.objective_type === 'rarity_card' && (
                 <label className="block">
@@ -469,7 +469,7 @@ export default function ObjectiveStudio({
                             <span className="mb-1.5 block text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">Mode de comptage</span>
                             <select
                               value={requirement.count_mode}
-                              onChange={(event) => updateRequirement(index, 'count_mode', event.target.value as ObjectiveRequirement['count_mode'])}
+                              onChange={(event) => updateRequirement(index, 'count_mode', event.target.value as ObjectiveRequirementDraft['count_mode'])}
                               className="w-full rounded-lg border border-white/10 bg-[#090c11] px-3 py-2.5 text-xs outline-none focus:border-cyan-400/70"
                             >
                               <option value="copies">Exemplaires (doublons inclus)</option>
@@ -487,7 +487,7 @@ export default function ObjectiveStudio({
                               step={1}
                               required
                               value={requirement.target_count}
-                              onChange={(event) => updateRequirement(index, 'target_count', Number(event.target.value))}
+                              onChange={(event) => updateRequirement(index, 'target_count', event.target.value === '' ? '' : Number(event.target.value))}
                               className="w-full rounded-lg border border-white/10 bg-[#090c11] px-3 py-2.5 text-xs outline-none focus:border-cyan-400/70"
                             />
                           </label>
@@ -518,7 +518,7 @@ export default function ObjectiveStudio({
               )}
               <label className="block">
                 <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Récompense AP</span>
-                <input type="number" min={0} max={1000000} step={1} required value={draft.reward_ap} onChange={(event) => updateDraft('reward_ap', Number(event.target.value))} className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm outline-none focus:border-cyan-400/70" />
+                <input type="number" min={0} max={1000000} step={1} required value={draft.reward_ap} onChange={(event) => updateDraft('reward_ap', event.target.value === '' ? '' : Number(event.target.value))} className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm outline-none focus:border-cyan-400/70" />
               </label>
               <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 sm:col-span-2">
                 <input type="checkbox" checked={draft.is_active} onChange={(event) => updateDraft('is_active', event.target.checked)} className="h-4 w-4 accent-cyan-300" />

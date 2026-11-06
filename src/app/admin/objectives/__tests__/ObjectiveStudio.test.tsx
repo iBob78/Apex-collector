@@ -101,4 +101,20 @@ describe('ObjectiveStudio collection conditions', () => {
       ],
     }));
   });
+
+  it('lets numeric fields stay empty while entering a replacement value', () => {
+    render(<ObjectiveStudio initialObjectives={[]} catalogs={catalogs} />);
+
+    const targetCount = screen.getByLabelText('Nombre à atteindre') as HTMLInputElement;
+    fireEvent.change(targetCount, { target: { value: '' } });
+    expect(targetCount.value).toBe('');
+    fireEvent.change(targetCount, { target: { value: '300' } });
+    expect(targetCount.value).toBe('300');
+
+    const reward = screen.getByLabelText('Récompense AP') as HTMLInputElement;
+    fireEvent.change(reward, { target: { value: '' } });
+    expect(reward.value).toBe('');
+    fireEvent.change(reward, { target: { value: '300' } });
+    expect(reward.value).toBe('300');
+  });
 });

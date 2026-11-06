@@ -191,6 +191,7 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
 - Respecter `prefers-reduced-motion` : le halo reste visible mais immobile. Conserver les effets holographiques de rareté préexistants ; ne pas les remplacer par l'aura de révélation.
 - Ne modifier **ni la dépense AP, ni les tirages, ni l'enregistrement des cartes** pour une demande de changement visuel sur `/boosters` ou `/open`.
 - Les contrats et succès sont administrés dans `/admin/objectives` : objectifs, cibles, rareté éventuelle, AP à réclamer, activation et progression. Le type « Posséder des cartes selon des conditions » accepte plusieurs conditions reliées par ET/OU sur véhicules, circuits et pilotes, avec une carte précise ou des filtres catalogue, et un comptage en exemplaires ou en cartes distinctes. La progression se base sur l'inventaire actuel ; la migration `029_objective_collection_requirements.sql` doit être appliquée à la base autorisée avant d'utiliser cette fonction.
+- Dans l'atelier des contrats et succès, les champs numériques de cible, de récompense AP et de quantité par condition peuvent rester temporairement vides pendant la saisie ; la validation serveur refuse une valeur obligatoire vide ou hors limites avant l'enregistrement.
 - Événements connus : ouverture de boosters, collection de véhicules, circuits ou pilotes, rareté, annonce de marché, connexion sur différents jours.
 - Une récompense n'est pas acquise avant la réclamation prévue par le système ; respecter les fonctions RPC atomiques et la progression sauvegardée.
 
