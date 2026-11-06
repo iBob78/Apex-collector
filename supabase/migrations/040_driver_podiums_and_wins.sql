@@ -1,0 +1,5 @@
+ALTER TABLE public.drivers
+  ADD COLUMN IF NOT EXISTS podiums INTEGER NOT NULL DEFAULT 0
+    CHECK (podiums >= 0),
+  ADD COLUMN IF NOT EXISTS race_wins INTEGER NOT NULL DEFAULT 0
+    CHECK (race_wins >= 0);

@@ -30,6 +30,8 @@ const emptyDraft: DriverDraft = {
   country: '',
   country_code: '',
   world_championships: '0',
+  podiums: '0',
+  race_wins: '0',
   won_monaco_gp: false,
   won_indy_500: false,
   won_24h_le_mans: false,
@@ -48,6 +50,8 @@ function toDraft(driver: DriverData): DriverDraft {
     country: driver.country ?? '',
     country_code: driver.country_code ?? '',
     world_championships: String(driver.world_championships ?? 0),
+    podiums: String(driver.podiums ?? 0),
+    race_wins: String(driver.race_wins ?? 0),
     won_monaco_gp: driver.won_monaco_gp,
     won_indy_500: driver.won_indy_500,
     won_24h_le_mans: driver.won_24h_le_mans,
@@ -280,6 +284,8 @@ export default function DriverStudio({ initialDrivers }: { initialDrivers: Drive
                 <p className="mb-5 text-[10px] font-black uppercase tracking-[0.22em] text-cyan-300">Palmarès</p>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   <TextField label="Titres de champion du monde" value={draft.world_championships} onChange={(value) => setField('world_championships', value)} type="number" min="0" />
+                  <TextField label="Podiums" value={draft.podiums} onChange={(value) => setField('podiums', value)} type="number" min="0" />
+                  <TextField label="Courses gagnées" value={draft.race_wins} onChange={(value) => setField('race_wins', value)} type="number" min="0" />
                   <ToggleField label="Grand Prix de Monaco remporté" checked={draft.won_monaco_gp} onChange={(value) => setField('won_monaco_gp', value)} />
                   <ToggleField label="500 miles d’Indianapolis remportés" checked={draft.won_indy_500} onChange={(value) => setField('won_indy_500', value)} />
                   <ToggleField label="24 Heures du Mans remportées" checked={draft.won_24h_le_mans} onChange={(value) => setField('won_24h_le_mans', value)} />
@@ -341,6 +347,8 @@ export default function DriverStudio({ initialDrivers }: { initialDrivers: Drive
                   </p>
                   <div className="mt-3 flex justify-center gap-3 text-[10px] font-bold text-slate-100">
                     <span className="inline-flex items-center gap-1"><Crown size={12} /> {draft.world_championships || '0'}</span>
+                    <span title="Podiums">POD {draft.podiums || '0'}</span>
+                    <span title="Courses gagnées">VIC {draft.race_wins || '0'}</span>
                     <span>MON {draft.won_monaco_gp ? '✓' : '—'}</span>
                     <span>IND {draft.won_indy_500 ? '✓' : '—'}</span>
                     <span>LEM {draft.won_24h_le_mans ? '✓' : '—'}</span>
@@ -361,7 +369,7 @@ export default function DriverStudio({ initialDrivers }: { initialDrivers: Drive
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-xs font-bold text-slate-100">{driver.name}</span>
                       <span className="mt-1 block truncate text-[10px] text-slate-500">
-                        #{driver.collection_number} · {driver.year} · {driver.country} · {driver.world_championships} titre{driver.world_championships === 1 ? '' : 's'}
+                        #{driver.collection_number} · {driver.year} · {driver.country} · {driver.world_championships} titre{driver.world_championships === 1 ? '' : 's'} · {driver.podiums} podium{driver.podiums === 1 ? '' : 's'} · {driver.race_wins} victoire{driver.race_wins === 1 ? '' : 's'}
                       </span>
                     </span>
                     {selectedId === driver.id ? <Check size={15} className="text-cyan-300" /> : <ChevronRight size={15} className="text-slate-600 transition group-hover:text-slate-300" />}

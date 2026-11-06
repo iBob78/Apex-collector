@@ -27,6 +27,9 @@ describe('site preference formatters', () => {
       .toBe('Do you want to buy this card for 250 AP?');
     expect(translate('en', 'Masquer les cartes non déverrouillées')).toBe('Hide locked cards');
     expect(translate('es', 'Masquer les cartes non déverrouillées')).toBe('Ocultar cartas bloqueadas');
+    expect(translate('en', 'Courses gagnées')).toBe('Race wins');
+    expect(translate('es', 'Podiums')).toBe('Podios');
+    expect(translate('en', 'Jour {day}/7', { day: 6 })).toBe('Day 6/7');
     expect(translate('fr', 'Chaîne inconnue')).toBe('Chaîne inconnue');
   });
 });

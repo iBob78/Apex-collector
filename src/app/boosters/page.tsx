@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/lib/supabaseClient';
@@ -8,34 +8,57 @@ import { PACKS } from '@/lib/boosters';
 import { motion } from 'framer-motion';
 import SafeImage from '@/components/SafeImage';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
+import { fetchAllPages } from '@/lib/fetchAllPages';
+
+type DailyBooster = {
+  id: string;
+  pack_slug: string;
+  streak_day: number;
+  created_at: string;
+};
 
 export default function BoostersPage() {
   const router = useRouter();
   const { t } = useSitePreferences();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [dailyBoosters, setDailyBoosters] = useState<DailyBooster[]>([]);
+  const [dailyBoosterError, setDailyBoosterError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchProfile = useCallback(async (userId: string) => {
+    try {
+      const [profileResult, dailyBoostersResult] = await Promise.all([
+        supabase.from('profiles').select('ap').eq('id', userId).single(),
+        fetchAllPages((from, to) => supabase.from('user_daily_boosters')
+          .select('id, pack_slug, streak_day, created_at')
+          .eq('user_id', userId)
+          .is('opened_at', null)
+          .order('created_at', { ascending: true })
+          .order('id', { ascending: true })
+          .range(from, to)),
+      ]);
+      if (profileResult.data) setProfile(profileResult.data);
+      setDailyBoosterError(null);
+      setDailyBoosters((dailyBoostersResult ?? []) as DailyBooster[]);
+    } catch (error) {
+      console.error('[BoostersPage] Impossible de charger les boosters quotidiens:', error);
+      setDailyBoosterError(t('Impossible de charger vos boosters offerts.'));
+    } finally {
+      setLoading(false);
+    }
+  }, [t]);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user);
       if (data.user) {
-        fetchProfile(data.user.id);
+        void fetchProfile(data.user.id);
       } else {
         setLoading(false);
       }
     });
-  }, []);
-
-  const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('ap')
-      .eq('id', userId)
-      .single();
-    if (data) setProfile(data);
-    setLoading(false);
-  };
+  }, [fetchProfile]);
 
   if (loading) return (
     <div className="flex min-h-screen bg-black items-center justify-center">
@@ -68,6 +91,51 @@ export default function BoostersPage() {
               </div>
             )}
           </header>
+
+          {dailyBoosterError && (
+            <p role="alert" className="mb-6 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-amber-200">
+              {dailyBoosterError}
+            </p>
+          )}
+
+          {dailyBoosters.length > 0 && (
+            <section aria-labelledby="daily-boosters-heading" className="mb-8 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] p-4 sm:p-6">
+              <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300">{t('Récompenses de connexion')}</p>
+                  <h2 id="daily-boosters-heading" className="mt-1 text-xl font-black">{t('Boosters offerts à ouvrir')}</h2>
+                </div>
+                <span className="text-xs text-gray-400">{dailyBoosters.length} {t(dailyBoosters.length === 1 ? 'booster disponible' : 'boosters disponibles')}</span>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {dailyBoosters.map((dailyBooster) => {
+                  const pack = PACKS[dailyBooster.pack_slug];
+                  if (!pack) {
+                    console.error('[BoostersPage] Type de booster quotidien inconnu:', dailyBooster.pack_slug);
+                    return null;
+                  }
+                  return (
+                    <article key={dailyBooster.id} className="flex min-w-0 items-center gap-3 rounded-xl border border-white/10 bg-black/30 p-3">
+                      <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-lg">
+                        <SafeImage src={pack.imageUrl} alt={pack.name} fill className="object-cover" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="truncate text-sm font-black">{t(pack.name)}</h3>
+                        <p className="mt-1 text-xs text-cyan-200/70">{t('Jour {day}/7', { day: dailyBooster.streak_day })}</p>
+                        <button
+                          type="button"
+                          onClick={() => router.push(`/open?daily_booster=${encodeURIComponent(dailyBooster.id)}`)}
+                          className="mt-2 min-h-10 rounded-lg bg-cyan-300 px-3 py-2 text-xs font-black text-slate-950 transition hover:bg-cyan-200"
+                        >
+                          {t('Ouvrir ce booster offert')}
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+          )}
 
           <div className="grid grid-cols-2 gap-x-2 gap-y-3 py-3 sm:grid-cols-2 sm:gap-6 sm:py-4 xl:grid-cols-3">
             {Object.values(PACKS).map((pack, i) => (

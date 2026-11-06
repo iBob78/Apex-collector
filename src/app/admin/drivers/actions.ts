@@ -11,6 +11,8 @@ export type DriverDraft = {
   country: string;
   country_code: string;
   world_championships: string;
+  podiums: string;
+  race_wins: string;
   won_monaco_gp: boolean;
   won_indy_500: boolean;
   won_24h_le_mans: boolean;
@@ -31,6 +33,8 @@ export type DriverData = {
   country: string;
   country_code: string | null;
   world_championships: number;
+  podiums: number;
+  race_wins: number;
   won_monaco_gp: boolean;
   won_indy_500: boolean;
   won_24h_le_mans: boolean;
@@ -46,7 +50,7 @@ type SaveResult = { success: true; driver: DriverData } | { success: false; erro
 
 const rarities = ['Common', 'Uncommon', 'Atypique', 'Rare', 'Very rare', 'Epic', 'Legend', 'Mythic', 'Icon'];
 const fields: (keyof DriverDraft)[] = [
-  'name', 'year', 'birth_date', 'country', 'country_code', 'world_championships',
+  'name', 'year', 'birth_date', 'country', 'country_code', 'world_championships', 'podiums', 'race_wins',
   'rarity', 'image_url', 'description',
 ];
 
@@ -82,6 +86,8 @@ function parseDriverDraft(draft: DriverDraft) {
   const year = Number(draft.year);
   const birthDate = draft.birth_date.trim();
   const championships = draft.world_championships.trim() ? Number(draft.world_championships) : 0;
+  const podiums = draft.podiums.trim() ? Number(draft.podiums) : 0;
+  const raceWins = draft.race_wins.trim() ? Number(draft.race_wins) : 0;
   const maximumYear = new Date().getFullYear() + 2;
 
   if (!name) return { error: 'Le nom du pilote est obligatoire.' } as const;
@@ -99,6 +105,12 @@ function parseDriverDraft(draft: DriverDraft) {
   if (!Number.isInteger(championships) || championships < 0) {
     return { error: 'Le nombre de titres mondiaux doit être un entier positif ou nul.' } as const;
   }
+  if (!Number.isInteger(podiums) || podiums < 0) {
+    return { error: 'Le nombre de podiums doit être un entier positif ou nul.' } as const;
+  }
+  if (!Number.isInteger(raceWins) || raceWins < 0) {
+    return { error: 'Le nombre de courses gagnées doit être un entier positif ou nul.' } as const;
+  }
   if (!rarities.includes(draft.rarity)) {
     return { error: 'Choisis une rareté valide.' } as const;
   }
@@ -111,6 +123,8 @@ function parseDriverDraft(draft: DriverDraft) {
       country,
       country_code: draft.country_code.trim() || null,
       world_championships: championships,
+      podiums,
+      race_wins: raceWins,
       won_monaco_gp: draft.won_monaco_gp,
       won_indy_500: draft.won_indy_500,
       won_24h_le_mans: draft.won_24h_le_mans,

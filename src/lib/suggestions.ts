@@ -96,6 +96,8 @@ export const SUGGESTION_FIELDS: Record<SuggestionCategory, SuggestionField[]> = 
     { name: 'country', label: 'Pays', required: true },
     { name: 'country_code', label: 'Code pays', hint: 'Ex. : FR, GB, BR' },
     { name: 'world_championships', label: 'Titres mondiaux', type: 'number' },
+    { name: 'podiums', label: 'Podiums', type: 'number' },
+    { name: 'race_wins', label: 'Courses gagnées', type: 'number' },
     { name: 'won_monaco_gp', label: 'A déjà gagné le GP de Monaco', type: 'select', options: [{ value: 'Non', label: 'Non' }, { value: 'Oui', label: 'Oui' }] },
     { name: 'won_indy_500', label: 'A déjà gagné les 500 miles d’Indianapolis', type: 'select', options: [{ value: 'Non', label: 'Non' }, { value: 'Oui', label: 'Oui' }] },
     { name: 'won_24h_le_mans', label: 'A déjà gagné les 24 Heures du Mans', type: 'select', options: [{ value: 'Non', label: 'Non' }, { value: 'Oui', label: 'Oui' }] },
@@ -109,12 +111,12 @@ const numericFields: Record<SuggestionCategory, string[]> = {
     'acceleration_0_100', 'new_price_eur', 'max_rpm', 'units_sold',
   ],
   circuit: ['year', 'length_km', 'turns', 'straight_km'],
-  driver: ['year', 'world_championships'],
+  driver: ['year', 'world_championships', 'podiums', 'race_wins'],
 };
 const integerFields: Record<SuggestionCategory, string[]> = {
   vehicle: ['year', 'max_rpm', 'units_sold'],
   circuit: ['year', 'turns'],
-  driver: ['year', 'world_championships'],
+  driver: ['year', 'world_championships', 'podiums', 'race_wins'],
 };
 
 const maxFieldLength: Partial<Record<SuggestionCategory, Record<string, number>>> = {

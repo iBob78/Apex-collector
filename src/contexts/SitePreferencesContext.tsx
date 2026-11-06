@@ -1,8 +1,11 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
+import { GiftIcon, XIcon } from 'lucide-react';
 import { createClient } from '@/lib/supabaseBrowser';
 import { SiteLanguage, translate, UnitSystem } from '@/lib/preferences';
+import { PACKS } from '@/lib/boosters';
 
 interface SitePreferences {
   language: SiteLanguage;
@@ -29,6 +32,7 @@ export function SitePreferencesProvider({ children }: { children: React.ReactNod
   const [language, setLanguage] = useState<SiteLanguage>('fr');
   const [units, setUnits] = useState<UnitSystem>('metric');
   const [userId, setUserId] = useState<string | null>(null);
+  const [dailyBoosterNotice, setDailyBoosterNotice] = useState<{ packSlug: string; streakDay: number } | null>(null);
   const activeUserId = useRef<string | null>(null);
 
   useEffect(() => {
@@ -39,6 +43,23 @@ export function SitePreferencesProvider({ children }: { children: React.ReactNod
 
     let mounted = true;
     let authEventReceived = false;
+    const claimDailyLoginBooster = async () => {
+      try {
+        const { data, error } = await supabase.rpc('claim_daily_login_booster');
+        if (error) {
+          console.error('[SitePreferencesProvider] Impossible de réclamer le booster quotidien:', error.message);
+          return;
+        }
+        if (!data?.awarded) return;
+        if (!PACKS[data.pack_slug] || !Number.isInteger(data.streak_day)) {
+          console.error('[SitePreferencesProvider] Réponse inattendue pour le booster quotidien:', data);
+          return;
+        }
+        if (mounted) setDailyBoosterNotice({ packSlug: data.pack_slug, streakDay: data.streak_day });
+      } catch (error) {
+        console.error('[SitePreferencesProvider] Impossible de réclamer le booster quotidien:', error);
+      }
+    };
     const loadProfilePreferences = async (id: string) => {
       const { data, error } = await supabase
         .from('profiles')
@@ -68,7 +89,14 @@ export function SitePreferencesProvider({ children }: { children: React.ReactNod
       const id = session?.user.id ?? null;
       activeUserId.current = id;
       setUserId(id);
-      if (id) void loadProfilePreferences(id);
+      if (id) {
+        void loadProfilePreferences(id);
+        if (_event === 'SIGNED_IN' || _event === 'INITIAL_SESSION') {
+          window.setTimeout(() => { void claimDailyLoginBooster(); }, 0);
+        }
+      } else {
+        setDailyBoosterNotice(null);
+      }
     });
 
     supabase.auth.getUser().then(({ data: { user }, error }) => {
@@ -79,6 +107,7 @@ export function SitePreferencesProvider({ children }: { children: React.ReactNod
         activeUserId.current = user.id;
         setUserId(user.id);
         void loadProfilePreferences(user.id);
+        void claimDailyLoginBooster();
       }
     });
 
@@ -142,6 +171,23 @@ export function SitePreferencesProvider({ children }: { children: React.ReactNod
   return (
     <SitePreferencesContext.Provider value={contextValue}>
       {children}
+      {dailyBoosterNotice && PACKS[dailyBoosterNotice.packSlug] && (
+        <div role="status" aria-live="polite" className="fixed inset-x-3 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-[70] mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-cyan-300/30 bg-[#0d1722] p-4 text-sm text-cyan-50 shadow-2xl md:inset-x-auto md:bottom-6 md:right-6">
+          <GiftIcon size={20} className="shrink-0 text-cyan-300" aria-hidden="true" />
+          <span className="min-w-0 flex-1">
+            {translate(language, 'Booster offert : {pack} (jour {day}/7).', {
+              pack: translate(language, PACKS[dailyBoosterNotice.packSlug].name),
+              day: dailyBoosterNotice.streakDay,
+            })}
+          </span>
+          <Link href="/boosters" onClick={() => setDailyBoosterNotice(null)} className="shrink-0 rounded-lg bg-cyan-300 px-3 py-2 text-xs font-black text-slate-950">
+            {translate(language, 'Ouvrir')}
+          </Link>
+          <button type="button" onClick={() => setDailyBoosterNotice(null)} aria-label={translate(language, 'Fermer')} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-white">
+            <XIcon size={16} aria-hidden="true" />
+          </button>
+        </div>
+      )}
     </SitePreferencesContext.Provider>
   );
 }

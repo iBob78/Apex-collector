@@ -530,6 +530,16 @@ export default function Card(props: CardProps) {
                   {(props as any).world_championships || 0} {t('titres')}
                 </span>
               </div>
+              <div className="flex min-w-0 items-center justify-start gap-1" title={t('Podiums')}>
+                <span className={clsx(mobileGrid && "min-w-0 truncate sm:overflow-visible")}>
+                  {(props as any).podiums || 0} {t('Podiums').toLowerCase()}
+                </span>
+              </div>
+              <div className="flex min-w-0 items-center justify-start gap-1" title={t('Courses gagnées')}>
+                <span className={clsx(mobileGrid && "min-w-0 truncate sm:overflow-visible")}>
+                  {(props as any).race_wins || 0} {t('Courses gagnées').toLowerCase()}
+                </span>
+              </div>
               {[
                 ['MON', (props as any).won_monaco_gp, 'Grand Prix de Monaco'],
                 ['IND', (props as any).won_indy_500, '500 miles d’Indianapolis'],

@@ -204,6 +204,8 @@ export default function CardDetailsModal({
         { label: t('Âge sur cette carte'), value: getDriverAgeAtCardYear(card.birth_date, card.year) },
         { label: t('Pays d’origine'), value: card.country || card.country_code || null },
         { label: t('Titres de champion du monde'), value: card.world_championships ?? 0 },
+        { label: t('Podiums'), value: card.podiums ?? 0 },
+        { label: t('Courses gagnées'), value: card.race_wins ?? 0 },
         { label: t('Grand Prix de Monaco remporté'), value: card.won_monaco_gp ? t('Oui') : t('Non') },
         { label: t('500 miles d’Indianapolis remportés'), value: card.won_indy_500 ? t('Oui') : t('Non') },
         { label: t('24 Heures du Mans remportées'), value: card.won_24h_le_mans ? t('Oui') : t('Non') },

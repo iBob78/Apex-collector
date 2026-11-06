@@ -18,7 +18,11 @@ function OpenContent() {
   const { t } = useSitePreferences();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const packSlug = searchParams.get('pack') || 'common';
+  const requestedPackSlug = searchParams.get('pack') || 'common';
+  const dailyBoosterId = searchParams.get('daily_booster');
+  const [dailyPackSlug, setDailyPackSlug] = useState<string | null>(null);
+  const [dailyBoosterError, setDailyBoosterError] = useState<string | null>(null);
+  const packSlug = dailyBoosterId ? dailyPackSlug || 'common' : requestedPackSlug;
   const pack = PACKS[packSlug] || PACKS.common;
 
   const [userId, setUserId] = useState<string | null>(null);
@@ -48,21 +52,54 @@ function OpenContent() {
     return () => media.removeEventListener('change', syncLayout);
   }, []);
 
-  // 1. AuthService Check
+  // 1. Check authentication and load the owned daily booster, if requested.
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) {
-        router.push('/login');
-      } else {
-        setUserId(data.user.id);
-        setLoading(false);
+    let active = true;
+    const loadOpeningContext = async () => {
+      try {
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError) throw authError;
+        if (!user) {
+          router.push('/login');
+          return;
+        }
+
+        if (dailyBoosterId) {
+          const { data, error } = await supabase
+            .from('user_daily_boosters')
+            .select('pack_slug')
+            .eq('id', dailyBoosterId)
+            .eq('user_id', user.id)
+            .is('opened_at', null)
+            .maybeSingle();
+          if (error) throw error;
+          if (!data || !PACKS[data.pack_slug]) {
+            if (active) setDailyBoosterError(t('Ce booster offert est indisponible ou a déjà été ouvert.'));
+          } else if (active) {
+            setDailyPackSlug(data.pack_slug);
+          }
+        }
+
+        if (active) {
+          setUserId(user.id);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('[OpenBoosterPage] Impossible de charger le booster:', error);
+        if (active) {
+          setDailyBoosterError(t('Impossible de vérifier ce booster offert.'));
+          setLoading(false);
+        }
       }
-    });
-  }, [router]);
+    };
+    void loadOpeningContext();
+    return () => { active = false; };
+  }, [router, dailyBoosterId, t]);
 
   // 2. Logic to Open Pack
   const handleOpenPack = async () => {
     if (!userId || isOpening || isPrepared) return;
+    if (dailyBoosterId && (!dailyPackSlug || dailyBoosterError)) return;
 
     setIsOpening(true);
     setDiscoverySaveError(null);
@@ -120,13 +157,29 @@ function OpenContent() {
         console.warn('[Booster] Impossible de vérifier les premières découvertes.', ownedVehiclesResult.error || ownedCircuitsResult.error || ownedDriversResult.error);
       }
 
-      // 1. Déduire les AP après avoir confirmé qu'un tirage est possible.
-      const deduction = await deductAP(userId, pack.price);
-
-      if (!deduction.success) {
-        alert(`${t('Erreur')}: ${deduction.error}`);
-        setIsOpening(false);
-        return;
+      if (dailyBoosterId) {
+        const { data, error } = await supabase.rpc('consume_daily_login_booster', {
+          p_booster_id: dailyBoosterId,
+        });
+        if (error) {
+          console.error('[Booster] Impossible de consommer le booster quotidien:', error.message);
+          setDailyBoosterError(t('Impossible d’ouvrir ce booster offert.'));
+          setIsOpening(false);
+          return;
+        }
+        if (!data?.success || data.pack_slug !== packSlug) {
+          setDailyBoosterError(t(data?.error || 'Ce booster offert est indisponible ou a déjà été ouvert.'));
+          setIsOpening(false);
+          return;
+        }
+      } else {
+        // 1. Deduct AP only for a pack bought from the shop.
+        const deduction = await deductAP(userId, pack.price);
+        if (!deduction.success) {
+          alert(`${t('Erreur')}: ${deduction.error}`);
+          setIsOpening(false);
+          return;
+        }
       }
 
       // 2. Sauvegarde dans la collection du joueur
@@ -379,14 +432,27 @@ function OpenContent() {
             </motion.div>
 
             {!isPrepared && !isOpening && (
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                onClick={handleOpenPack}
-                className="mt-12 px-12 py-4 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-colors tracking-widest uppercase text-sm"
-              >
-                {t('Ouvrir le booster')}
-              </motion.button>
+              <>
+                {dailyBoosterId && (
+                  <p className="mt-6 max-w-sm text-center text-sm text-cyan-200">
+                    {t('Booster offert : aucune dépense d’AP ne sera effectuée.')}
+                  </p>
+                )}
+                {dailyBoosterError && (
+                  <p role="alert" className="mt-6 max-w-md rounded-xl border border-red-400/20 bg-red-400/10 p-4 text-sm text-red-200">
+                    {dailyBoosterError}
+                  </p>
+                )}
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  disabled={Boolean(dailyBoosterId && (!dailyPackSlug || dailyBoosterError))}
+                  onClick={handleOpenPack}
+                  className="mt-12 rounded-full bg-white px-12 py-4 text-sm font-bold uppercase tracking-widest text-black transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {t('Ouvrir le booster')}
+                </motion.button>
+              </>
             )}
 
             {isOpening && (

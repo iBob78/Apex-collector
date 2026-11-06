@@ -71,6 +71,8 @@ export interface DriverCard extends BaseCard {
     country: string;
     country_code?: string | null;
     world_championships: number;
+    podiums: number;
+    race_wins: number;
     won_monaco_gp: boolean;
     won_indy_500: boolean;
     won_24h_le_mans: boolean;

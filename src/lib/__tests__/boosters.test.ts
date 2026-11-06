@@ -1,6 +1,14 @@
-import { drawBoosterCards, PACKS, getPackImageUrl, getFirstTimeBoosterCardIndices, getBoosterCardIdentity } from '../boosters';
+import { drawBoosterCards, PACKS, getPackImageUrl, getFirstTimeBoosterCardIndices, getBoosterCardIdentity, getDailyLoginPackSlug } from '../boosters';
 
 describe('Booster pack assets', () => {
+  it('assigns increasingly valuable packs across the seven-day login streak', () => {
+    expect(Array.from({ length: 7 }, (_, index) => getDailyLoginPackSlug(index + 1))).toEqual([
+      'common', 'uncommon', 'rare', 'ultrarare', 'prototype', 'mythic', 'carbon',
+    ]);
+    expect(getDailyLoginPackSlug(0)).toBeNull();
+    expect(getDailyLoginPackSlug(8)).toBeNull();
+  });
+
   it('uses the Supabase booster asset paths and includes the expected pack slugs', () => {
     expect(PACKS.common.imageUrl).toBe('assets/boosters/common.jpg');
     expect(PACKS.uncommon.imageUrl).toBe('assets/boosters/uncommon.jpg');

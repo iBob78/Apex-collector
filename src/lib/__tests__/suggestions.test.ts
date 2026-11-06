@@ -86,6 +86,31 @@ describe('parseSuggestionDraft', () => {
     }, ['GT3'])).toEqual({ error: 'La valeur du champ « Type de compétition » est invalide.' });
   });
 
+  it('accepts non-negative integer podium and race-win counts for driver suggestions', () => {
+    const result = parseSuggestionDraft({
+      category: 'driver',
+      details: { name: 'Alex Driver', year: '2025', country: 'France', podiums: '42', race_wins: '17' },
+      submitterName: '',
+      sourceUrl: '',
+      message: '',
+    });
+
+    expect('data' in result && result.data.details).toEqual({
+      name: 'Alex Driver',
+      year: '2025',
+      country: 'France',
+      podiums: '42',
+      race_wins: '17',
+    });
+    expect(parseSuggestionDraft({
+      category: 'driver',
+      details: { name: 'Alex Driver', year: '2025', country: 'France', podiums: '-1' },
+      submitterName: '',
+      sourceUrl: '',
+      message: '',
+    })).toEqual({ error: 'Les champs numériques doivent contenir des nombres positifs ou nuls.' });
+  });
+
   it('requires a record description when a vehicle suggestion is marked as a record', () => {
     expect(parseSuggestionDraft({
       category: 'vehicle',

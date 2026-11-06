@@ -2,6 +2,21 @@ import { getPublicImage } from '@/lib/images';
 
 type BoosterRarity = 'Common' | 'Uncommon' | 'Rare' | 'Epic' | 'Legend' | 'Icon';
 
+export const DAILY_LOGIN_PACKS = [
+    'common',
+    'uncommon',
+    'rare',
+    'ultrarare',
+    'prototype',
+    'mythic',
+    'carbon',
+] as const;
+
+export function getDailyLoginPackSlug(streakDay: number) {
+    if (!Number.isInteger(streakDay) || streakDay < 1 || streakDay > DAILY_LOGIN_PACKS.length) return null;
+    return DAILY_LOGIN_PACKS[streakDay - 1];
+}
+
 export interface BoosterCatalogCard {
     id?: string;
     card_id?: string;
