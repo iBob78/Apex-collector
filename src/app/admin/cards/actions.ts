@@ -110,6 +110,7 @@ export type CircuitData = {
 type SaveResult = { success: true; card: CardData } | { success: false; error: string };
 type CircuitSaveResult = { success: true; circuit: CircuitData } | { success: false; error: string };
 export type CompetitionTypeResult = { success: true; name: string } | { success: false; error: string };
+export type CircuitTypeResult = { success: true; name: string } | { success: false; error: string };
 
 function parseOptionalNumber(value: string, label: string, allowNegative = false) {
   if (!value.trim()) return { value: null, error: null };
@@ -223,8 +224,9 @@ function parseCircuitDraft(draft: CircuitDraft) {
   if (!rarities.includes(draft.rarity as (typeof rarities)[number])) {
     return { error: 'Choisis une rareté valide.' } as const;
   }
-  if (draft.type && !['Route', 'Urbain', 'Oval'].includes(draft.type)) {
-    return { error: 'Choisis un type de circuit valide.' } as const;
+  const type = draft.type.trim();
+  if (type.length > 40) {
+    return { error: 'Le type de tracé ne peut pas dépasser 40 caractères.' } as const;
   }
 
   const year = parseOptionalNumber(draft.year, 'L’année');
@@ -247,7 +249,7 @@ function parseCircuitDraft(draft: CircuitDraft) {
       country_code: draft.country_code.trim() || null,
       year: year.value,
       rarity: draft.rarity,
-      type: draft.type || null,
+      type: type || null,
       length_km: length.value,
       turns: turns.value,
       straight_km: straight.value,
@@ -568,4 +570,92 @@ export async function updateCircuit(id: string, draft: CircuitDraft): Promise<Ci
   revalidatePath('/collection');
   revalidatePath('/open');
   return { success: true, circuit: data as CircuitData };
+}
+
+function validateCircuitTypeName(value: unknown) {
+  if (typeof value !== 'string') return { name: null, error: 'Le type de tracé est invalide.' };
+  const name = value.trim();
+  if (!name || name.length > 40) {
+    return { name: null, error: 'Le nom doit contenir entre 1 et 40 caractères.' };
+  }
+  return { name, error: null };
+}
+
+function revalidateCircuitTypePages() {
+  revalidatePath('/admin/circuits');
+  revalidatePath('/collection');
+  revalidatePath('/open');
+}
+
+export async function addCircuitType(value: string): Promise<CircuitTypeResult> {
+  const authorization = await getAdminClient();
+  if (!authorization.client) return { success: false, error: authorization.error ?? 'Accès administrateur refusé.' };
+
+  const parsed = validateCircuitTypeName(value);
+  if (!parsed.name) return { success: false, error: parsed.error! };
+
+  const { data, error } = await authorization.client
+    .from('circuit_types')
+    .insert({ name: parsed.name })
+    .select('name')
+    .single();
+
+  if (error) {
+    const message = error.code === '23505'
+      ? 'Ce type existe déjà dans la liste.'
+      : `Le type n’a pas pu être ajouté : ${error.message}`;
+    return { success: false, error: message };
+  }
+
+  revalidateCircuitTypePages();
+  return { success: true, name: data.name };
+}
+
+export async function renameCircuitType(currentValue: string, nextValue: string): Promise<CircuitTypeResult> {
+  const authorization = await getAdminClient();
+  if (!authorization.client) return { success: false, error: authorization.error ?? 'Accès administrateur refusé.' };
+
+  const current = validateCircuitTypeName(currentValue);
+  const next = validateCircuitTypeName(nextValue);
+  if (!current.name) return { success: false, error: current.error! };
+  if (!next.name) return { success: false, error: next.error! };
+
+  const { data, error } = await authorization.client
+    .from('circuit_types')
+    .update({ name: next.name })
+    .eq('name', current.name)
+    .select('name')
+    .maybeSingle();
+
+  if (error) {
+    const message = error.code === '23505'
+      ? 'Un type portant ce nom existe déjà.'
+      : `Le type n’a pas pu être renommé : ${error.message}`;
+    return { success: false, error: message };
+  }
+  if (!data) return { success: false, error: 'Le type à renommer est introuvable.' };
+
+  revalidateCircuitTypePages();
+  return { success: true, name: data.name };
+}
+
+export async function deleteCircuitType(value: string): Promise<CircuitTypeResult> {
+  const authorization = await getAdminClient();
+  if (!authorization.client) return { success: false, error: authorization.error ?? 'Accès administrateur refusé.' };
+
+  const parsed = validateCircuitTypeName(value);
+  if (!parsed.name) return { success: false, error: parsed.error! };
+
+  const { data, error } = await authorization.client
+    .from('circuit_types')
+    .delete()
+    .eq('name', parsed.name)
+    .select('name')
+    .maybeSingle();
+
+  if (error) return { success: false, error: `Le type n’a pas pu être supprimé : ${error.message}` };
+  if (!data) return { success: false, error: 'Le type à supprimer est introuvable.' };
+
+  revalidateCircuitTypePages();
+  return { success: true, name: data.name };
 }

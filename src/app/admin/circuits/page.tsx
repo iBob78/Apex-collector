@@ -53,24 +53,34 @@ export default async function AdminCircuitsPage() {
   }
 
   let circuits: CircuitData[];
+  let circuitTypes: string[];
   try {
-    circuits = await fetchAllPages((from, to) => supabase
-      .from('circuits')
-      .select('*')
-      .order('name', { ascending: true })
-      .order('id', { ascending: true })
-      .range(from, to)) as CircuitData[];
+    const [circuitRows, typeRows] = await Promise.all([
+      fetchAllPages((from, to) => supabase
+        .from('circuits')
+        .select('*')
+        .order('name', { ascending: true })
+        .order('id', { ascending: true })
+        .range(from, to)),
+      fetchAllPages((from, to) => supabase
+        .from('circuit_types')
+        .select('name,sort_order')
+        .order('sort_order', { ascending: true })
+        .range(from, to)),
+    ]);
+    circuits = circuitRows as CircuitData[];
+    circuitTypes = typeRows.map((row) => row.name as string);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur Supabase inconnue.';
-    console.error('[AdminCircuitsPage] Impossible de charger le catalogue complet:', message);
+    console.error('[AdminCircuitsPage] Impossible de charger le catalogue ou les types de tracé:', message);
     return (
       <main className="min-h-screen bg-[#07090d] px-5 py-12 text-white md:px-10">
         <p role="alert" className="mx-auto max-w-3xl rounded-2xl border border-red-400/20 bg-red-400/10 p-5 text-red-200">
-          Impossible de charger le catalogue de circuits : {message}
+          Impossible de charger le catalogue ou les types de tracé : {message}. Vérifie que la migration 036_circuit_types.sql est appliquée.
         </p>
       </main>
     );
   }
 
-  return <CircuitStudio initialCircuits={circuits} />;
+  return <CircuitStudio initialCircuits={circuits} initialCircuitTypes={circuitTypes} />;
 }

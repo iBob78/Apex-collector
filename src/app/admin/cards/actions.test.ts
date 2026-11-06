@@ -1,4 +1,4 @@
-import { createCard, type CardDraft } from './actions';
+import { addCircuitType, createCard, type CardDraft } from './actions';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
 import { getAdminAccess } from '@/lib/admin';
 
@@ -78,5 +78,31 @@ describe('createCard', () => {
       is_record: false,
       record_description: null,
     }));
+  });
+});
+
+describe('addCircuitType', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('adds a trimmed type after confirming administrator access', async () => {
+    const single = jest.fn().mockResolvedValue({ data: { name: 'Street' }, error: null });
+    const select = jest.fn().mockReturnValue({ single });
+    const insert = jest.fn().mockReturnValue({ select });
+    const from = jest.fn().mockReturnValue({ insert });
+    const client = {
+      auth: { getUser: jest.fn().mockResolvedValue({ data: { user: { id: 'admin-id' } }, error: null }) },
+      from,
+    };
+
+    mockCreateServerSupabaseClient.mockResolvedValue(client as never);
+    mockGetAdminAccess.mockResolvedValue({ isAdmin: true, isOwner: false, error: null });
+
+    const result = await addCircuitType(' Street ');
+
+    expect(result).toEqual({ success: true, name: 'Street' });
+    expect(from).toHaveBeenCalledWith('circuit_types');
+    expect(insert).toHaveBeenCalledWith({ name: 'Street' });
   });
 });

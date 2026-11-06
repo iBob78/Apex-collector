@@ -51,6 +51,7 @@ export default function CollectionPage() {
   const [visibleCount, setVisibleCount] = useState(24);
   const [favoriteKeys, setFavoriteKeys] = useState<Set<string>>(() => new Set());
   const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [hideLockedCards, setHideLockedCards] = useState(false);
   const [favoritePendingKey, setFavoritePendingKey] = useState<string | null>(null);
   const [favoritesError, setFavoritesError] = useState<string | null>(null);
   const [newCardKeys, setNewCardKeys] = useState<Set<string>>(() => new Set());
@@ -63,7 +64,7 @@ export default function CollectionPage() {
   const [sortBy, setSortBy] = useState<'name' | 'make-asc' | 'make-desc' | 'ip-desc' | 'ip-asc' | 'level-asc' | 'level-desc' | 'rarity' | 'newest'>('name');
 
   // Keep the initial card grid light on smartphones when filters change.
-  useEffect(() => setVisibleCount(24), [activeTab, searchQuery, rarityFilter, sortBy, favoritesOnly]);
+  useEffect(() => setVisibleCount(24), [activeTab, searchQuery, rarityFilter, sortBy, favoritesOnly, hideLockedCards]);
 
   // Authentification
   useEffect(() => {
@@ -197,6 +198,10 @@ export default function CollectionPage() {
       result = result.filter(c => (c.category || 'vehicle') === activeTab);
     }
 
+    if (hideLockedCards) {
+      result = result.filter((card) => (userCards[getCardId(card)] || 0) > 0);
+    }
+
     if (favoritesOnly) {
       result = result.filter((card) => favoriteKeys.has(getFavoriteKey(card)));
     }
@@ -258,7 +263,7 @@ export default function CollectionPage() {
     });
 
     return result;
-  }, [cards, activeTab, searchQuery, rarityFilter, sortBy, userCardLevels, favoritesOnly, favoriteKeys]);
+  }, [cards, activeTab, searchQuery, rarityFilter, sortBy, userCardLevels, userCards, hideLockedCards, favoritesOnly, favoriteKeys]);
 
   // Statistiques
   const stats = useMemo(() => {
@@ -420,6 +425,16 @@ export default function CollectionPage() {
                 <Star size={18} fill={favoritesOnly ? 'currentColor' : 'none'} aria-hidden="true" />
                 {t('Favoris')} ({favoriteKeys.size})
               </button>
+
+              <label className="flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-300 transition hover:bg-white/10 sm:w-auto">
+                <input
+                  type="checkbox"
+                  checked={hideLockedCards}
+                  onChange={(event) => setHideLockedCards(event.target.checked)}
+                  className="size-4 accent-blue-500"
+                />
+                <span>{t('Masquer les cartes non déverrouillées')}</span>
+              </label>
 
               {/* Search */}
               <div className="w-full min-w-0 flex-1 sm:min-w-[200px]">

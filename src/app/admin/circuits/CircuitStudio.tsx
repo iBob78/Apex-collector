@@ -9,6 +9,7 @@ import {
   Flag,
   Image as ImageIcon,
   LoaderCircle,
+  Pencil,
   Plus,
   Save,
   Search,
@@ -21,13 +22,16 @@ import { resolveCardImage, resolveCountryFlag, IMAGE_PATHS } from '@/lib/images'
 import SafeImage from '@/components/SafeImage';
 import {
   createCircuit,
+  addCircuitType,
+  deleteCircuitType,
+  renameCircuitType,
   updateCircuit,
   type CircuitData,
   type CircuitDraft,
+  type CircuitTypeResult,
 } from '../cards/actions';
 
 const rarities = ['Common', 'Uncommon', 'Atypique', 'Rare', 'Very rare', 'Epic', 'Legend', 'Mythic', 'Icon'];
-const circuitTypes = ['Route', 'Urbain', 'Oval'];
 
 const emptyDraft: CircuitDraft = {
   name: '',
@@ -98,15 +102,28 @@ function TextField({
   );
 }
 
-export default function CircuitStudio({ initialCircuits }: { initialCircuits: CircuitData[] }) {
+export default function CircuitStudio({
+  initialCircuits,
+  initialCircuitTypes,
+}: {
+  initialCircuits: CircuitData[];
+  initialCircuitTypes: string[];
+}) {
   const [circuits, setCircuits] = useState(initialCircuits);
+  const [circuitTypes, setCircuitTypes] = useState(initialCircuitTypes);
   const [draft, setDraft] = useState<CircuitDraft>(emptyDraft);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState('');
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [newCircuitType, setNewCircuitType] = useState('');
+  const [editingCircuitType, setEditingCircuitType] = useState<string | null>(null);
+  const [editedCircuitType, setEditedCircuitType] = useState('');
+  const [circuitTypePending, setCircuitTypePending] = useState(false);
+  const [circuitTypeFeedback, setCircuitTypeFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => setCircuits(initialCircuits), [initialCircuits]);
+  useEffect(() => setCircuitTypes(initialCircuitTypes), [initialCircuitTypes]);
 
   const selectedCircuit = circuits.find((circuit) => circuit.id === selectedId) ?? null;
   const filteredCircuits = useMemo(() => {
@@ -159,6 +176,63 @@ export default function CircuitStudio({ initialCircuits }: { initialCircuits: Ci
     setSelectedId(result.circuit.id);
     setDraft(toDraft(result.circuit));
     setFeedback({ type: 'success', text: selectedId ? 'Modifications enregistrées.' : 'Circuit créé dans le catalogue.' });
+  };
+
+  const updateCircuitTypeReferences = (oldName: string, newName: string | null) => {
+    setCircuits((current) => current.map((circuit) => circuit.type === oldName
+      ? { ...circuit, type: newName }
+      : circuit));
+    setDraft((current) => current.type === oldName
+      ? { ...current, type: newName ?? '' }
+      : current);
+  };
+
+  const handleAddCircuitType = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (circuitTypePending) return;
+    setCircuitTypePending(true);
+    setCircuitTypeFeedback(null);
+    const result = await addCircuitType(newCircuitType);
+    setCircuitTypePending(false);
+    if (!result.success) {
+      setCircuitTypeFeedback({ type: 'error', text: result.error });
+      return;
+    }
+    setCircuitTypes((current) => [...current, result.name]);
+    setNewCircuitType('');
+    setCircuitTypeFeedback({ type: 'success', text: `« ${result.name} » a été ajouté.` });
+  };
+
+  const handleRenameCircuitType = async (currentName: string) => {
+    if (circuitTypePending) return;
+    setCircuitTypePending(true);
+    setCircuitTypeFeedback(null);
+    const result = await renameCircuitType(currentName, editedCircuitType);
+    setCircuitTypePending(false);
+    if (!result.success) {
+      setCircuitTypeFeedback({ type: 'error', text: result.error });
+      return;
+    }
+    setCircuitTypes((current) => current.map((name) => name === currentName ? result.name : name));
+    updateCircuitTypeReferences(currentName, result.name);
+    setEditingCircuitType(null);
+    setEditedCircuitType('');
+    setCircuitTypeFeedback({ type: 'success', text: `« ${currentName} » a été renommé en « ${result.name} ».` });
+  };
+
+  const handleDeleteCircuitType = async (name: string) => {
+    if (circuitTypePending || !window.confirm(`Supprimer « ${name} » de la liste ? Les circuits qui utilisent ce type ne l’afficheront plus.`)) return;
+    setCircuitTypePending(true);
+    setCircuitTypeFeedback(null);
+    const result: CircuitTypeResult = await deleteCircuitType(name);
+    setCircuitTypePending(false);
+    if (!result.success) {
+      setCircuitTypeFeedback({ type: 'error', text: result.error });
+      return;
+    }
+    setCircuitTypes((current) => current.filter((item) => item !== name));
+    updateCircuitTypeReferences(name, null);
+    setCircuitTypeFeedback({ type: 'success', text: `« ${name} » a été supprimé.` });
   };
 
   const rarityColor = getRarityColor(draft.rarity);
@@ -361,6 +435,89 @@ export default function CircuitStudio({ initialCircuits }: { initialCircuits: Ci
                 <button type="button" onClick={startNewCircuit} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 py-3 text-xs font-bold text-slate-400 hover:border-cyan-300/40 hover:text-cyan-200">
                   <Plus size={15} /> Créer le premier circuit
                 </button>
+              )}
+            </section>
+            <section className="rounded-3xl border border-white/[0.08] bg-[#0d1118]/90 p-5 shadow-2xl shadow-black/20">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300">Liste des types</p>
+              <h2 className="mt-1 text-lg font-black">Gérer les types de tracé</h2>
+              <p className="mt-2 text-xs leading-5 text-slate-400">Renommer un type met à jour les circuits concernés. Le supprimer retire ce type de ces circuits.</p>
+              <form onSubmit={handleAddCircuitType} className="mt-4 flex gap-2">
+                <input
+                  aria-label="Nouveau type de tracé"
+                  value={newCircuitType}
+                  onChange={(event) => setNewCircuitType(event.target.value)}
+                  maxLength={40}
+                  placeholder="Ajouter un type"
+                  className="min-w-0 flex-1 rounded-xl border border-white/10 bg-[#090c11] px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-400/70"
+                />
+                <button
+                  type="submit"
+                  disabled={circuitTypePending || !newCircuitType.trim()}
+                  aria-label="Ajouter le type de tracé"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-300/30 bg-cyan-300/10 text-cyan-200 transition hover:bg-cyan-300/20 disabled:opacity-50"
+                >
+                  {circuitTypePending ? <LoaderCircle size={16} className="animate-spin" /> : <Plus size={16} />}
+                </button>
+              </form>
+              <div className="mt-3 max-h-72 space-y-1 overflow-y-auto pr-1">
+                {circuitTypes.map((name) => (
+                  <div key={name} className="flex items-center gap-2 rounded-lg border border-white/[0.06] px-2 py-1.5">
+                    {editingCircuitType === name ? (
+                      <>
+                        <input
+                          aria-label={`Renommer ${name}`}
+                          value={editedCircuitType}
+                          onChange={(event) => setEditedCircuitType(event.target.value)}
+                          maxLength={40}
+                          className="min-w-0 flex-1 rounded-md border border-white/10 bg-[#090c11] px-2 py-1.5 text-xs text-white outline-none focus:border-cyan-400/70"
+                        />
+                        <button
+                          type="button"
+                          disabled={circuitTypePending || !editedCircuitType.trim()}
+                          onClick={() => void handleRenameCircuitType(name)}
+                          aria-label={`Enregistrer le renommage de ${name}`}
+                          className="rounded-md p-1.5 text-emerald-300 hover:bg-emerald-300/10 disabled:opacity-50"
+                        >
+                          {circuitTypePending ? <LoaderCircle size={14} className="animate-spin" /> : <Check size={14} />}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setEditingCircuitType(null); setEditedCircuitType(''); }}
+                          aria-label={`Annuler le renommage de ${name}`}
+                          className="rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white"
+                        >
+                          <X size={14} />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <span className="min-w-0 flex-1 truncate text-xs font-semibold text-slate-200">{name}</span>
+                        <button
+                          type="button"
+                          onClick={() => { setEditingCircuitType(name); setEditedCircuitType(name); }}
+                          aria-label={`Renommer ${name}`}
+                          className="rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white"
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={circuitTypePending}
+                          onClick={() => void handleDeleteCircuitType(name)}
+                          aria-label={`Supprimer ${name}`}
+                          className="rounded-md p-1.5 text-red-300 hover:bg-red-300/10 disabled:opacity-50"
+                        >
+                          {circuitTypePending ? <LoaderCircle size={14} className="animate-spin" /> : <X size={14} />}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {circuitTypeFeedback && (
+                <p role={circuitTypeFeedback.type === 'error' ? 'alert' : 'status'} className={`mt-3 text-xs ${circuitTypeFeedback.type === 'error' ? 'text-red-300' : 'text-emerald-300'}`}>
+                  {circuitTypeFeedback.text}
+                </p>
               )}
             </section>
           </aside>
