@@ -47,4 +47,52 @@ describe('parseSuggestionDraft', () => {
       message: '',
     })).toEqual({ error: 'Un ou plusieurs champs de la suggestion sont invalides.' });
   });
+
+  it('accepts a comma decimal mass and validates competition type and record fields', () => {
+    const result = parseSuggestionDraft({
+      category: 'vehicle',
+      details: {
+        make: 'Apex',
+        model: 'GT',
+        year: '2025',
+        weight_t: '1,230',
+        transmission: 'FR',
+        competition_type: 'GT3',
+        is_record: 'true',
+        record_description: 'Record du tour en catégorie GT3',
+      },
+      submitterName: '',
+      sourceUrl: '',
+      message: '',
+    }, ['GT3']);
+
+    expect('data' in result && result.data.details).toEqual({
+      make: 'Apex',
+      model: 'GT',
+      year: '2025',
+      weight_t: '1.230',
+      transmission: 'FR',
+      competition_type: 'GT3',
+      is_record: 'true',
+      record_description: 'Record du tour en catégorie GT3',
+    });
+
+    expect(parseSuggestionDraft({
+      category: 'vehicle',
+      details: { make: 'Apex', model: 'GT', year: '2025', competition_type: 'Unknown' },
+      submitterName: '',
+      sourceUrl: '',
+      message: '',
+    }, ['GT3'])).toEqual({ error: 'La valeur du champ « Type de compétition » est invalide.' });
+  });
+
+  it('requires a record description when a vehicle suggestion is marked as a record', () => {
+    expect(parseSuggestionDraft({
+      category: 'vehicle',
+      details: { make: 'Apex', model: 'GT', year: '2025', is_record: 'true' },
+      submitterName: '',
+      sourceUrl: '',
+      message: '',
+    })).toEqual({ error: 'Décris le record proposé.' });
+  });
 });

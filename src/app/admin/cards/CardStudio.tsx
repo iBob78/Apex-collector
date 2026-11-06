@@ -62,6 +62,8 @@ const emptyDraft: CardDraft = {
   fuel_type: '',
   competition_type: '',
   competition_type_custom: '',
+  is_record: false,
+  record_description: '',
   max_rpm: '',
   units_sold: '',
 };
@@ -91,6 +93,8 @@ function toDraft(card: CardData): CardDraft {
     fuel_type: getFuelTypeInfo(card.fuel_type)?.code ?? card.fuel_type ?? '',
     competition_type: card.competition_type ?? '',
     competition_type_custom: card.competition_type_custom ?? '',
+    is_record: card.is_record === true,
+    record_description: card.record_description ?? '',
     max_rpm: String(card.max_rpm ?? ''),
     units_sold: String(card.units_sold ?? ''),
   };
@@ -587,6 +591,33 @@ export default function CardStudio({
                     placeholder="Ex. : catégorie Hypercar, saison 2025"
                     hint="Complément affiché avec le type sélectionné"
                   />
+                  <label className="flex min-w-0 items-center gap-3 rounded-xl border border-amber-300/20 bg-amber-300/[0.04] px-3.5 py-3">
+                    <input
+                      type="checkbox"
+                      checked={draft.is_record}
+                      onChange={(event) => {
+                        setDraft((current) => ({ ...current, is_record: event.target.checked }));
+                        setFeedback(null);
+                      }}
+                      className="h-4 w-4 accent-amber-300"
+                    />
+                    <span className="text-sm font-bold text-amber-100">Record</span>
+                  </label>
+                  {draft.is_record && (
+                    <label className="block min-w-0 sm:col-span-2 lg:col-span-3">
+                      <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Description du record</span>
+                      <textarea
+                        aria-label="Description du record"
+                        value={draft.record_description}
+                        onChange={(event) => setField('record_description', event.target.value)}
+                        maxLength={500}
+                        rows={3}
+                        placeholder="Décris le record détenu par ce véhicule..."
+                        className="w-full resize-y rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-amber-300/70 focus:ring-2 focus:ring-amber-300/10"
+                        required
+                      />
+                    </label>
+                  )}
                   <TextField label="Régime maximal" value={draft.max_rpm} onChange={(value) => setField('max_rpm', value)} type="number" min="0" step="1" placeholder="9000" hint="Tours par minute (tr/min)" />
                   <TextField label="Exemplaires vendus" value={draft.units_sold} onChange={(value) => setField('units_sold', value)} type="number" min="0" step="1" placeholder="9181" hint="Production réelle du modèle" />
                 </div>
@@ -728,11 +759,30 @@ export default function CardStudio({
                   fuel_type={draft.fuel_type || undefined}
                   competition_type={draft.competition_type || undefined}
                   competition_type_custom={draft.competition_type_custom || undefined}
+                  is_record={draft.is_record}
+                  record_description={draft.record_description || undefined}
                   country_code={draft.country_code}
                   showLevel={false}
                   onCardClick={() => {}}
                 />
               </div>
+              {draft.is_record ? (
+                <div className="mx-auto mt-4 flex max-w-[300px] items-start gap-3 rounded-xl border border-amber-300/25 bg-amber-300/[0.06] p-3">
+                  <span className="inline-flex h-7 min-w-7 shrink-0 items-center justify-center rounded border border-amber-200 bg-amber-300 px-1 text-xs font-black text-[#251500]">
+                    R
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-black uppercase tracking-[0.16em] text-amber-200">Record affiché dans la modale</p>
+                    <p className="mt-1 whitespace-pre-line break-words text-xs leading-5 text-slate-200">
+                      {draft.record_description || 'La description du record apparaîtra ici.'}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="mx-auto mt-4 max-w-[250px] text-center text-xs text-slate-500">
+                  Coche « Record » pour afficher le badge R sur la carte.
+                </p>
+              )}
               {!(Number(draft.power_hp) > 0 && Number(draft.weight_t) > 0) && (
                 <p className="mx-auto mt-3 max-w-[250px] text-center text-xs text-slate-500">
                   Renseigne la puissance et le poids pour afficher l’IP.

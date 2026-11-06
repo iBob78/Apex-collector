@@ -148,6 +148,10 @@ export default function Card(props: CardProps) {
       ].filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
     : [];
   const competitionType = competitionTypeParts.join(' · ');
+  const isRecord = isVehicle && 'is_record' in props && props.is_record === true;
+  const recordDescription = isRecord && 'record_description' in props && typeof props.record_description === 'string'
+    ? props.record_description.trim()
+    : '';
 
   const handleCardClick = () => {
     if (isConcealed) return;
@@ -326,12 +330,21 @@ export default function Card(props: CardProps) {
         )}
 
         {/* IP Badge - Top Left */}
-        {isVehicle && (ip > 0 || fuelType || competitionType) && (
+        {isVehicle && (ip > 0 || fuelType || competitionType || isRecord) && (
           <div className={clsx(
               "absolute z-20 flex origin-top-left flex-col items-start gap-1",
               mobileGrid ? "left-0.5 top-0.5 scale-[0.62] sm:left-3 sm:top-3 sm:scale-100" : "left-3 top-3",
-              mobileGrid && ip <= 0 && !fuelType && !competitionType && "hidden sm:flex",
+              mobileGrid && ip <= 0 && !fuelType && !competitionType && !isRecord && "hidden sm:flex",
             )}>
+            {isRecord && (
+              <span
+                aria-label="Record"
+                title={recordDescription || 'Record'}
+                className={clsx("inline-flex h-5 min-w-5 items-center justify-center rounded border border-amber-200 bg-amber-300 px-1 text-[11px] font-black leading-none text-[#251500] shadow-sm shadow-black/50", mobileGrid && "h-4 min-w-4 text-[9px] sm:h-5 sm:min-w-5 sm:text-[11px]")}
+              >
+                R
+              </span>
+            )}
             {ip > 0 && <IPBadge value={ip} size="sm" />}
             {fuelType && (
               <span

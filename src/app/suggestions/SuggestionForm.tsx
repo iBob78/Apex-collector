@@ -18,7 +18,7 @@ const categoryLabels: Record<SuggestionCategory, string> = {
 
 const fieldClass = 'w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/10';
 
-export default function SuggestionForm() {
+export default function SuggestionForm({ initialCompetitionTypes }: { initialCompetitionTypes: string[] }) {
   const [category, setCategory] = useState<SuggestionCategory>('vehicle');
   const [details, setDetails] = useState<Record<string, string>>({});
   const [submitterName, setSubmitterName] = useState('');
@@ -92,30 +92,61 @@ export default function SuggestionForm() {
             </label>
 
             <div className="grid gap-5 sm:grid-cols-2">
-              {SUGGESTION_FIELDS[category].map((field) => (
+              {SUGGESTION_FIELDS[category]
+                .filter((field) => field.name !== 'record_description' || details.is_record === 'true')
+                .map((field) => (
                 <label key={field.name} className={`block min-w-0 ${field.name === 'image_url' ? 'sm:col-span-2' : ''}`}>
                   <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">
-                    {field.label}{field.required && <span className="ml-1 text-cyan-300">*</span>}
+                    {field.label}{(field.required || (field.name === 'record_description' && details.is_record === 'true')) && <span className="ml-1 text-cyan-300">*</span>}
                   </span>
                   {field.type === 'select' ? (
                     <select
                       className={fieldClass}
                       value={details[field.name] ?? ''}
                       onChange={(event) => setDetails((current) => ({ ...current, [field.name]: event.target.value }))}
+                      required={field.required}
                     >
-                      <option value="">Choisir…</option>
-                      {field.options?.map((option) => <option key={option} value={option}>{option}</option>)}
+                      <option value="">{field.name === 'transmission' ? 'Non renseignée' : 'Choisir…'}</option>
+                      {(field.dynamicOptions === 'competitionTypes'
+                        ? initialCompetitionTypes.map((value) => ({ value, label: value }))
+                        : field.options ?? []
+                      ).map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                     </select>
+                  ) : field.type === 'checkbox' ? (
+                    <span className="flex min-h-12 items-center gap-3 rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3">
+                      <input
+                        type="checkbox"
+                        checked={details[field.name] === 'true'}
+                        onChange={(event) => setDetails((current) => ({
+                          ...current,
+                          [field.name]: event.target.checked ? 'true' : '',
+                          ...(field.name === 'is_record' && !event.target.checked ? { record_description: '' } : {}),
+                        }))}
+                        className="h-4 w-4 accent-cyan-300"
+                      />
+                      <span className="text-sm text-slate-200">Cette voiture détient un record</span>
+                    </span>
+                  ) : field.name === 'record_description' ? (
+                    <textarea
+                      className={`${fieldClass} min-h-24 resize-y`}
+                      value={details[field.name] ?? ''}
+                      onChange={(event) => setDetails((current) => ({ ...current, [field.name]: event.target.value }))}
+                      required={details.is_record === 'true'}
+                      maxLength={500}
+                      placeholder="Décris le record détenu par cette voiture..."
+                    />
                   ) : (
                     <input
                       className={fieldClass}
-                      type={field.type ?? 'text'}
+                      type={field.type === 'decimal' ? 'text' : field.type ?? 'text'}
+                      inputMode={field.type === 'decimal' ? 'decimal' : undefined}
                       value={details[field.name] ?? ''}
                       onChange={(event) => setDetails((current) => ({ ...current, [field.name]: event.target.value }))}
                       required={field.required}
-                      maxLength={field.type === 'url' ? 2048 : 200}
+                      maxLength={field.type === 'url' ? 2048 : field.name === 'competition_type_custom' ? 60 : 200}
                       min={field.type === 'number' ? '0' : undefined}
                       step={field.type === 'number' ? 'any' : undefined}
+                      pattern={field.type === 'decimal' ? '[0-9]+([.,][0-9]+)?' : undefined}
                       placeholder={field.type === 'url' ? 'https://' : undefined}
                     />
                   )}

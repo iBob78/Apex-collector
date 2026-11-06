@@ -28,6 +28,8 @@ export interface CarCard {
   fuel_type: string | null;
   competition_type: string | null;
   competition_type_custom: string | null;
+  is_record: boolean;
+  record_description: string | null;
   max_rpm: number | null;
   units_sold: number | null;
 }

@@ -148,7 +148,9 @@ export default function SuggestionInbox({ initialSuggestions }: { initialSuggest
                   {Object.entries(selected.details).map(([key, value]) => (
                     <div key={key} className="min-w-0 rounded-xl border border-white/[0.06] bg-[#090c11] px-4 py-3">
                       <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">{getSuggestionFieldLabel(selected.category, key)}</dt>
-                      <dd className="mt-1 break-words text-sm text-slate-200">{value}</dd>
+                      <dd className="mt-1 break-words text-sm text-slate-200">
+                        {key === 'is_record' ? (value === 'true' ? 'Oui' : 'Non') : value}
+                      </dd>
                     </div>
                   ))}
                 </dl>

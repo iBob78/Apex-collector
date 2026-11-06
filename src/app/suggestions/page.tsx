@@ -31,5 +31,21 @@ export default async function SuggestionsPage() {
     );
   }
 
-  return <SuggestionForm />;
+  const { data: competitionTypes, error: competitionTypesError } = await supabase
+    .from('competition_types')
+    .select('name')
+    .order('sort_order');
+
+  if (competitionTypesError) {
+    console.error('[SuggestionsPage] Chargement des types de compétition impossible:', competitionTypesError.message);
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#07090d] px-5 text-white">
+        <p role="alert" className="max-w-lg rounded-2xl border border-red-400/20 bg-red-400/10 p-5 text-sm text-red-200">
+          Impossible de charger les types de compétition : {competitionTypesError.message}. Vérifie que la migration 032_competition_types.sql est appliquée.
+        </p>
+      </main>
+    );
+  }
+
+  return <SuggestionForm initialCompetitionTypes={competitionTypes.map(({ name }) => name)} />;
 }

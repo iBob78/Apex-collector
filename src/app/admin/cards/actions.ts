@@ -9,7 +9,8 @@ const draftFields: (keyof CardDraft)[] = [
   'make', 'model', 'year', 'rarity', 'image_url', 'description',
   'power_hp', 'power_kw', 'torque_nm', 'max_speed_kmh', 'weight_t',
   'acceleration_0_100', 'engine_size', 'cylinder', 'boost', 'country_code',
-  'transmission', 'new_price_eur', 'fuel_type', 'competition_type', 'competition_type_custom', 'max_rpm', 'units_sold',
+  'transmission', 'new_price_eur', 'fuel_type', 'competition_type', 'competition_type_custom',
+  'is_record', 'record_description', 'max_rpm', 'units_sold',
 ];
 
 export type CardDraft = {
@@ -36,6 +37,8 @@ export type CardDraft = {
   fuel_type: string;
   competition_type: string;
   competition_type_custom: string;
+  is_record: boolean;
+  record_description: string;
   max_rpm: string;
   units_sold: string;
 };
@@ -69,6 +72,8 @@ export type CardData = {
   fuel_type: string | null;
   competition_type: string | null;
   competition_type_custom: string | null;
+  is_record: boolean;
+  record_description: string | null;
   max_rpm: number | null;
   units_sold: number | null;
 };
@@ -121,7 +126,8 @@ function parseCardDraft(draft: CardDraft) {
     typeof draft !== 'object' ||
     draftFields.some((field) => typeof draft[field] !== 'string') ||
     typeof draft.is_active !== 'boolean' ||
-    typeof draft.booster_enabled !== 'boolean'
+    typeof draft.booster_enabled !== 'boolean' ||
+    typeof draft.is_record !== 'boolean'
   ) {
     return { error: 'Les informations fournies pour la carte sont invalides.' } as const;
   }
@@ -141,6 +147,12 @@ function parseCardDraft(draft: CardDraft) {
   }
   if (draft.competition_type.trim().length > 40 || draft.competition_type_custom.trim().length > 60) {
     return { error: 'Le type de compétition est trop long.' } as const;
+  }
+  if (draft.record_description.trim().length > 500) {
+    return { error: 'La description du record ne peut pas dépasser 500 caractères.' } as const;
+  }
+  if (draft.is_record && !draft.record_description.trim()) {
+    return { error: 'Décris le record pour pouvoir l’enregistrer.' } as const;
   }
 
   const numbers = {
@@ -189,6 +201,8 @@ function parseCardDraft(draft: CardDraft) {
       fuel_type: draft.fuel_type.trim() || null,
       competition_type: draft.competition_type.trim() || null,
       competition_type_custom: draft.competition_type_custom.trim() || null,
+      is_record: draft.is_record,
+      record_description: draft.record_description.trim() || null,
       max_rpm: numbers.max_rpm.value,
       units_sold: numbers.units_sold.value,
     },
@@ -422,6 +436,8 @@ export async function createAlternativeArt(cardRowId: string, imageUrl: string):
       fuel_type: source.fuel_type,
       competition_type: source.competition_type,
       competition_type_custom: source.competition_type_custom,
+      is_record: source.is_record,
+      record_description: source.record_description,
       max_rpm: source.max_rpm,
       units_sold: source.units_sold,
       card_id: crypto.randomUUID(),
@@ -488,6 +504,8 @@ export async function updateCard(id: string, draft: CardDraft): Promise<SaveResu
       fuel_type: source.fuel_type,
       competition_type: source.competition_type,
       competition_type_custom: source.competition_type_custom,
+      is_record: source.is_record,
+      record_description: source.record_description,
       max_rpm: source.max_rpm,
       units_sold: source.units_sold,
     };

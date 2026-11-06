@@ -1,3 +1,5 @@
+import { drivetrainLayoutDescriptions, drivetrainLayouts } from '@/lib/drivetrain';
+
 export const SUGGESTION_CATEGORIES = ['vehicle', 'circuit', 'driver'] as const;
 export type SuggestionCategory = (typeof SUGGESTION_CATEGORIES)[number];
 export type SuggestionStatus = 'pending' | 'reviewing' | 'accepted' | 'rejected';
@@ -28,9 +30,10 @@ export type SuggestionRecord = {
 export type SuggestionField = {
   name: string;
   label: string;
-  type?: 'text' | 'number' | 'date' | 'url' | 'select';
+  type?: 'text' | 'number' | 'decimal' | 'date' | 'url' | 'select' | 'checkbox';
   required?: boolean;
-  options?: string[];
+  options?: { value: string; label: string }[];
+  dynamicOptions?: 'competitionTypes';
   hint?: string;
 };
 
@@ -43,13 +46,28 @@ export const SUGGESTION_FIELDS: Record<SuggestionCategory, SuggestionField[]> = 
     { name: 'power_kw', label: 'Puissance (kW)', type: 'number' },
     { name: 'torque_nm', label: 'Couple (Nm)', type: 'number' },
     { name: 'max_speed_kmh', label: 'Vitesse maximale (km/h)', type: 'number' },
-    { name: 'weight_t', label: 'Masse (tonnes)', type: 'number' },
+    { name: 'weight_t', label: 'Masse (tonnes)', type: 'decimal', hint: 'Ex. : 1,230 pour 1 tonne et 230 kg' },
     { name: 'acceleration_0_100', label: '0 à 100 km/h (secondes)', type: 'number' },
     { name: 'engine_size', label: 'Motorisation', hint: 'Ex. : V8 4.0 L biturbo' },
     { name: 'cylinder', label: 'Architecture moteur', hint: 'Ex. : V8, flat-six' },
     { name: 'boost', label: 'Suralimentation' },
     { name: 'country_code', label: 'Code pays', hint: 'Ex. : FR, DE, JP' },
-    { name: 'transmission', label: 'Transmission', hint: 'Ex. : FR, MR, AWD' },
+    {
+      name: 'transmission',
+      label: 'Position moteur / transmission',
+      type: 'select',
+      options: [
+        { value: '', label: 'Non renseignée' },
+        ...drivetrainLayouts.map((layout) => ({
+          value: layout,
+          label: `${layout} - ${drivetrainLayoutDescriptions[layout]}`,
+        })),
+      ],
+    },
+    { name: 'competition_type', label: 'Type de compétition', type: 'select', dynamicOptions: 'competitionTypes' },
+    { name: 'competition_type_custom', label: 'Précision libre', hint: 'Ex. : catégorie Hypercar, saison 2025' },
+    { name: 'is_record', label: 'Record', type: 'checkbox' },
+    { name: 'record_description', label: 'Description du record', hint: 'Décris le record détenu par ce véhicule.' },
     { name: 'new_price_eur', label: 'Prix neuf (€)', type: 'number' },
     { name: 'fuel_type', label: 'Carburant' },
     { name: 'max_rpm', label: 'Régime maximal (tr/min)', type: 'number' },
@@ -61,7 +79,11 @@ export const SUGGESTION_FIELDS: Record<SuggestionCategory, SuggestionField[]> = 
     { name: 'country', label: 'Pays' },
     { name: 'country_code', label: 'Code pays', hint: 'Ex. : FR, IT, JP' },
     { name: 'year', label: 'Année à associer', type: 'number' },
-    { name: 'type', label: 'Type', type: 'select', options: ['Route', 'Urbain', 'Oval'] },
+    { name: 'type', label: 'Type', type: 'select', options: [
+      { value: 'Route', label: 'Route' },
+      { value: 'Urbain', label: 'Urbain' },
+      { value: 'Oval', label: 'Oval' },
+    ] },
     { name: 'length_km', label: 'Longueur (km)', type: 'number' },
     { name: 'turns', label: 'Nombre de virages', type: 'number' },
     { name: 'straight_km', label: 'Plus longue ligne droite (km)', type: 'number' },
@@ -74,9 +96,9 @@ export const SUGGESTION_FIELDS: Record<SuggestionCategory, SuggestionField[]> = 
     { name: 'country', label: 'Pays', required: true },
     { name: 'country_code', label: 'Code pays', hint: 'Ex. : FR, GB, BR' },
     { name: 'world_championships', label: 'Titres mondiaux', type: 'number' },
-    { name: 'won_monaco_gp', label: 'A déjà gagné le GP de Monaco', type: 'select', options: ['Non', 'Oui'] },
-    { name: 'won_indy_500', label: 'A déjà gagné les 500 miles d’Indianapolis', type: 'select', options: ['Non', 'Oui'] },
-    { name: 'won_24h_le_mans', label: 'A déjà gagné les 24 Heures du Mans', type: 'select', options: ['Non', 'Oui'] },
+    { name: 'won_monaco_gp', label: 'A déjà gagné le GP de Monaco', type: 'select', options: [{ value: 'Non', label: 'Non' }, { value: 'Oui', label: 'Oui' }] },
+    { name: 'won_indy_500', label: 'A déjà gagné les 500 miles d’Indianapolis', type: 'select', options: [{ value: 'Non', label: 'Non' }, { value: 'Oui', label: 'Oui' }] },
+    { name: 'won_24h_le_mans', label: 'A déjà gagné les 24 Heures du Mans', type: 'select', options: [{ value: 'Non', label: 'Non' }, { value: 'Oui', label: 'Oui' }] },
     { name: 'image_url', label: 'Lien vers une image', type: 'url' },
   ],
 };
@@ -89,18 +111,21 @@ const numericFields: Record<SuggestionCategory, string[]> = {
   circuit: ['year', 'length_km', 'turns', 'straight_km'],
   driver: ['year', 'world_championships'],
 };
-
 const integerFields: Record<SuggestionCategory, string[]> = {
   vehicle: ['year', 'max_rpm', 'units_sold'],
   circuit: ['year', 'turns'],
   driver: ['year', 'world_championships'],
 };
 
+const maxFieldLength: Partial<Record<SuggestionCategory, Record<string, number>>> = {
+  vehicle: { record_description: 500, competition_type: 40, competition_type_custom: 60 },
+};
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-export function parseSuggestionDraft(input: unknown):
+export function parseSuggestionDraft(input: unknown, competitionTypes: readonly string[] = []):
   | { data: SuggestionDraft; title: string }
   | { error: string } {
   if (!isRecord(input) || !SUGGESTION_CATEGORIES.includes(input.category as SuggestionCategory)) {
@@ -121,11 +146,14 @@ export function parseSuggestionDraft(input: unknown):
   const details: Record<string, string> = {};
   for (const [key, value] of Object.entries(input.details)) {
     const field = allowedFields.find((candidate) => candidate.name === key);
-    if (!field || typeof value !== 'string' || value.length > (field.type === 'url' ? 2048 : 200)) {
+    if (!field || typeof value !== 'string' || value.length > (maxFieldLength[category]?.[key] ?? (field.type === 'url' ? 2048 : 200))) {
       return { error: 'Un ou plusieurs champs de la suggestion sont invalides.' };
     }
     const cleanValue = value.trim();
-    if (field.type === 'select' && cleanValue && !field.options?.includes(cleanValue)) {
+    if (field.type === 'select' && field.options && cleanValue && !field.options.some((option) => option.value === cleanValue)) {
+      return { error: `La valeur du champ « ${field.label} » est invalide.` };
+    }
+    if (field.dynamicOptions === 'competitionTypes' && cleanValue && !competitionTypes.includes(cleanValue)) {
       return { error: `La valeur du champ « ${field.label} » est invalide.` };
     }
     if (field.type === 'url' && cleanValue) {
@@ -136,7 +164,7 @@ export function parseSuggestionDraft(input: unknown):
         return { error: `Le lien du champ « ${field.label} » doit être une URL http ou https valide.` };
       }
     }
-    if (cleanValue) details[key] = cleanValue;
+    if (cleanValue) details[key] = key === 'weight_t' ? cleanValue.replace(',', '.') : cleanValue;
   }
 
   for (const field of allowedFields) {
@@ -148,13 +176,20 @@ export function parseSuggestionDraft(input: unknown):
   for (const field of numericFields[category]) {
     const value = details[field];
     if (value === undefined) continue;
-    const number = Number(value);
+    const number = Number(value.replace(',', '.'));
     if (!Number.isFinite(number) || number < 0) {
       return { error: 'Les champs numériques doivent contenir des nombres positifs ou nuls.' };
     }
     if (integerFields[category].includes(field) && !Number.isInteger(number)) {
       return { error: 'L’année et les compteurs doivent être des nombres entiers.' };
     }
+  }
+
+  if (category === 'vehicle' && details.is_record === 'true' && !details.record_description?.trim()) {
+    return { error: 'Décris le record proposé.' };
+  }
+  if (category === 'vehicle' && details.is_record && !['true', 'false'].includes(details.is_record)) {
+    return { error: 'La valeur du champ « Record » est invalide.' };
   }
 
   const year = details.year ? Number(details.year) : null;

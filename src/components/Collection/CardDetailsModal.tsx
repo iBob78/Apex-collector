@@ -304,6 +304,16 @@ export default function CardDetailsModal({
                 </div>
               </div>
 
+              {isVehicle && card.is_record === true && card.record_description && (
+                <section className="mb-5 rounded-xl border border-amber-300/30 bg-amber-300/[0.07] p-4">
+                  <div className="flex items-center gap-2 text-amber-200">
+                    <span className="inline-flex h-6 min-w-6 items-center justify-center rounded border border-amber-200 bg-amber-300 px-1 text-xs font-black text-[#251500]">R</span>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.16em]">{t('Record détenu')}</h3>
+                  </div>
+                  <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-gray-100">{card.record_description}</p>
+                </section>
+              )}
+
               {card && (
                 <section aria-live="polite" className="mb-5 rounded-xl border border-amber-300/15 bg-amber-300/[0.04] p-4">
                   <p className="text-[10px] font-black uppercase tracking-[0.16em] text-amber-200">

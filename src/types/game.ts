@@ -45,6 +45,8 @@ export interface VehicleCard extends BaseCard {
     fuel_type?: string;
     competition_type?: string;
     competition_type_custom?: string;
+    is_record?: boolean;
+    record_description?: string;
     max_rpm?: number | string;
     units_sold?: number | string;
 }
