@@ -10,7 +10,7 @@ const draftFields: (keyof CardDraft)[] = [
   'power_hp', 'power_kw', 'torque_nm', 'max_speed_kmh', 'weight_t',
   'acceleration_0_100', 'engine_size', 'cylinder', 'boost', 'country_code',
   'transmission', 'new_price_eur', 'fuel_type', 'competition_type', 'competition_type_custom',
-  'is_record', 'record_description', 'max_rpm', 'units_sold',
+  'record_description', 'max_rpm', 'units_sold',
 ];
 
 export type CardDraft = {
