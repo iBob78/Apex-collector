@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { isAdminEmail } from '@/lib/admin';
+import { getAdminAccess } from '@/lib/admin';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
 import type { SuggestionStatus } from '@/lib/suggestions';
 
@@ -27,7 +27,9 @@ export async function updateSuggestion(
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError) return { success: false, error: `Impossible de vérifier la session : ${authError.message}` };
   if (!user) return { success: false, error: 'Connecte-toi pour traiter les suggestions.' };
-  if (!isAdminEmail(user.email)) return { success: false, error: 'Cette action est réservée aux administrateurs.' };
+  const adminAccess = await getAdminAccess(supabase);
+  if (adminAccess.error) return { success: false, error: `${adminAccess.error}. Vérifie que la migration 034_managed_admin_users.sql a été appliquée.` };
+  if (!adminAccess.isAdmin) return { success: false, error: 'Cette action est réservée aux administrateurs.' };
 
   const { data, error } = await supabase
     .from('card_suggestions')

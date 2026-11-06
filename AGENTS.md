@@ -58,6 +58,8 @@ Le créateur du projet n'est pas développeur. Être concret et compréhensible,
 | Boutique de boosters (cartes, grille, prix affichés) | `src/app/boosters/page.tsx` |
 | Ouverture et révélation des cartes des boosters | `src/app/open/page.tsx` |
 | Catalogue et atelier des pilotes | `src/app/admin/drivers/` |
+| Gestion des rôles administrateur | `src/app/admin/access/` |
+| Suggestions publiques et boîte de réception admin | `src/app/suggestions/` ; `src/app/admin/suggestions/` |
 | Validation et sauvegarde des fiches pilote | `src/app/admin/drivers/actions.ts` |
 | Calcul de l'âge d'une fiche pilote | `src/lib/driverCards.ts` |
 | Animations et halo de révélation | `src/app/globals.css` (`.booster-reveal-halo`) |
@@ -163,7 +165,7 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
 - **Migration `021_circuit_driver_collection_numbers.sql`** : ajoute `collection_number` aux catalogues `circuits` et `drivers`, corrige l'ancienne valeur exacte `Atypic` en `Atypique` (valeur canonique acceptée par le catalogue), remplit les numéros manquants de manière stable, impose l'unicité/non-nullité et configure une séquence indépendante par famille. Pour les circuits, l'ordre de backfill utilise le `created_at` présent dans la ligne lorsqu'il existe, puis `id`, et reste compatible avec un catalogue ancien sans cette colonne. Elle doit être appliquée après la migration 020 pour numéroter les pilotes. Ne pas appliquer de migration sans accord explicite et confirmation de la cible.
 - Dans le résultat SQL de 021, une ligne `setval` contenant `2` est le retour normal de la configuration de la séquence, pas un nombre de lignes mises à jour ni une erreur. La séquence est réglée sur `MAX(collection_number) + 1` avec le troisième argument `FALSE`, donc le prochain `nextval()` attribue exactement cette valeur ; par exemple, un maximum existant de 1 prépare le prochain numéro 2. Un résultat `setval` seul ne prouve pas que toutes les instructions suivantes du script ont réussi : vérifier l'absence d'erreur finale et contrôler séparément les numéros des catalogues.
 - **Important avant test** : cette migration n'est qu'un fichier du dépôt, elle n'est pas appliquée automatiquement. Le nouveau code de `/collection` et `/open` interroge `drivers` (et selon l'utilisateur `user_drivers`) pendant le chargement : appliquer la migration à la base de test autorisée avant d'exécuter cette version, sinon ces parcours peuvent échouer. La page `/admin/drivers` affiche également une erreur invitant à appliquer la migration. Ne jamais l'appliquer à Supabase sans accord explicite et confirmation de la cible.
-- L'atelier vérifie le compte avec `isAdminEmail` côté serveur, tandis que les policies SQL de la migration 020 autorisent l'écriture à l'adresse e-mail littérale déjà utilisée par la migration. Garder ces deux contrôles cohérents si la configuration d'administration change. La migration n'ajoute pas de policy de suppression pour `drivers`; ne pas ajouter un bouton de suppression sans définir explicitement les règles d'historique et de possessions.
+- Les ateliers, contrats/succès et la boîte de réception vérifient les droits avec les RPC `is_admin` / `is_site_owner`. La migration `034_managed_admin_users.sql` ancre le propriétaire au compte existant `bobwatercooling@gmail.com` et permet à ce compte seul d'attribuer ou retirer le rôle via un pseudo ; les administrateurs délégués ne peuvent pas gérer les rôles. Ne pas appliquer cette migration sans accord explicite et confirmation de la cible. La migration n'ajoute pas de policy de suppression pour `drivers`; ne pas ajouter un bouton de suppression sans définir explicitement les règles d'historique et de possessions.
 - La migration 020 ne préremplit aucun pilote : après son application, le catalogue est vide jusqu'à ce qu'un administrateur crée ses fiches. Ne pas inventer ni importer automatiquement des données de pilotes.
 - Un éventuel **showroom public** est une idée future, **pas une permission de rendre tous les favoris ou inventaires publics**. Prévoir une sélection explicite, des données filtrées et une autorisation adaptée avant toute implémentation.
 - Dans Card Studio, un véhicule peut avoir un numéro permanent, être **désactivé** sans être supprimé, ou être **exclu des tirages de boosters**. « Désactivé » et « exclu des boosters » ne sont pas synonymes.
@@ -198,10 +200,12 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
 - Les actions qui touchent les AP, aux collections, aux achats, au marché et aux récompenses demandent une vérification d'identité et des contrôles côté base.
 - Respecter et vérifier les **policies RLS** avant toute requête ou migration. Ne jamais désactiver RLS « pour débloquer » une fonctionnalité.
 - Les ateliers admin `/admin/cards`, `/admin/circuits`, `/admin/drivers` et `/admin/objectives` demandent une autorisation réelle, pas simplement la présence d'un lien dans la sidebar.
-- L'administration dépend notamment de `ADMIN_EMAILS` et des policies SQL d'écriture (`005` / `006`). La configuration doit rester cohérente côté environnement, serveur et base.
+- La sidebar regroupe les ateliers, les contrats/succès et la boîte de réception sous « ADMIN ». Le lien « Gestion des accès » est réservé au propriétaire, mais les pages et actions serveur doivent toujours refaire le contrôle d'accès.
+- L'administration est contrôlée côté serveur et par les policies RLS via `is_admin()` après application de `034_managed_admin_users.sql`. La migration initialise le propriétaire avec le compte existant `bobwatercooling@gmail.com`; cette identité est enregistrée en base et ne peut pas être changée par un administrateur délégué. Seul le propriétaire peut rechercher un joueur par pseudo, lui attribuer ou retirer le rôle ; un administrateur délégué ne peut pas gérer les rôles. Les ateliers, contrats/succès, types de compétition et suggestions sont accessibles aux administrateurs. Les migrations SQL précédentes restent l'historique de l'état initial et leurs politiques sont remplacées par cette migration. Ne pas appliquer la migration sans accord explicite et confirmation de la cible Supabase.
+- `ADMIN_EMAILS` n'est plus utilisé pour déterminer les droits ; les rôles sont gérés en base. Ne pas réintroduire de contrôle d'accès fondé uniquement sur l'adresse e-mail ou sur la visibilité d'un lien.
 - Les nouvelles inscriptions utilisent normalement la langue française par défaut ; la confirmation d'e-mail dépend de Supabase Auth et SMTP. Un succès de sign-up ne garantit pas la réception de l'e-mail.
-- Variables documentées dans `.env.example` : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET`, `NEXT_PUBLIC_APP_URL`, `ADMIN_EMAILS`, `SERVER_ACTIONS_ALLOWED_ORIGINS`. Les secrets vont dans `.env.local` / le gestionnaire d'environnement, **jamais** dans Git ou une réponse.
-- Les migrations du dépôt vont actuellement de `002_quests_system.sql` à `022_user_card_discoveries.sql` (avec un ancien fichier additionnel non numéroté). Repères :
+- Variables documentées dans `.env.example` : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET`, `NEXT_PUBLIC_APP_URL`, `SERVER_ACTIONS_ALLOWED_ORIGINS`. Les secrets vont dans `.env.local` / le gestionnaire d'environnement, **jamais** dans Git ou une réponse.
+- Les migrations numérotées du dépôt vont actuellement de `002_quests_system.sql` à `034_managed_admin_users.sql` (avec un ancien fichier additionnel non numéroté). Repères :
   - `005` / `006` : politiques d'administration cartes et circuits ;
   - `007` : caractéristiques des véhicules ;
   - `008` / `009` : langue et unités du profil ;
@@ -222,11 +226,13 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
   - `026` : statistiques complémentaires du showroom public : compteur des boosters ouverts à partir de son activation, meilleurs niveaux de véhicules et succès réclamés.
   - `027` : RPC authentifiée pour identifier le détenteur principal d'une carte sans exposer la liste des propriétaires.
   - `028` : lien entre une carte véhicule alternative et sa carte d'origine pour permettre des exemplaires collectionnables séparément.
+  - `034` : rôles administrateurs attribuables par pseudo ; seul le propriétaire initial peut les gérer et les policies RLS utilisent le rôle en base.
   - `029` : conditions cumulatives de collection pour les contrats et succès, avec progression par cartes actuellement possédées.
   - `030` : suggestions de cartes de joueurs authentifiés, statuts de traitement, notes administratives et RLS.
   - `031` : premier champ de compétition des véhicules, synchronisé entre une carte d'origine et ses alternatives art.
   - `032` : liste des types de compétition administrable et précision libre, avec RLS ; la migration conserve les anciennes valeurs déjà saisies.
   - `033` : indicateur de record des véhicules et description, synchronisés entre une carte d'origine et ses alternatives art.
+  - `034` : propriétaire initial et rôles administrateurs gérés par pseudo, RPC protégées et remplacement des policies d'administration par `is_admin()`.
 - **Ne pas supposer** qu'une migration est absente ou non appliquée parce qu'elle existe dans le dépôt. Inspecter l'état réel de la base et demander l'autorisation avant toute migration, modification de schéma ou backfill.
 - Ne pas supprimer, réinitialiser ou modifier des données de joueurs pour résoudre un problème d'affichage.
 

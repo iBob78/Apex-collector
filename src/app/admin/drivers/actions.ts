@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { isAdminEmail } from '@/lib/admin';
+import { getAdminAccess } from '@/lib/admin';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
 
 export type DriverDraft = {
@@ -59,7 +59,9 @@ async function getAdminClient(): Promise<
 
   if (error) return { client: null, error: `Impossible de vérifier la session : ${error.message}` };
   if (!user) return { client: null, error: 'Connecte-toi pour gérer les pilotes.' };
-  if (!isAdminEmail(user.email)) return { client: null, error: 'Cette action est réservée aux administrateurs.' };
+  const adminAccess = await getAdminAccess(client);
+  if (adminAccess.error) return { client: null, error: `${adminAccess.error}. Vérifie que la migration 034_managed_admin_users.sql a été appliquée.` };
+  if (!adminAccess.isAdmin) return { client: null, error: 'Cette action est réservée aux administrateurs.' };
 
   return { client, error: null };
 }

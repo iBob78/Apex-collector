@@ -647,89 +647,6 @@ export default function CardStudio({
 
           <aside className="space-y-5 xl:sticky xl:top-5">
             <section className="rounded-3xl border border-white/[0.08] bg-[#0d1118]/90 p-5 shadow-2xl shadow-black/20">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300">Liste des types</p>
-              <h2 className="mt-1 text-lg font-black">Gérer les types de compétition</h2>
-              <p className="mt-2 text-xs leading-5 text-slate-400">Renommer un type met à jour les cartes concernées. Le supprimer retire ce type de ces cartes.</p>
-              <form onSubmit={handleAddCompetitionType} className="mt-4 flex gap-2">
-                <input
-                  aria-label="Nouveau type de compétition"
-                  value={newCompetitionType}
-                  onChange={(event) => setNewCompetitionType(event.target.value)}
-                  maxLength={40}
-                  placeholder="Ajouter un type"
-                  className="min-w-0 flex-1 rounded-xl border border-white/10 bg-[#090c11] px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-400/70"
-                />
-                <button
-                  type="submit"
-                  disabled={competitionTypePending || !newCompetitionType.trim()}
-                  aria-label="Ajouter le type de compétition"
-                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-300/30 bg-cyan-300/10 text-cyan-200 transition hover:bg-cyan-300/20 disabled:opacity-50"
-                >
-                  {competitionTypePending ? <LoaderCircle size={16} className="animate-spin" /> : <Plus size={16} />}
-                </button>
-              </form>
-              <div className="mt-3 max-h-72 space-y-1 overflow-y-auto pr-1">
-                {competitionTypes.map((name) => (
-                  <div key={name} className="flex items-center gap-2 rounded-lg border border-white/[0.06] px-2 py-1.5">
-                    {editingCompetitionType === name ? (
-                      <>
-                        <input
-                          aria-label={`Renommer ${name}`}
-                          value={editedCompetitionType}
-                          onChange={(event) => setEditedCompetitionType(event.target.value)}
-                          maxLength={40}
-                          className="min-w-0 flex-1 rounded-md border border-white/10 bg-[#090c11] px-2 py-1.5 text-xs text-white outline-none focus:border-cyan-400/70"
-                        />
-                        <button
-                          type="button"
-                          disabled={competitionTypePending || !editedCompetitionType.trim()}
-                          onClick={() => void handleRenameCompetitionType(name)}
-                          aria-label={`Enregistrer le renommage de ${name}`}
-                          className="rounded-md p-1.5 text-emerald-300 hover:bg-emerald-300/10 disabled:opacity-50"
-                        >
-                          {competitionTypePending ? <LoaderCircle size={14} className="animate-spin" /> : <Check size={14} />}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => { setEditingCompetitionType(null); setEditedCompetitionType(''); }}
-                          aria-label={`Annuler le renommage de ${name}`}
-                          className="rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white"
-                        >
-                          <X size={14} />
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <span className="min-w-0 flex-1 truncate text-xs font-semibold text-slate-200">{name}</span>
-                        <button
-                          type="button"
-                          onClick={() => { setEditingCompetitionType(name); setEditedCompetitionType(name); }}
-                          aria-label={`Renommer ${name}`}
-                          className="rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white"
-                        >
-                          <Pencil size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          disabled={competitionTypePending}
-                          onClick={() => void handleDeleteCompetitionType(name)}
-                          aria-label={`Supprimer ${name}`}
-                          className="rounded-md p-1.5 text-red-300 hover:bg-red-300/10 disabled:opacity-50"
-                        >
-                          {competitionTypePending ? <LoaderCircle size={14} className="animate-spin" /> : <X size={14} />}
-                        </button>
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
-              {competitionTypeFeedback && (
-                <p role={competitionTypeFeedback.type === 'error' ? 'alert' : 'status'} className={`mt-3 text-xs ${competitionTypeFeedback.type === 'error' ? 'text-red-300' : 'text-emerald-300'}`}>
-                  {competitionTypeFeedback.text}
-                </p>
-              )}
-            </section>
-            <section className="rounded-3xl border border-white/[0.08] bg-[#0d1118]/90 p-5 shadow-2xl shadow-black/20">
               <div className="mb-4 flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300">Aperçu en direct</p>
@@ -863,6 +780,89 @@ export default function CardStudio({
                 <button type="button" onClick={startNewCard} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 py-3 text-xs font-bold text-slate-400 hover:border-cyan-300/40 hover:text-cyan-200">
                   <Plus size={15} /> Créer la première carte
                 </button>
+              )}
+            </section>
+            <section className="rounded-3xl border border-white/[0.08] bg-[#0d1118]/90 p-5 shadow-2xl shadow-black/20">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300">Liste des types</p>
+              <h2 className="mt-1 text-lg font-black">Gérer les types de compétition</h2>
+              <p className="mt-2 text-xs leading-5 text-slate-400">Renommer un type met à jour les cartes concernées. Le supprimer retire ce type de ces cartes.</p>
+              <form onSubmit={handleAddCompetitionType} className="mt-4 flex gap-2">
+                <input
+                  aria-label="Nouveau type de compétition"
+                  value={newCompetitionType}
+                  onChange={(event) => setNewCompetitionType(event.target.value)}
+                  maxLength={40}
+                  placeholder="Ajouter un type"
+                  className="min-w-0 flex-1 rounded-xl border border-white/10 bg-[#090c11] px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-400/70"
+                />
+                <button
+                  type="submit"
+                  disabled={competitionTypePending || !newCompetitionType.trim()}
+                  aria-label="Ajouter le type de compétition"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-300/30 bg-cyan-300/10 text-cyan-200 transition hover:bg-cyan-300/20 disabled:opacity-50"
+                >
+                  {competitionTypePending ? <LoaderCircle size={16} className="animate-spin" /> : <Plus size={16} />}
+                </button>
+              </form>
+              <div className="mt-3 max-h-72 space-y-1 overflow-y-auto pr-1">
+                {competitionTypes.map((name) => (
+                  <div key={name} className="flex items-center gap-2 rounded-lg border border-white/[0.06] px-2 py-1.5">
+                    {editingCompetitionType === name ? (
+                      <>
+                        <input
+                          aria-label={`Renommer ${name}`}
+                          value={editedCompetitionType}
+                          onChange={(event) => setEditedCompetitionType(event.target.value)}
+                          maxLength={40}
+                          className="min-w-0 flex-1 rounded-md border border-white/10 bg-[#090c11] px-2 py-1.5 text-xs text-white outline-none focus:border-cyan-400/70"
+                        />
+                        <button
+                          type="button"
+                          disabled={competitionTypePending || !editedCompetitionType.trim()}
+                          onClick={() => void handleRenameCompetitionType(name)}
+                          aria-label={`Enregistrer le renommage de ${name}`}
+                          className="rounded-md p-1.5 text-emerald-300 hover:bg-emerald-300/10 disabled:opacity-50"
+                        >
+                          {competitionTypePending ? <LoaderCircle size={14} className="animate-spin" /> : <Check size={14} />}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setEditingCompetitionType(null); setEditedCompetitionType(''); }}
+                          aria-label={`Annuler le renommage de ${name}`}
+                          className="rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white"
+                        >
+                          <X size={14} />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <span className="min-w-0 flex-1 truncate text-xs font-semibold text-slate-200">{name}</span>
+                        <button
+                          type="button"
+                          onClick={() => { setEditingCompetitionType(name); setEditedCompetitionType(name); }}
+                          aria-label={`Renommer ${name}`}
+                          className="rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white"
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={competitionTypePending}
+                          onClick={() => void handleDeleteCompetitionType(name)}
+                          aria-label={`Supprimer ${name}`}
+                          className="rounded-md p-1.5 text-red-300 hover:bg-red-300/10 disabled:opacity-50"
+                        >
+                          {competitionTypePending ? <LoaderCircle size={14} className="animate-spin" /> : <X size={14} />}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {competitionTypeFeedback && (
+                <p role={competitionTypeFeedback.type === 'error' ? 'alert' : 'status'} className={`mt-3 text-xs ${competitionTypeFeedback.type === 'error' ? 'text-red-300' : 'text-emerald-300'}`}>
+                  {competitionTypeFeedback.text}
+                </p>
               )}
             </section>
           </aside>

@@ -21,12 +21,23 @@ import {
   AwardIcon,
   MedalIcon,
   LightbulbIcon,
+  ChevronDownIcon,
+  ShieldCheckIcon,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabaseBrowser';
 import { useState, useEffect, useMemo } from 'react';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 import { updateQuestProgress } from '@/lib/actions/objectives';
+import { getAdminNavigationAccess } from '@/app/admin/navigation-actions';
+
+const adminItems = [
+  { href: '/admin/cards', label: 'ATELIER CARTES', icon: WrenchIcon },
+  { href: '/admin/circuits', label: 'ATELIER CIRCUITS', icon: MapIcon },
+  { href: '/admin/drivers', label: 'ATELIER PILOTES', icon: AwardIcon },
+  { href: '/admin/objectives', label: 'CONTRATS & SUCCÈS', icon: ClipboardListIcon },
+  { href: '/admin/suggestions', label: 'BOÎTE DE RÉCEPTION', icon: LightbulbIcon },
+];
 
 const navItems = [
   { href: '/dashboard', label: 'ACCUEIL', icon: HomeIcon },
@@ -48,6 +59,9 @@ export default function Sidebar() {
   const [user, setUser] = useState<any>(null);
   const [authLoaded, setAuthLoaded] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -82,11 +96,33 @@ export default function Sidebar() {
   }, [supabase]);
 
   useEffect(() => {
+    let active = true;
+    setIsAdmin(false);
+    setIsOwner(false);
+
+    if (!user?.id) return () => { active = false; };
+
+    getAdminNavigationAccess()
+      .then((access) => {
+        if (active && access.userId === user.id) {
+          setIsAdmin(access.isAdmin);
+          setIsOwner(access.isOwner);
+        }
+      })
+      .catch((error: unknown) => {
+        console.error('[Sidebar] Vérification de l’accès administrateur impossible:', error);
+      });
+
+    return () => { active = false; };
+  }, [user?.id]);
+
+  useEffect(() => {
     document.body.classList.add('apex-mobile-app');
     return () => document.body.classList.remove('apex-mobile-app');
   }, []);
 
   useEffect(() => setMobileMenuOpen(false), [pathname]);
+  useEffect(() => setAdminMenuOpen(pathname.startsWith('/admin/')), [pathname]);
 
   useEffect(() => {
     if (!mobileMenuOpen) return;
@@ -100,16 +136,10 @@ export default function Sidebar() {
   const isActivePath = (href: string) =>
     pathname === href || pathname.startsWith(href + '/') || (href === '/boosters' && pathname === '/open');
 
-  const extraItems = [
-    ...navItems.slice(4),
-    ...(user ? [
-      { href: '/admin/cards', label: 'ATELIER CARTES', icon: WrenchIcon },
-      { href: '/admin/circuits', label: 'ATELIER CIRCUITS', icon: MapIcon },
-      { href: '/admin/drivers', label: 'ATELIER PILOTES', icon: AwardIcon },
-      { href: '/admin/objectives', label: 'ATELIER OBJECTIFS', icon: ClipboardListIcon },
-      { href: '/admin/suggestions', label: 'SUGGESTIONS JOUEURS', icon: LightbulbIcon },
-    ] : []),
-  ];
+  const extraItems = navItems.slice(4);
+  const visibleAdminItems = isOwner
+    ? [...adminItems, { href: '/admin/access', label: 'GESTION DES ACCÈS', icon: ShieldCheckIcon }]
+    : adminItems;
 
   return (
     <>
@@ -126,14 +156,8 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-col gap-2 flex-1">
-        {[...navItems, ...(user ? [
-          { href: '/admin/cards', label: 'ATELIER CARTES', icon: WrenchIcon },
-          { href: '/admin/circuits', label: 'ATELIER CIRCUITS', icon: MapIcon },
-          { href: '/admin/drivers', label: 'ATELIER PILOTES', icon: AwardIcon },
-          { href: '/admin/objectives', label: 'ATELIER OBJECTIFS', icon: ClipboardListIcon },
-          { href: '/admin/suggestions', label: 'SUGGESTIONS JOUEURS', icon: LightbulbIcon },
-        ] : [])].map(({ href, label, icon: Icon }) => {
+      <nav className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+        {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = isActivePath(href);
           const isLocked = authLoaded && !user && href !== '/login';
 
@@ -169,6 +193,38 @@ export default function Sidebar() {
             </Link>
           );
         })}
+        {isAdmin && (
+          <div className="mt-2 border-t border-white/[0.08] pt-3">
+            <button
+              type="button"
+              aria-expanded={adminMenuOpen}
+              onClick={() => setAdminMenuOpen((open) => !open)}
+              className={`group flex w-full items-center gap-4 rounded-xl px-4 py-3 text-left transition-all ${pathname.startsWith('/admin/') ? 'bg-blue-500/10 text-white' : 'text-gray-500 hover:bg-white/5 hover:text-white'}`}
+            >
+              <ShieldCheckIcon size={20} className={pathname.startsWith('/admin/') ? 'text-blue-500' : 'group-hover:text-blue-400'} />
+              <span className="flex-1 text-xs font-black tracking-widest">{t('ADMIN')}</span>
+              <ChevronDownIcon size={16} className={`transition-transform ${adminMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {adminMenuOpen && (
+              <div className="mt-1 space-y-1 pl-3">
+                {visibleAdminItems.map(({ href, label, icon: Icon }) => {
+                  const active = isActivePath(href);
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      aria-current={active ? 'page' : undefined}
+                      className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-bold transition ${active ? 'bg-blue-500/10 text-blue-300' : 'text-gray-500 hover:bg-white/5 hover:text-white'}`}
+                    >
+                      <Icon size={16} aria-hidden="true" />
+                      <span>{t(label)}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </nav>
 
       {/* Pilot Stats Mini Card */}
@@ -226,6 +282,39 @@ export default function Sidebar() {
                 </Link>
               );
             })}
+            {isAdmin && (
+              <div className="mt-2 border-t border-white/10 pt-2">
+                <button
+                  type="button"
+                  aria-expanded={adminMenuOpen}
+                  onClick={() => setAdminMenuOpen((open) => !open)}
+                  className="flex min-h-12 w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold text-gray-200 hover:bg-white/10"
+                >
+                  <ShieldCheckIcon size={20} aria-hidden="true" />
+                  <span className="flex-1">{t('ADMIN')}</span>
+                  <ChevronDownIcon size={16} className={`transition-transform ${adminMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {adminMenuOpen && (
+                  <div className="space-y-1 pl-4">
+                    {visibleAdminItems.map(({ href, label, icon: Icon }) => {
+                      const active = isActivePath(href);
+                      return (
+                        <Link
+                          key={href}
+                          href={href}
+                          aria-current={active ? 'page' : undefined}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`flex min-h-11 items-center gap-3 rounded-xl px-4 py-2 text-sm font-bold ${active ? 'bg-blue-500/15 text-blue-300' : 'text-gray-300 hover:bg-white/10'}`}
+                        >
+                          <Icon size={18} aria-hidden="true" />
+                          <span>{t(label)}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
         </div>
       )}
@@ -246,7 +335,7 @@ export default function Sidebar() {
           })}
           <button type="button" aria-label={t('Plus')} aria-controls="apex-mobile-more-menu" aria-expanded={mobileMenuOpen}
             onClick={() => setMobileMenuOpen((open) => !open)}
-            className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1 text-[10px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${mobileMenuOpen || extraItems.some(({ href }) => isActivePath(href)) ? 'text-blue-400' : 'text-gray-400'}`}>
+            className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1 text-[10px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${mobileMenuOpen || extraItems.some(({ href }) => isActivePath(href)) || (isAdmin && pathname.startsWith('/admin/')) ? 'text-blue-400' : 'text-gray-400'}`}>
             <MenuIcon size={21} aria-hidden="true" />
             <span>{t('Plus')}</span>
           </button>

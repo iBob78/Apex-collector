@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ArrowLeft, ShieldAlert } from 'lucide-react';
-import { isAdminEmail } from '@/lib/admin';
+import { getAdminAccess } from '@/lib/admin';
 import { fetchAllPages } from '@/lib/fetchAllPages';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
 import DriverStudio from './DriverStudio';
@@ -22,7 +22,17 @@ export default async function AdminDriversPage() {
   }
   if (!user) redirect('/login?redirect=/admin/drivers');
 
-  if (!isAdminEmail(user.email)) {
+  const adminAccess = await getAdminAccess(supabase);
+  if (adminAccess.error) {
+    return (
+      <main className="min-h-screen bg-[#07090d] px-5 py-12 text-white md:px-10">
+        <p role="alert" className="mx-auto max-w-3xl rounded-2xl border border-red-400/20 bg-red-400/10 p-5 text-red-200">
+          {adminAccess.error}. Vérifie que la migration 034_managed_admin_users.sql a été appliquée.
+        </p>
+      </main>
+    );
+  }
+  if (!adminAccess.isAdmin) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#07090d] px-5 text-white">
         <section className="w-full max-w-lg rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-center">

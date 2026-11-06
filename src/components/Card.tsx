@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import clsx from 'clsx';
 import IPBadge from './IPBadge';
 import SafeImage from './SafeImage';
@@ -69,6 +70,7 @@ export default function Card(props: CardProps) {
     onCardClick,
   } = props;
   const reduceMotion = useReducedMotion();
+  const recordGradientId = useId();
 
   // ID ROBUSTE : card_id d'abord (CSV), puis id
   const isDriver = (props as any).category === 'driver' || 'driver_id' in props;
@@ -292,7 +294,7 @@ export default function Card(props: CardProps) {
         )}
 
         {/* Top Right Logo / Flag */}
-        {isVehicle && ((props as any).make || vehicleFlag) && (
+        {isVehicle && ((props as any).make || vehicleFlag || isRecord) && (
           <div className={clsx("absolute z-10 flex flex-col items-center", mobileGrid ? "right-0.5 top-0.5 gap-0.5 sm:right-3 sm:top-3 sm:gap-1" : "right-3 top-3 gap-1")}>
             {(props as any).make && (
               <div className={clsx("relative", mobileGrid ? "h-3.5 w-3.5 sm:h-7 sm:w-7" : "h-7 w-7")}>
@@ -305,7 +307,11 @@ export default function Card(props: CardProps) {
               </div>
             )}
             {vehicleFlag && (
-              <div className={clsx("relative overflow-hidden rounded-[1px] border border-white/30 bg-black/40", mobileGrid ? "h-[7px] w-3 sm:h-[11px] sm:w-4" : "h-[11px] w-4")}>
+              <div
+                role="img"
+                aria-label={`Drapeau : ${vehicleCountry}`}
+                className={clsx("relative overflow-hidden rounded-[1px] border border-white/30 bg-black/40", mobileGrid ? "h-[7px] w-3 sm:h-[11px] sm:w-4" : "h-[11px] w-4")}
+              >
                 <SafeImage
                   src={vehicleFlag}
                   alt={vehicleCountry}
@@ -314,6 +320,32 @@ export default function Card(props: CardProps) {
                   className="object-cover"
                 />
               </div>
+            )}
+            {isRecord && (
+              <span
+                role="img"
+                aria-label="Record"
+                title={recordDescription || 'Record'}
+                className={clsx(
+                  "flex h-7 w-7 items-center justify-center rounded-full bg-[#08090c] shadow-[0_2px_8px_rgba(0,0,0,0.75)]",
+                  mobileGrid ? "h-5 w-5 sm:h-7 sm:w-7" : "h-7 w-7",
+                )}
+              >
+                <svg aria-hidden="true" viewBox="0 0 48 48" className="h-full w-full">
+                  <defs>
+                    <linearGradient id={recordGradientId} x1="13" y1="13" x2="37" y2="38" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#f4f4f5" />
+                      <stop offset="0.52" stopColor="#bfc2c8" />
+                      <stop offset="0.53" stopColor="#ef111d" />
+                      <stop offset="1" stopColor="#b9000a" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M16 4.5a21 21 0 0 1 7-1.2M33 5a21 21 0 0 1 10.4 11.1M44.5 31.5a21 21 0 0 1-7.3 10.2M10.8 41.5a21 21 0 0 1-7.3-10.2M3.3 16.1A21 21 0 0 1 10 7.4" fill="none" stroke="#ed101b" strokeLinecap="round" strokeWidth="2.4" />
+                  <path d="M15.5 12.5h14a10 10 0 0 1 3.2 19.5l8 7.5h-10l-8-7.5h-5.3L16 39.5H7.8l3.6-22.1a5.8 5.8 0 0 1 4.1-4.9Z" fill={`url(#${recordGradientId})`} />
+                  <path d="M19.2 19h8.6a3.1 3.1 0 0 1 .8 6.1l-1.3.4h-9.1l1-6.5Z" fill="#08090c" />
+                  <path d="M33.4 14.8a9.9 9.9 0 0 1 3.1 7.2c0 3.8-2.1 7.2-5.4 8.9" fill="none" stroke="#f4f4f5" strokeLinecap="round" strokeWidth="1.5" />
+                </svg>
+              </span>
             )}
           </div>
         )}
@@ -330,21 +362,12 @@ export default function Card(props: CardProps) {
         )}
 
         {/* IP Badge - Top Left */}
-        {isVehicle && (ip > 0 || fuelType || competitionType || isRecord) && (
+        {isVehicle && (ip > 0 || fuelType || competitionType) && (
           <div className={clsx(
               "absolute z-20 flex origin-top-left flex-col items-start gap-1",
               mobileGrid ? "left-0.5 top-0.5 scale-[0.62] sm:left-3 sm:top-3 sm:scale-100" : "left-3 top-3",
-              mobileGrid && ip <= 0 && !fuelType && !competitionType && !isRecord && "hidden sm:flex",
+              mobileGrid && ip <= 0 && !fuelType && !competitionType && "hidden sm:flex",
             )}>
-            {isRecord && (
-              <span
-                aria-label="Record"
-                title={recordDescription || 'Record'}
-                className={clsx("inline-flex h-5 min-w-5 items-center justify-center rounded border border-amber-200 bg-amber-300 px-1 text-[11px] font-black leading-none text-[#251500] shadow-sm shadow-black/50", mobileGrid && "h-4 min-w-4 text-[9px] sm:h-5 sm:min-w-5 sm:text-[11px]")}
-              >
-                R
-              </span>
-            )}
             {ip > 0 && <IPBadge value={ip} size="sm" />}
             {fuelType && (
               <span

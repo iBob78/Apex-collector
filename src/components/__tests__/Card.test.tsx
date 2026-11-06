@@ -37,6 +37,7 @@ describe('Card competition type badge', () => {
         fuel_type="ES"
         competition_type="WEC"
         competition_type_custom="LMGT3"
+        country_code="DE"
         is_record
         record_description="Record du tour en catégorie LMGT3"
         showLevel={false}
@@ -45,8 +46,12 @@ describe('Card competition type badge', () => {
 
     const fuelBadge = screen.getByLabelText('Carburant : Essence');
     const categoryBadge = screen.getByLabelText('Type de compétition : WEC · LMGT3');
+    const flag = screen.getByRole('img', { name: 'Drapeau : DE' });
+    const record = screen.getByRole('img', { name: 'Record' });
 
-    expect(screen.getByLabelText('Record').textContent).toBe('R');
+    expect(record.querySelector('svg')).toBeInTheDocument();
+    expect(flag.parentElement).toBe(record.parentElement);
+    expect(flag.compareDocumentPosition(record) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(categoryBadge.textContent).toBe('WEC · LMGT3');
     expect(fuelBadge.compareDocumentPosition(categoryBadge) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
