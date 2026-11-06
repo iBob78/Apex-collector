@@ -141,6 +141,13 @@ export default function Card(props: CardProps) {
   const cardCountry = (props as any).country_code || (props as any).country;
   const vehicleFlag = isVehicle ? resolveCountryFlag(vehicleCountry) : undefined;
   const fuelType = isVehicle ? getFuelTypeInfo((props as any).fuel_type) : null;
+  const competitionTypeParts = isVehicle
+    ? [
+        'competition_type' in props ? props.competition_type : '',
+        'competition_type_custom' in props ? props.competition_type_custom : '',
+      ].filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+    : [];
+  const competitionType = competitionTypeParts.join(' · ');
 
   const handleCardClick = () => {
     if (isConcealed) return;
@@ -319,11 +326,11 @@ export default function Card(props: CardProps) {
         )}
 
         {/* IP Badge - Top Left */}
-        {isVehicle && (ip > 0 || fuelType) && (
+        {isVehicle && (ip > 0 || fuelType || competitionType) && (
           <div className={clsx(
               "absolute z-20 flex origin-top-left flex-col items-start gap-1",
               mobileGrid ? "left-0.5 top-0.5 scale-[0.62] sm:left-3 sm:top-3 sm:scale-100" : "left-3 top-3",
-              mobileGrid && ip <= 0 && "hidden sm:flex",
+              mobileGrid && ip <= 0 && !fuelType && !competitionType && "hidden sm:flex",
             )}>
             {ip > 0 && <IPBadge value={ip} size="sm" />}
             {fuelType && (
@@ -333,6 +340,15 @@ export default function Card(props: CardProps) {
                 className={clsx("inline-flex items-center justify-center border border-sky-200/75 bg-[#061a2e]/90 font-black leading-none tracking-wide text-white shadow-sm shadow-black/40", mobileGrid ? "min-w-0 rounded-sm px-0.5 py-0 text-[8px] sm:min-w-8 sm:rounded-md sm:px-1.5 sm:py-0.5 sm:text-[10px]" : "min-w-8 rounded-md px-1.5 py-0.5 text-[10px]")}
               >
                 {fuelType.code}
+              </span>
+            )}
+            {competitionType && (
+              <span
+                aria-label={`Type de compétition : ${competitionType}`}
+                title={competitionType}
+                className={clsx("inline-flex max-w-full items-center justify-center truncate border border-amber-200/70 bg-[#241706]/90 font-black leading-none tracking-wide text-amber-100 shadow-sm shadow-black/40", mobileGrid ? "max-w-[108px] rounded-sm px-1 py-0.5 text-[8px] sm:max-w-[140px] sm:rounded-md sm:px-1.5 sm:text-[10px]" : "max-w-[140px] rounded-md px-1.5 py-0.5 text-[10px]")}
+              >
+                {competitionType}
               </span>
             )}
           </div>

@@ -111,7 +111,7 @@ Le dossier `src/app/` définit les autres routes : `/boosters`, `/open`, `/marke
 - Les badges et effets visuels dépendent des raretés. Utiliser **`RARITY_CONFIG`, `getRarityColor` et `getRarityBorderClass`** dans `src/lib/rarity.ts` ; ne pas inventer une nouvelle correspondance de couleurs dans chaque composant.
 - Les cartes Icon, Mythic et Legend ont des effets visuels distinctifs. Le niveau d'amélioration 1 ajoute une finition acier poli translucide : conserver l'image visible, ajouter un grain brossé fin et un reflet spéculaire guidé par le pointeur sur ordinateur, sans vidéo, webcam ni WebGL. Les niveaux 2 à 4 ajoutent des effets cristallins progressifs et les niveaux 5 à 9 des effets holographiques. Les couches sont définies dans `src/app/globals.css`, appliquées par `src/components/Card.tsx` et doivent respecter `prefers-reduced-motion` sans masquer l'illustration ou les informations.
 - L'indice de performance (IP) d'un véhicule est fondé sur puissance et masse : réutiliser les fonctions de `src/lib/vehicleStats.ts`, ne pas recalculer localement selon une autre formule.
-- Les cartes véhicules comportent notamment puissance HP/kW, couple, vitesse maximale, masse, transmission, prix neuf (€), carburant, régime moteur et exemplaires vendus, selon la disponibilité des données.
+- Les cartes véhicules comportent notamment puissance HP/kW, couple, vitesse maximale, masse, transmission, prix neuf (€), carburant, type de compétition, régime moteur et exemplaires vendus, selon la disponibilité des données. Le type choisi dans la liste administrable et sa précision libre éventuelle apparaissent sous le badge de carburant.
 - Les alternative arts de véhicules sont des lignes distinctes dans `cards`, reliées à la carte d'origine par `variant_of_card_id`. Elles ont un `card_id`, un numéro de collection et une possession propres, reprennent et synchronisent les caractéristiques de la carte d'origine et sont hors boosters par défaut. Ne pas les fusionner dans les compteurs ou favoris de la carte originale.
 - Les codes de configuration moteur/transmission sont **MR, FF, FR, MF, FA, RR, RA, MA** ; descriptions dans `src/lib/drivetrain.ts` et icônes via les résolveurs d'images.
 - Le sélecteur carburant admin reconnaît notamment **ES, GO, EL, EE, EH, GL, GH, E85, ET, GP, GN, H2, EG, EN, FG, FL** ainsi que les anciennes valeurs courantes comme Essence et Diesel. Réutiliser `src/lib/fuelTypes.ts`.
@@ -181,7 +181,7 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
 - **Aucune latence dans le halo** : l'animation CSS `booster-reveal-glow` de `src/app/globals.css` démarre **sans délai** et avec une opacité non nulle dès que l'état `flippedCards` passe à révélé. Préserver l'animation de retournement 3D et l'action « Retourner toutes les cartes ».
 - Respecter `prefers-reduced-motion` : le halo reste visible mais immobile. Conserver les effets holographiques de rareté préexistants ; ne pas les remplacer par l'aura de révélation.
 - Ne modifier **ni la dépense AP, ni les tirages, ni l'enregistrement des cartes** pour une demande de changement visuel sur `/boosters` ou `/open`.
-- Les contrats et succès sont administrés dans `/admin/objectives` : objectifs, cibles, rareté éventuelle, AP à réclamer, activation et progression.
+- Les contrats et succès sont administrés dans `/admin/objectives` : objectifs, cibles, rareté éventuelle, AP à réclamer, activation et progression. Le type « Posséder des cartes selon des conditions » accepte plusieurs conditions reliées par ET/OU sur véhicules, circuits et pilotes, avec une carte précise ou des filtres catalogue, et un comptage en exemplaires ou en cartes distinctes. La progression se base sur l'inventaire actuel ; la migration `029_objective_collection_requirements.sql` doit être appliquée à la base autorisée avant d'utiliser cette fonction.
 - Événements connus : ouverture de boosters, collection de véhicules, circuits ou pilotes, rareté, annonce de marché, connexion sur différents jours.
 - Une récompense n'est pas acquise avant la réclamation prévue par le système ; respecter les fonctions RPC atomiques et la progression sauvegardée.
 
@@ -215,6 +215,9 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
   - `026` : statistiques complémentaires du showroom public : compteur des boosters ouverts à partir de son activation, meilleurs niveaux de véhicules et succès réclamés.
   - `027` : RPC authentifiée pour identifier le détenteur principal d'une carte sans exposer la liste des propriétaires.
   - `028` : lien entre une carte véhicule alternative et sa carte d'origine pour permettre des exemplaires collectionnables séparément.
+  - `029` : conditions cumulatives de collection pour les contrats et succès, avec progression par cartes actuellement possédées.
+  - `031` : premier champ de compétition des véhicules, synchronisé entre une carte d'origine et ses alternatives art.
+  - `032` : liste des types de compétition administrable et précision libre, avec RLS ; la migration conserve les anciennes valeurs déjà saisies.
 - **Ne pas supposer** qu'une migration est absente ou non appliquée parce qu'elle existe dans le dépôt. Inspecter l'état réel de la base et demander l'autorisation avant toute migration, modification de schéma ou backfill.
 - Ne pas supprimer, réinitialiser ou modifier des données de joueurs pour résoudre un problème d'affichage.
 

@@ -133,6 +133,7 @@ export default function ObjectiveBoard({
                 const isClaimed = item.status === 'claimed';
                 const isCompleted = item.status === 'completed';
                 const percent = Math.min(100, (item.current_count / item.objective.target_count) * 100);
+                const requirements = item.objective.requirements ?? [];
                 return (
                   <article
                     key={item.id}
@@ -153,6 +154,11 @@ export default function ObjectiveBoard({
                         {item.objective.reward_ap} AP
                       </span>
                     </div>
+                    {requirements.length > 0 && (
+                      <p className="mt-4 text-[10px] font-bold uppercase tracking-wider text-cyan-200/70">
+                        {item.objective.requirement_operator === 'any' ? 'Valider au moins une condition' : 'Valider toutes les conditions'}
+                      </p>
+                    )}
 
                     <div className="mt-6">
                       <div className="mb-2 flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-500">
@@ -165,6 +171,48 @@ export default function ObjectiveBoard({
                         <div className={`h-full rounded-full transition-all ${isCompleted || isClaimed ? 'bg-amber-400' : 'bg-blue-600'}`} style={{ width: `${percent}%` }} />
                       </div>
                     </div>
+
+                    {requirements.length > 0 && (
+                      <ul className="mt-5 space-y-2.5">
+                        {requirements.map((requirement, requirementIndex) => {
+                          const current = item.requirement_progress?.[requirementIndex] ?? 0;
+                          const categoryLabel = requirement.category === 'vehicle'
+                            ? 'Véhicules'
+                            : requirement.category === 'circuit'
+                              ? 'Circuits'
+                              : 'Pilotes';
+                          const details = [
+                            requirement.item_label,
+                            requirement.make,
+                            requirement.model,
+                            requirement.year,
+                            requirement.country,
+                            requirement.type,
+                            requirement.fuel_type,
+                            requirement.transmission,
+                            requirement.rarity,
+                          ].filter(Boolean);
+                          const requirementPercent = Math.min(100, (current / requirement.target_count) * 100);
+                          return (
+                            <li key={`${item.id}-condition-${requirementIndex}`} className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-3">
+                              <div className="mb-2 flex items-start justify-between gap-3 text-xs">
+                                <span className="min-w-0 text-gray-300">
+                                  <span className="font-bold text-gray-200">{categoryLabel}</span>
+                                  {details.length > 0 && <span className="text-gray-500"> · {details.join(' · ')}</span>}
+                                  <span className="mt-1 block text-[10px] text-gray-500">
+                                    {requirement.count_mode === 'copies' ? 'Exemplaires' : 'Cartes différentes'}
+                                  </span>
+                                </span>
+                                <span className="shrink-0 font-black text-blue-200">{current} / {requirement.target_count}</span>
+                              </div>
+                              <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+                                <div className="h-full rounded-full bg-cyan-400" style={{ width: `${requirementPercent}%` }} />
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
 
                     {isCompleted ? (
                       <button

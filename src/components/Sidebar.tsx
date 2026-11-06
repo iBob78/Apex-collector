@@ -20,6 +20,7 @@ import {
   ClipboardListIcon,
   AwardIcon,
   MedalIcon,
+  LightbulbIcon,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabaseBrowser';
@@ -37,6 +38,7 @@ const navItems = [
   { href: '/achievements', label: 'Succès', icon: StarIcon },
   { href: '/profile', label: 'PROFIL PILOTE', icon: UserIcon },
   { href: '/settings', label: 'RÉGLAGES', icon: SettingsIcon },
+  { href: '/suggestions', label: 'SUGGÉRER UNE CARTE', icon: LightbulbIcon },
 ];
 
 export default function Sidebar() {
@@ -105,6 +107,7 @@ export default function Sidebar() {
       { href: '/admin/circuits', label: 'ATELIER CIRCUITS', icon: MapIcon },
       { href: '/admin/drivers', label: 'ATELIER PILOTES', icon: AwardIcon },
       { href: '/admin/objectives', label: 'ATELIER OBJECTIFS', icon: ClipboardListIcon },
+      { href: '/admin/suggestions', label: 'SUGGESTIONS JOUEURS', icon: LightbulbIcon },
     ] : []),
   ];
 
@@ -129,6 +132,7 @@ export default function Sidebar() {
           { href: '/admin/circuits', label: 'ATELIER CIRCUITS', icon: MapIcon },
           { href: '/admin/drivers', label: 'ATELIER PILOTES', icon: AwardIcon },
           { href: '/admin/objectives', label: 'ATELIER OBJECTIFS', icon: ClipboardListIcon },
+          { href: '/admin/suggestions', label: 'SUGGESTIONS JOUEURS', icon: LightbulbIcon },
         ] : [])].map(({ href, label, icon: Icon }) => {
           const isActive = isActivePath(href);
           const isLocked = authLoaded && !user && href !== '/login';

@@ -10,8 +10,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "prepare": "husky install",
-    "postinstall": "husky install"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@supabase/auth-js": "^2.70.0",
@@ -28,8 +27,6 @@
   },
   "devDependencies": {
     "@axe-core/react": "^4.10.1",
-    "@commitlint/cli": "^19.8.0",
-    "@commitlint/config-conventional": "^19.8.0",
     "@eslint/js": "^9.25.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^14.3.1",

@@ -43,6 +43,8 @@ export interface VehicleCard extends BaseCard {
     country_code?: string;
     new_price_eur?: number | string;
     fuel_type?: string;
+    competition_type?: string;
+    competition_type_custom?: string;
     max_rpm?: number | string;
     units_sold?: number | string;
 }

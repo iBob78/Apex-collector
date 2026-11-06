@@ -43,23 +43,33 @@ export default async function AdminCardsPage() {
   }
 
   let cards: CardData[];
+  let competitionTypes: string[];
   try {
-    cards = await fetchAllPages((from, to) => supabase
-      .from('cards')
-      .select('*')
-      .order('id')
-      .range(from, to)) as CardData[];
+    const [cardRows, competitionTypeResult] = await Promise.all([
+      fetchAllPages((from, to) => supabase
+        .from('cards')
+        .select('*')
+        .order('id')
+        .range(from, to)),
+      supabase
+        .from('competition_types')
+        .select('name')
+        .order('sort_order'),
+    ]);
+    if (competitionTypeResult.error) throw new Error(competitionTypeResult.error.message);
+    cards = cardRows as CardData[];
+    competitionTypes = competitionTypeResult.data.map(({ name }) => name);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur Supabase inconnue.';
     console.error('[AdminCardsPage] Impossible de charger le catalogue complet:', message);
     return (
       <main className="min-h-screen bg-[#07090d] px-5 py-12 text-white md:px-10">
         <p role="alert" className="mx-auto max-w-3xl rounded-2xl border border-red-400/20 bg-red-400/10 p-5 text-red-200">
-          Impossible de charger le catalogue : {message}
+          Impossible de charger le catalogue et les types de compétition : {message}. Vérifie que la migration 032_competition_types.sql est appliquée.
         </p>
       </main>
     );
   }
 
-  return <CardStudio initialCards={cards} />;
+  return <CardStudio initialCards={cards} initialCompetitionTypes={competitionTypes} />;
 }

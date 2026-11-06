@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Image as ImageIcon,
   LoaderCircle,
+  Pencil,
   Plus,
   Save,
   Search,
@@ -22,7 +23,17 @@ import { drivetrainLayoutDescriptions, drivetrainLayouts } from '@/lib/drivetrai
 import { getRarityColor } from '@/lib/rarity';
 import { getIncompleteVehicleCardFields } from '@/lib/card-completeness';
 import { fuelTypes, getFuelTypeInfo } from '@/lib/fuelTypes';
-import { createAlternativeArt, createCard, updateCard, type CardData, type CardDraft } from './actions';
+import {
+  addCompetitionType,
+  createAlternativeArt,
+  createCard,
+  deleteCompetitionType,
+  renameCompetitionType,
+  updateCard,
+  type CardData,
+  type CardDraft,
+  type CompetitionTypeResult,
+} from './actions';
 
 const rarities = ['Common', 'Uncommon', 'Atypique', 'Rare', 'Very rare', 'Epic', 'Legend', 'Mythic', 'Icon'];
 const CUSTOM_MAKE = '__custom_make__';
@@ -49,6 +60,8 @@ const emptyDraft: CardDraft = {
   transmission: '',
   new_price_eur: '',
   fuel_type: '',
+  competition_type: '',
+  competition_type_custom: '',
   max_rpm: '',
   units_sold: '',
 };
@@ -76,6 +89,8 @@ function toDraft(card: CardData): CardDraft {
     transmission: card.transmission ?? '',
     new_price_eur: String(card.new_price_eur ?? ''),
     fuel_type: getFuelTypeInfo(card.fuel_type)?.code ?? card.fuel_type ?? '',
+    competition_type: card.competition_type ?? '',
+    competition_type_custom: card.competition_type_custom ?? '',
     max_rpm: String(card.max_rpm ?? ''),
     units_sold: String(card.units_sold ?? ''),
   };
@@ -134,8 +149,15 @@ function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) 
   );
 }
 
-export default function CardStudio({ initialCards }: { initialCards: CardData[] }) {
+export default function CardStudio({
+  initialCards,
+  initialCompetitionTypes,
+}: {
+  initialCards: CardData[];
+  initialCompetitionTypes: string[];
+}) {
   const [cards, setCards] = useState(initialCards);
+  const [competitionTypes, setCompetitionTypes] = useState(initialCompetitionTypes);
   const [draft, setDraft] = useState<CardDraft>(emptyDraft);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isCustomMake, setIsCustomMake] = useState(false);
@@ -143,8 +165,14 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
   const [saving, setSaving] = useState(false);
   const [alternativeArtImage, setAlternativeArtImage] = useState('');
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [newCompetitionType, setNewCompetitionType] = useState('');
+  const [editingCompetitionType, setEditingCompetitionType] = useState<string | null>(null);
+  const [editedCompetitionType, setEditedCompetitionType] = useState('');
+  const [competitionTypePending, setCompetitionTypePending] = useState(false);
+  const [competitionTypeFeedback, setCompetitionTypeFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => setCards(initialCards), [initialCards]);
+  useEffect(() => setCompetitionTypes(initialCompetitionTypes), [initialCompetitionTypes]);
 
   const selectedCard = cards.find((card) => card.id === selectedId) ?? null;
   const selectedMissingFields = selectedCard ? getIncompleteVehicleCardFields(selectedCard) : [];
@@ -230,6 +258,63 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
     setFeedback({ type: 'success', text: 'Alternative art créée avec un nouveau numéro de collection.' });
   };
 
+  const updateCompetitionTypeReferences = (oldName: string, newName: string | null) => {
+    setCards((current) => current.map((card) => card.competition_type === oldName
+      ? { ...card, competition_type: newName }
+      : card));
+    setDraft((current) => current.competition_type === oldName
+      ? { ...current, competition_type: newName ?? '' }
+      : current);
+  };
+
+  const handleAddCompetitionType = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (competitionTypePending) return;
+    setCompetitionTypePending(true);
+    setCompetitionTypeFeedback(null);
+    const result = await addCompetitionType(newCompetitionType);
+    setCompetitionTypePending(false);
+    if (!result.success) {
+      setCompetitionTypeFeedback({ type: 'error', text: result.error });
+      return;
+    }
+    setCompetitionTypes((current) => [...current, result.name]);
+    setNewCompetitionType('');
+    setCompetitionTypeFeedback({ type: 'success', text: `« ${result.name} » a été ajouté.` });
+  };
+
+  const handleRenameCompetitionType = async (currentName: string) => {
+    if (competitionTypePending) return;
+    setCompetitionTypePending(true);
+    setCompetitionTypeFeedback(null);
+    const result = await renameCompetitionType(currentName, editedCompetitionType);
+    setCompetitionTypePending(false);
+    if (!result.success) {
+      setCompetitionTypeFeedback({ type: 'error', text: result.error });
+      return;
+    }
+    setCompetitionTypes((current) => current.map((name) => name === currentName ? result.name : name));
+    updateCompetitionTypeReferences(currentName, result.name);
+    setEditingCompetitionType(null);
+    setEditedCompetitionType('');
+    setCompetitionTypeFeedback({ type: 'success', text: `« ${currentName} » a été renommé en « ${result.name} ».` });
+  };
+
+  const handleDeleteCompetitionType = async (name: string) => {
+    if (competitionTypePending || !window.confirm(`Supprimer « ${name} » de la liste ? Les cartes qui utilisent ce type ne l’afficheront plus.`)) return;
+    setCompetitionTypePending(true);
+    setCompetitionTypeFeedback(null);
+    const result: CompetitionTypeResult = await deleteCompetitionType(name);
+    setCompetitionTypePending(false);
+    if (!result.success) {
+      setCompetitionTypeFeedback({ type: 'error', text: result.error });
+      return;
+    }
+    setCompetitionTypes((current) => current.filter((item) => item !== name));
+    updateCompetitionTypeReferences(name, null);
+    setCompetitionTypeFeedback({ type: 'success', text: `« ${name} » a été supprimé.` });
+  };
+
   return (
     <main className="min-h-screen overflow-hidden bg-[#07090d] text-white">
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_72%_0%,rgba(14,165,233,0.12),transparent_40%),radial-gradient(ellipse_at_0%_40%,rgba(30,64,175,0.08),transparent_36%)]" />
@@ -267,6 +352,7 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
           <Link href="/admin/cards" className="rounded-xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-2.5 text-xs font-bold text-cyan-200">Cartes véhicule</Link>
           <Link href="/admin/circuits" className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-bold text-slate-400 transition hover:bg-white/5 hover:text-white">Cartes circuit</Link>
           <Link href="/admin/drivers" className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-bold text-slate-400 transition hover:bg-white/5 hover:text-white">Cartes pilote</Link>
+          <Link href="/admin/suggestions" className="rounded-xl border border-amber-300/20 bg-amber-300/[0.06] px-4 py-2.5 text-xs font-bold text-amber-200 transition hover:bg-amber-300/10">Suggestions joueurs</Link>
           <Link href="/admin/objectives" className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-bold text-slate-400 transition hover:bg-white/5 hover:text-white">Succès & contrats</Link>
         </div>
 
@@ -480,6 +566,27 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                       ))}
                     </select>
                   </label>
+                  <label className="block min-w-0">
+                    <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Type de compétition</span>
+                    <select
+                      value={draft.competition_type}
+                      onChange={(event) => setField('competition_type', event.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm text-white outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/10"
+                    >
+                      <option value="">Non renseigné</option>
+                      {draft.competition_type && !competitionTypes.includes(draft.competition_type) && (
+                        <option value={draft.competition_type}>Valeur actuelle : {draft.competition_type}</option>
+                      )}
+                      {competitionTypes.map((name) => <option key={name} value={name}>{name}</option>)}
+                    </select>
+                  </label>
+                  <TextField
+                    label="Précision libre"
+                    value={draft.competition_type_custom}
+                    onChange={(value) => setField('competition_type_custom', value)}
+                    placeholder="Ex. : catégorie Hypercar, saison 2025"
+                    hint="Complément affiché avec le type sélectionné"
+                  />
                   <TextField label="Régime maximal" value={draft.max_rpm} onChange={(value) => setField('max_rpm', value)} type="number" min="0" step="1" placeholder="9000" hint="Tours par minute (tr/min)" />
                   <TextField label="Exemplaires vendus" value={draft.units_sold} onChange={(value) => setField('units_sold', value)} type="number" min="0" step="1" placeholder="9181" hint="Production réelle du modèle" />
                 </div>
@@ -509,6 +616,89 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
 
           <aside className="space-y-5 xl:sticky xl:top-5">
             <section className="rounded-3xl border border-white/[0.08] bg-[#0d1118]/90 p-5 shadow-2xl shadow-black/20">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300">Liste des types</p>
+              <h2 className="mt-1 text-lg font-black">Gérer les types de compétition</h2>
+              <p className="mt-2 text-xs leading-5 text-slate-400">Renommer un type met à jour les cartes concernées. Le supprimer retire ce type de ces cartes.</p>
+              <form onSubmit={handleAddCompetitionType} className="mt-4 flex gap-2">
+                <input
+                  aria-label="Nouveau type de compétition"
+                  value={newCompetitionType}
+                  onChange={(event) => setNewCompetitionType(event.target.value)}
+                  maxLength={40}
+                  placeholder="Ajouter un type"
+                  className="min-w-0 flex-1 rounded-xl border border-white/10 bg-[#090c11] px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-400/70"
+                />
+                <button
+                  type="submit"
+                  disabled={competitionTypePending || !newCompetitionType.trim()}
+                  aria-label="Ajouter le type de compétition"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-300/30 bg-cyan-300/10 text-cyan-200 transition hover:bg-cyan-300/20 disabled:opacity-50"
+                >
+                  {competitionTypePending ? <LoaderCircle size={16} className="animate-spin" /> : <Plus size={16} />}
+                </button>
+              </form>
+              <div className="mt-3 max-h-72 space-y-1 overflow-y-auto pr-1">
+                {competitionTypes.map((name) => (
+                  <div key={name} className="flex items-center gap-2 rounded-lg border border-white/[0.06] px-2 py-1.5">
+                    {editingCompetitionType === name ? (
+                      <>
+                        <input
+                          aria-label={`Renommer ${name}`}
+                          value={editedCompetitionType}
+                          onChange={(event) => setEditedCompetitionType(event.target.value)}
+                          maxLength={40}
+                          className="min-w-0 flex-1 rounded-md border border-white/10 bg-[#090c11] px-2 py-1.5 text-xs text-white outline-none focus:border-cyan-400/70"
+                        />
+                        <button
+                          type="button"
+                          disabled={competitionTypePending || !editedCompetitionType.trim()}
+                          onClick={() => void handleRenameCompetitionType(name)}
+                          aria-label={`Enregistrer le renommage de ${name}`}
+                          className="rounded-md p-1.5 text-emerald-300 hover:bg-emerald-300/10 disabled:opacity-50"
+                        >
+                          {competitionTypePending ? <LoaderCircle size={14} className="animate-spin" /> : <Check size={14} />}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setEditingCompetitionType(null); setEditedCompetitionType(''); }}
+                          aria-label={`Annuler le renommage de ${name}`}
+                          className="rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white"
+                        >
+                          <X size={14} />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <span className="min-w-0 flex-1 truncate text-xs font-semibold text-slate-200">{name}</span>
+                        <button
+                          type="button"
+                          onClick={() => { setEditingCompetitionType(name); setEditedCompetitionType(name); }}
+                          aria-label={`Renommer ${name}`}
+                          className="rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white"
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={competitionTypePending}
+                          onClick={() => void handleDeleteCompetitionType(name)}
+                          aria-label={`Supprimer ${name}`}
+                          className="rounded-md p-1.5 text-red-300 hover:bg-red-300/10 disabled:opacity-50"
+                        >
+                          {competitionTypePending ? <LoaderCircle size={14} className="animate-spin" /> : <X size={14} />}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {competitionTypeFeedback && (
+                <p role={competitionTypeFeedback.type === 'error' ? 'alert' : 'status'} className={`mt-3 text-xs ${competitionTypeFeedback.type === 'error' ? 'text-red-300' : 'text-emerald-300'}`}>
+                  {competitionTypeFeedback.text}
+                </p>
+              )}
+            </section>
+            <section className="rounded-3xl border border-white/[0.08] bg-[#0d1118]/90 p-5 shadow-2xl shadow-black/20">
               <div className="mb-4 flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300">Aperçu en direct</p>
@@ -536,6 +726,8 @@ export default function CardStudio({ initialCards }: { initialCards: CardData[] 
                   weight_t={draft.weight_t || 0}
                   transmission={draft.transmission || undefined}
                   fuel_type={draft.fuel_type || undefined}
+                  competition_type={draft.competition_type || undefined}
+                  competition_type_custom={draft.competition_type_custom || undefined}
                   country_code={draft.country_code}
                   showLevel={false}
                   onCardClick={() => {}}

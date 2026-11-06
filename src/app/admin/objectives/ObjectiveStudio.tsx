@@ -4,8 +4,11 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Check, CircleOff, ClipboardList, Plus, Save, Trophy } from 'lucide-react';
 import {
+  type ObjectiveCardCategory,
   type ObjectiveCategory,
   type ObjectiveDefinition,
+  type ObjectiveRequirement,
+  type ObjectiveRequirementOperator,
   type ObjectiveType,
 } from '@/lib/actions/objectives';
 import {
@@ -18,12 +21,35 @@ import {
 const rarities = ['Common', 'Uncommon', 'Atypique', 'Rare', 'Very rare', 'Epic', 'Legend', 'Mythic', 'Icon'];
 const objectiveTypeLabels: Record<ObjectiveType, string> = {
   booster_open: 'Ouvrir des boosters',
-  collection_count: 'Collectionner des véhicules',
+  collection_count: 'Collectionner des cartes',
   rarity_card: 'Obtenir une carte d’une rareté',
   marketplace_listing: 'Créer une annonce Marketplace',
   circuit_collection: 'Collectionner des circuits',
   daily_login: 'Se connecter des jours différents',
+  collection_requirement: 'Posséder des cartes selon des conditions',
 };
+export type ObjectiveCatalogs = {
+  vehicles: { card_id: string; make: string; model: string; year: number; rarity: string; fuel_type: string | null; transmission: string | null; collection_number: number }[];
+  circuits: { circuit_id: string; name: string; country: string | null; year: number | null; rarity: string; type: string | null; collection_number: number }[];
+  drivers: { driver_id: string; name: string; year: number; country: string; rarity: string; collection_number: number }[];
+};
+
+const emptyRequirement = (category: ObjectiveCardCategory = 'vehicle'): ObjectiveRequirement => ({
+  category,
+  card_id: '',
+  item_label: '',
+  make: '',
+  model: '',
+  year: '',
+  rarity: '',
+  country: '',
+  type: '',
+  fuel_type: '',
+  transmission: '',
+  count_mode: 'copies',
+  target_count: 1,
+});
+
 const blankDraft: ObjectiveDraft = {
   category: 'contract',
   title: '',
@@ -31,6 +57,8 @@ const blankDraft: ObjectiveDraft = {
   objective_type: 'booster_open',
   target_count: 1,
   required_rarity: 'Icon',
+  requirements: [],
+  requirement_operator: 'all',
   reward_ap: 100,
   is_active: true,
 };
@@ -43,12 +71,41 @@ function toDraft(objective: ObjectiveDefinition): ObjectiveDraft {
     objective_type: objective.objective_type,
     target_count: objective.target_count,
     required_rarity: objective.required_rarity ?? 'Icon',
+    requirements: objective.requirements ?? [],
+    requirement_operator: objective.requirement_operator ?? 'all',
     reward_ap: objective.reward_ap,
     is_active: objective.is_active,
   };
 }
 
-export default function ObjectiveStudio({ initialObjectives }: { initialObjectives: ObjectiveDefinition[] }) {
+function uniqueOptions(values: (string | number | null | undefined)[]) {
+  return Array.from(new Set(values.filter((value): value is string | number => value !== null && value !== undefined && String(value).trim() !== '').map(String)))
+    .sort((left, right) => left.localeCompare(right, 'fr', { numeric: true }));
+}
+
+function requirementLabel(requirement: ObjectiveRequirement) {
+  const category = requirement.category === 'vehicle' ? 'Véhicules' : requirement.category === 'circuit' ? 'Circuits' : 'Pilotes';
+  const details = [
+    requirement.item_label,
+    requirement.make,
+    requirement.model,
+    requirement.year,
+    requirement.country,
+    requirement.type,
+    requirement.fuel_type,
+    requirement.transmission,
+    requirement.rarity,
+  ].filter(Boolean);
+  return `${category} · ${details.join(' · ') || 'Toutes les cartes correspondantes'}`;
+}
+
+export default function ObjectiveStudio({
+  initialObjectives,
+  catalogs,
+}: {
+  initialObjectives: ObjectiveDefinition[];
+  catalogs: ObjectiveCatalogs;
+}) {
   const [objectives, setObjectives] = useState(initialObjectives);
   const [category, setCategory] = useState<ObjectiveCategory>('contract');
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -76,9 +133,95 @@ export default function ObjectiveStudio({ initialObjectives }: { initialObjectiv
   };
 
   const updateDraft = <K extends keyof ObjectiveDraft>(field: K, value: ObjectiveDraft[K]) => {
-    setDraft((current) => ({ ...current, [field]: value }));
+    setDraft((current) => ({
+      ...current,
+      [field]: value,
+      ...(field === 'objective_type' && value === 'collection_requirement' && current.requirements.length === 0
+        ? { requirements: [emptyRequirement()] }
+        : {}),
+    }));
     setFeedback(null);
   };
+
+  const updateRequirement = <K extends keyof ObjectiveRequirement>(
+    index: number,
+    field: K,
+    value: ObjectiveRequirement[K],
+  ) => {
+    setDraft((current) => ({
+      ...current,
+      requirements: current.requirements.map((requirement, requirementIndex) => {
+        if (requirementIndex !== index) return requirement;
+        if (field === 'category') {
+          return { ...emptyRequirement(value as ObjectiveCardCategory), target_count: requirement.target_count, count_mode: requirement.count_mode };
+        }
+        return { ...requirement, [field]: value };
+      }),
+    }));
+    setFeedback(null);
+  };
+
+  const catalogEntries = (cardCategory: ObjectiveCardCategory) => {
+    if (cardCategory === 'vehicle') {
+      return catalogs.vehicles.map((card) => ({
+        id: card.card_id,
+        label: `#${card.collection_number} · ${card.make} ${card.model} (${card.year})`,
+      }));
+    }
+    if (cardCategory === 'circuit') {
+      return catalogs.circuits.map((circuit) => ({
+        id: circuit.circuit_id,
+        label: `#${circuit.collection_number} · ${circuit.name} (${circuit.country || 'Pays inconnu'})`,
+      }));
+    }
+    return catalogs.drivers.map((driver) => ({
+      id: driver.driver_id,
+      label: `#${driver.collection_number} · ${driver.name} (${driver.year})`,
+    }));
+  };
+
+  const requirementOptions = (requirement: ObjectiveRequirement, field: 'make' | 'model' | 'year' | 'rarity' | 'country' | 'type' | 'fuel_type' | 'transmission') => {
+    if (requirement.category === 'vehicle') {
+      const vehicles = catalogs.vehicles.filter((card) => !requirement.make || card.make === requirement.make);
+      if (field === 'make') return uniqueOptions(catalogs.vehicles.map((card) => card.make));
+      if (field === 'model') return uniqueOptions(vehicles.map((card) => card.model));
+      if (field === 'year') return uniqueOptions(vehicles.map((card) => card.year));
+      if (field === 'rarity') return uniqueOptions(vehicles.map((card) => card.rarity));
+      if (field === 'fuel_type') return uniqueOptions(catalogs.vehicles.map((card) => card.fuel_type));
+      if (field === 'transmission') return uniqueOptions(catalogs.vehicles.map((card) => card.transmission));
+      return [];
+    }
+    if (requirement.category === 'circuit') {
+      if (field === 'country') return uniqueOptions(catalogs.circuits.map((circuit) => circuit.country));
+      if (field === 'year') return uniqueOptions(catalogs.circuits.map((circuit) => circuit.year));
+      if (field === 'type') return uniqueOptions(catalogs.circuits.map((circuit) => circuit.type));
+      if (field === 'rarity') return uniqueOptions(catalogs.circuits.map((circuit) => circuit.rarity));
+      return [];
+    }
+    if (field === 'country') return uniqueOptions(catalogs.drivers.map((driver) => driver.country));
+    if (field === 'year') return uniqueOptions(catalogs.drivers.map((driver) => driver.year));
+    if (field === 'rarity') return uniqueOptions(catalogs.drivers.map((driver) => driver.rarity));
+    return [];
+  };
+
+  const renderRequirementFilter = (
+    index: number,
+    requirement: ObjectiveRequirement,
+    field: 'make' | 'model' | 'year' | 'rarity' | 'country' | 'type' | 'fuel_type' | 'transmission',
+    label: string,
+  ) => (
+    <label key={field} className="block">
+      <span className="mb-1.5 block text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">{label}</span>
+      <select
+        value={requirement[field]}
+        onChange={(event) => updateRequirement(index, field, event.target.value)}
+        className="w-full rounded-lg border border-white/10 bg-[#090c11] px-3 py-2.5 text-xs outline-none focus:border-cyan-400/70"
+      >
+        <option value="">Tous</option>
+        {requirementOptions(requirement, field).map((option) => <option key={option} value={option}>{option}</option>)}
+      </select>
+    </label>
+  );
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -190,7 +333,11 @@ export default function ObjectiveStudio({ initialObjectives }: { initialObjectiv
                       </span>
                     </span>
                     <span className="mt-1 block text-[10px] text-slate-500">
-                      {objectiveTypeLabels[objective.objective_type]} · cible {objective.target_count} · {objective.reward_ap} AP
+                      {objectiveTypeLabels[objective.objective_type]}
+                      {objective.objective_type === 'collection_requirement'
+                        ? ` · ${objective.requirements?.length ?? 0} conditions · ${objective.requirement_operator === 'any' ? 'OU' : 'ET'}`
+                        : ` · cible ${objective.target_count}`}
+                      {' · '}{objective.reward_ap} AP
                     </span>
                   </button>
                   <button
@@ -232,10 +379,10 @@ export default function ObjectiveStudio({ initialObjectives }: { initialObjectiv
                   {Object.entries(objectiveTypeLabels).map(([type, label]) => <option key={type} value={type}>{label}</option>)}
                 </select>
               </label>
-              <label className="block">
+              {draft.objective_type !== 'collection_requirement' && <label className="block">
                 <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Nombre à atteindre</span>
                 <input type="number" min={1} max={1000000} step={1} required value={draft.target_count} onChange={(event) => updateDraft('target_count', Number(event.target.value))} className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm outline-none focus:border-cyan-400/70" />
-              </label>
+              </label>}
               {draft.objective_type === 'rarity_card' && (
                 <label className="block">
                   <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Rareté requise</span>
@@ -243,6 +390,131 @@ export default function ObjectiveStudio({ initialObjectives }: { initialObjectiv
                     {rarities.map((rarity) => <option key={rarity} value={rarity}>{rarity}</option>)}
                   </select>
                 </label>
+              )}
+              {draft.objective_type === 'collection_requirement' && (
+                <section className="space-y-4 sm:col-span-2" aria-label="Conditions de collection">
+                  <div className="rounded-xl border border-cyan-300/15 bg-cyan-300/[0.04] p-4">
+                    <h3 className="text-sm font-black text-cyan-100">Conditions de collection</h3>
+                    <p className="mt-1 text-xs leading-5 text-slate-400">
+                      La progression se base sur les cartes actuellement possédées et inclut les véhicules, circuits et pilotes.
+                    </p>
+                  </div>
+                  <label className="block">
+                    <span className="mb-1.5 block text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">Combinaison des conditions</span>
+                    <select
+                      value={draft.requirement_operator}
+                      onChange={(event) => updateDraft('requirement_operator', event.target.value as ObjectiveRequirementOperator)}
+                      className="w-full rounded-lg border border-white/10 bg-[#090c11] px-3 py-2.5 text-xs outline-none focus:border-cyan-400/70 sm:max-w-sm"
+                    >
+                      <option value="all">Toutes les conditions (ET)</option>
+                      <option value="any">Au moins une condition (OU)</option>
+                    </select>
+                  </label>
+                  {draft.requirements.map((requirement, index) => {
+                    const categoryCatalog = catalogEntries(requirement.category);
+                    const filterFields = requirement.category === 'vehicle'
+                      ? [
+                          ['make', 'Marque'],
+                          ['model', 'Modèle'],
+                          ['year', 'Année'],
+                          ['rarity', 'Rareté'],
+                          ['fuel_type', 'Carburant'],
+                          ['transmission', 'Transmission'],
+                        ] as const
+                      : requirement.category === 'circuit'
+                        ? [
+                            ['country', 'Pays'],
+                            ['year', 'Année'],
+                            ['type', 'Type de circuit'],
+                            ['rarity', 'Rareté'],
+                          ] as const
+                        : [
+                            ['country', 'Pays'],
+                            ['year', 'Saison'],
+                            ['rarity', 'Rareté'],
+                          ] as const;
+                    return (
+                      <fieldset key={`requirement-${index}`} className="space-y-3 rounded-2xl border border-white/10 bg-black/20 p-4">
+                        <legend className="px-2 text-xs font-black text-slate-200">Condition {index + 1}</legend>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          <label className="block">
+                            <span className="mb-1.5 block text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">Catégorie</span>
+                            <select
+                              value={requirement.category}
+                              onChange={(event) => updateRequirement(index, 'category', event.target.value as ObjectiveCardCategory)}
+                              className="w-full rounded-lg border border-white/10 bg-[#090c11] px-3 py-2.5 text-xs outline-none focus:border-cyan-400/70"
+                            >
+                              <option value="vehicle">Véhicules</option>
+                              <option value="circuit">Circuits</option>
+                              <option value="driver">Pilotes</option>
+                            </select>
+                          </label>
+                          <label className="block">
+                            <span className="mb-1.5 block text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">Carte précise (facultatif)</span>
+                            <select
+                              value={requirement.card_id}
+                              onChange={(event) => {
+                                const entry = categoryCatalog.find((item) => item.id === event.target.value);
+                                updateRequirement(index, 'card_id', event.target.value);
+                                updateRequirement(index, 'item_label', entry?.label ?? '');
+                              }}
+                              className="w-full rounded-lg border border-white/10 bg-[#090c11] px-3 py-2.5 text-xs outline-none focus:border-cyan-400/70"
+                            >
+                              <option value="">Toutes les cartes correspondant aux filtres</option>
+                              {categoryCatalog.map((entry) => <option key={entry.id} value={entry.id}>{entry.label}</option>)}
+                            </select>
+                          </label>
+                          {filterFields.map(([field, label]) => renderRequirementFilter(index, requirement, field, label))}
+                          <label className="block">
+                            <span className="mb-1.5 block text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">Mode de comptage</span>
+                            <select
+                              value={requirement.count_mode}
+                              onChange={(event) => updateRequirement(index, 'count_mode', event.target.value as ObjectiveRequirement['count_mode'])}
+                              className="w-full rounded-lg border border-white/10 bg-[#090c11] px-3 py-2.5 text-xs outline-none focus:border-cyan-400/70"
+                            >
+                              <option value="copies">Exemplaires (doublons inclus)</option>
+                              <option value="unique">Cartes différentes (sans doublons)</option>
+                            </select>
+                          </label>
+                          <label className="block">
+                            <span className="mb-1.5 block text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500">
+                              {requirement.count_mode === 'copies' ? 'Nombre d’exemplaires' : 'Nombre de cartes différentes'}
+                            </span>
+                            <input
+                              type="number"
+                              min={1}
+                              max={1000000}
+                              step={1}
+                              required
+                              value={requirement.target_count}
+                              onChange={(event) => updateRequirement(index, 'target_count', Number(event.target.value))}
+                              className="w-full rounded-lg border border-white/10 bg-[#090c11] px-3 py-2.5 text-xs outline-none focus:border-cyan-400/70"
+                            />
+                          </label>
+                        </div>
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.06] pt-3">
+                          <p className="text-[10px] leading-4 text-slate-500">{requirementLabel(requirement)}</p>
+                          <button
+                            type="button"
+                            onClick={() => updateDraft('requirements', draft.requirements.filter((_, itemIndex) => itemIndex !== index))}
+                            disabled={draft.requirements.length <= 1}
+                            className="rounded-lg border border-red-400/15 px-2.5 py-1.5 text-[10px] font-bold text-red-200 disabled:opacity-40"
+                          >
+                            Supprimer
+                          </button>
+                        </div>
+                      </fieldset>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    onClick={() => updateDraft('requirements', [...draft.requirements, emptyRequirement()])}
+                    disabled={draft.requirements.length >= 20}
+                    className="inline-flex items-center gap-2 rounded-xl border border-cyan-300/20 px-4 py-2.5 text-xs font-bold text-cyan-100 hover:bg-cyan-300/5 disabled:opacity-40"
+                  >
+                    <Plus size={14} /> Ajouter une condition
+                  </button>
+                </section>
               )}
               <label className="block">
                 <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Récompense AP</span>
@@ -255,7 +527,7 @@ export default function ObjectiveStudio({ initialObjectives }: { initialObjectiv
             </div>
 
             <p className="rounded-xl border border-amber-300/15 bg-amber-300/[0.04] p-3 text-xs leading-5 text-amber-100/70">
-              Les nouvelles définitions s’appliquent aux joueurs à partir de leur création. Une désactivation conserve les progressions déjà enregistrées ; une récompense ne peut être réclamée qu’une seule fois.
+              Les nouvelles définitions s’appliquent aux joueurs à partir de leur création. Les conditions de collection sont vérifiées sur l’inventaire actuel, y compris les cartes déjà possédées. Une désactivation conserve les progressions enregistrées ; une récompense ne peut être réclamée qu’une seule fois.
             </p>
             {feedback && (
               <p role={feedback.type === 'error' ? 'alert' : 'status'} className={`rounded-xl border px-4 py-3 text-sm ${feedback.type === 'error' ? 'border-red-400/20 bg-red-400/10 text-red-200' : 'border-emerald-400/20 bg-emerald-400/10 text-emerald-200'}`}>

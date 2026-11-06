@@ -7,7 +7,28 @@ export type ObjectiveType =
   | 'rarity_card'
   | 'marketplace_listing'
   | 'circuit_collection'
-  | 'daily_login';
+  | 'daily_login'
+  | 'collection_requirement';
+
+export type ObjectiveCardCategory = 'vehicle' | 'circuit' | 'driver';
+export type ObjectiveRequirementOperator = 'all' | 'any';
+type ObjectiveEventType = Exclude<ObjectiveType, 'collection_requirement'>;
+
+export type ObjectiveRequirement = {
+  category: ObjectiveCardCategory;
+  card_id: string;
+  item_label: string;
+  make: string;
+  model: string;
+  year: string;
+  rarity: string;
+  country: string;
+  type: string;
+  fuel_type: string;
+  transmission: string;
+  count_mode: 'copies' | 'unique';
+  target_count: number;
+};
 
 export type ObjectiveDefinition = {
   id: string;
@@ -17,6 +38,8 @@ export type ObjectiveDefinition = {
   objective_type: ObjectiveType;
   target_count: number;
   required_rarity: string | null;
+  requirements: ObjectiveRequirement[];
+  requirement_operator: ObjectiveRequirementOperator;
   reward_ap: number;
   is_active: boolean;
   created_at: string;
@@ -27,6 +50,7 @@ export type ObjectiveProgress = {
   user_id: string;
   objective_id: string;
   current_count: number;
+  requirement_progress: number[];
   status: 'active' | 'completed' | 'claimed';
   started_at: string;
   completed_at: string | null;
@@ -38,6 +62,9 @@ export async function getUserObjectives(userId: string, category: ObjectiveCateg
 
   const { error: ensureError } = await supabase.rpc('ensure_user_objectives');
   if (ensureError) return { data: [] as ObjectiveProgress[], error: ensureError.message };
+
+  const { error: refreshError } = await supabase.rpc('refresh_collection_objective_progress');
+  if (refreshError) return { data: [] as ObjectiveProgress[], error: refreshError.message };
 
   const { data: objectives, error: objectivesError } = await supabase
     .from('objective_definitions')
@@ -60,7 +87,13 @@ export async function getUserObjectives(userId: string, category: ObjectiveCateg
   const progressByObjective = new Map((progressRows ?? []).map((progress) => [progress.objective_id, progress]));
   const data = objectives.flatMap((objective) => {
     const progress = progressByObjective.get(objective.id);
-    return progress ? [{ ...progress, objective } as ObjectiveProgress] : [];
+    return progress
+      ? [{
+          ...progress,
+          requirement_progress: progress.requirement_progress ?? [],
+          objective,
+        } as ObjectiveProgress]
+      : [];
   });
 
   return { data, error: null };
@@ -68,7 +101,7 @@ export async function getUserObjectives(userId: string, category: ObjectiveCateg
 
 export async function updateQuestProgress(
   userId: string,
-  objectiveType: ObjectiveType | 'marketplace_sell' | 'collection_target',
+  objectiveType: ObjectiveEventType | 'marketplace_sell' | 'collection_target',
   amount = 1,
   metadata?: { rarity?: string },
 ) {

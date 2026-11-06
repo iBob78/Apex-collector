@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
+import { fetchAllPages } from '@/lib/fetchAllPages';
+import { getGarageProgress } from '@/lib/garage-level';
 import Sidebar from '@/components/Sidebar';
 import { ArrowRight, ArrowUpRight, Gauge, Layers3, Lightbulb, ShoppingBag, Trophy, Wallet } from 'lucide-react';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
@@ -14,6 +16,36 @@ export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [stats, setStats] = useState({ totalCards: 0, uniqueCards: 0 });
+  const [statsError, setStatsError] = useState<string | null>(null);
+
+  const fetchProfile = useCallback(async (userId: string) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('ap')
+      .eq('id', userId)
+      .single();
+    if (data) setProfile(data);
+  }, []);
+
+  const fetchStats = useCallback(async (userId: string) => {
+    try {
+      const data = await fetchAllPages((from, to) => supabase
+        .from('user_cards')
+        .select('id, count')
+        .eq('user_id', userId)
+        .order('id')
+        .range(from, to));
+      const total = data.reduce((acc, curr) => acc + curr.count, 0);
+      setStats({
+        totalCards: total,
+        uniqueCards: data.length,
+      });
+      setStatsError(null);
+    } catch (error) {
+      console.error('[DashboardPage] Impossible de charger les possessions de véhicules:', error);
+      setStatsError(t('Impossible de charger les statistiques de votre écurie.'));
+    }
+  }, [t]);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -23,35 +55,10 @@ export default function DashboardPage() {
         fetchProfile(data.user.id);
       }
     });
-  }, []);
+  }, [fetchProfile, fetchStats]);
 
-  const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('ap')
-      .eq('id', userId)
-      .single();
-    if (data) setProfile(data);
-  };
-
-  const fetchStats = async (userId: string) => {
-    const { data } = await supabase
-      .from('user_cards')
-      .select('count')
-      .eq('user_id', userId);
-
-    if (data) {
-      const total = data.reduce((acc, curr) => acc + curr.count, 0);
-      setStats({
-        totalCards: total,
-        uniqueCards: data.length,
-      });
-    }
-  };
-
-  // Keep the existing level formula and underlying data unchanged.
-  const garageLevel = Math.floor(stats.uniqueCards / 10) + 1;
-  const progressCount = stats.uniqueCards % 10;
+  const garageProgress = getGarageProgress(stats.uniqueCards);
+  const progressCount = garageProgress.progress;
   const progressPercent = progressCount * 10;
   const apBalance = Number(profile?.ap) || 0;
   const duplicateCards = Math.max(0, stats.totalCards - stats.uniqueCards);
@@ -113,6 +120,12 @@ export default function DashboardPage() {
               </h2>
             </div>
 
+            {statsError && (
+              <p role="alert" className="mb-4 rounded-lg border border-red-400/20 bg-red-950/30 px-3 py-2 text-sm text-red-200">
+                {statsError}
+              </p>
+            )}
+
             <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
               <article className="flex min-w-0 flex-col rounded-2xl border border-blue-400/20 bg-[#101722] p-4 sm:p-5">
                 <div className="flex items-start justify-between gap-2">
@@ -128,7 +141,7 @@ export default function DashboardPage() {
                 <div className="mt-auto space-y-2 border-t border-white/10 pt-3 text-xs sm:mt-5">
                   <div className="flex flex-wrap items-center justify-between gap-1 text-gray-400">
                     <span>{t('Niveau écurie')}</span>
-                    <strong className="font-mono text-blue-200">{garageLevel}</strong>
+                    <strong className="font-mono text-blue-200">{garageProgress.level}</strong>
                   </div>
                   <Link
                     href="/collection"
@@ -167,12 +180,15 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-2">
                     <Gauge size={17} className="shrink-0 text-amber-300" aria-hidden="true" />
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-amber-200 sm:text-xs">
-                      {t('Niveau écurie')}
-                    </h3>
+                    <div className="min-w-0">
+                      <h3 className="text-[11px] font-bold uppercase tracking-wider text-amber-200 sm:text-xs">
+                        {t('Niveau écurie')}
+                      </h3>
+                      <p className="truncate text-[10px] text-gray-400 sm:text-xs">{t(garageProgress.tierTitle)}</p>
+                    </div>
                   </div>
                   <strong className="font-mono text-xl font-black tabular-nums text-white sm:text-2xl">
-                    {garageLevel}
+                    {garageProgress.level}
                   </strong>
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-3 text-[11px] text-gray-400">

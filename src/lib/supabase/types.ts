@@ -26,6 +26,8 @@ export interface CarCard {
   transmission: string | null;
   new_price_eur: number | null;
   fuel_type: string | null;
+  competition_type: string | null;
+  competition_type_custom: string | null;
   max_rpm: number | null;
   units_sold: number | null;
 }

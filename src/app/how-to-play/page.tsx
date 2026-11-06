@@ -11,6 +11,7 @@ export default function HowToPlayPage() {
     { number: '03', title: 'Explorez votre garage', description: 'Le garage rassemble les véhicules et les circuits du catalogue. Recherchez et filtrez les cartes, puis ouvrez une carte pour consulter ses détails et votre nombre d’exemplaires.', href: '/collection', linkLabel: 'Ouvrir le garage' },
     { number: '04', title: 'Suivez vos missions', description: 'Les missions affichent leur objectif, leur progression et leur récompense. Lorsqu’une mission est terminée, récupérez les AP depuis cette page.', href: '/missions', linkLabel: 'Voir les missions' },
     { number: '05', title: 'Parcourez le marché', description: 'Consultez les cartes mises en vente par les joueurs, achetez-les avec vos AP ou proposez vos propres cartes à la vente.', href: '/marketplace', linkLabel: 'Visiter le marketplace' },
+    { number: '06', title: 'Faites progresser votre écurie', description: 'Le niveau écurie augmente d’un niveau tous les 10 modèles de véhicules différents possédés. Vous commencez au niveau 1 ; les doublons, circuits, pilotes et succès ne comptent pas. Les titres des niveaux 1, 5, 10, 20 et 50 sont décoratifs et ne donnent pas de récompense.', href: '/dashboard', linkLabel: 'Voir le tableau de bord' },
   ];
 
   return (

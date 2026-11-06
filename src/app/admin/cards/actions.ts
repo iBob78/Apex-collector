@@ -9,7 +9,7 @@ const draftFields: (keyof CardDraft)[] = [
   'make', 'model', 'year', 'rarity', 'image_url', 'description',
   'power_hp', 'power_kw', 'torque_nm', 'max_speed_kmh', 'weight_t',
   'acceleration_0_100', 'engine_size', 'cylinder', 'boost', 'country_code',
-  'transmission', 'new_price_eur', 'fuel_type', 'max_rpm', 'units_sold',
+  'transmission', 'new_price_eur', 'fuel_type', 'competition_type', 'competition_type_custom', 'max_rpm', 'units_sold',
 ];
 
 export type CardDraft = {
@@ -34,6 +34,8 @@ export type CardDraft = {
   transmission: string;
   new_price_eur: string;
   fuel_type: string;
+  competition_type: string;
+  competition_type_custom: string;
   max_rpm: string;
   units_sold: string;
 };
@@ -65,6 +67,8 @@ export type CardData = {
   transmission: string | null;
   new_price_eur: number | null;
   fuel_type: string | null;
+  competition_type: string | null;
+  competition_type_custom: string | null;
   max_rpm: number | null;
   units_sold: number | null;
 };
@@ -100,6 +104,7 @@ export type CircuitData = {
 
 type SaveResult = { success: true; card: CardData } | { success: false; error: string };
 type CircuitSaveResult = { success: true; circuit: CircuitData } | { success: false; error: string };
+export type CompetitionTypeResult = { success: true; name: string } | { success: false; error: string };
 
 function parseOptionalNumber(value: string, label: string, allowNegative = false) {
   if (!value.trim()) return { value: null, error: null };
@@ -133,6 +138,9 @@ function parseCardDraft(draft: CardDraft) {
   }
   if (!rarities.includes(draft.rarity as (typeof rarities)[number])) {
     return { error: 'Choisis une rareté valide.' } as const;
+  }
+  if (draft.competition_type.trim().length > 40 || draft.competition_type_custom.trim().length > 60) {
+    return { error: 'Le type de compétition est trop long.' } as const;
   }
 
   const numbers = {
@@ -179,6 +187,8 @@ function parseCardDraft(draft: CardDraft) {
       transmission: draft.transmission.trim() || null,
       new_price_eur: numbers.new_price_eur.value,
       fuel_type: draft.fuel_type.trim() || null,
+      competition_type: draft.competition_type.trim() || null,
+      competition_type_custom: draft.competition_type_custom.trim() || null,
       max_rpm: numbers.max_rpm.value,
       units_sold: numbers.units_sold.value,
     },
@@ -261,6 +271,88 @@ function revalidateCardPages() {
   revalidatePath('/collection/[id]', 'page');
 }
 
+function validateCompetitionTypeName(value: unknown) {
+  if (typeof value !== 'string') return { name: null, error: 'Le type de compétition est invalide.' };
+  const name = value.trim();
+  if (!name || name.length > 40) {
+    return { name: null, error: 'Le nom doit contenir entre 1 et 40 caractères.' };
+  }
+  return { name, error: null };
+}
+
+export async function addCompetitionType(value: string): Promise<CompetitionTypeResult> {
+  const authorization = await getAdminClient();
+  if (!authorization.client) return { success: false, error: authorization.error ?? 'Accès administrateur refusé.' };
+
+  const parsed = validateCompetitionTypeName(value);
+  if (!parsed.name) return { success: false, error: parsed.error! };
+
+  const { data, error } = await authorization.client
+    .from('competition_types')
+    .insert({ name: parsed.name })
+    .select('name')
+    .single();
+
+  if (error) {
+    const message = error.code === '23505'
+      ? 'Ce type existe déjà dans la liste.'
+      : `Le type n’a pas pu être ajouté : ${error.message}`;
+    return { success: false, error: message };
+  }
+
+  revalidatePath('/admin/cards');
+  return { success: true, name: data.name };
+}
+
+export async function renameCompetitionType(currentValue: string, nextValue: string): Promise<CompetitionTypeResult> {
+  const authorization = await getAdminClient();
+  if (!authorization.client) return { success: false, error: authorization.error ?? 'Accès administrateur refusé.' };
+
+  const current = validateCompetitionTypeName(currentValue);
+  const next = validateCompetitionTypeName(nextValue);
+  if (!current.name) return { success: false, error: current.error! };
+  if (!next.name) return { success: false, error: next.error! };
+
+  const { data, error } = await authorization.client
+    .from('competition_types')
+    .update({ name: next.name })
+    .eq('name', current.name)
+    .select('name')
+    .maybeSingle();
+
+  if (error) {
+    const message = error.code === '23505'
+      ? 'Un type portant ce nom existe déjà.'
+      : `Le type n’a pas pu être renommé : ${error.message}`;
+    return { success: false, error: message };
+  }
+  if (!data) return { success: false, error: 'Le type à renommer est introuvable.' };
+
+  revalidateCardPages();
+  return { success: true, name: data.name };
+}
+
+export async function deleteCompetitionType(value: string): Promise<CompetitionTypeResult> {
+  const authorization = await getAdminClient();
+  if (!authorization.client) return { success: false, error: authorization.error ?? 'Accès administrateur refusé.' };
+
+  const parsed = validateCompetitionTypeName(value);
+  if (!parsed.name) return { success: false, error: parsed.error! };
+
+  const { data, error } = await authorization.client
+    .from('competition_types')
+    .delete()
+    .eq('name', parsed.name)
+    .select('name')
+    .maybeSingle();
+
+  if (error) return { success: false, error: `Le type n’a pas pu être supprimé : ${error.message}` };
+  if (!data) return { success: false, error: 'Le type à supprimer est introuvable.' };
+
+  revalidateCardPages();
+  return { success: true, name: data.name };
+}
+
 export async function createCard(draft: CardDraft): Promise<SaveResult> {
   const authorization = await getAdminClient();
   if (!authorization.client) return { success: false, error: authorization.error ?? 'Accès administrateur refusé.' };
@@ -328,6 +420,8 @@ export async function createAlternativeArt(cardRowId: string, imageUrl: string):
       transmission: source.transmission,
       new_price_eur: source.new_price_eur,
       fuel_type: source.fuel_type,
+      competition_type: source.competition_type,
+      competition_type_custom: source.competition_type_custom,
       max_rpm: source.max_rpm,
       units_sold: source.units_sold,
       card_id: crypto.randomUUID(),
@@ -392,6 +486,8 @@ export async function updateCard(id: string, draft: CardDraft): Promise<SaveResu
       transmission: source.transmission,
       new_price_eur: source.new_price_eur,
       fuel_type: source.fuel_type,
+      competition_type: source.competition_type,
+      competition_type_custom: source.competition_type_custom,
       max_rpm: source.max_rpm,
       units_sold: source.units_sold,
     };

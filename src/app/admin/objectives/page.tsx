@@ -2,8 +2,9 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ArrowLeft, ShieldAlert } from 'lucide-react';
 import { isAdminEmail } from '@/lib/admin';
+import { fetchAllPages } from '@/lib/fetchAllPages';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
-import ObjectiveStudio from './ObjectiveStudio';
+import ObjectiveStudio, { type ObjectiveCatalogs } from './ObjectiveStudio';
 import type { ObjectiveDefinition } from '@/lib/actions/objectives';
 
 export default async function AdminObjectivesPage() {
@@ -41,15 +42,44 @@ export default async function AdminObjectivesPage() {
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) {
+  let catalogs: ObjectiveCatalogs;
+  try {
+    if (error) throw error;
+    const [vehicles, circuits, drivers] = await Promise.all([
+      fetchAllPages((from, to) => supabase
+        .from('cards')
+        .select('card_id, make, model, year, rarity, fuel_type, transmission, collection_number')
+        .order('collection_number')
+        .order('id')
+        .range(from, to)),
+      fetchAllPages((from, to) => supabase
+        .from('circuits')
+        .select('circuit_id, name, country, year, rarity, type, collection_number')
+        .order('collection_number')
+        .order('id')
+        .range(from, to)),
+      fetchAllPages((from, to) => supabase
+        .from('drivers')
+        .select('driver_id, name, year, country, rarity, collection_number')
+        .order('collection_number')
+        .order('id')
+        .range(from, to)),
+    ]);
+    catalogs = {
+      vehicles: vehicles as ObjectiveCatalogs['vehicles'],
+      circuits: circuits as ObjectiveCatalogs['circuits'],
+      drivers: drivers as ObjectiveCatalogs['drivers'],
+    };
+  } catch (loadError) {
+    const message = loadError instanceof Error ? loadError.message : 'Erreur Supabase inconnue.';
     return (
       <main className="min-h-screen bg-[#07090d] px-5 py-12 text-white md:px-10">
         <p role="alert" className="mx-auto max-w-3xl rounded-2xl border border-red-400/20 bg-red-400/10 p-5 text-red-200">
-          Impossible de charger les objectifs : {error.message}. Vérifie que la migration `014_manage_objectives.sql` est appliquée dans Supabase.
+          Impossible de charger les objectifs et les catalogues de cartes : {message}. Vérifie que les migrations 014 (objectifs), 020 (pilotes) et 021 (numéros de collection) sont appliquées dans Supabase.
         </p>
       </main>
     );
   }
 
-  return <ObjectiveStudio initialObjectives={(data ?? []) as ObjectiveDefinition[]} />;
+  return <ObjectiveStudio initialObjectives={(data ?? []) as ObjectiveDefinition[]} catalogs={catalogs} />;
 }
