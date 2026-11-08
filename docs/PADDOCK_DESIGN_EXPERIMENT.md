@@ -45,3 +45,28 @@ La quatrième itération est désormais intitulée **« Night Drive / Collection
 7. Exécuter CI/lint/tests/build sur la **PR #17** et contrôler le lien de Preview Vercel avant de demander un avis.
 
 **Statut :** prototype v4 en revue. Aucun déploiement de production ni fusion `main` autorisé.
+
+## V5 — Night Drive Collector's Vault
+
+La V5 approfondit la direction validée à la V4, sans changement d'économie, de données Supabase ou de rareté. Les évolutions sont **visuelles et ergonomiques**, avec des données calculées depuis les possessions réelles :
+
+- **Collection / bandeau :** nouvelle jauge circulaire qui lit le vrai `stats.percentage`, nombre réel d'exemplaires et compteur `NEW!` basé sur les découvertes encore non vues.
+- **Filtres mobile et tablette :** recherche toujours visible, autres contrôles dépliables avec bouton `aria-expanded` ; à partir de 1280 px, la colonne complète reste visible. Les 4 cartes par ligne sur smartphone restent inchangées.
+- **Filtres rapides de rareté :** raccourcis `Tous / Commun / Rare / Épique / Légendaire`, reliés à la **même valeur `rarityFilter`** que le sélecteur exhaustif ; les chiffres sont les **modèles possédés** de chaque rareté, pas les cartes à découvrir. Les raretés moins courantes restent accessibles dans le sélecteur.
+- **Sélection de carte sur écran large :** halo de sélection piloté par `getRarityColor()`, vitrine avec lueur de rareté, affichage des vraies données déjà disponibles. Les cartes non possédées restent exclues de la vitrine et des flèches.
+- **Détails sur mobile et PC :** fenêtre plein écran sur téléphone, visuel et filet lumineux liés à la rareté, meilleure hiérarchie typographique, fiches de caractéristiques lisibles. Tous les champs, le principal détenteur, les favoris et l'achat de niveaux sont conservés.
+- **Accueil connecté :** panneau « GARAGE STATUS » translucide avec vrais modèles uniques, exemplaires et niveau calculé, visible sur grand écran sans empiéter sur la voiture.
+- **Tirage :** compteur `révélées / total` et barre de progression basés sur `flippedCards` ; compteur `NEW!` uniquement pour les cartes **déjà retournées**. Pas de fuite de rareté avant révélation, ni de changement de probabilité ou de débit AP.
+- **Boutique :** halo doux lié à `pack.color` (identité du pack), deux packs par ligne sur mobile, prix et stocks inchangés.
+- **Navigation :** état actif lumineux en barre mobile, sans modifier les routes ni les autorisations.
+- **Animations et accessibilité :** les nouvelles animations CSS se désactivent avec `prefers-reduced-motion`, les champs et boutons gardent leurs focus visibles. Les valeurs dynamiques restent lisibles et accessibles au clavier.
+
+### Contrôles supplémentaires V5
+
+- Comparer l'affichage collection sur 360 / 390 / 430 px, 768 / 1024 / 1280 px et au-delà de 1536 px. Vérifier les filtres repliés par défaut sur petit écran et disponibles en desktop.
+- Vérifier le compteur de rareté réel (notamment zéro carte possédée), le rétrécissement des libellés, le niveau et les favoris après achat.
+- Pour les cartes non possédées, vérifier qu'aucune information privée de découverte ne s'affiche via la vitrine et ses flèches.
+- Dans le reveal, vérifier que le compteur `NEW!` reste invisible tant que la nouvelle carte n'est pas révélée, et que la jauge suit `Retourner toutes les cartes`.
+- Confirmer les checks GitHub et l'état Vercel Preview de la tête de PR #17. **La vérification automatique de compilation ne remplace pas un examen visuel sur navigateur.**
+
+**Rappel : cette documentation porte sur le prototype Night Drive V5 de la PR #17, pas sur `main`.**
