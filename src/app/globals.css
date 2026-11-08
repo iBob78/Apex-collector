@@ -802,7 +802,7 @@ html, body {
 .apx-dashboard-hero{position:relative;isolation:isolate;min-height:330px;overflow:hidden;border-radius:21px;
   border:1px solid rgba(163,190,249,.22);
   background:linear-gradient(90deg,rgba(8,14,32,.94) 0%,rgba(10,18,40,.61) 52%,rgba(8,13,31,.06) 100%),
-    url("https://images.pexels.com/photos/14905468/pexels-photo-14905468.jpeg?auto=compress&cs=tinysrgb&w=1600") center/cover;
+    url("https://images.pexels.com/photos/21404862/pexels-photo-21404862.jpeg?auto=compress&cs=tinysrgb&w=1600") center/cover;
   box-shadow:0 25px 70px rgba(0,0,0,.3)}
 .apx-dashboard-hero:after{content:"";position:absolute;inset:auto 0 0;height:3px;background:linear-gradient(90deg,#ed3554,#806aff,#5fbbff)}
 .apx-hud{border:1px solid rgba(176,188,237,.22);border-radius:13px;background:rgba(12,19,40,.75);backdrop-filter:blur(14px);box-shadow:inset 0 1px rgba(255,255,255,.08)}
