@@ -143,125 +143,84 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="paddock-sidebar hidden w-[280px] shrink-0 h-screen p-6 flex-col gap-7 sticky top-0 z-50 md:flex lg:w-[294px]">
-      {/* Brand Logo */}
-      <div className="border-b border-cyan-100/15 pb-6">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-md border border-cyan-300/20 bg-cyan-300/[0.06] px-2 py-1 text-[9px] font-black tracking-[0.18em] text-cyan-200">
-          <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_#85eaff]" /> APEX / PADDOCK
-        </div>
-        <h1 className="text-[35px] font-normal uppercase leading-[.83] tracking-wide" style={{ fontFamily: '"Bebas Neue", Impact, sans-serif' }}>
-          APEX <span className="text-[#e7c18a]">COLLECTOR</span>
-        </h1>
-        <div className="mt-4 flex items-center gap-2"><span className="h-px w-7 bg-[#e7c18a]" />
-          <span className="text-[10px] font-bold uppercase tracking-[0.23em] text-slate-400">{t('Season One')}</span>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto pr-1" aria-label={t("Navigation principale")}>
-        {navItems.map(({ href, label, icon: Icon }) => {
-          const isActive = isActivePath(href);
-          const isLocked = authLoaded && !user && href !== '/login';
-
-          return (
-            <Link
-              key={href}
-              href={isLocked ? '/login' : href}
-              className={`group relative flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 ${isActive
-                ? 'border border-cyan-300/25 bg-cyan-200/[0.09] text-white'
-                : isLocked
-                  ? 'text-gray-700 cursor-not-allowed opacity-50'
-                  : 'border border-transparent text-slate-400 hover:border-white/10 hover:text-white hover:bg-white/[0.05]'
-                }`}
-            >
-              {isActive && (
-                <motion.div
-                  layoutId="activeTab"
-                  className="absolute left-0 w-[3px] h-6 bg-[#e7c18a] rounded-full shadow-[0_0_15px_rgba(231,193,138,.55)]"
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                />
-              )}
-
-              <Icon size={20} className={`transition-colors ${isActive ? 'text-blue-500' : isLocked ? 'text-gray-800' : 'group-hover:text-blue-400'}`} />
-              <span className="text-xs font-black tracking-widest uppercase">{t(label)}</span>
-
-              {isLocked && (
-                <LockIcon size={12} className="ml-auto text-gray-800" />
-              )}
-
-              {isActive && (
-                <div className="absolute right-4 w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,1)]" />
-              )}
-            </Link>
-          );
-        })}
-        {isAdmin && (
-          <div className="mt-2 border-t border-white/[0.08] pt-3">
-            <button
-              type="button"
-              aria-expanded={adminMenuOpen}
-              onClick={() => setAdminMenuOpen((open) => !open)}
-              className={`group flex w-full items-center gap-4 rounded-xl px-4 py-3 text-left transition-all ${pathname.startsWith('/admin/') ? 'border border-cyan-300/25 bg-cyan-200/[0.09] text-white' : 'text-gray-500 hover:bg-white/5 hover:text-white'}`}
-            >
-              <ShieldCheckIcon size={20} className={pathname.startsWith('/admin/') ? 'text-blue-500' : 'group-hover:text-blue-400'} />
-              <span className="flex-1 text-xs font-black tracking-widest">{t('ADMIN')}</span>
-              <ChevronDownIcon size={16} className={`transition-transform ${adminMenuOpen ? 'rotate-180' : ''}`} />
-            </button>
-            {adminMenuOpen && (
-              <div className="mt-1 space-y-1 pl-3">
-                {visibleAdminItems.map(({ href, label, icon: Icon }) => {
-                  const active = isActivePath(href);
-                  return (
-                    <Link
-                      key={href}
-                      href={href}
-                      aria-current={active ? 'page' : undefined}
-                      className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-bold transition ${active ? 'bg-blue-500/10 text-blue-300' : 'text-gray-500 hover:bg-white/5 hover:text-white'}`}
-                    >
-                      <Icon size={16} aria-hidden="true" />
-                      <span>{t(label)}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
+      <aside className="paddock-sidebar sticky top-0 z-50 hidden h-screen w-[264px] shrink-0 flex-col md:flex lg:w-[280px]">
+        <Link href="/dashboard" className="group relative block overflow-hidden border-b border-white/20 px-5 pb-7 pt-8">
+          <span className="absolute -right-8 -top-12 h-40 w-24 skew-x-[-25deg] bg-[#dbff35]/[.07]" aria-hidden="true"/>
+          <div className="mb-5 flex items-center gap-2 font-['Barlow_Condensed'] text-[11px] font-extrabold uppercase tracking-[.2em] text-[#dbff35]">
+            <span className="h-[7px] w-[7px] bg-[#f4523d]" /> RACING DEPARTMENT
           </div>
-        )}
-      </nav>
-
-      {/* Pilot Stats Mini Card */}
-      {!authLoaded ? null : user ? (
-        <div className="paddock-panel mt-auto p-4 relative overflow-hidden group">
-          <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="flex items-center gap-3 relative z-10">
-            <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
-              <CrownIcon size={18} className="text-blue-500" />
-            </div>
-            <div>
-              <div className="text-[10px] uppercase tracking-tighter text-gray-500 font-bold">{t('Email')}</div>
-              <div className="max-w-[155px] truncate text-xs font-bold text-white" title={user.email || undefined}>{user.email || t('PROFIL PILOTE')}</div>
-            </div>
+          <h1 className="font-['Barlow_Condensed'] text-[60px] font-black uppercase leading-[.7] tracking-[-.065em] text-white transition group-hover:text-[#dbff35]">
+            APEX<span className="mt-2 block text-[49px] tracking-[-.045em] text-[#dbff35] group-hover:text-white">COLLECTOR</span>
+          </h1>
+          <div className="mt-6 flex items-center gap-2 border-t border-white/20 pt-3">
+            <span className="h-[2px] w-6 bg-[#f4523d]" />
+            <span className="font-mono text-[10px] uppercase tracking-[.1em] text-gray-400">{t('Season One')} / AC-001</span>
           </div>
-
-          <Link href="/profile" className="mt-4 flex items-center justify-between border-t border-white/10 pt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-cyan-200 transition hover:text-white">
-            <span>{t('PROFIL PILOTE')}</span><span aria-hidden="true">↗</span>
-          </Link>
-        </div>
-      ) : (
-        <Link
-          href="/login"
-          className="mt-auto p-6 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl border border-blue-500/30 text-center transition-all shadow-xl shadow-blue-500/20 group"
-        >
-          <div className="text-xs font-black uppercase tracking-[0.2em]">{t('Se Connecter')}</div>
-          <div className="text-[9px] font-medium opacity-70 mt-1">{t('Rejoignez l\'élite Apex')}</div>
         </Link>
-      )}
+        <div className="flex items-center justify-between gap-2 border-b border-white/10 px-5 py-4 font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.17em]">
+          <span className="text-gray-400">MAIN / NAVIGATION</span><span className="text-[#dbff35]">10 SECTORS</span>
+        </div>
+        <nav aria-label={t('Navigation principale')} className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-3">
+          {navItems.map(({ href, label, icon: Icon }, index) => {
+            const active = isActivePath(href);
+            const locked = authLoaded && !user && href !== '/login';
+            return (
+              <Link key={href} href={locked ? '/login' : href} aria-current={active ? 'page' : undefined}
+                className={`group relative flex min-h-[47px] items-center gap-3 border-l-[3px] px-3 py-2 transition-colors ${active
+                  ? 'border-[#dbff35] bg-[#dbff35] text-[#0d100b]'
+                  : locked ? 'border-transparent text-gray-600 opacity-60'
+                    : 'border-transparent text-[#bac3b5] hover:border-[#f4523d] hover:bg-white/[.07] hover:text-white'
+                  }`}>
+                <span className={`w-[21px] shrink-0 font-mono text-[10px] font-bold ${active ? 'text-[#31401b]' : 'text-gray-600 group-hover:text-[#dbff35]'}`}>{String(index + 1).padStart(2, '0')}</span>
+                <Icon size={18} className="shrink-0" aria-hidden="true"/>
+                <span className="min-w-0 flex-1 font-['Barlow_Condensed'] text-[14px] font-extrabold uppercase tracking-[.06em]">{t(label)}</span>
+                {locked ? <LockIcon size={13} aria-hidden="true" /> : active ? <span className="h-2 w-2 rotate-45 bg-[#f4523d]" aria-hidden="true" /> : null}
+              </Link>
+            );
+          })}
+          {isAdmin && (
+            <div className="mt-3 border-t border-white/20 pt-3">
+              <button type="button" aria-expanded={adminMenuOpen} onClick={() => setAdminMenuOpen((open) => !open)}
+                className={`flex min-h-11 w-full items-center gap-3 border-l-[3px] px-3 py-2 text-left font-['Barlow_Condensed'] text-[14px] font-extrabold uppercase tracking-[.09em] transition ${pathname.startsWith('/admin/') ? 'border-[#f4523d] text-[#dbff35]' : 'border-transparent text-gray-400 hover:text-white'}`}>
+                <ShieldCheckIcon size={18} aria-hidden="true"/><span className="flex-1">{t('ADMIN')}</span>
+                <ChevronDownIcon size={16} className={`transition-transform ${adminMenuOpen ? 'rotate-180' : ''}`} aria-hidden="true"/>
+              </button>
+              {adminMenuOpen && (
+                <div className="mt-1 space-y-1 pl-4">
+                  {visibleAdminItems.map(({ href, label, icon: Icon }) => {
+                    const active = isActivePath(href);
+                    return <Link key={href} href={href} aria-current={active ? 'page' : undefined}
+                      className={`flex min-h-10 items-center gap-3 border-l-2 px-3 py-2 font-['Barlow_Condensed'] text-[12px] font-bold uppercase tracking-[.04em] ${active ? 'border-[#dbff35] bg-white/10 text-[#dbff35]' : 'border-transparent text-gray-400 hover:border-white/30 hover:text-white'}`}>
+                      <Icon size={16} aria-hidden="true"/><span>{t(label)}</span>
+                    </Link>;
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </nav>
+        {!authLoaded ? null : user ? (
+          <Link href="/profile" className="group block border-t border-white/20 bg-[#1b211a] px-5 py-5 transition-colors hover:bg-[#26301e]">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <span className="font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.16em] text-[#dbff35]">DRIVER / IDENTITY</span>
+              <CrownIcon size={17} className="text-[#dbff35]" aria-hidden="true"/>
+            </div>
+            <p className="truncate font-mono text-[11px] text-white" title={user.email || undefined}>{user.email || t('PROFIL PILOTE')}</p>
+            <div className="mt-3 flex items-center justify-between border-t border-white/15 pt-2 font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.1em] text-gray-400">
+              <span>{t('PROFIL PILOTE')}</span><span className="text-[#dbff35] transition-transform group-hover:translate-x-1">↗</span>
+            </div>
+          </Link>
+        ) : (
+          <Link href="/login" className="m-3 flex min-h-12 items-center justify-center bg-[#dbff35] px-3 font-['Barlow_Condensed'] text-[15px] font-black uppercase tracking-[.1em] text-[#0e120e] transition hover:bg-white">
+            {t('Se Connecter')}
+          </Link>
+        )}
       </aside>
 
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[55] md:hidden">
           <button type="button" aria-label={t('Fermer le menu')} onClick={() => setMobileMenuOpen(false)} className="absolute inset-0 bg-black/75" />
-          <nav id="apex-mobile-more-menu" aria-label={t('Navigation secondaire')} className="paddock-mobile-sheet absolute inset-x-3 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-h-[75dvh] overflow-y-auto rounded-2xl p-3">
+          <nav id="apex-mobile-more-menu" aria-label={t('Navigation secondaire')} className="paddock-mobile-sheet absolute inset-x-3 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-h-[75dvh] overflow-y-auto p-3">
             <div className="flex items-center justify-between px-3 pb-3 pt-1">
               <span className="text-sm font-black uppercase tracking-widest">{t('Plus')}</span>
               <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label={t('Fermer le menu')} className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
@@ -325,15 +284,16 @@ export default function Sidebar() {
             const shortLabel = label === 'ACCUEIL' ? 'Accueil' : label === 'MA COLLECTION' ? 'Collection' : label === 'BOUTIQUE PACKS' ? 'Boosters' : 'Marché';
             return (
               <Link key={href} href={locked ? '/login' : href} aria-current={active ? 'page' : undefined}
-                className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1 text-[10px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${active ? 'text-blue-400' : 'text-gray-400'}`}>
-                <Icon size={21} aria-hidden="true" />
+                className={`group relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.04em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#dbff35] ${active ? 'text-[#dbff35]' : 'text-[#a4aba1]'}`}>
+                {active && <span className="absolute -top-[3px] left-4 right-4 h-[3px] bg-[#f4523d]" aria-hidden="true" />}
+                <Icon size={22} strokeWidth={active ? 2.6 : 1.75} aria-hidden="true" />
                 <span className="truncate">{t(shortLabel)}</span>
               </Link>
             );
           })}
           <button type="button" aria-label={t('Plus')} aria-controls="apex-mobile-more-menu" aria-expanded={mobileMenuOpen}
             onClick={() => setMobileMenuOpen((open) => !open)}
-            className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1 text-[10px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${mobileMenuOpen || extraItems.some(({ href }) => isActivePath(href)) || (isAdmin && pathname.startsWith('/admin/')) ? 'text-blue-400' : 'text-gray-400'}`}>
+            className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.04em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#dbff35] ${mobileMenuOpen || extraItems.some(({ href }) => isActivePath(href)) || (isAdmin && pathname.startsWith('/admin/')) ? 'text-[#dbff35]' : 'text-[#a4aba1]'}`}>
             <MenuIcon size={21} aria-hidden="true" />
             <span>{t('Plus')}</span>
           </button>
