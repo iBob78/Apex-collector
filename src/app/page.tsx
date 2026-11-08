@@ -92,7 +92,7 @@ export default function LandingPage() {
       <div className="race-ticker" aria-label="Apex Collector, Garage, Boosters, Marketplace">
         <div className="race-ticker-track" aria-hidden="true">
           {Array.from({ length: 4 }, (_, i) => (
-            <span key={i}>APEX COLLECTOR <span className="mx-7 text-[#f4523d]">✦</span> MOTORSPORT CULTURE <span className="mx-7">///</span> THE GARAGE <span className="mx-7 text-[#f4523d]">✦</span> OPEN THE PACKS <span className="mx-7">///</span></span>
+            <span key={i}>APEX COLLECTOR <span className="mx-7 text-[#f4523d]">✦</span> MOTORSPORT CULTURE <span className="mx-7">{"///"}</span> THE GARAGE <span className="mx-7 text-[#f4523d]">✦</span> OPEN THE PACKS <span className="mx-7">{"///"}</span></span>
           ))}
         </div>
       </div>
