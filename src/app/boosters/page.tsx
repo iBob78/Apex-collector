@@ -144,7 +144,8 @@ export default function BoostersPage() {
                 transition={{ duration: .33, delay: i * .06 }} className="paddock-pack-card group flex min-w-0 flex-col">
                 <div className={`absolute left-0 right-0 top-0 z-10 h-[4px] bg-gradient-to-r ${pack.color}`} aria-hidden="true"/>
                 <div className="apx-pack-display relative overflow-hidden px-3 pb-3 pt-4 sm:px-6 sm:pb-5 sm:pt-6">
-                  <div className="flex items-center justify-between gap-2">
+                  <div aria-hidden="true" className={`pointer-events-none absolute inset-x-5 top-[23%] h-[62%] rounded-full bg-gradient-to-r ${pack.color} opacity-[.16] blur-[46px] transition-opacity duration-300 group-hover:opacity-[.26]`} />
+                  <div className="relative flex items-center justify-between gap-2">
                     <span className="font-mono text-[10px] text-[#a6baff]">DROP // {String(i+1).padStart(2,'0')}</span>
                     <span className="font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.08em] text-gray-300">{pack.cardCount} {t('Cartes')}</span>
                   </div>
