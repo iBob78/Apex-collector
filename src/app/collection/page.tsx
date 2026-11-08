@@ -377,38 +377,35 @@ export default function CollectionPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white">
+    <div className="apex-paddock flex min-h-screen text-white">
       <Sidebar />
 
       <main className="flex-1 min-w-0 flex flex-col">
-        <div className="p-4 md:p-8 flex-1">
+        <div className="paddock-shell flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-9 lg:py-10">
           {/* Header & Stats */}
           <header className="mb-8">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-              <div>
-                <h1 className="bg-gradient-to-r from-white to-gray-500 bg-clip-text text-3xl font-black uppercase italic tracking-tighter text-transparent sm:text-4xl">
-                  {t('Mon Garage')}
-                </h1>
-                <p className="text-gray-500 font-mono text-sm mt-1">
-                  {t('Collection complète des véhicules, circuits et pilotes d’exception.')}
-                </p>
+            <div className="paddock-header mb-5 flex flex-col justify-between gap-5 md:flex-row md:items-center">
+              <div className="relative z-10">
+                <p className="paddock-eyebrow">APEX / COLLECTOR ARCHIVE</p>
+                <h1 className="paddock-title mt-3">{t('Mon Garage')}<span className="text-[#e7c18a]">.</span></h1>
+                <p className="paddock-subtitle">{t('Collection complète des véhicules, circuits et pilotes d’exception.')}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-4">
+              <div className="relative z-10 grid grid-cols-2 gap-2 sm:flex sm:gap-3">
                 <StatCard label={t('Collection')} value={`${stats.owned}/${stats.total}`} sub={`${stats.percentage}%`} color="text-blue-400" />
                 <StatCard label={t('Total Cartes')} value={stats.totalCopies} sub={t('Exemplaires')} color="text-purple-400" />
               </div>
             </div>
 
             {/* Barre de Filtres */}
-            <div className="flex flex-col gap-3 rounded-2xl border border-white/5 bg-[#0a0a0a] p-3 shadow-2xl sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 sm:p-4">
+            <div className="paddock-panel flex flex-col gap-3 p-3 shadow-2xl sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 sm:p-4">
               {/* Tabs */}
-              <div className="grid w-full grid-cols-4 rounded-xl bg-white/5 p-1 sm:flex sm:w-auto">
+              <div className="grid w-full grid-cols-4 rounded-xl border border-cyan-100/10 bg-[#07111d] p-1 sm:flex sm:w-auto">
                 {(['all', 'vehicle', 'circuit', 'driver'] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`min-h-11 rounded-lg px-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all sm:px-4 sm:text-xs sm:tracking-widest ${activeTab === tab ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
+                    className={`min-h-11 rounded-lg px-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all sm:px-4 sm:text-xs sm:tracking-widest ${activeTab === tab ? 'bg-[#e7c18a] text-[#1b1b1b] shadow-[0_5px_12px_rgba(231,193,138,.12)]' : 'text-slate-400 hover:bg-white/[0.05] hover:text-white'
                       }`}
                   >
                     {t(tab === 'all' ? 'Tous' : tab === 'vehicle' ? 'Véhicules' : tab === 'circuit' ? 'Circuits' : 'Pilotes')}
@@ -443,7 +440,7 @@ export default function CollectionPage() {
                   placeholder={t('Rechercher une carte...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="min-h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-base transition-colors focus:border-blue-500/50 focus:outline-none sm:text-sm"
+                  className="paddock-field min-h-11 w-full rounded-xl px-4 py-2 text-base transition-colors sm:text-sm"
                 />
               </div>
 
@@ -451,7 +448,7 @@ export default function CollectionPage() {
               <select
                 value={rarityFilter}
                 onChange={(e) => setRarityFilter(e.target.value as any)}
-                className="min-h-11 w-full min-w-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-base text-white focus:outline-none sm:w-auto sm:text-sm [&>option]:bg-[#171717] [&>option]:text-white"
+                className="paddock-field min-h-11 w-full min-w-0 rounded-xl px-3 py-2 text-base sm:w-auto sm:text-sm [&>option]:bg-[#111b2a] [&>option]:text-white"
               >
                 <option value="All">{t('Toutes les raretés')}</option>
                 <option value="Common">{t('Commun')}</option>
@@ -466,7 +463,7 @@ export default function CollectionPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="min-h-11 w-full min-w-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-base text-white focus:outline-none sm:w-auto sm:text-sm [&>option]:bg-[#171717] [&>option]:text-white"
+                className="paddock-field min-h-11 w-full min-w-0 rounded-xl px-3 py-2 text-base sm:w-auto sm:text-sm [&>option]:bg-[#111b2a] [&>option]:text-white"
               >
                 <option value="name">{t('Trier par Nom')}</option>
                 <option value="make-asc">{t('Marques, A à Z')}</option>
@@ -491,6 +488,17 @@ export default function CollectionPage() {
             )}
           </header>
 
+          {/* Collection readout: only real filtered catalogue data. */}
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-cyan-100/10 pb-4">
+            <div>
+              <p className="paddock-eyebrow">APEX / INVENTORY</p>
+              <h2 className="paddock-section-title mt-2">{t('Collection')}</h2>
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-lg border border-[#e7c18a]/20 bg-[#e7c18a]/[0.04] px-3 py-2 text-xs text-[#e7c18a]">
+              <span className="font-mono font-bold tabular-nums">{filteredCards.length}</span>
+              <span className="font-bold uppercase tracking-[.1em]">{t('Cartes')}</span>
+            </div>
+          </div>
           {/* Grid of Cards */}
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 opacity-50">
@@ -559,9 +567,9 @@ export default function CollectionPage() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
                         transition={{ duration: 0.2 }}
-                        className="col-span-full flex min-w-0 items-center gap-3 pt-3 first:pt-0 sm:gap-4 sm:pt-5"
+                        className="col-span-full flex min-w-0 items-center gap-3 border-t border-cyan-100/10 pt-3 first:border-0 first:pt-0 sm:gap-4 sm:pt-5"
                       >
-                        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] sm:h-12 sm:w-12">
+                        <div className="paddock-tile relative flex h-10 w-10 shrink-0 items-center justify-center sm:h-12 sm:w-12">
                           <span aria-hidden="true" className="text-sm font-black text-white/60 sm:text-base">
                             {make.slice(0, 2).toUpperCase()}
                           </span>
@@ -575,7 +583,7 @@ export default function CollectionPage() {
                             />
                           )}
                         </div>
-                        <h2 className="shrink-0 text-xs font-black uppercase tracking-[0.18em] text-slate-200 sm:text-sm sm:tracking-[0.22em]">
+                        <h2 className="shrink-0 text-base font-normal uppercase tracking-[0.09em] text-[#e7c18a] sm:text-xl" style={{ fontFamily: '"Bebas Neue", Impact, sans-serif' }}>
                           {make}
                         </h2>
                         <div aria-hidden="true" className="h-px min-w-0 flex-1 bg-gradient-to-r from-cyan-300/50 via-white/15 to-transparent" />
@@ -595,7 +603,7 @@ export default function CollectionPage() {
                 <button
                   type="button"
                   onClick={() => setVisibleCount((count) => count + 24)}
-                  className="min-h-12 rounded-xl border border-blue-400/40 bg-blue-500/15 px-6 py-3 text-sm font-bold text-blue-200 transition hover:bg-blue-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                  className="paddock-ghost min-h-12 rounded-xl px-6 py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
                 >
                   {t('Afficher plus')} ({Math.min(visibleCount, filteredCards.length)}/{filteredCards.length})
                 </button>
@@ -622,9 +630,9 @@ export default function CollectionPage() {
 
 function StatCard({ label, value, sub, color }: { label: string, value: string | number, sub: string, color: string }) {
   return (
-    <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 sm:min-w-[120px] sm:px-6">
+    <div className="paddock-tile min-w-0 px-3 py-3 sm:min-w-[124px] sm:px-6">
       <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1">{label}</div>
-      <div className={`text-xl font-black ${color}`}>{value}</div>
+      <div className={`paddock-stat-number text-2xl sm:text-3xl ${color}`}>{value}</div>
       <div className="text-[10px] text-gray-400 mt-1 uppercase tracking-tight">{sub}</div>
     </div>
   );
