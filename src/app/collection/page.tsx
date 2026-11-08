@@ -389,10 +389,12 @@ export default function CollectionPage() {
   };
 
 
-  const inspectorCard = (selectedCard && filteredCards.some((item) => getCardId(item) === getCardId(selectedCard))
+  // The preview must never disclose a locked card, including keyboard navigation.
+  const inspectableCards = filteredCards.filter((item) => (userCards[getCardId(item)] || 0) > 0);
+  const inspectorCard = (selectedCard && inspectableCards.some((item) => getCardId(item) === getCardId(selectedCard))
     ? selectedCard
-    : null) || filteredCards.find((item) => (userCards[getCardId(item)] || 0) > 0) || null;
-  const inspectorIndex = inspectorCard ? filteredCards.findIndex((item) => getCardId(item) === getCardId(inspectorCard)) : -1;
+    : null) || inspectableCards[0] || null;
+  const inspectorIndex = inspectorCard ? inspectableCards.findIndex((item) => getCardId(item) === getCardId(inspectorCard)) : -1;
 
   return (
     <div className="apex-paddock flex min-h-screen text-white">
@@ -662,11 +664,11 @@ export default function CollectionPage() {
                   </div>
                   <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
                     <button type="button" aria-label={t('Carte précédente')} disabled={inspectorIndex <= 0}
-                      onClick={() => inspectorIndex > 0 && void handleOpenCardDetails(filteredCards[inspectorIndex - 1])}
+                      onClick={() => inspectorIndex > 0 && void handleOpenCardDetails(inspectableCards[inspectorIndex - 1])}
                       className="paddock-ghost flex h-9 w-10 items-center justify-center disabled:opacity-30"><ChevronLeft size={17}/></button>
-                    <span className="font-mono text-[11px] text-[#9aa9c7]">{inspectorIndex + 1} / {filteredCards.length}</span>
-                    <button type="button" aria-label={t('Carte suivante')} disabled={inspectorIndex < 0 || inspectorIndex >= filteredCards.length - 1}
-                      onClick={() => inspectorIndex >= 0 && inspectorIndex < filteredCards.length - 1 && void handleOpenCardDetails(filteredCards[inspectorIndex + 1])}
+                    <span className="font-mono text-[11px] text-[#9aa9c7]">{inspectorIndex + 1} / {inspectableCards.length}</span>
+                    <button type="button" aria-label={t('Carte suivante')} disabled={inspectorIndex < 0 || inspectorIndex >= inspectableCards.length - 1}
+                      onClick={() => inspectorIndex >= 0 && inspectorIndex < inspectableCards.length - 1 && void handleOpenCardDetails(inspectableCards[inspectorIndex + 1])}
                       className="paddock-ghost flex h-9 w-10 items-center justify-center disabled:opacity-30"><ChevronRight size={17}/></button>
                   </div>
                 </div>
