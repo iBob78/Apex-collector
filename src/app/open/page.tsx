@@ -331,11 +331,11 @@ function OpenContent() {
   if (loading) return null;
 
   return (
-    <div className="apex-paddock relative flex min-h-screen flex-col items-center justify-center overflow-x-hidden px-4 py-9 sm:px-6 sm:py-14">
+    <div className="apex-paddock apx-reveal-stage relative flex min-h-screen flex-col items-center justify-center overflow-x-hidden px-3 py-8 sm:px-6 sm:py-12">
 
       {/* Background Ambience */}
-      <div className={`absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-60 z-0`}></div>
-      <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r ${pack.color} opacity-10 blur-[120px] rounded-full z-0`}></div>
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_50%_10%,rgba(147,168,255,.17),transparent_38%),linear-gradient(120deg,transparent_30%,rgba(89,144,234,.07)_48%,transparent_63%)]" />
+      <div className={`pointer-events-none absolute left-1/2 top-1/2 z-0 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r ${pack.color} opacity-20 blur-[120px]`}></div>
 
       <AnimatePresence mode="wait">
         {!showCards ? (
@@ -346,14 +346,14 @@ function OpenContent() {
             exit={{ scale: 1.5, opacity: 0, filter: 'blur(20px)' }}
             className="relative z-10 flex flex-col items-center"
           >
-            <div className="mb-8 text-center">
-              <p className="paddock-eyebrow">APEX / PACK UNSEAL</p>
-              <h1 className="paddock-section-title mt-3">{t(pack.name)}</h1>
+            <div className="mb-9 text-center">
+              <p className="paddock-eyebrow justify-center">APEX / BOOSTER OPENING</p>
+              <h1 className="paddock-title mt-3">{t(pack.name)}</h1>
               <p className="mt-2 text-xs uppercase tracking-[.15em] text-slate-400">{pack.cardCount} {t('Cartes')}</p>
             </div>
             <motion.div
               ref={packRef}
-              className={`group relative h-96 w-64 overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br ${pack.color} p-1 shadow-[0_30px_90px_rgba(0,0,0,.65),0_0_35px_rgba(82,202,236,.17)]`}
+              className={`group relative h-96 w-64 overflow-hidden rounded-2xl border border-[#9eb6ff]/35 bg-gradient-to-br ${pack.color} p-1 shadow-[0_30px_90px_rgba(0,0,0,.65),0_0_38px_rgba(118,122,255,.4)]`}
             >
               {/* Pack Interior Design */}
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 backdrop-blur-[2px]">
@@ -481,12 +481,12 @@ function OpenContent() {
             animate={{ opacity: 1 }}
             className="relative z-10 flex w-full max-w-[1400px] flex-col items-center"
           >
-            <header className="race-hero mb-6 w-full bg-[#171A1E] px-4 py-6 text-center sm:px-8">
-              <p className="race-eyebrow mb-3 justify-center">APEX / CARD REVEAL</p>
+            <header className="apx-reveal-header mb-6 w-full max-w-[1100px] rounded-xl bg-[#0a1022]/60">
+              <p className="paddock-eyebrow mb-3 justify-center">APEX / CARD REVEAL</p>
               <motion.h2
                 initial={{ y: -20 }}
                 animate={{ y: 0 }}
-                className="paddock-title"
+                className="font-[\'Barlow_Condensed\'] text-[clamp(2.2rem,5vw,4rem)] font-black italic text-white"
               >
                 {t('Tes cartes sont là !')}
               </motion.h2>
@@ -506,14 +506,14 @@ function OpenContent() {
             <button
               type="button"
               onClick={flipAllCards}
-              className="paddock-action mb-8 min-h-12 px-6 py-3 text-xs font-black uppercase tracking-widest"
+              className="paddock-ghost mb-8 min-h-11 px-6 py-3 text-xs font-bold"
             >
               {flippedCards.size === drawnCards.length
                 ? t('Retourner les cartes face cachée')
                 : t('Retourner toutes les cartes')}
             </button>
 
-            <div className="mb-12 w-full max-w-[1400px]">
+            <div className="mb-10 w-full max-w-[1400px]">
               <div className="grid grid-cols-3 justify-items-center gap-2 px-1 sm:flex sm:flex-wrap sm:items-stretch sm:justify-center sm:gap-4 sm:px-2">
                 {drawnCards.map((card, idx) => (
                   <motion.div
@@ -542,13 +542,13 @@ function OpenContent() {
                         tabIndex={flippedCards.has(idx) ? -1 : 0}
                         onClick={() => flipCard(idx)}
                         aria-label={t('Retourner la carte {number}', { number: idx + 1 })}
-                        className="absolute inset-0 overflow-hidden border-2 border-[#D32F35]/50 bg-[repeating-linear-gradient(125deg,#161c17_0px,#161c17_18px,#202821_18px,#202821_36px)] shadow-[0_12px_30px_rgba(0,0,0,0.5)]"
+                        className="absolute inset-0 overflow-hidden rounded-xl border-2 border-[#719aff]/70 bg-[repeating-linear-gradient(125deg,#111c3b_0px,#111c3b_17px,#202b53_17px,#202b53_34px)] shadow-[0_12px_34px_rgba(27,53,136,0.52),0_0_21px_rgba(108,128,253,0.25)]"
                         style={{ backfaceVisibility: 'hidden' }}
                       >
-                        <div className="absolute inset-2 border border-[#D32F35]/55" />
+                        <div className="absolute inset-2 rounded-lg border border-[#89b5ff]/50" />
                         <div className="absolute inset-4 border border-white/15" />
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_center,rgba(211,47,53,0.14),transparent_65%)]">
-                          <span className="text-[65px] font-black uppercase tracking-tighter text-[#F0EFEB] drop-shadow-[0_0_20px_rgba(211,47,53,0.4)]">A</span>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_center,rgba(127,106,255,0.3),transparent_65%)]">
+                          <span className="text-[65px] font-black italic uppercase tracking-tighter text-white drop-shadow-[0_0_20px_rgba(115,157,255,0.8)]">A</span>
                           <span className="mt-1 text-[12px] font-black uppercase tracking-[.2em] text-white/70">Apex Collector</span>
                         </div>
                         <span className="absolute bottom-3 left-0 right-0 text-center text-[8px] font-bold uppercase tracking-[0.3em] text-white/40">
