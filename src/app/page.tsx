@@ -36,12 +36,12 @@ export default function LandingPage() {
 
   return (
     <main className="apex-paddock paddock-landing min-h-screen overflow-hidden text-white">
-      <header className="relative z-30 flex min-h-[76px] items-center justify-between gap-3 border-b border-white/20 bg-[#171A1E] px-4 sm:px-9 lg:px-14">
+      <header className="relative z-30 flex min-h-[76px] items-center justify-between gap-3 border-b border-white/20 bg-[#0b1225]/95 px-4 backdrop-blur-xl sm:px-9 lg:px-14">
         <Link href="/" className="flex min-w-0 items-center gap-3" aria-label="Apex Collector">
-          <span className="flex h-10 w-10 items-center justify-center bg-[#D32F35] text-[#F0EFEB]">
+          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#f34b66] to-[#bd1e4d] text-white shadow-[0_0_20px_rgba(231,42,82,.25)]">
             <Flag size={22} strokeWidth={2.8} aria-hidden="true"/>
           </span>
-          <div className="font-['Barlow_Condensed'] text-[26px] font-black uppercase leading-[.76] tracking-[-.045em] sm:text-[31px]">
+          <div className="font-['Barlow_Condensed'] text-[26px] font-black italic uppercase leading-[.76] tracking-[-.045em] sm:text-[31px]">
             APEX <span className="block text-[#F0EFEB]">COLLECTOR</span>
           </div>
         </Link>
@@ -56,17 +56,17 @@ export default function LandingPage() {
       </header>
 
       {/* Racing photography and diagonal overprint take over the entire first screen. */}
-      <section className="relative isolate min-h-[min(790px,91dvh)] overflow-hidden bg-[#171A1E]" aria-label="Apex Collector Motorsport">
-        <div className="race-photo absolute inset-0" aria-hidden="true" />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,9,7,.94)_0%,rgba(8,11,9,.67)_50%,rgba(5,8,6,.24)_100%)]" aria-hidden="true" />
+      <section className="apx-dashboard-hero relative isolate min-h-[min(690px,91dvh)] overflow-hidden !rounded-none !border-x-0" aria-label="Apex Collector Motorsport">
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,14,31,.86),rgba(8,14,29,.25))]" aria-hidden="true" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,13,29,.91)_0%,rgba(11,16,34,.7)_49%,rgba(10,14,26,.1)_100%)]" aria-hidden="true" />
         <div className="absolute -right-14 -top-16 rotate-[-12deg] font-['Barlow_Condensed'] text-[230px] font-black leading-none tracking-[-.09em] text-white/[.08] sm:text-[470px]" aria-hidden="true">01</div>
-        <div className="relative z-10 mx-auto flex min-h-[min(790px,91dvh)] max-w-[1600px] flex-col justify-end px-5 pb-12 pt-24 sm:px-10 sm:pb-16 lg:px-16">
+        <div className="relative z-10 mx-auto flex min-h-[min(690px,91dvh)] max-w-[1600px] flex-col justify-end px-5 pb-12 pt-24 sm:px-10 sm:pb-16 lg:px-16">
           <motion.div initial={{ opacity: 0, x: -34 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .55 }} className="max-w-[960px]">
-            <span className="race-poster-label">THE MOTORSPORT COLLECTION / 001</span>
-            <p className="race-eyebrow mb-5 mt-7">COLLECT // COMPETE // CREATE YOUR LEGACY</p>
-            <h1 className="font-['Barlow_Condensed'] text-[clamp(4.4rem,13vw,12rem)] font-black uppercase leading-[.71] tracking-[-.065em]">
-              <span className="block">{t('Collectionnez')}</span>
-              <span className="block text-[#D32F35]">{t('l’Élite Automobile')}</span>
+            <span className="race-poster-label">APEX COLLECTOR / AUTOMOTIVE CARDS</span>
+            <p className="race-eyebrow mb-5 mt-7">COLLECT // DISCOVER // BUILD YOUR GARAGE</p>
+            <h1 className="font-['Barlow_Condensed'] text-[clamp(4.4rem,13vw,12rem)] font-black italic uppercase leading-[.78] tracking-[-.055em]">
+              <span className="block">APEX</span>
+              <span className="block text-white">COLLECTOR<span className="text-[#ee4464]">.</span></span>
             </h1>
             <p className="mt-7 max-w-[600px] border-l-[3px] border-[#D32F35] pl-4 text-[14px] font-medium leading-relaxed text-gray-200 sm:mt-10 sm:text-[18px]">
               {t('Ouvrez des packs premium, construisez votre garage légendaire et dominez le marché mondial. Chaque carte est une icône automobile rare.')}
@@ -81,7 +81,7 @@ export default function LandingPage() {
             </div>
           </motion.div>
           <div className="mt-16 flex items-center gap-4 border-t border-white/30 pt-5 font-mono text-[10px] font-bold uppercase tracking-[.12em] text-white/65">
-            <span className="text-[#F0EFEB]">AC // RACING DEPARTMENT</span>
+            <span className="text-[#F0EFEB]">AC // THE COLLECTION</span>
             <span className="h-px flex-1 bg-white/25"/>
             <span className="hidden sm:inline">GARAGE · BOOSTERS · MARKET</span>
             <span>01 / 03</span>
@@ -113,18 +113,18 @@ export default function LandingPage() {
             const Icon = sector.icon;
             return (
               <motion.article key={sector.id} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: .4, delay: index * .08 }}
-                className="group relative flex min-h-[420px] flex-col overflow-hidden border border-white/25 bg-[#161b17]">
-                <div className="relative h-[205px] overflow-hidden bg-[#101215] sm:h-[250px]">
+                className="group relative flex min-h-[420px] flex-col overflow-hidden rounded-[18px] border border-[#8198d8]/25 bg-[#111c33] shadow-[0_15px_45px_rgba(0,0,0,.22)]">
+                <div className="relative h-[205px] overflow-hidden bg-[#0b152a] sm:h-[250px]">
                   <img src={sector.image} alt="" loading="lazy" className="h-full w-full object-cover opacity-80 transition duration-500 group-hover:scale-105 group-hover:opacity-100"/>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#161b17] to-transparent"/>
-                  <span className="absolute left-5 top-5 bg-[#D32F35] px-3 py-1 font-['Barlow_Condensed'] text-[13px] font-black text-[#F0EFEB]">{sector.id} / 03</span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#111c33] to-transparent"/>
+                  <span className="absolute left-5 top-5 rounded-md bg-gradient-to-r from-[#e7375b] to-[#7250bd] px-3 py-1 font-['Barlow_Condensed'] text-[13px] font-black text-[#F0EFEB]">{sector.id} / 03</span>
                   <div className="absolute bottom-0 right-2 font-['Barlow_Condensed'] text-[110px] font-black leading-[.75] text-white/10">{sector.id}</div>
                 </div>
                 <div className="relative flex flex-1 flex-col p-6">
                   <p className="race-eyebrow">{sector.tag}</p>
                   <h3 className="mt-3 font-['Barlow_Condensed'] text-[34px] font-black uppercase leading-[.87] text-white sm:text-[41px]">{t(sector.key)}</h3>
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-gray-400">{t(sector.text)}</p>
-                  <Link href={sector.href} className="mt-7 flex items-center justify-between border-t border-white/25 pt-4 font-['Barlow_Condensed'] text-[13px] font-black uppercase tracking-[.12em] text-[#F0EFEB] hover:text-white">
+                  <Link href={sector.href} className="mt-7 flex items-center justify-between border-t border-white/15 pt-4 font-['Barlow_Condensed'] text-[13px] font-bold tracking-[.08em] text-[#a5baff] hover:text-white">
                     <span>{t('How to play')}</span><Icon size={22} aria-hidden="true"/>
                   </Link>
                 </div>
@@ -134,24 +134,24 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="race-journey" className="bg-[#F0EFEB] px-5 py-16 text-[#101215] sm:px-10 sm:py-20 lg:px-16">
+      <section id="race-journey" className="apx-showcase-section px-5 py-16 text-white sm:px-10 sm:py-20 lg:px-16">
         <div className="mx-auto max-w-[1500px]">
           <p className="font-['Barlow_Condensed'] text-[12px] font-black uppercase tracking-[.2em]">03 / STARTING GRID</p>
           <h2 className="mt-3 font-['Barlow_Condensed'] text-[clamp(4rem,9vw,9rem)] font-black uppercase leading-[.77] tracking-[-.055em]">YOUR ROAD TO THE TOP<span className="text-[#D32F35]">.</span></h2>
-          <div className="mt-12 grid gap-[2px] bg-[#101215]/25 md:grid-cols-4">
+          <div className="mt-12 grid gap-3 md:grid-cols-4">
             {[
               { id:'01', label:t('Créez votre compte'), icon:Flag },
               { id:'02', label:t('Ouvrez des boosters'), icon:Zap },
               { id:'03', label:t('Explorez votre garage'), icon:Gauge },
               { id:'04', label:t('Suivez vos missions'), icon:Trophy },
             ].map(({ id, label, icon: Icon }) => (
-              <div key={id} className="flex flex-col justify-between gap-7 bg-[#F0EFEB] p-5 sm:p-7">
+              <div key={id} className="paddock-tile flex flex-col justify-between gap-7 p-5 sm:p-7">
                 <div className="flex items-start justify-between"><span className="font-['Barlow_Condensed'] text-[65px] font-black leading-[.75]">{id}</span><Icon size={29} aria-hidden="true"/></div>
                 <h3 className="max-w-[250px] font-['Barlow_Condensed'] text-[27px] font-black uppercase leading-[.88]">{label}</h3>
               </div>
             ))}
           </div>
-          <Link href="/how-to-play" className="mt-8 inline-flex min-h-12 items-center gap-4 border border-[#101215] bg-[#171A1E] px-6 font-['Barlow_Condensed'] text-[14px] font-black uppercase tracking-[.15em] text-white transition hover:bg-[#555D65]">
+          <Link href="/how-to-play" className="paddock-ghost mt-8 inline-flex min-h-12 items-center gap-4 px-6 text-[14px] font-bold">
             {t('How to play')} <ArrowUpRight size={18} aria-hidden="true"/>
           </Link>
         </div>
@@ -168,7 +168,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="flex flex-wrap items-center justify-between gap-4 bg-[#101215] px-5 py-6 text-[10px] font-extrabold uppercase tracking-[.14em] text-gray-500 sm:px-10">
+      <footer className="flex flex-wrap items-center justify-between gap-4 bg-[#090f20] px-5 py-6 text-[10px] font-extrabold uppercase tracking-[.14em] text-gray-500 sm:px-10">
         <span className="text-white">APEX <span className="text-[#F0EFEB]">COLLECTOR</span> / RACING DEPARTMENT</span>
         <span>COLLECT / DISCOVER / TRADE</span>
         <Link href="/how-to-play" className="hover:text-[#F0EFEB]">{t('How to play')} ↗</Link>
