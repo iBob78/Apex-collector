@@ -67,12 +67,12 @@ export default function DashboardPage() {
   const formatAverage = (value: number) => new Intl.NumberFormat(language, { maximumFractionDigits: 1 }).format(value);
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white">
+    <div className="apex-paddock flex min-h-screen text-white">
       <Sidebar />
       <main className="min-w-0 flex-1">
-        <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-7 px-4 py-6 sm:gap-9 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
+        <div className="paddock-shell flex flex-col gap-7 px-4 py-6 sm:gap-8 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
           {/* Keep AP in a compact, persistent top-right header instead of the statistics grid. */}
-          <header className="sticky top-0 z-40 -mx-4 -mt-6 flex items-start justify-between gap-2 border-b border-white/10 bg-[#050505]/95 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:-mt-8 sm:items-center sm:px-6 sm:py-4 lg:-mx-10 lg:-mt-10 lg:px-10">
+          <header className="sticky top-0 z-40 -mx-4 -mt-6 flex items-start justify-between gap-2 border-b border-cyan-100/10 bg-[#0a1421]/95 px-4 py-3 shadow-[0_8px_40px_rgba(0,0,0,.12)] backdrop-blur-xl sm:-mx-6 sm:-mt-8 sm:items-center sm:px-6 sm:py-4 lg:-mx-10 lg:-mt-10 lg:px-10">
             <div className="min-w-0">
               <h1
                 className="bg-gradient-to-r from-white to-slate-400 bg-clip-text text-[27px] font-normal uppercase not-italic leading-none tracking-[0.035em] text-transparent sm:text-4xl"
@@ -88,7 +88,7 @@ export default function DashboardPage() {
             <div className="flex shrink-0 items-center gap-2">
               <div
                 aria-label={t('Balance AP')}
-                className="flex min-h-9 flex-col justify-center rounded-lg border border-emerald-400/25 bg-[#0e1a17] px-2 py-1 text-right shadow-[0_1px_16px_rgba(0,0,0,0.18)]"
+                className="flex min-h-9 flex-col justify-center rounded-lg border border-emerald-300/30 bg-emerald-300/[0.08] px-2 py-1 text-right shadow-[0_1px_16px_rgba(0,0,0,0.18)]"
               >
                 <span className="text-[8px] font-bold uppercase leading-tight tracking-normal text-emerald-200/70">
                   {t('Balance AP')}
@@ -111,11 +111,47 @@ export default function DashboardPage() {
             </div>
           </header>
 
+          {/* Motorsport-style command deck, populated exclusively with actual garage stats. */}
+          <section className="paddock-hero grid min-w-0 gap-6 p-5 sm:p-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)] lg:items-center" aria-label={t('Niveau écurie')}>
+            <div className="relative z-10 min-w-0">
+              <p className="paddock-eyebrow">APEX / GARAGE CONTROL</p>
+              <h2 className="mt-4 max-w-[550px] text-[clamp(2.7rem,6vw,5.7rem)] font-normal uppercase leading-[.89] tracking-[.03em] text-white" style={{ fontFamily: '"Bebas Neue", Impact, sans-serif' }}>
+                {t('Mon Garage')}<span className="text-[#e7c18a]">.</span>
+              </h2>
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-slate-300">{t('Gérez votre écurie et vos actifs.')}</p>
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <Link href="/collection" className="paddock-action min-h-11 px-5">
+                  {t('MA COLLECTION')} <ArrowUpRight size={16} aria-hidden="true" />
+                </Link>
+                <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.16em] text-slate-400">
+                  <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_11px_rgba(110,231,183,.6)]" />
+                  {t('Niveau écurie')} {garageProgress.level}
+                </span>
+              </div>
+            </div>
+            <div className="paddock-panel relative z-10 min-w-0 overflow-hidden p-5 sm:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <p className="paddock-micro">{t('Vers le prochain niveau')}</p>
+                <Gauge size={18} className="text-[#e7c18a]" aria-hidden="true" />
+              </div>
+              <div className="mt-3 flex items-end justify-between gap-4">
+                <span className="paddock-stat-number text-[#e7c18a]">{garageProgress.level}</span>
+                <span className="mb-1 text-right text-[11px] font-bold uppercase tracking-wide text-slate-400">{t(garageProgress.tierTitle)}</span>
+              </div>
+              <div className="mt-4 flex items-center justify-between gap-3 text-xs text-slate-300">
+                <span>{t('Vers le prochain niveau')}</span>
+                <strong className="font-mono text-cyan-200">{progressCount}/10</strong>
+              </div>
+              <div className="paddock-meter mt-2"><div style={{ width: progressPercent + '%' }} /></div>
+              <div className="paddock-telemetry mt-5 h-7 opacity-70" aria-hidden="true" />
+            </div>
+          </section>
+
           {/* Smaller cards, more practical numbers, and no duplicate AP balance. */}
           <section aria-label={t('Statistiques du garage')}>
             <div className="mb-4 flex items-center gap-3">
-              <span className="h-5 w-1 rounded-full bg-blue-500" aria-hidden="true" />
-              <h2 className="text-sm font-black uppercase tracking-[0.16em] text-gray-300">
+              <span className="h-7 w-[3px] rounded-full bg-[#e7c18a]" aria-hidden="true" />
+              <h2 className="paddock-section-title">
                 {t('Statistiques du garage')}
               </h2>
             </div>
@@ -127,7 +163,7 @@ export default function DashboardPage() {
             )}
 
             <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
-              <article className="flex min-w-0 flex-col rounded-2xl border border-blue-400/20 bg-[#101722] p-4 sm:p-5">
+              <article className="paddock-data-card flex min-w-0 flex-col p-4 sm:p-5">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="text-[11px] font-bold uppercase tracking-wider text-blue-200 sm:text-xs">
                     {t('Mon Garage')}
@@ -153,7 +189,7 @@ export default function DashboardPage() {
                 </div>
               </article>
 
-              <article className="flex min-w-0 flex-col rounded-2xl border border-violet-400/15 bg-[#13131c] p-4 sm:p-5">
+              <article className="paddock-data-card flex min-w-0 flex-col p-4 sm:p-5">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="text-[11px] font-bold uppercase tracking-wider text-violet-200 sm:text-xs">
                     {t('Cartes totales')}
@@ -176,7 +212,7 @@ export default function DashboardPage() {
                 </div>
               </article>
 
-              <article className="col-span-2 min-w-0 self-start rounded-2xl border border-amber-400/15 bg-[#171610] p-3 sm:p-4 lg:col-span-1">
+              <article className="paddock-data-card col-span-2 min-w-0 self-start p-3 sm:p-4 lg:col-span-1">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-2">
                     <Gauge size={17} className="shrink-0 text-amber-300" aria-hidden="true" />
@@ -212,8 +248,8 @@ export default function DashboardPage() {
           {/* Direct links instead of a promotional booster listing. */}
           <section aria-label={t('Accès rapide')}>
             <div className="mb-4 flex items-center gap-3">
-              <span className="h-5 w-1 rounded-full bg-blue-500" aria-hidden="true" />
-              <h2 className="text-sm font-black uppercase tracking-[0.16em] text-gray-300">
+              <span className="h-7 w-[3px] rounded-full bg-[#e7c18a]" aria-hidden="true" />
+              <h2 className="paddock-section-title">
                 {t('Accès rapide')}
               </h2>
             </div>
@@ -224,7 +260,7 @@ export default function DashboardPage() {
             </div>
           </section>
 
-          <aside className="flex items-start gap-3 rounded-2xl border border-blue-500/15 bg-[#0c1421] p-4 sm:p-5">
+          <aside className="paddock-panel flex items-start gap-3 p-4 sm:p-5">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-300">
               <Lightbulb size={19} aria-hidden="true" />
             </span>
@@ -253,7 +289,7 @@ function DashboardShortcut({
   return (
     <Link
       href={href}
-      className="group flex min-h-[76px] items-center gap-3 rounded-2xl border border-white/10 bg-[#10131a] p-4 transition hover:border-blue-400/40 hover:bg-[#151d2b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+      className="paddock-data-card group flex min-h-[90px] items-center gap-3 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
     >
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/5 text-blue-300">
         {icon}
