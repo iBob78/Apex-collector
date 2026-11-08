@@ -82,7 +82,7 @@ export default function CardShowcasePage() {
     const brandLogo = resolveBrandLogo(card.make);
 
     return (
-        <div className="flex min-h-screen bg-[#050505] text-white">
+        <div className="apex-paddock flex min-h-screen text-white">
             <Sidebar />
             <main className="flex-1 flex flex-col relative overflow-hidden">
                 {/* Cinematic Background Glow */}
@@ -91,15 +91,15 @@ export default function CardShowcasePage() {
                     style={{ backgroundColor: getRarityColor(card.rarity) }}
                 />
 
-                <div className="z-10 p-8 md:p-12 flex-1 flex flex-col">
+                <div className="paddock-shell z-10 flex flex-1 flex-col px-4 py-7 sm:px-8 sm:py-10 lg:px-12">
                     <button
                         onClick={() => router.back()}
-                        className="flex items-center gap-3 text-gray-500 hover:text-white transition-colors uppercase text-[10px] font-black tracking-[0.3em] mb-12"
+                        className="paddock-ghost mb-8 flex min-h-10 w-fit items-center gap-3 rounded-lg px-4 text-[10px] font-black uppercase tracking-[0.2em] transition"
                     >
                         <ArrowLeftIcon size={16} /> {t('Retour au garage')}
                     </button>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
                         {/* Left Col: Hero Image */}
                         <motion.div
                             initial={{ opacity: 0, x: -50 }}
@@ -111,7 +111,7 @@ export default function CardShowcasePage() {
                                 style={{ backgroundColor: getRarityColor(card.rarity) }}
                             />
 
-                            <div className="relative h-full w-full rounded-[24px] overflow-hidden border border-white/10 shadow-2xl">
+                            <div className="relative h-full w-full overflow-hidden rounded-[24px] border border-cyan-100/20 shadow-[0_30px_90px_rgba(0,0,0,.5)]">
                                 <SafeImage
                                     src={card.image_url}
                                     fallback={IMAGE_PATHS.PLACEHOLDERS.VEHICLE_CARD}
@@ -122,7 +122,7 @@ export default function CardShowcasePage() {
                             </div>
 
                             {/* Owned Badge */}
-                            <div className="absolute -bottom-6 -right-6 bg-blue-600 border-4 border-[#050505] px-6 py-4 rounded-3xl shadow-2xl">
+                            <div className="absolute -bottom-5 -right-2 rounded-xl border-2 border-[#101a27] bg-gradient-to-br from-[#185c76] to-[#102638] px-4 py-3 shadow-2xl sm:-right-6 sm:px-6 sm:py-4">
                                 <div className="text-[10px] font-black uppercase tracking-widest text-blue-100">{t('Exemplaires')}</div>
                                 <div className="text-3xl font-black italic tracking-tighter">x{ownedCount}</div>
                             </div>
@@ -133,12 +133,12 @@ export default function CardShowcasePage() {
                             initial={{ opacity: 0, x: 50 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="flex flex-col"
+                            className="paddock-panel flex flex-col p-5 sm:p-7"
                         >
                             <div className="flex items-center gap-6 mb-4">
                                 <SafeImage src={brandLogo} width={60} height={60} alt="" className="object-contain opacity-50" />
                                 <div>
-                                    <h1 className="text-5xl font-black uppercase italic tracking-tighter leading-none mb-2">
+                                    <h1 className="paddock-title mb-3">
                                         {card.make} <span className="text-transparent border-text block md:inline" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.3)' }}>{card.model}</span>
                                     </h1>
                                     <div className="flex items-center gap-4">
@@ -162,7 +162,7 @@ export default function CardShowcasePage() {
                             </p>
 
                             {/* Technical Grid */}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                            <div className="mb-10 grid grid-cols-2 gap-3 md:grid-cols-4">
                                 <SpecItem icon={<ZapIcon size={16} />} label={t('Puissance')} value={formatPower(Number(card.power_hp), units, language, Number(card.power_kw) || undefined)} />
                                 <SpecItem icon={<GaugeIcon size={16} />} label={t('Vitesse Max')} value={formatSpeed(Number(card.max_speed_kmh), units, language)} />
                                 <SpecItem icon={<ActivityIcon size={16} />} label={t('0 à 100 km/h')} value={card.acceleration_0_100 ? `${card.acceleration_0_100}s` : '--'} />
@@ -175,10 +175,10 @@ export default function CardShowcasePage() {
 
                             {/* Actions */}
                             <div className="flex flex-wrap gap-4">
-                                <button className="bg-white text-black px-10 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-blue-500 hover:text-white transition-all shadow-xl">
+                                <button className="paddock-action px-6 py-4 text-xs shadow-xl">
                                     Mettre en vente
                                 </button>
-                                <button className="bg-white/5 border border-white/10 px-10 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-white/10 transition-all">
+                                <button className="paddock-ghost rounded-xl px-6 py-4 text-xs font-black uppercase tracking-widest transition-all">
                                     Ajouter aux favoris
                                 </button>
                             </div>
@@ -192,7 +192,7 @@ export default function CardShowcasePage() {
 
 function SpecItem({ icon, label, value, sub }: { icon: any, label: string, value: string | number, sub?: string }) {
     return (
-        <div className="bg-white/5 border border-white/5 rounded-2xl p-4 group hover:border-blue-500/30 transition-all">
+        <div className="paddock-tile group p-3 transition-all sm:p-4">
             <div className="text-blue-500 mb-3 group-hover:scale-110 transition-transform origin-left">{icon}</div>
             <div className="text-[9px] uppercase font-black tracking-widest text-gray-600 mb-1">{label}</div>
             <div className="text-sm font-black italic tracking-tighter">{value}</div>
