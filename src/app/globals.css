@@ -1059,3 +1059,21 @@ html, body {
 @media(max-width:639px){
   .apex-paddock .apx-card-details-content{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
 }
+
+
+/* Bottom navigation: active arcade-game light pool instead of a flat underline. */
+.paddock-mobile-nav a[aria-current="page"]{
+  background:radial-gradient(ellipse 66% 58% at 50% 32%,rgba(106,128,255,.24),transparent 88%);
+  color:#eef4ff;text-shadow:0 0 9px rgba(128,158,255,.23);
+}
+.paddock-mobile-nav a[aria-current="page"] svg{
+  filter:drop-shadow(0 0 7px rgba(112,150,255,.48));
+}
+.paddock-mobile-nav{
+  background:linear-gradient(180deg,rgba(19,29,53,.93),rgba(9,15,29,.98));
+  border-top:1px solid rgba(129,167,243,.38);
+  box-shadow:0 -12px 32px rgba(0,0,0,.36),0 -1px 15px rgba(91,124,245,.1);
+}
+@media(prefers-reduced-motion:reduce){
+  .paddock-mobile-nav a[aria-current="page"] svg{filter:none}
+}
