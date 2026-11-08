@@ -671,3 +671,9 @@ html, body {
 .paddock-mobile-nav{border-top:1px solid rgba(131,201,226,.26);background:rgba(8,17,29,.96);box-shadow:0 -14px 42px rgba(0,0,0,.46),inset 0 1px rgba(255,255,255,.05)}.paddock-mobile-sheet{border:1px solid rgba(161,204,226,.29);background:linear-gradient(145deg,#1a2a3d,#0b131f);box-shadow:0 30px 80px rgba(0,0,0,.7)}
 @media(max-width:639px){.paddock-header{padding:19px;border-radius:18px}.paddock-pack-card{border-radius:14px}.paddock-landing-title{font-size:clamp(3.2rem,15vw,5rem)}.paddock-landing-image{max-height:340px;transform:rotate(2deg)}}
 @media(prefers-reduced-motion:reduce){.paddock-data-card,.paddock-action,.paddock-pack-card,.paddock-landing-image{transition:none}.paddock-data-card:hover,.paddock-action:hover,.paddock-pack-card:hover,.paddock-landing-image:hover{transform:none}}
+
+/* Visible keyboard focus is part of the sandbox design language. */
+.paddock-action:focus-visible,.paddock-ghost:focus-visible,.paddock-field:focus-visible{
+  outline:2px solid #9eeeff;
+  outline-offset:3px;
+}

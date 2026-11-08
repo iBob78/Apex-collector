@@ -22,6 +22,10 @@ Cette branche est un **bac à sable visuel**, isolé de `main`. Ne pas fusionner
 | Ouverture `/open` | Mise en scène du pack et en-tête de révélation, contrôles existants conservés |
 | Marketplace | Présentation boursière, panneaux des annonces, actions et fenêtre de vente |
 | Profil | Identité de pilote, statistiques, progression et showroom |
+| Contrats / succès | Même langage de panneaux pour les missions, conditions de progression et récompenses |
+| Showroom public | Affiche du véhicule vedette, galerie, niveaux et statistiques respectant le mode privé |
+| Suggestions | Formulaire enrichi visuellement, sans modification des validations ni du traitement |
+| Fiche véhicule | Présentation de collection et tuiles de caractéristiques techniques |
 | Connexion | Vue scindée grand écran, visuel du jeu, champs et CTA premium |
 | Classement, réglages, guide | Uniformisation des panneaux, titres et contrôles |
 
@@ -40,7 +44,7 @@ Cette branche est un **bac à sable visuel**, isolé de `main`. Ne pas fusionner
 1. Ouvrir en **360, 390, 430 px** puis tablette et PC ; contrôler les zones fixes, le scroll horizontal, les grilles, les tailles de textes et l'accès à tous les boutons.
 2. Tester le parcours connexion → dashboard → collection, recherche, filtres, favoris, détails, progression et achats de niveaux.
 3. Tester le booster payant, le booster quotidien gratuit, sa déchirure, le flip, `NEW!`, le halo et l'absence de niveaux sur le tirage.
-4. Tester les annonces marketplace, le showroom privé/public, le classement, langue et unités.
+4. Tester les annonces marketplace, le showroom privé/public, le classement, les missions et récompenses, les suggestions, les détails véhicule, la langue et les unités.
 5. Exécuter `npm run lint`, `npm test`, `npm run build`, vérifier le Preview Vercel si disponible.
 6. Vérifier les trois langues FR/EN/ES et la réduction des animations.
 

@@ -238,7 +238,7 @@ export default function Sidebar() {
               <CrownIcon size={18} className="text-blue-500" />
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-tighter text-gray-500 font-bold">{t('Rang Actuel')}</div>
+              <div className="text-[10px] uppercase tracking-tighter text-gray-500 font-bold">{t('Email')}</div>
               <div className="max-w-[155px] truncate text-xs font-bold text-white" title={user.email || undefined}>{user.email || t('PROFIL PILOTE')}</div>
             </div>
           </div>
