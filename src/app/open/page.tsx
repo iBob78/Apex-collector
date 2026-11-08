@@ -486,7 +486,7 @@ function OpenContent() {
               <motion.h2
                 initial={{ y: -20 }}
                 animate={{ y: 0 }}
-                className="font-[\'Barlow_Condensed\'] text-[clamp(2.2rem,5vw,4rem)] font-black italic text-white"
+                className="font-['Barlow_Condensed'] text-[clamp(2.2rem,5vw,4rem)] font-black italic text-white"
               >
                 {t('Tes cartes sont là !')}
               </motion.h2>
