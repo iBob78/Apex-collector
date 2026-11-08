@@ -67,20 +67,23 @@ export default function BoostersPage() {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white">
+    <div className="apex-paddock flex min-h-screen text-white">
       <Sidebar />
       <main className="min-w-0 flex-1 flex flex-col">
-        <div className="p-4 sm:p-6 lg:p-8 flex-1">
-          <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-black uppercase italic tracking-tighter bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent mb-2">
-                {t('Boutique Officielle')}
-              </h1>
-              <p className="text-gray-500 font-mono text-sm">{t('Débloquez de nouvelles mécaniques et agrandissez votre garage.')}</p>
+        <div className="paddock-shell flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-9 lg:py-10">
+          <header className="paddock-header mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-center">
+            <div className="relative z-10 min-w-0">
+              <p className="paddock-eyebrow">APEX / BOOSTER LAB</p>
+              <h1 className="paddock-title mt-3">{t('Boutique Officielle')}<span className="text-[#e7c18a]">.</span></h1>
+              <p className="paddock-subtitle">{t('Débloquez de nouvelles mécaniques et agrandissez votre garage.')}</p>
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <span className="rounded-md border border-cyan-300/20 bg-cyan-300/[0.05] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-cyan-100">{Object.keys(PACKS).length} {t('Boosters')}</span>
+                <span className="rounded-md border border-[#e7c18a]/25 bg-[#e7c18a]/[0.06] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-[#e7c18a]">{t('Apex Points')}</span>
+              </div>
             </div>
 
             {profile && (
-              <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4 shadow-2xl">
+              <div className="paddock-panel relative z-10 flex items-center gap-3 px-4 py-3 shadow-2xl sm:px-6 sm:py-4">
                 <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
                   <span className="text-blue-500 text-xl font-bold">▲</span>
                 </div>
@@ -99,7 +102,7 @@ export default function BoostersPage() {
           )}
 
           {dailyBoosters.length > 0 && (
-            <section aria-labelledby="daily-boosters-heading" className="mb-8 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] p-4 sm:p-6">
+            <section aria-labelledby="daily-boosters-heading" className="paddock-panel mb-8 p-4 sm:p-6">
               <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300">{t('Récompenses de connexion')}</p>
@@ -115,7 +118,7 @@ export default function BoostersPage() {
                     return null;
                   }
                   return (
-                    <article key={dailyBooster.id} className="flex min-w-0 items-center gap-3 rounded-xl border border-white/10 bg-black/30 p-3">
+                    <article key={dailyBooster.id} className="paddock-tile flex min-w-0 items-center gap-3 p-3">
                       <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-lg">
                         <SafeImage src={pack.imageUrl} alt={pack.name} fill className="object-cover" />
                       </div>
@@ -137,6 +140,13 @@ export default function BoostersPage() {
             </section>
           )}
 
+          <div className="mb-4 flex items-end justify-between gap-3">
+            <div>
+              <p className="paddock-eyebrow">APEX / PACK CATALOGUE</p>
+              <h2 className="paddock-section-title mt-2">{t('Boosters')}</h2>
+            </div>
+            <span className="paddock-micro hidden sm:block">COLLECT / REVEAL / REPEAT</span>
+          </div>
           <div className="grid grid-cols-2 gap-x-2 gap-y-3 py-3 sm:grid-cols-2 sm:gap-6 sm:py-4 xl:grid-cols-3">
             {Object.values(PACKS).map((pack, i) => (
               <motion.div
@@ -147,14 +157,18 @@ export default function BoostersPage() {
                 className="group relative"
               >
                 {/* Glow Effect */}
-                <div className={`absolute -inset-0.5 bg-gradient-to-r ${pack.color} rounded-2xl blur opacity-20 group-hover:opacity-100 transition duration-500`}></div>
+                <div className={`pointer-events-none absolute -inset-0.5 bg-gradient-to-r ${pack.color} rounded-2xl blur opacity-10 group-hover:opacity-30 transition duration-500`}></div>
 
-                <div className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0a0a0a] p-2.5 sm:rounded-2xl sm:p-6">
+                <div className="paddock-pack-card relative flex h-full min-w-0 flex-col overflow-hidden p-2.5 sm:p-6">
                   {/* Decorative Gradient Top */}
                   <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${pack.color}`}></div>
 
                   <div className="flex-1">
-                    <div className="relative mx-auto mb-2.5 aspect-[3/4] w-[62%] overflow-hidden rounded-lg shadow-2xl transition-transform duration-500 group-hover:scale-[1.02] sm:mb-6 sm:w-[50%] sm:rounded-xl">
+                    <div className="mb-2 flex items-center justify-between gap-1 px-0.5 sm:mb-4">
+                      <span className="text-[9px] font-black uppercase tracking-[.16em] text-cyan-200/80 sm:text-[10px]">APX / {String(i + 1).padStart(2, '0')}</span>
+                      <span className="text-[9px] font-black uppercase tracking-wider text-[#e7c18a] sm:text-[10px]">{pack.cardCount} {t('Cartes')}</span>
+                    </div>
+                    <div className="paddock-pack-image relative mx-auto mb-2.5 aspect-[3/4] w-[62%] overflow-hidden rounded-lg transition-transform duration-500 group-hover:scale-[1.03] sm:mb-6 sm:w-[50%] sm:rounded-xl">
                       <SafeImage
                         src={pack.imageUrl}
                         alt={pack.name}
@@ -164,8 +178,8 @@ export default function BoostersPage() {
                       <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent`}></div>
                     </div>
 
-                    <h2 className="mb-1 min-h-8 text-[13px] font-normal leading-4 sm:mb-2 sm:min-h-0 sm:text-2xl sm:leading-normal" style={{ fontFamily: '"Bebas Neue", Impact, "Arial Narrow", sans-serif' }}>{t(pack.name)}</h2>
-                    <p className="mb-2 text-[10px] leading-[1.35] text-gray-400 sm:mb-6 sm:text-sm sm:leading-relaxed">
+                    <h2 className="mb-1 min-h-8 text-[16px] font-normal leading-4 tracking-[.04em] text-white sm:mb-2 sm:min-h-0 sm:text-[32px] sm:leading-none" style={{ fontFamily: '"Bebas Neue", Impact, "Arial Narrow", sans-serif' }}>{t(pack.name)}</h2>
+                    <p className="mb-2 text-[10px] leading-[1.35] text-[#aebecb] sm:mb-6 sm:text-sm sm:leading-relaxed">
                       <span className="line-clamp-2 sm:line-clamp-none">{t(pack.description)}</span>
                       <span className="mt-1 block text-[9px] italic text-white/60 sm:mt-2 sm:text-xs">
                         {t('Contient')} {pack.cardCount} {t('cartes aléatoires')}
@@ -174,8 +188,8 @@ export default function BoostersPage() {
                   </div>
 
                   <div className="mt-2 sm:mt-8">
-                    <div className="mb-2 flex min-w-0 items-center justify-between gap-1 sm:mb-4 sm:px-2">
-                      <span className="whitespace-nowrap text-base font-black italic tracking-tighter sm:text-2xl">
+                    <div className="mb-2 flex min-w-0 items-center justify-between gap-1 border-t border-white/10 pt-2 sm:mb-4 sm:px-2 sm:pt-4">
+                      <span className="whitespace-nowrap font-mono text-base font-black tracking-tighter text-[#e7c18a] sm:text-2xl">
                         <span className="mr-0.5 text-xs not-italic text-blue-500 sm:mr-1 sm:text-base">▲</span>{pack.price}<span className="ml-1 text-[9px] not-italic text-blue-400 sm:hidden">AP</span>
                       </span>
                       <span className="hidden text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600 sm:inline">{t('Apex Points')}</span>
@@ -184,7 +198,7 @@ export default function BoostersPage() {
                     <button
                       disabled={profile && profile.ap < pack.price}
                       onClick={() => router.push(`/open?pack=${pack.slug}`)}
-                      className={`min-h-10 w-full rounded-lg px-1 py-2 text-[9px] font-black uppercase leading-tight tracking-normal shadow-lg shadow-black/40 transition-all duration-300 sm:rounded-xl sm:py-4 sm:text-xs sm:tracking-[0.2em] 
+                      className={`paddock-action min-h-10 w-full rounded-lg px-1 py-2 text-[9px] leading-tight tracking-normal sm:rounded-xl sm:py-4 sm:text-xs sm:tracking-[0.13em] 
                         ${profile && profile.ap < pack.price
                           ? 'bg-gray-800 text-gray-600 grayscale cursor-not-allowed border border-white/5'
                           : `bg-gradient-to-r ${pack.color} text-white hover:scale-[1.02] active:scale-[0.98] hover:shadow-2xl hover:shadow-black/50`
