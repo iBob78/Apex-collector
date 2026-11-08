@@ -80,29 +80,29 @@ export default function ObjectiveBoard({
   const completedCount = objectives.filter((item) => item.status !== 'active').length;
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white">
+    <div className="apex-paddock flex min-h-screen text-white">
       <Sidebar />
       <main className="min-w-0 flex-1">
-        <div className="p-4 sm:p-6 md:p-12">
-          <header className="mb-9">
-            <p className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.25em] text-blue-400">
+        <div className="paddock-shell px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
+          <header className="paddock-header mb-8">
+            <p className="paddock-eyebrow mb-3">
               <Trophy size={14} /> Apex Collector
             </p>
-            <h1 className="text-3xl sm:text-4xl font-black uppercase italic tracking-tighter">{t(title)}</h1>
-            <p className="mt-2 max-w-2xl text-sm text-gray-500">{t(subtitle)}</p>
+            <h1 className="paddock-title">{t(title)}</h1>
+            <p className="paddock-subtitle">{t(subtitle)}</p>
           </header>
 
           {userId && !loading && !loadError && objectives.length > 0 && (
-            <section className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <section className="paddock-panel mb-8 flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6">
               <div>
-                <h2 className="font-black uppercase tracking-wide">{t('Votre progression')}</h2>
+                <h2 className="paddock-section-title">{t('Votre progression')}</h2>
                 <p className="mt-1 text-xs text-gray-500">
                   {completedCount} / {objectives.length} {t(category === 'contract' ? 'contrats terminés' : 'succès débloqués')}
                 </p>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-white/10 sm:w-48">
+              <div className="paddock-meter h-2 w-full sm:w-48">
                 <div
-                  className="h-full rounded-full bg-blue-500 transition-all"
+                  className="h-full rounded-full bg-gradient-to-r from-[#D32F35] to-[#F0EFEB] transition-all"
                   style={{ width: `${(completedCount / objectives.length) * 100}%` }}
                 />
               </div>
@@ -110,16 +110,16 @@ export default function ObjectiveBoard({
           )}
 
           {loading ? (
-            <div className="flex h-48 items-center justify-center text-blue-400"><LoaderCircle className="animate-spin" /></div>
+            <div className="flex h-48 items-center justify-center text-[#F0EFEB]"><LoaderCircle className="animate-spin" /></div>
           ) : loadError ? (
             <p role="alert" className="rounded-2xl border border-red-400/20 bg-red-400/10 p-5 text-sm text-red-200">
               {t('Impossible de charger les objectifs')}: {loadError}
             </p>
           ) : !userId ? (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
-              <LockKeyhole className="mx-auto mb-3 text-blue-400" />
+            <div className="paddock-panel p-8 text-center">
+              <LockKeyhole className="mx-auto mb-3 text-[#F0EFEB]" />
               <p className="text-sm text-gray-400">{t('Connectez-vous pour suivre vos objectifs.')}</p>
-              <button onClick={() => router.push('/login')} className="mt-4 rounded-xl bg-blue-600 px-5 py-2 text-xs font-black uppercase">
+              <button onClick={() => router.push('/login')} className="paddock-action mt-4 min-h-11 px-5 py-2">
                 {t('Se connecter')}
               </button>
             </div>
@@ -137,25 +137,25 @@ export default function ObjectiveBoard({
                 return (
                   <article
                     key={item.id}
-                    className={`relative overflow-hidden rounded-3xl border p-6 transition ${
-                      isCompleted ? 'border-amber-400/30 bg-amber-400/[0.035]' : 'border-white/[0.08] bg-[#0a0a0a]'
+                    className={`paddock-data-card relative overflow-hidden p-5 transition sm:p-6 ${
+                      isCompleted ? 'border-[#F0EFEB]/45 bg-[#F0EFEB]/[0.035]' : ''
                     }`}
                     style={{ animationDelay: `${index * 70}ms` }}
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3">
-                        {isClaimed ? <CheckCircle2 className="mt-1 shrink-0 text-emerald-400" /> : isCompleted ? <Gift className="mt-1 shrink-0 text-amber-300" /> : <Circle className="mt-1 shrink-0 text-blue-400" />}
+                        {isClaimed ? <CheckCircle2 className="mt-1 shrink-0 text-emerald-400" /> : isCompleted ? <Gift className="mt-1 shrink-0 text-amber-300" /> : <Circle className="mt-1 shrink-0 text-[#F0EFEB]" />}
                         <div>
                           <h2 className={`font-black uppercase tracking-wide ${isClaimed ? 'text-gray-500' : 'text-white'}`}>{t(item.objective.title)}</h2>
                           <p className="mt-2 text-sm leading-6 text-gray-400">{t(item.objective.description)}</p>
                         </div>
                       </div>
-                      <span className="shrink-0 rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1 text-[10px] font-black text-blue-200">
+                      <span className="shrink-0 rounded-full border border-[#555D65]/20 bg-[#D32F35]/10 px-3 py-1 text-[10px] font-black text-[#F0EFEB]">
                         {item.objective.reward_ap} AP
                       </span>
                     </div>
                     {requirements.length > 0 && (
-                      <p className="mt-4 text-[10px] font-bold uppercase tracking-wider text-cyan-200/70">
+                      <p className="mt-4 text-[10px] font-bold uppercase tracking-wider text-[#F0EFEB]/70">
                         {item.objective.requirement_operator === 'any' ? 'Valider au moins une condition' : 'Valider toutes les conditions'}
                       </p>
                     )}
@@ -163,12 +163,12 @@ export default function ObjectiveBoard({
                     <div className="mt-6">
                       <div className="mb-2 flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-500">
                         <span>{t('Progression')}</span>
-                        <span className={isCompleted || isClaimed ? 'text-amber-300' : 'text-blue-300'}>
+                        <span className={isCompleted || isClaimed ? 'text-amber-300' : 'text-[#F0EFEB]'}>
                           {item.current_count} / {item.objective.target_count}
                         </span>
                       </div>
-                      <div className="h-2 overflow-hidden rounded-full border border-white/5 bg-white/5">
-                        <div className={`h-full rounded-full transition-all ${isCompleted || isClaimed ? 'bg-amber-400' : 'bg-blue-600'}`} style={{ width: `${percent}%` }} />
+                      <div className="paddock-meter h-2">
+                        <div className={`h-full rounded-full transition-all ${isCompleted || isClaimed ? 'bg-amber-400' : 'bg-[#D32F35]'}`} style={{ width: `${percent}%` }} />
                       </div>
                     </div>
 
@@ -194,7 +194,7 @@ export default function ObjectiveBoard({
                           ].filter(Boolean);
                           const requirementPercent = Math.min(100, (current / requirement.target_count) * 100);
                           return (
-                            <li key={`${item.id}-condition-${requirementIndex}`} className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-3">
+                            <li key={`${item.id}-condition-${requirementIndex}`} className="rounded-xl border border-[#555D65]/10 bg-[#171A1E]/80 p-3">
                               <div className="mb-2 flex items-start justify-between gap-3 text-xs">
                                 <span className="min-w-0 text-gray-300">
                                   <span className="font-bold text-gray-200">{categoryLabel}</span>
@@ -203,10 +203,10 @@ export default function ObjectiveBoard({
                                     {requirement.count_mode === 'copies' ? 'Exemplaires' : 'Cartes différentes'}
                                   </span>
                                 </span>
-                                <span className="shrink-0 font-black text-blue-200">{current} / {requirement.target_count}</span>
+                                <span className="shrink-0 font-black text-[#F0EFEB]">{current} / {requirement.target_count}</span>
                               </div>
                               <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-                                <div className="h-full rounded-full bg-cyan-400" style={{ width: `${requirementPercent}%` }} />
+                                <div className="h-full rounded-full bg-[#D32F35]" style={{ width: `${requirementPercent}%` }} />
                               </div>
                             </li>
                           );
@@ -219,7 +219,7 @@ export default function ObjectiveBoard({
                         type="button"
                         onClick={() => void handleClaim(item.id)}
                         disabled={claimingId === item.id}
-                        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-4 py-3 text-xs font-black uppercase tracking-widest text-black transition hover:bg-amber-300 disabled:opacity-60"
+                        className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#D32F35]/30 bg-[#D32F35] px-4 py-3 text-xs font-black uppercase tracking-widest text-[#F0EFEB] transition hover:bg-[#555D65] disabled:opacity-60"
                       >
                         {claimingId === item.id ? <LoaderCircle size={15} className="animate-spin" /> : <Gift size={15} />}
                         {t('Réclamer la récompense')}

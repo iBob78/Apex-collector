@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, type CSSProperties } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { fetchAllPages } from '@/lib/fetchAllPages';
 import Sidebar from '@/components/Sidebar';
@@ -12,7 +12,8 @@ import { Rarity } from '@/types/game';
 import { getNextLevelUnlock } from '@/lib/level';
 import { purchaseCardUpgrade } from '@/lib/actions/card-upgrades';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
-import { Star } from 'lucide-react';
+import { Star, Search, Layers3, LayoutGrid, SlidersHorizontal, ArrowUpRight, ChevronLeft, ChevronRight, ChevronDown, Sparkles } from 'lucide-react';
+import { getRarityColor } from '@/lib/rarity';
 import { resolveBrandLogo } from '@/lib/images';
 
 type FavoriteCategory = 'vehicle' | 'circuit' | 'driver';
@@ -44,6 +45,16 @@ export default function CollectionPage() {
   const [user, setUser] = useState<any>(null);
   const [cards, setCards] = useState<any[]>([]);
   const [selectedCard, setSelectedCard] = useState<any | null>(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [wideInspector, setWideInspector] = useState(false);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 1536px)');
+    const sync = () => setWideInspector(media.matches);
+    sync();
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
+  }, []);
   const [userCards, setUserCards] = useState<Record<string, number>>({});
   const [userCardLevels, setUserCardLevels] = useState<Record<string, number>>({});
   const [upgradingCardId, setUpgradingCardId] = useState<string | null>(null);
@@ -279,12 +290,24 @@ export default function CollectionPage() {
     return { total, owned, percentage, totalCopies };
   }, [cards, userCards]);
 
-  const handleToggleFavorite = async () => {
-    if (!user || !selectedCard || favoritePendingKey) return;
-    const category = getCardCategory(selectedCard);
-    const cardId = getCardEntityId(selectedCard);
-    const key = getFavoriteKey(selectedCard);
-    if ((userCards[getCardId(selectedCard)] || 0) <= 0) return;
+  // Count only discovered/owned models for the visual rarity shortcut shelf.
+  const ownedRarityCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const card of cards) {
+      if ((userCards[getCardId(card)] || 0) <= 0) continue;
+      const rarity = String(card.rarity || 'Common');
+      counts[rarity] = (counts[rarity] || 0) + 1;
+    }
+    return counts;
+  }, [cards, userCards]);
+
+  const handleToggleFavorite = async (cardOverride?: any) => {
+    const target = cardOverride || selectedCard;
+    if (!user || !target || favoritePendingKey) return;
+    const category = getCardCategory(target);
+    const cardId = getCardEntityId(target);
+    const key = getFavoriteKey(target);
+    if ((userCards[getCardId(target)] || 0) <= 0) return;
 
     setFavoritePendingKey(key);
     setFavoritesError(null);
@@ -313,6 +336,7 @@ export default function CollectionPage() {
 
   const handleOpenCardDetails = async (card: any) => {
     setSelectedCard(card);
+    if (!wideInspector) setDetailModalOpen(true);
     const key = getFavoriteKey(card);
     if (!user || !newCardKeys.has(key)) return;
 
@@ -376,83 +400,88 @@ export default function CollectionPage() {
     }
   };
 
+
+  // The preview must never disclose a locked card, including keyboard navigation.
+  const inspectableCards = filteredCards.filter((item) => (userCards[getCardId(item)] || 0) > 0);
+  const inspectorCard = (selectedCard && inspectableCards.some((item) => getCardId(item) === getCardId(selectedCard))
+    ? selectedCard
+    : null) || inspectableCards[0] || null;
+  const inspectorIndex = inspectorCard ? inspectableCards.findIndex((item) => getCardId(item) === getCardId(inspectorCard)) : -1;
+
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white">
+    <div className="apex-paddock flex min-h-screen text-white">
       <Sidebar />
-
-      <main className="flex-1 min-w-0 flex flex-col">
-        <div className="p-4 md:p-8 flex-1">
-          {/* Header & Stats */}
-          <header className="mb-8">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+      <main className="min-w-0 flex-1">
+        <div className="paddock-shell space-y-4 px-3 py-4 pb-28 sm:px-5 sm:py-6 lg:px-6 2xl:px-7">
+          <header className="collector-hero flex flex-col justify-end p-5 sm:min-h-[245px] sm:p-8">
+            <div className="relative z-10 flex flex-wrap items-end justify-between gap-5">
               <div>
-                <h1 className="bg-gradient-to-r from-white to-gray-500 bg-clip-text text-3xl font-black uppercase italic tracking-tighter text-transparent sm:text-4xl">
-                  {t('Mon Garage')}
+                <p className="paddock-eyebrow">{t('Collection')}</p>
+                <h1 className="mt-3 font-['Barlow_Condensed'] text-[clamp(2.6rem,5vw,4.9rem)] font-black italic leading-[.85] tracking-[-.025em] text-white drop-shadow-xl">
+                  {t('Ma Collection')}
                 </h1>
-                <p className="text-gray-500 font-mono text-sm mt-1">
-                  {t('Collection complète des véhicules, circuits et pilotes d’exception.')}
-                </p>
+                <p className="mt-3 text-sm text-[#dce5f6]">{t('Collection complète des véhicules, circuits et pilotes d’exception.')}</p>
+                <div className="mt-4 max-w-[360px]">
+                  <p className="mb-2 text-[12px] font-bold tabular-nums text-white">{stats.owned.toLocaleString()} / {stats.total.toLocaleString()} {t('Cartes')} ({stats.percentage} %)</p>
+                  <div className="paddock-meter" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={stats.percentage} aria-label={t('Collection')}>
+                    <div style={{width: `${stats.percentage}%`}} />
+                  </div>
+                </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-4">
-                <StatCard label={t('Collection')} value={`${stats.owned}/${stats.total}`} sub={`${stats.percentage}%`} color="text-blue-400" />
-                <StatCard label={t('Total Cartes')} value={stats.totalCopies} sub={t('Exemplaires')} color="text-purple-400" />
+              <div className="apx-hud hidden items-center gap-4 px-4 py-3 sm:flex">
+                <div className="collector-completion-wheel" role="progressbar" aria-valuemin={0} aria-valuemax={100}
+                  aria-valuenow={stats.percentage} aria-label={t('Collection')}
+                  style={{ '--collector-progress': `${stats.percentage}%` } as CSSProperties}>
+                  <div><strong>{stats.percentage}%</strong></div>
+                </div>
+                <div className="min-w-0">
+                  <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-[#9eafd1]">
+                    <Layers3 size={13} aria-hidden="true" /> {t('Exemplaires')}
+                  </span>
+                  <span className="mt-1 block font-mono text-xl font-bold tabular-nums text-white">{stats.totalCopies.toLocaleString()}</span>
+                  {newCardKeys.size > 0 && (
+                    <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[#72dfaf]/10 px-2 py-0.5 text-[10px] font-bold text-[#a9f7c9]">
+                      <Sparkles size={11} aria-hidden="true"/> {newCardKeys.size} NEW!
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
+          </header>
 
-            {/* Barre de Filtres */}
-            <div className="flex flex-col gap-3 rounded-2xl border border-white/5 bg-[#0a0a0a] p-3 shadow-2xl sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 sm:p-4">
-              {/* Tabs */}
-              <div className="grid w-full grid-cols-4 rounded-xl bg-white/5 p-1 sm:flex sm:w-auto">
+          <div className="grid min-w-0 items-start gap-3 xl:grid-cols-[190px_minmax(0,1fr)] 2xl:grid-cols-[194px_minmax(0,1fr)_252px]">
+            <aside className="collector-rail" aria-label={t('Filtres')}>
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="flex items-center gap-2 text-sm font-bold text-white"><SlidersHorizontal size={17} className="text-[#91b5ff]" aria-hidden="true" /> {t('Filtres')}</h2>
+                <button type="button" aria-expanded={filtersExpanded} aria-controls="collector-filter-controls"
+                  onClick={() => setFiltersExpanded((current) => !current)}
+                  className="paddock-ghost inline-flex min-h-10 items-center gap-2 px-3 text-xs font-bold xl:hidden">
+                  {filtersExpanded ? t('Masquer') : t('Afficher')} <ChevronDown size={15} aria-hidden="true"
+                    className={`transition-transform ${filtersExpanded ? 'rotate-180' : ''}`}/>
+                </button>
+              </div>
+              <div className="collector-divider" />
+              <label className="relative block">
+                <span className="sr-only">{t('Rechercher une carte...')}</span>
+                <Search size={17} className="pointer-events-none absolute left-3 top-3.5 text-[#8193b8]" aria-hidden="true"/>
+                <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t('Rechercher une carte...')}
+                  className="paddock-field min-h-11 w-full pl-9 pr-3 text-[12px]" />
+              </label>
+              <div id="collector-filter-controls" className={`pt-1 ${filtersExpanded ? 'block' : 'hidden'} xl:block`}>
+              <div className="collector-divider" />
+              <p className="collector-rail-heading mb-3">{t('Collection')}</p>
+              <div className="grid grid-cols-2 gap-2 xl:grid-cols-1">
                 {(['all', 'vehicle', 'circuit', 'driver'] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`min-h-11 rounded-lg px-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all sm:px-4 sm:text-xs sm:tracking-widest ${activeTab === tab ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
-                      }`}
-                  >
+                  <button key={tab} type="button" aria-pressed={activeTab === tab} onClick={() => setActiveTab(tab)}
+                    className={`min-h-9 rounded-lg px-3 py-2 text-left text-[12px] font-semibold transition ${activeTab === tab ? 'border border-[#7085ff]/70 bg-[#31447d] text-white' : 'border border-white/10 bg-[#0c1629] text-[#b6c1d7] hover:bg-[#24345a] hover:text-white'}`}>
                     {t(tab === 'all' ? 'Tous' : tab === 'vehicle' ? 'Véhicules' : tab === 'circuit' ? 'Circuits' : 'Pilotes')}
                   </button>
                 ))}
               </div>
-
-              <button
-                type="button"
-                aria-pressed={favoritesOnly}
-                onClick={() => setFavoritesOnly((current) => !current)}
-                className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${favoritesOnly ? 'border-amber-400/70 bg-amber-400/20 text-amber-200' : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'}`}
-              >
-                <Star size={18} fill={favoritesOnly ? 'currentColor' : 'none'} aria-hidden="true" />
-                {t('Favoris')} ({favoriteKeys.size})
-              </button>
-
-              <label className="flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-300 transition hover:bg-white/10 sm:w-auto">
-                <input
-                  type="checkbox"
-                  checked={hideLockedCards}
-                  onChange={(event) => setHideLockedCards(event.target.checked)}
-                  className="size-4 accent-blue-500"
-                />
-                <span>{t('Masquer les cartes non déverrouillées')}</span>
-              </label>
-
-              {/* Search */}
-              <div className="w-full min-w-0 flex-1 sm:min-w-[200px]">
-                <input
-                  type="text"
-                  placeholder={t('Rechercher une carte...')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="min-h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-base transition-colors focus:border-blue-500/50 focus:outline-none sm:text-sm"
-                />
-              </div>
-
-              {/* Rarity Select */}
-              <select
-                value={rarityFilter}
-                onChange={(e) => setRarityFilter(e.target.value as any)}
-                className="min-h-11 w-full min-w-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-base text-white focus:outline-none sm:w-auto sm:text-sm [&>option]:bg-[#171717] [&>option]:text-white"
-              >
+              <div className="collector-divider" />
+              <label className="mb-2 block collector-rail-heading">{t('Toutes les raretés')}</label>
+              <select value={rarityFilter} onChange={(e) => setRarityFilter(e.target.value as Rarity | 'All')} className="paddock-field min-h-11 w-full px-3 text-[12px]">
                 <option value="All">{t('Toutes les raretés')}</option>
                 <option value="Common">{t('Commun')}</option>
                 <option value="Uncommon">{t('Inhabituel')}</option>
@@ -461,40 +490,74 @@ export default function CollectionPage() {
                 <option value="Legend">{t('Légendaire')}</option>
                 <option value="Icon">{t('Icon')}</option>
               </select>
+              <div className="collector-divider" />
+              <label className="flex min-h-10 items-center gap-2 text-[12px] text-[#c4cde3]">
+                <input type="checkbox" checked={favoritesOnly} onChange={(e) => setFavoritesOnly(e.target.checked)}
+                  className="h-4 w-4 accent-[#8274f7]" />
+                <Star size={15} className="text-[#cda2ff]" aria-hidden="true" /> {t('Favoris')} ({favoriteKeys.size})
+              </label>
+              <label className="mt-2 flex min-h-10 items-center gap-2 text-[12px] text-[#c4cde3]">
+                <input type="checkbox" checked={hideLockedCards} onChange={(e) => setHideLockedCards(e.target.checked)} className="h-4 w-4 accent-[#8274f7]" />
+                <span>{t('Masquer les cartes non déverrouillées')}</span>
+              </label>
+              <div className="collector-divider" />
+              <button type="button" onClick={() => {setActiveTab('all');setRarityFilter('All');setFavoritesOnly(false);setHideLockedCards(false);setSearchQuery('');setSortBy('name');}}
+                className="paddock-ghost min-h-10 w-full px-3 text-[11px] font-semibold">
+                {t('Réinitialiser les filtres')}
+              </button>
+              </div>
+              {(favoritesError || discoveryError) && (
+                <p role="alert" className="mt-4 rounded-lg border border-red-400/30 bg-red-900/20 p-3 text-xs text-red-200">{favoritesError || discoveryError}</p>
+              )}
+            </aside>
 
-              {/* Sort Select */}
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="min-h-11 w-full min-w-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-base text-white focus:outline-none sm:w-auto sm:text-sm [&>option]:bg-[#171717] [&>option]:text-white"
-              >
-                <option value="name">{t('Trier par Nom')}</option>
-                <option value="make-asc">{t('Marques, A à Z')}</option>
-                <option value="make-desc">{t('Marques, Z à A')}</option>
-                <option value="ip-desc">{t('IP, décroissant')}</option>
-                <option value="ip-asc">{t('IP, croissant')}</option>
-                <option value="level-asc">{t('Niveau, croissant')}</option>
-                <option value="level-desc">{t('Niveau, décroissant')}</option>
-                <option value="rarity">{t('Trier par Rareté')}</option>
-                <option value="newest">{t('Plus récent')}</option>
-              </select>
-            </div>
-            {favoritesError && (
-              <p role="alert" className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-200">
-                {favoritesError}
-              </p>
-            )}
-            {discoveryError && (
-              <p role="alert" className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-200">
-                {discoveryError}
-              </p>
-            )}
-          </header>
-
+            <section className="collector-gallery" aria-label={t('Ma Collection')}>
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+                <div className="flex items-center gap-2">
+                  <LayoutGrid size={18} className="text-[#9cafff]" aria-hidden="true"/>
+                  <span className="text-lg font-bold tabular-nums">{filteredCards.length.toLocaleString()}</span>
+                  <span className="text-sm text-[#aab7d1]">{t('Cartes')}</span>
+                </div>
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="hidden text-[11px] text-[#a3aec8] sm:block">{t('Trier par')}</span>
+                  <select value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                    className="paddock-field min-h-10 min-w-0 max-w-[220px] px-2 text-[11px]">
+                    <option value="name">{t('Trier par Nom')}</option>
+                    <option value="make-asc">{t('Marques, A à Z')}</option>
+                    <option value="make-desc">{t('Marques, Z à A')}</option>
+                    <option value="ip-desc">{t('IP, décroissant')}</option>
+                    <option value="ip-asc">{t('IP, croissant')}</option>
+                    <option value="level-asc">{t('Niveau, croissant')}</option>
+                    <option value="level-desc">{t('Niveau, décroissant')}</option>
+                    <option value="rarity">{t('Trier par Rareté')}</option>
+                    <option value="newest">{t('Plus récent')}</option>
+                  </select>
+                </div>
+              </div>
+              {/* Fast rarity shelf; counts are calculated from real owned cards. */}
+              <nav aria-label={t('Toutes les raretés')} className="collector-rarity-shelf mb-5">
+                {(['All', 'Common', 'Rare', 'Epic', 'Legend'] as const).map((value) => {
+                  const label = value === 'All' ? t('Tous')
+                    : value === 'Common' ? t('Commun')
+                      : value === 'Epic' ? t('Épique')
+                        : value === 'Legend' ? t('Légendaire')
+                          : t('Rare');
+                  const count = value === 'All' ? stats.owned : (ownedRarityCounts[value] || 0);
+                  return (
+                    <button key={value} type="button" aria-pressed={rarityFilter === value}
+                      onClick={() => setRarityFilter(value)}
+                      className="collector-rarity-chip"
+                      style={{ '--chip-rarity-color': value === 'All' ? '#81a9ff' : getRarityColor(value) } as CSSProperties}>
+                      <span className="collector-rarity-dot" aria-hidden="true" />
+                      <span>{label}</span><span className="collector-rarity-count">{count.toLocaleString()}</span>
+                    </button>
+                  );
+                })}
+              </nav>
           {/* Grid of Cards */}
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 opacity-50">
-              <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+              <div className="w-12 h-12 border-4 border-[#555D65] border-t-transparent rounded-full animate-spin mb-4"></div>
               <p className="font-mono text-sm uppercase tracking-widest">{t('Initialisation du garage...')}</p>
             </div>
           ) : (
@@ -503,7 +566,7 @@ export default function CollectionPage() {
               {filteredCards.length > 0 ? (
                 <motion.div
                   layout
-                  className="grid grid-cols-4 gap-x-1.5 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(min(100%,14rem),1fr))] sm:gap-x-6 sm:gap-y-8"
+                  className="grid grid-cols-4 gap-x-1.5 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(min(100%,10.5rem),1fr))] sm:gap-x-3 sm:gap-y-5 2xl:grid-cols-4"
                 >
                   {filteredCards.slice(0, visibleCount).flatMap((card, index, visibleCards) => {
                     const cid = getCardId(card);
@@ -528,6 +591,10 @@ export default function CollectionPage() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                         transition={{ duration: 0.2 }}
+                        className={`collector-card-wrap ${inspectorCard && getCardId(inspectorCard) === cid ? 'collector-card-selected' : ''}`}
+                        style={inspectorCard && getCardId(inspectorCard) === cid
+                          ? { '--collector-selected-glow': getRarityColor(String(card.rarity || 'Common')) } as CSSProperties
+                          : undefined}
                       >
                         <Card
                           {...card}
@@ -559,9 +626,9 @@ export default function CollectionPage() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
                         transition={{ duration: 0.2 }}
-                        className="col-span-full flex min-w-0 items-center gap-3 pt-3 first:pt-0 sm:gap-4 sm:pt-5"
+                        className="col-span-full flex min-w-0 items-center gap-3 border-t border-[#555D65]/10 pt-3 first:border-0 first:pt-0 sm:gap-4 sm:pt-5"
                       >
-                        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] sm:h-12 sm:w-12">
+                        <div className="paddock-tile relative flex h-10 w-10 shrink-0 items-center justify-center sm:h-12 sm:w-12">
                           <span aria-hidden="true" className="text-sm font-black text-white/60 sm:text-base">
                             {make.slice(0, 2).toUpperCase()}
                           </span>
@@ -575,10 +642,10 @@ export default function CollectionPage() {
                             />
                           )}
                         </div>
-                        <h2 className="shrink-0 text-xs font-black uppercase tracking-[0.18em] text-slate-200 sm:text-sm sm:tracking-[0.22em]">
+                        <h2 className="shrink-0 text-base font-normal uppercase tracking-[0.09em] text-[#F0EFEB] sm:text-xl" style={{ fontFamily: '"Bebas Neue", Impact, sans-serif' }}>
                           {make}
                         </h2>
-                        <div aria-hidden="true" className="h-px min-w-0 flex-1 bg-gradient-to-r from-cyan-300/50 via-white/15 to-transparent" />
+                        <div aria-hidden="true" className="h-px min-w-0 flex-1 bg-gradient-to-r from-[#D32F35]/50 via-white/15 to-transparent" />
                       </motion.div>,
                       cardElement,
                     ];
@@ -595,7 +662,7 @@ export default function CollectionPage() {
                 <button
                   type="button"
                   onClick={() => setVisibleCount((count) => count + 24)}
-                  className="min-h-12 rounded-xl border border-blue-400/40 bg-blue-500/15 px-6 py-3 text-sm font-bold text-blue-200 transition hover:bg-blue-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                  className="paddock-ghost min-h-12 rounded-xl px-6 py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D32F35]"
                 >
                   {t('Afficher plus')} ({Math.min(visibleCount, filteredCards.length)}/{filteredCards.length})
                 </button>
@@ -603,10 +670,80 @@ export default function CollectionPage() {
             )}
             </>
           )}
+            </section>
+
+            <aside className="collector-inspector hidden 2xl:block" aria-label={t('Détails de la carte')}>
+              {inspectorCard ? (
+                <div>
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <span className="collector-rail-heading">{t('Détails de la carte')}</span>
+                    <span className="rounded-md border border-white/20 bg-[#19243d] px-2 py-1 font-mono text-xs">
+                      {inspectorCard.collection_number ? `#${inspectorCard.collection_number}` : ''}
+                    </span>
+                  </div>
+                  <div className="collector-inspector-stage"
+                    style={{ '--inspector-rarity': getRarityColor(String(inspectorCard.rarity || 'Common')) } as CSSProperties}>
+                    <div className="collector-inspector-horizon" aria-hidden="true" />
+                    <div className="collector-inspector-card relative z-10">
+                      <Card {...inspectorCard} owned={true} compact showLevel={false}
+                        onCardClick={() => {setSelectedCard(inspectorCard);setDetailModalOpen(true);}}/>
+                    </div>
+                    <span className="relative z-10 mt-4 block text-center font-mono text-[9px] font-bold uppercase tracking-[.2em] text-[#9caed2]">
+                      APEX / THE CARD VAULT
+                    </span>
+                  </div>
+                  <div className="mt-4 flex items-start justify-between gap-2">
+                    <h3 className="min-w-0 text-lg font-black leading-tight text-white">{getCardCategory(inspectorCard) === 'vehicle' ? `${inspectorCard.make || ''} ${inspectorCard.model || ''}`.trim() : inspectorCard.name || ''}</h3>
+                    <span className="shrink-0 rounded-lg border px-2 py-1 text-xs font-bold" style={{color:getRarityColor(String(inspectorCard.rarity || 'Common')),borderColor:getRarityColor(String(inspectorCard.rarity || 'Common'))}}>
+                      {t(String(inspectorCard.rarity || 'Common'))}
+                    </span>
+                  </div>
+                  <div className="collector-divider" />
+                  <dl className="space-y-3 text-[12px]">
+                    <div className="flex items-start justify-between gap-3">
+                      <dt className="text-[#97a5c2]">{t('Collection')}</dt>
+                      <dd className="max-w-[130px] text-right font-semibold">{inspectorCard.collection_name || inspectorCard.collection || '—'}</dd>
+                    </div>
+                    {getCardCategory(inspectorCard) === 'vehicle' && (
+                      <>
+                        <div className="flex justify-between gap-3"><dt className="text-[#97a5c2]">{t('Marque')}</dt><dd className="font-semibold">{inspectorCard.make || '—'}</dd></div>
+                        <div className="flex justify-between gap-3"><dt className="text-[#97a5c2]">{t('Année')}</dt><dd className="font-semibold">{inspectorCard.year || '—'}</dd></div>
+                      </>
+                    )}
+                    <div className="flex justify-between gap-3"><dt className="text-[#97a5c2]">{t('Exemplaires')}</dt><dd className="font-bold text-[#99deff]">{userCards[getCardId(inspectorCard)] || 0}</dd></div>
+                    <div className="flex justify-between gap-3"><dt className="text-[#97a5c2]">{t('Niveau')}</dt><dd className="font-semibold">{userCardLevels[getCardId(inspectorCard)] || 0}</dd></div>
+                  </dl>
+                  <div className="collector-divider" />
+                  <div className="flex gap-2">
+                    <button type="button" disabled={Boolean(favoritePendingKey)}
+                      onClick={() => void handleToggleFavorite(inspectorCard)}
+                      aria-label={t('Favoris')}
+                      className="paddock-ghost inline-flex h-11 w-11 shrink-0 items-center justify-center disabled:opacity-50">
+                      <Star size={18} fill={favoriteKeys.has(getFavoriteKey(inspectorCard)) ? 'currentColor' : 'none'}
+                        className={favoriteKeys.has(getFavoriteKey(inspectorCard)) ? 'text-[#f0c66b]' : 'text-white'} aria-hidden="true"/>
+                    </button>
+                    <button type="button" onClick={() => {setSelectedCard(inspectorCard);setDetailModalOpen(true);}}
+                      className="paddock-action min-h-11 flex-1 px-2 text-[12px]">{t('Voir les détails')} <ArrowUpRight size={16} aria-hidden="true"/></button>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
+                    <button type="button" aria-label={t('Carte précédente')} disabled={inspectorIndex <= 0}
+                      onClick={() => inspectorIndex > 0 && void handleOpenCardDetails(inspectableCards[inspectorIndex - 1])}
+                      className="paddock-ghost flex h-9 w-10 items-center justify-center disabled:opacity-30"><ChevronLeft size={17}/></button>
+                    <span className="font-mono text-[11px] text-[#9aa9c7]">{inspectorIndex + 1} / {inspectableCards.length}</span>
+                    <button type="button" aria-label={t('Carte suivante')} disabled={inspectorIndex < 0 || inspectorIndex >= inspectableCards.length - 1}
+                      onClick={() => inspectorIndex >= 0 && inspectorIndex < inspectableCards.length - 1 && void handleOpenCardDetails(inspectableCards[inspectorIndex + 1])}
+                      className="paddock-ghost flex h-9 w-10 items-center justify-center disabled:opacity-30"><ChevronRight size={17}/></button>
+                  </div>
+                </div>
+              ) : (
+                <div className="py-12 text-center text-sm text-[#a8b5d0]">{t('Sélectionnez une carte de votre collection.')}</div>
+              )}
+            </aside>
+          </div>
         </div>
       </main>
       <CardDetailsModal
-        card={selectedCard}
+        card={detailModalOpen ? selectedCard : null}
         ownedCount={selectedCard ? userCards[getCardId(selectedCard)] || 0 : 0}
         upgradeLevel={selectedCard ? userCardLevels[getCardId(selectedCard)] || 0 : 0}
         upgradePending={upgradingCardId === (selectedCard ? getCardId(selectedCard) : null)}
@@ -614,18 +751,8 @@ export default function CollectionPage() {
         favoritePending={selectedCard ? favoritePendingKey === getFavoriteKey(selectedCard) : false}
         onToggleFavorite={() => void handleToggleFavorite()}
         onUpgrade={() => selectedCard && handleUpgrade(selectedCard)}
-        onClose={() => setSelectedCard(null)}
+        onClose={() => setDetailModalOpen(false)}
       />
-    </div>
-  );
-}
-
-function StatCard({ label, value, sub, color }: { label: string, value: string | number, sub: string, color: string }) {
-  return (
-    <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 sm:min-w-[120px] sm:px-6">
-      <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1">{label}</div>
-      <div className={`text-xl font-black ${color}`}>{value}</div>
-      <div className="text-[10px] text-gray-400 mt-1 uppercase tracking-tight">{sub}</div>
     </div>
   );
 }

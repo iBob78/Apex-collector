@@ -37,13 +37,13 @@ export default function LeaderboardPage() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white">
+    <div className="apex-paddock flex min-h-screen text-white">
       <Sidebar />
       <main className="min-w-0 flex-1 pb-28 md:pb-10">
         <div className="mx-auto max-w-[1100px] px-4 py-6 sm:px-7 sm:py-9 lg:px-10">
-          <header className="mb-7">
-            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-amber-300">{t('Pilotes Apex')}</p>
-            <h1 className="mt-2 flex items-center gap-3 text-3xl font-black uppercase italic tracking-tight sm:text-4xl">
+          <header className="paddock-header mb-7">
+            <p className="paddock-eyebrow">{t('Pilotes Apex')}</p>
+            <h1 className="paddock-title mt-3 flex items-center gap-3">
               <Trophy className="text-amber-300" size={30} />
               {t('Classement des joueurs')}
             </h1>
@@ -52,8 +52,8 @@ export default function LeaderboardPage() {
             </p>
           </header>
 
-          <section className="overflow-hidden rounded-3xl border border-white/10 bg-[#0a0a0a]" aria-label={t('Classement des joueurs')}>
-            <div className="grid grid-cols-[52px_minmax(0,1fr)_90px] gap-3 border-b border-white/10 bg-white/[0.03] px-4 py-3 text-[10px] font-black uppercase tracking-widest text-gray-500 sm:grid-cols-[76px_minmax(0,1fr)_150px] sm:px-6">
+          <section className="paddock-panel overflow-hidden" aria-label={t('Classement des joueurs')}>
+            <div className="grid grid-cols-[52px_minmax(0,1fr)_90px] gap-3 border-b border-[#555D65]/15 bg-[#555D65]/[.05] px-4 py-4 text-[10px] font-black uppercase tracking-widest text-[#F0EFEB] sm:grid-cols-[76px_minmax(0,1fr)_150px] sm:px-6">
               <span>{t('Rang')}</span>
               <span>{t('Pilote')}</span>
               <span className="text-right">{t('Cartes')}</span>
@@ -61,7 +61,7 @@ export default function LeaderboardPage() {
 
             {loading ? (
               <div className="flex min-h-48 items-center justify-center">
-                <div className="h-9 w-9 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+                <div className="h-9 w-9 animate-spin rounded-full border-4 border-[#555D65] border-t-transparent" />
               </div>
             ) : loadError ? (
               <div className="flex flex-col items-center gap-3 px-5 py-12 text-center">
@@ -82,7 +82,7 @@ export default function LeaderboardPage() {
                 {players.map((player) => (
                   <li
                     key={player.player_rank}
-                    className="grid grid-cols-[52px_minmax(0,1fr)_90px] items-center gap-3 border-b border-white/[0.06] px-4 py-3 last:border-0 hover:bg-white/[0.03] sm:grid-cols-[76px_minmax(0,1fr)_150px] sm:px-6"
+                    className="grid grid-cols-[52px_minmax(0,1fr)_90px] items-center gap-3 border-b border-[#555D65]/[.08] px-4 py-3.5 last:border-0 hover:bg-[#555D65]/[.04] sm:grid-cols-[76px_minmax(0,1fr)_150px] sm:px-6"
                   >
                     <span className={`flex h-9 w-9 items-center justify-center rounded-xl text-sm font-black tabular-nums ${
                       player.player_rank === 1
@@ -99,7 +99,7 @@ export default function LeaderboardPage() {
                     </span>
                     <Link
                       href={`/showroom/${encodeURIComponent(player.username)}`}
-                      className="min-w-0 truncate rounded-lg text-sm font-bold text-gray-100 transition hover:text-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 sm:text-base"
+                      className="min-w-0 truncate rounded-lg text-sm font-bold text-gray-100 transition hover:text-[#F0EFEB] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 sm:text-base"
                     >
                       @{player.username}
                     </Link>

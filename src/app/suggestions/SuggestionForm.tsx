@@ -16,7 +16,7 @@ const categoryLabels: Record<SuggestionCategory, string> = {
   driver: 'Pilote',
 };
 
-const fieldClass = 'w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/10';
+const fieldClass = 'paddock-field w-full rounded-xl px-3.5 py-3 text-sm outline-none transition placeholder:text-slate-500';
 
 export default function SuggestionForm({ initialCompetitionTypes }: { initialCompetitionTypes: string[] }) {
   const [category, setCategory] = useState<SuggestionCategory>('vehicle');
@@ -61,18 +61,18 @@ export default function SuggestionForm({ initialCompetitionTypes }: { initialCom
   };
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#07090d] text-white">
+    <main className="apex-paddock min-h-screen overflow-hidden text-white">
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_72%_0%,rgba(14,165,233,0.12),transparent_40%),radial-gradient(ellipse_at_0%_40%,rgba(30,64,175,0.08),transparent_36%)]" />
       <div className="relative mx-auto max-w-4xl px-4 pb-20 pt-6 sm:px-6 lg:px-10">
         <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-bold text-slate-400 transition hover:text-white">
           <ArrowLeft size={16} /> Retour au garage
         </Link>
 
-        <section className="mt-8 rounded-3xl border border-white/[0.08] bg-white/[0.025] p-5 sm:mt-12 sm:p-8 lg:p-10">
-          <p className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">
+        <section className="paddock-panel mt-8 p-5 sm:mt-12 sm:p-8 lg:p-10">
+          <p className="paddock-eyebrow mb-3">
             <Lightbulb size={14} /> Apex Collector · Vos idées
           </p>
-          <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Suggérer une carte</h1>
+          <h1 className="paddock-title">Suggérer une carte</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">
             Une voiture, un circuit ou un pilote mérite sa place dans la collection ? Partage les informations que tu connais ; l’équipe vérifiera et complétera la fiche.
           </p>
@@ -97,7 +97,7 @@ export default function SuggestionForm({ initialCompetitionTypes }: { initialCom
                 .map((field) => (
                 <label key={field.name} className={`block min-w-0 ${field.name === 'image_url' ? 'sm:col-span-2' : ''}`}>
                   <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">
-                    {field.label}{(field.required || (field.name === 'record_description' && details.is_record === 'true')) && <span className="ml-1 text-cyan-300">*</span>}
+                    {field.label}{(field.required || (field.name === 'record_description' && details.is_record === 'true')) && <span className="ml-1 text-[#D32F35]">*</span>}
                   </span>
                   {field.type === 'select' ? (
                     <select
@@ -113,7 +113,7 @@ export default function SuggestionForm({ initialCompetitionTypes }: { initialCom
                       ).map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                     </select>
                   ) : field.type === 'checkbox' ? (
-                    <span className="flex min-h-12 items-center gap-3 rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3">
+                    <span className="flex min-h-12 items-center gap-3 rounded-xl border border-white/10 bg-[#171A1E] px-3.5 py-3">
                       <input
                         type="checkbox"
                         checked={details[field.name] === 'true'}
@@ -122,7 +122,7 @@ export default function SuggestionForm({ initialCompetitionTypes }: { initialCom
                           [field.name]: event.target.checked ? 'true' : '',
                           ...(field.name === 'is_record' && !event.target.checked ? { record_description: '' } : {}),
                         }))}
-                        className="h-4 w-4 accent-cyan-300"
+                        className="h-4 w-4 accent-[#D32F35]"
                       />
                       <span className="text-sm text-slate-200">Cette voiture détient un record</span>
                     </span>
@@ -184,7 +184,7 @@ export default function SuggestionForm({ initialCompetitionTypes }: { initialCom
               </p>
             )}
 
-            <button type="submit" disabled={busy} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-cyan-300 px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-cyan-200 disabled:cursor-wait disabled:opacity-60 sm:w-auto">
+            <button type="submit" disabled={busy} className="paddock-action inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm disabled:cursor-wait disabled:opacity-60 sm:w-auto">
               {busy ? <LoaderCircle className="animate-spin" size={17} /> : <Send size={16} />}
               {busy ? 'Envoi…' : 'Envoyer la suggestion'}
             </button>

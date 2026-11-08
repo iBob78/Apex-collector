@@ -321,8 +321,8 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#050505] text-white">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-[#101215] text-white">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#555D65] border-t-transparent" />
       </div>
     );
   }
@@ -333,38 +333,46 @@ export default function ProfilePage() {
     : '—';
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white">
+    <div className="apex-paddock flex min-h-screen text-white">
       <Sidebar />
       <main className="min-w-0 flex-1 pb-28 md:pb-10">
-        <div className="mx-auto max-w-[1400px] space-y-8 px-4 py-6 sm:px-7 sm:py-9 lg:px-10">
-          <header className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex min-w-0 items-center gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-blue-400/30 bg-blue-500/10 text-2xl font-black uppercase text-blue-200">
-                {displayName[0]}
+        <div className="paddock-shell space-y-8 px-4 py-6 sm:px-7 sm:py-9 lg:px-10">
+          <header className="grid overflow-hidden rounded-[22px] border border-[#8099d6]/25 shadow-[0_22px_62px_rgba(0,0,0,.25)] lg:grid-cols-[minmax(0,1fr)_250px]">
+            <div className="race-photo-soft relative isolate flex min-h-[270px] flex-col justify-between px-5 py-6 sm:min-h-[330px] sm:px-9 sm:py-9">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0a1329]/95 via-[#101d37]/82 to-[#101c3b]/30" aria-hidden="true" />
+              <span className="absolute -right-5 -top-16 select-none font-['Barlow_Condensed'] text-[270px] font-black leading-none text-white/[.05]" aria-hidden="true">{String(collectorProgress.level).padStart(2,'0')}</span>
+              <div className="relative z-10 flex flex-wrap items-start justify-between gap-4">
+                <p className="paddock-eyebrow">APEX / PROFIL PILOTE</p>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => router.push('/settings')}
+                    className="paddock-ghost inline-flex min-h-10 items-center gap-2 px-3 font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.1em]">
+                    <Settings size={16} aria-hidden="true"/><span className="hidden sm:inline">{t('Réglages')}</span>
+                  </button>
+                  <button type="button" onClick={() => void signOut()} aria-label={t('Se déconnecter')} title={t('Se déconnecter')}
+                    className="flex h-10 w-10 items-center justify-center border border-[#D32F35]/40 bg-[#D32F35]/20 text-[#F0EFEB] transition hover:bg-[#D32F35]/35">
+                    <LogOut size={17} aria-hidden="true" />
+                  </button>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">{t('Identité pilote')}</p>
-                <h1 className="truncate text-2xl font-black uppercase italic tracking-tight sm:text-3xl">{displayName}</h1>
+              <div className="relative z-10 flex min-w-0 items-end gap-5">
+                <div className="hidden h-[84px] w-[84px] shrink-0 items-center justify-center rounded-2xl border border-[#96b3ff]/35 bg-[#283963] font-['Barlow_Condensed'] text-[57px] font-black uppercase text-white shadow-[0_0_24px_rgba(98,110,244,.26)] sm:flex" aria-hidden="true">
+                  {displayName[0]}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-bold uppercase tracking-[.14em] text-[#a6bfff]">{t('Identité pilote')} / APEX</p>
+                  <h1 className="mt-3 break-words font-['Barlow_Condensed'] text-[clamp(2.7rem,5vw,5rem)] font-black italic leading-[.93] tracking-[-.03em]">{displayName}</h1>
+                  <p className="mt-4 font-mono text-[10px] uppercase tracking-[.12em] text-gray-300">RACING DEPARTMENT / MEMBER</p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => router.push('/settings')}
-                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-xs font-bold uppercase tracking-wider text-gray-200 transition hover:bg-white/10"
-              >
-                <Settings size={15} /> <span className="hidden sm:inline">{t('Réglages')}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => void signOut()}
-                aria-label={t('Se déconnecter')}
-                title={t('Se déconnecter')}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-red-400/20 bg-red-500/10 text-red-300 transition hover:bg-red-500/20"
-              >
-                <LogOut size={16} />
-              </button>
-            </div>
+            <aside className="flex flex-col justify-between bg-gradient-to-br from-[#273a6c] via-[#202447] to-[#101d38] px-6 py-6 text-white sm:px-8 sm:py-8">
+              <p className="font-['Barlow_Condensed'] text-[14px] font-black uppercase tracking-[.17em]">DRIVER / LEVEL</p>
+              <strong className="font-['Barlow_Condensed'] text-[105px] font-black leading-[.85] tracking-[-.07em] text-[#e5edff] sm:text-[132px]">{String(collectorProgress.level).padStart(2,'0')}</strong>
+              <div className="border-t border-white/20 pt-4">
+                <p className="font-['Barlow_Condensed'] text-[22px] font-black uppercase leading-none">{t('Niveau')} {collectorProgress.level}</p>
+                <p className="mt-2 font-mono text-[11px] font-bold">{collectorProgress.progress} / 10 {t('points')}</p>
+              </div>
+            </aside>
           </header>
 
           {pageError && (
@@ -373,7 +381,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label={t('Statistiques du profil')}>
+          <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label={t('Statistiques du profil')}>
             <StatCard language={language} label={t('Cartes possédées')} value={stats.totalCards} icon={<CarFront size={18} />} />
             <StatCard language={language} label={t('Cartes légendaires')} value={stats.legendaryCards} icon={<Medal size={18} />} />
             <StatCard language={language} label={t('Constructeurs collectionnés')} value={stats.manufacturers} icon={<Users size={18} />} />
@@ -381,13 +389,13 @@ export default function ProfilePage() {
           </section>
 
           <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)]">
-            <article className="rounded-3xl border border-blue-400/15 bg-gradient-to-br from-[#101a28] via-[#0b0d12] to-[#090909] p-5 sm:p-7">
+            <article className="paddock-hero p-5 sm:p-7">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-300">{t('Progression collectionneur')}</p>
-                  <h2 className="mt-1 text-3xl font-black italic">{t('Niveau')} {collectorProgress.level}</h2>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#F0EFEB]">{t('Progression collectionneur')}</p>
+                  <h2 className="paddock-title mt-2">{t('Niveau')} {collectorProgress.level}</h2>
                 </div>
-                <Star className="text-blue-300" size={22} />
+                <Star className="text-[#F0EFEB]" size={22} />
               </div>
               <p className="mt-3 text-sm text-gray-400">
                 {t('La collection progresse grâce aux modèles, circuits, pilotes et succès réclamés, sans dépendre des compétitions.')}
@@ -403,9 +411,9 @@ export default function ProfilePage() {
                   aria-valuemin={0}
                   aria-valuemax={10}
                   aria-valuenow={collectorProgress.progress}
-                  className="h-2 overflow-hidden rounded-full bg-white/10"
+                  className="paddock-meter h-2"
                 >
-                  <div className="h-full rounded-full bg-blue-400 transition-all" style={{ width: `${collectorProgress.progress * 10}%` }} />
+                  <div className="h-full rounded-full bg-gradient-to-r from-[#D32F35] via-[#F0EFEB] to-[#F0EFEB] transition-all" style={{ width: `${collectorProgress.progress * 10}%` }} />
                 </div>
                 <p className="mt-3 text-[11px] leading-relaxed text-gray-500">
                   {t('1 point par modèle ou circuit unique ; 5 points par succès réclamé.')}
@@ -413,10 +421,10 @@ export default function ProfilePage() {
               </div>
             </article>
 
-            <article className="rounded-3xl border border-white/10 bg-[#0a0a0a] p-5 sm:p-7">
+            <article className="paddock-panel p-5 sm:p-7">
               <div className="mb-5 flex items-center gap-3">
                 <Trophy size={19} className="text-amber-300" />
-                <h2 className="text-sm font-black uppercase tracking-widest">{t('Palmarès compétition')}</h2>
+                <h2 className="paddock-section-title">{t('Palmarès compétition')}</h2>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <CompetitionStat label={t('Championnats remportés')} />
@@ -428,11 +436,11 @@ export default function ProfilePage() {
             </article>
           </section>
 
-          <section className="rounded-3xl border border-white/10 bg-[#0a0a0a] p-5 sm:p-7">
+          <section className="paddock-panel p-5 sm:p-7">
             <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">{t('Espace showroom')}</p>
-                <h2 className="mt-1 text-xl font-black uppercase italic tracking-tight sm:text-2xl">{t('Mon showroom')}</h2>
+                <p className="paddock-eyebrow" >{t('Espace showroom')}</p>
+                <h2 className="paddock-section-title mt-2">{t('Mon showroom')}</h2>
                 <p className="mt-1 text-xs text-gray-500">{t('Choisissez jusqu’à trois voitures à exposer. La publication est désactivée par défaut.')}</p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -448,7 +456,7 @@ export default function ProfilePage() {
                   type="button"
                   onClick={() => void saveGarage()}
                   disabled={!hasGarageChanges || savingGarage || Boolean(garageError)}
-                  className="min-h-10 rounded-xl bg-blue-600 px-4 text-xs font-black uppercase tracking-wider text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="paddock-action min-h-10 rounded-xl px-4 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {savingGarage ? t('Enregistrement…') : t('Enregistrer le showroom')}
                 </button>
@@ -463,7 +471,7 @@ export default function ProfilePage() {
 
             <div className="grid gap-3 md:grid-cols-3">
               {showcase.map((selectedId, index) => (
-                <label key={index} className="block rounded-2xl border border-white/10 bg-black/30 p-4">
+                <label key={index} className="paddock-tile block p-4">
                   <span className="mb-2 block text-[10px] font-black uppercase tracking-widest text-gray-400">
                     {index === 0 ? t('Voiture vedette') : `${t('Emplacement')} ${index + 1}`}
                   </span>
@@ -476,7 +484,7 @@ export default function ProfilePage() {
                       setSaveMessage(null);
                     }}
                     disabled={Boolean(garageError)}
-                    className="min-h-11 w-full rounded-lg border border-white/10 bg-[#111] px-3 text-sm text-white disabled:opacity-50"
+                    className="paddock-field min-h-11 w-full rounded-lg px-3 text-sm disabled:opacity-50"
                   >
                     <option value="">{t('Aucune voiture')}</option>
                     {selectedId && !vehicleById.has(selectedId) && (
@@ -496,9 +504,9 @@ export default function ProfilePage() {
               ))}
             </div>
 
-            {saveMessage && <p role="status" className="mt-4 text-sm text-blue-200">{saveMessage}</p>}
+            {saveMessage && <p role="status" className="mt-4 text-sm text-[#F0EFEB]">{saveMessage}</p>}
 
-            <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="paddock-tile mt-6 flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-bold">{t('Visibilité du showroom')}</p>
                 <p className="mt-1 text-xs text-gray-500">
@@ -521,7 +529,7 @@ export default function ProfilePage() {
                   : profile?.showroom_public ? t('Public') : t('Rendre public')}
               </button>
             </div>
-            {showroomMessage && <p role="status" className="mt-3 text-sm text-blue-200">{showroomMessage}</p>}
+            {showroomMessage && <p role="status" className="mt-3 text-sm text-[#F0EFEB]">{showroomMessage}</p>}
 
             {selectedVehicles.length > 0 ? (
               <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -547,17 +555,17 @@ export default function ProfilePage() {
           </section>
 
           <section className="grid gap-6 lg:grid-cols-2">
-            <article className="rounded-3xl border border-white/10 bg-[#0a0a0a] p-5 sm:p-7">
+            <article className="paddock-panel p-5 sm:p-7">
               <div className="mb-4 flex items-center gap-3">
-                <Medal size={18} className="text-purple-300" />
-                <h2 className="text-sm font-black uppercase tracking-widest">{t('Titres et badges')}</h2>
+                <Medal size={18} className="text-[#F0EFEB]" />
+                <h2 className="paddock-section-title">{t('Titres et badges')}</h2>
               </div>
               {achievementError ? (
                 <p className="text-sm text-amber-200">{t('Les succès ne sont pas disponibles pour le moment.')}</p>
               ) : achievements.length ? (
                 <div className="flex flex-wrap gap-2">
                   {achievements.map((achievement) => (
-                    <span key={achievement.id} title={achievement.description} className="rounded-full border border-purple-400/20 bg-purple-400/10 px-3 py-2 text-xs font-bold text-purple-100">
+                    <span key={achievement.id} title={achievement.description} className="rounded-full border border-purple-400/20 bg-[#555D65]/10 px-3 py-2 text-xs font-bold text-[#F0EFEB]">
                       {t(achievement.title)}
                     </span>
                   ))}
@@ -566,10 +574,10 @@ export default function ProfilePage() {
                 <p className="text-sm text-gray-500">{t('Aucun succès réclamé pour le moment.')}</p>
               )}
             </article>
-            <article className="rounded-3xl border border-white/10 bg-[#0a0a0a] p-5 sm:p-7">
+            <article className="paddock-panel p-5 sm:p-7">
               <div className="mb-4 flex items-center gap-3">
-                <CalendarDays size={18} className="text-blue-300" />
-                <h2 className="text-sm font-black uppercase tracking-widest">{t('Inscription')}</h2>
+                <CalendarDays size={18} className="text-[#F0EFEB]" />
+                <h2 className="paddock-section-title">{t('Inscription')}</h2>
               </div>
               <p className="text-lg font-bold">{registrationDate}</p>
               <p className="mt-2 text-xs text-gray-500">
@@ -585,12 +593,12 @@ export default function ProfilePage() {
 
 function StatCard({ language, label, value, icon }: { language: string; label: string; value: number; icon: React.ReactNode }) {
   return (
-    <article className="rounded-2xl border border-white/10 bg-[#0a0a0a] p-4 sm:p-5">
+    <article className="paddock-data-card p-4 sm:p-5">
       <div className="flex items-center justify-between gap-3">
         <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{label}</span>
-        <span className="text-blue-300">{icon}</span>
+        <span className="text-[#F0EFEB]">{icon}</span>
       </div>
-      <p className="mt-3 text-2xl font-black tabular-nums">{new Intl.NumberFormat(language).format(value)}</p>
+      <p className="paddock-stat-number mt-3 tabular-nums text-[#F0EFEB]">{new Intl.NumberFormat(language).format(value)}</p>
     </article>
   );
 }

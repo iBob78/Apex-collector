@@ -99,16 +99,16 @@ export default function ShowroomPage() {
   const featuredVehicle = showroom?.vehicles[0];
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white">
+    <div className="apex-paddock flex min-h-screen text-white">
       <Sidebar />
       <main className="min-w-0 flex-1 pb-28 md:pb-10">
-        <div className="mx-auto max-w-[1500px] px-4 py-6 sm:px-7 sm:py-9 lg:px-10">
+        <div className="paddock-shell px-4 py-6 sm:px-7 sm:py-9 lg:px-10">
           {loading ? (
             <div className="flex min-h-[60vh] items-center justify-center">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#555D65] border-t-transparent" />
             </div>
           ) : !showroom ? (
-            <section className="mx-auto mt-16 max-w-lg rounded-3xl border border-white/10 bg-[#0a0a0a] p-8 text-center">
+            <section className="paddock-panel mx-auto mt-16 max-w-lg p-8 text-center">
               <CarFront className="mx-auto text-gray-500" size={34} />
               <h1 className="mt-4 text-xl font-black uppercase">{t('Showroom indisponible')}</h1>
               <p className="mt-2 text-sm text-gray-400">
@@ -122,21 +122,21 @@ export default function ShowroomPage() {
             </section>
           ) : (
             <>
-              <header className="mb-6">
+              <header className="paddock-header mb-6">
                 <Link href="/marketplace" className="mb-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-400 transition hover:text-white">
                   <ArrowLeft size={15} /> {t('Retour au marché')}
                 </Link>
-                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-red-400">
+                <p className="paddock-eyebrow">
                   {showroom.isPublic ? t('Showroom public') : t('Showroom privé')}
                 </p>
-                <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tight sm:text-4xl">
+                <h1 className="paddock-title mt-3">
                   {t('Showroom de {username}', { username: showroom.username })}
                 </h1>
                 <p className="mt-1 text-sm text-gray-400">{t('Sa passion automobile, en un coup d’œil')}</p>
               </header>
 
               {!showroom.isPublic ? (
-                <section className="rounded-3xl border border-white/10 bg-[#0a0a0a] px-6 py-12 text-center sm:px-10">
+                <section className="paddock-panel px-6 py-12 text-center sm:px-10">
                   <LockKeyhole className="mx-auto text-gray-400" size={32} />
                   <h2 className="mt-4 text-xl font-black uppercase">{t('Showroom privé')}</h2>
                   <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-gray-400">
@@ -144,7 +144,7 @@ export default function ShowroomPage() {
                   </p>
                 </section>
               ) : featuredVehicle ? (
-                <section className="relative isolate min-h-[430px] overflow-hidden rounded-[2rem] border border-white/10 bg-[#090b10] sm:min-h-[520px]">
+                <section className="paddock-hero relative isolate min-h-[430px] overflow-hidden rounded-[2rem] sm:min-h-[520px]">
                   <SafeImage
                     src={resolveCardImage({
                       category: 'vehicle',
@@ -163,12 +163,12 @@ export default function ShowroomPage() {
                   <div className="absolute inset-0 -z-0 bg-gradient-to-r from-black via-black/75 to-black/5 sm:via-black/55" />
                   <div className="absolute inset-0 -z-0 bg-gradient-to-t from-black/90 via-transparent to-black/20" />
                   <div className="relative z-10 flex min-h-[430px] flex-col justify-between p-5 sm:min-h-[520px] sm:p-9 lg:p-12">
-                    <span className="w-fit rounded-md border border-red-400/30 bg-red-600/90 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider">
+                    <span className="w-fit rounded-md border border-[#F0EFEB]/40 bg-[#555D65]/85 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider">
                       {t('Voiture vedette')}
                     </span>
                     <div className="max-w-md">
                       <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-300">{featuredVehicle.make}</p>
-                      <h2 className="mt-1 text-3xl font-black uppercase italic leading-tight sm:text-5xl">
+                      <h2 className="paddock-title mt-2">
                         {featuredVehicle.model}
                       </h2>
                       <span
@@ -185,14 +185,14 @@ export default function ShowroomPage() {
                         <span className="text-gray-400">{t('Puissance')}</span>
                         <span className="text-right font-bold">{featuredVehicle.power_hp || '—'} ch</span>
                       </div>
-                      <a href="#collection-exposee" className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl border border-red-500/60 bg-black/50 px-4 text-xs font-black uppercase tracking-wider transition hover:bg-red-600">
+                      <a href="#collection-exposee" className="paddock-ghost mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl px-4 text-xs font-black uppercase tracking-wider">
                         {t('Découvrir le showroom')} <ArrowRight size={15} />
                       </a>
                     </div>
                   </div>
                 </section>
               ) : (
-                <div className="rounded-3xl border border-dashed border-white/15 bg-[#0a0a0a] p-10 text-center text-sm text-gray-400">
+                <div className="rounded-3xl border border-dashed border-white/15 bg-[#101215] p-10 text-center text-sm text-gray-400">
                   {t('Aucune voiture n’est actuellement exposée.')}
                 </div>
               )}
@@ -229,7 +229,7 @@ export default function ShowroomPage() {
                 <section className="mt-8">
                   <div className="mb-4">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300">{t('Améliorations de la collection')}</p>
-                    <h2 className="mt-1 text-xl font-black uppercase italic">{t('Cartes aux niveaux les plus élevés')}</h2>
+                    <h2 className="paddock-section-title mt-1">{t('Cartes aux niveaux les plus élevés')}</h2>
                   </div>
                   {showroom.topUpgrades.length > 0 ? (
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5">
@@ -247,7 +247,7 @@ export default function ShowroomPage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 text-sm text-gray-400">
+                    <p className="rounded-2xl border border-white/10 bg-[#101215] p-5 text-sm text-gray-400">
                       {t('Aucune carte véhicule améliorée pour le moment.')}
                     </p>
                   )}
@@ -257,15 +257,15 @@ export default function ShowroomPage() {
               {showroom.isPublic && showroom.hasCollectionHighlights && (
                 <section className="mt-8">
                   <div className="mb-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-300">{t('Palmarès du pilote')}</p>
-                    <h2 className="mt-1 text-xl font-black uppercase italic">{t('Succès débloqués')}</h2>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#F0EFEB]">{t('Palmarès du pilote')}</p>
+                    <h2 className="paddock-section-title mt-1">{t('Succès débloqués')}</h2>
                   </div>
                   {showroom.achievements.length > 0 ? (
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {showroom.achievements.map((achievement, index) => (
-                        <article key={`${achievement.title}-${index}`} className="rounded-2xl border border-purple-400/20 bg-purple-400/[0.06] p-4">
-                          <div className="flex items-center gap-2 text-sm font-bold text-purple-100">
-                            <Medal size={16} className="shrink-0 text-purple-300" />
+                        <article key={`${achievement.title}-${index}`} className="paddock-tile p-4">
+                          <div className="flex items-center gap-2 text-sm font-bold text-[#F0EFEB]">
+                            <Medal size={16} className="shrink-0 text-[#F0EFEB]" />
                             <span>{t(achievement.title)}</span>
                           </div>
                           {achievement.description && (
@@ -275,7 +275,7 @@ export default function ShowroomPage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 text-sm text-gray-400">
+                    <p className="rounded-2xl border border-white/10 bg-[#101215] p-5 text-sm text-gray-400">
                       {t('Aucun succès réclamé pour le moment.')}
                     </p>
                   )}
@@ -287,7 +287,7 @@ export default function ShowroomPage() {
                   <div className="mb-4 flex items-end justify-between gap-3">
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-400">{t('Sélection du pilote')}</p>
-                      <h2 className="mt-1 text-xl font-black uppercase italic">{t('Voitures exposées')}</h2>
+                      <h2 className="paddock-section-title mt-1">{t('Voitures exposées')}</h2>
                     </div>
                     <span className="text-xs text-gray-500">{showroom.vehicles.length} / 3</span>
                   </div>
@@ -326,12 +326,12 @@ function ShowroomStat({
   icon: React.ReactNode;
 }) {
   return (
-    <article className="rounded-2xl border border-white/10 bg-[#0a0a0a] p-4 sm:p-5">
+    <article className="paddock-data-card p-4 sm:p-5">
       <div className="flex items-center justify-between gap-3">
         <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{label}</span>
         <span className="text-red-300">{icon}</span>
       </div>
-      <p className="mt-3 text-2xl font-black tabular-nums">{new Intl.NumberFormat(language).format(value)}</p>
+      <p className="paddock-stat-number mt-3 tabular-nums text-[#F0EFEB]">{new Intl.NumberFormat(language).format(value)}</p>
     </article>
   );
 }

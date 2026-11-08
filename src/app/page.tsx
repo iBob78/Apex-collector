@@ -1,387 +1,178 @@
 'use client';
-import { useEffect, useState } from 'react';
+
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabaseBrowser';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import {
-  TrophyIcon,
-  PackageIcon,
-  StoreIcon,
-  ZapIcon,
-  ArrowRightIcon,
-  SparklesIcon,
-  CrownIcon,
-  CoinsIcon,
-  TargetIcon,
-  TrendingUpIcon,
-  ShieldCheckIcon,
-  UsersIcon
-} from 'lucide-react';
-import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { ArrowRight, ArrowUpRight, Flag, Gauge, Layers3, ShoppingBag, Sparkles, Trophy, Zap } from 'lucide-react';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
+
+const sectors = [
+  { id: '01', href: '/how-to-play', image: '/showcase-boosters.png', tag: 'PIT LANE / UNSEAL', key: 'Système de Boosters Premium', text: 'Des packs exclusifs pour tous les collectionneurs', icon: Zap },
+  { id: '02', href: '/how-to-play', image: '/showcase-card.png', tag: 'GARAGE / ARCHIVE', key: 'MA COLLECTION', text: 'Collection complète des véhicules, circuits et pilotes d’exception.', icon: Layers3 },
+  { id: '03', href: '/how-to-play', image: '/showcase-marketplace.png', tag: 'PADDOCK / TRADING', key: 'Marketplace Mondial', text: 'Achetez, vendez et dominez l’économie', icon: ShoppingBag },
+];
 
 export default function LandingPage() {
   const { t } = useSitePreferences();
-  const [user, setUser] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
-  const { scrollYProgress } = useScroll();
-
-  const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
-    setMounted(true);
+    let active = true;
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        router.push('/dashboard');
-      } else {
-        setUser(null);
-      }
+      if (!active) return;
+      if (data.user) router.push('/dashboard');
+      else setMounted(true);
+    }).catch(() => {
+      if (active) setMounted(true);
     });
+    return () => { active = false; };
   }, [router, supabase]);
 
-  if (!mounted || user) return null;
+  if (!mounted) return null;
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white overflow-hidden">
-      {/* Animated Background Grid */}
-      <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)',
-          backgroundSize: '50px 50px'
-        }} />
-      </div>
-
-      {/* Animated Blobs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <motion.div
-          animate={{
-            x: [0, 100, 0],
-            y: [0, -50, 0],
-            scale: [1, 1.2, 1]
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-blue-600/10 blur-[150px] rounded-full"
-        />
-        <motion.div
-          animate={{
-            x: [0, -100, 0],
-            y: [0, 50, 0],
-            scale: [1, 1.3, 1]
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute bottom-1/4 right-1/4 w-[700px] h-[700px] bg-indigo-600/10 blur-[150px] rounded-full"
-        />
-      </div>
-
-      {/* Header */}
-      <motion.header
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="relative z-50 flex justify-between items-center gap-2 px-4 sm:px-8 py-5 sm:py-6 backdrop-blur-xl bg-black/20 border-b border-white/5"
-      >
-        <div className="flex items-center gap-3">
-          <motion.div
-            whileHover={{ rotate: 180, scale: 1.1 }}
-            transition={{ duration: 0.5 }}
-            className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center"
-          >
-            <SparklesIcon size={20} className="text-white" />
-          </motion.div>
-          <h1 className="text-xl font-black uppercase italic tracking-tighter">Apex Collector</h1>
-        </div>
-        <Link
-          href="/login"
-          className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors px-6 py-2 rounded-full border border-white/10 hover:border-white/30"
-        >
-          {t('Connexion')}
+    <main className="apex-paddock paddock-landing min-h-screen overflow-hidden text-white">
+      <header className="relative z-30 flex min-h-[76px] items-center justify-between gap-3 border-b border-white/20 bg-[#0b1225]/95 px-4 backdrop-blur-xl sm:px-9 lg:px-14">
+        <Link href="/" className="flex min-w-0 items-center gap-3" aria-label="Apex Collector">
+          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#f34b66] to-[#bd1e4d] text-white shadow-[0_0_20px_rgba(231,42,82,.25)]">
+            <Flag size={22} strokeWidth={2.8} aria-hidden="true"/>
+          </span>
+          <div className="font-['Barlow_Condensed'] text-[26px] font-black italic uppercase leading-[.76] tracking-[-.045em] sm:text-[31px]">
+            APEX <span className="block text-[#F0EFEB]">COLLECTOR</span>
+          </div>
         </Link>
-      </motion.header>
+        <nav className="hidden items-center gap-8 font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[.14em] text-gray-300 md:flex" aria-label="Explorer">
+          <a href="#concept" className="transition hover:text-[#F0EFEB]">THE CONCEPT</a>
+          <a href="#race-journey" className="transition hover:text-[#F0EFEB]">THE GRID</a>
+          <Link href="/how-to-play" className="transition hover:text-[#F0EFEB]">{t('How to play')}</Link>
+        </nav>
+        <Link href="/login" className="paddock-action min-h-10 shrink-0 px-4 sm:px-6">
+          {t('Connexion')} <ArrowUpRight size={16} aria-hidden="true"/>
+        </Link>
+      </header>
 
-      <div className="relative z-10">
-        {/* Hero Section */}
-        <motion.section
-          style={{ y: heroY, opacity: heroOpacity }}
-          className="min-h-[85dvh] sm:min-h-screen flex flex-col justify-center items-center px-4 sm:px-8 py-16 sm:py-0 relative"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-5xl"
-          >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-5 py-2.5 mb-10"
-            >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              >
-                <ZapIcon size={16} className="text-blue-500" />
-              </motion.div>
-              <span className="text-xs font-black uppercase tracking-widest text-blue-400">{t('Saison 1 · Édition Limitée')}</span>
-            </motion.div>
-
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-[clamp(2.25rem,9vw,6rem)] font-black uppercase italic tracking-tighter mb-6 leading-tight sm:mb-8"
-            >
-              <span className="bg-gradient-to-r from-white via-blue-200 to-indigo-300 bg-clip-text text-transparent">
-                {t('Collectionnez')}
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                {t('l’Élite Automobile')}
-              </span>
-            </motion.h2>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-base sm:text-2xl text-gray-400 max-w-3xl mx-auto mb-8 sm:mb-16 leading-relaxed font-light"
-            >
+      {/* Racing photography and diagonal overprint take over the entire first screen. */}
+      <section className="apx-dashboard-hero relative isolate min-h-[min(690px,91dvh)] overflow-hidden !rounded-none !border-x-0" aria-label="Apex Collector Motorsport">
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,14,31,.86),rgba(8,14,29,.25))]" aria-hidden="true" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,13,29,.91)_0%,rgba(11,16,34,.7)_49%,rgba(10,14,26,.1)_100%)]" aria-hidden="true" />
+        <div className="absolute -right-14 -top-16 rotate-[-12deg] font-['Barlow_Condensed'] text-[230px] font-black leading-none tracking-[-.09em] text-white/[.08] sm:text-[470px]" aria-hidden="true">01</div>
+        <div className="relative z-10 mx-auto flex min-h-[min(690px,91dvh)] max-w-[1600px] flex-col justify-end px-5 pb-12 pt-24 sm:px-10 sm:pb-16 lg:px-16">
+          <motion.div initial={{ opacity: 0, x: -34 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .55 }} className="max-w-[960px]">
+            <span className="race-poster-label">APEX COLLECTOR / AUTOMOTIVE CARDS</span>
+            <p className="race-eyebrow mb-5 mt-7">COLLECT // DISCOVER // BUILD YOUR GARAGE</p>
+            <h1 className="font-['Barlow_Condensed'] text-[clamp(4.4rem,13vw,12rem)] font-black italic uppercase leading-[.78] tracking-[-.055em]">
+              <span className="block">APEX</span>
+              <span className="block text-white">COLLECTOR<span className="text-[#ee4464]">.</span></span>
+            </h1>
+            <p className="mt-7 max-w-[600px] border-l-[3px] border-[#D32F35] pl-4 text-[14px] font-medium leading-relaxed text-gray-200 sm:mt-10 sm:text-[18px]">
               {t('Ouvrez des packs premium, construisez votre garage légendaire et dominez le marché mondial. Chaque carte est une icône automobile rare.')}
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.7 }}
-              className="flex items-center justify-center gap-6"
-            >
-              <Link
-                href="/login"
-                className="group relative bg-blue-600 hover:bg-blue-500 px-6 sm:px-10 py-4 sm:py-5 rounded-2xl text-sm font-black uppercase tracking-[0.2em] transition-all shadow-2xl shadow-blue-500/40 flex items-center gap-4 overflow-hidden"
-              >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 opacity-0 group-hover:opacity-20"
-                  animate={{ x: [-100, 100] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                />
-                <span className="relative z-10">{t('Commencer Gratuitement')}</span>
-                <ArrowRightIcon size={20} className="relative z-10 group-hover:translate-x-2 transition-transform" />
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3 sm:mt-10">
+              <Link href="/login" className="paddock-action min-h-[54px] px-7 sm:px-9">
+                {t('Commencer Gratuitement')} <ArrowRight size={18} aria-hidden="true"/>
               </Link>
-            </motion.div>
-          </motion.div>
-
-          {/* Stats Bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1 }}
-            className="relative mx-auto mt-10 grid w-full max-w-3xl grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-[#0d1420]/90 p-2 shadow-[0_10px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl sm:mt-14 sm:grid-cols-3 sm:gap-3 sm:p-3"
-          >
-            <StatItem value="500+" label={t('Cartes Uniques')} />
-            <StatItem value="∞" label={t('Possibilités')} />
-            <StatItem value="24/7" label={t('Marketplace')} className="col-span-2 sm:col-span-1" />
-          </motion.div>
-        </motion.section>
-
-        {/* Features Deep Dive */}
-        <section className="py-32 px-8 relative">
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-20"
-            >
-              <h3 className="text-3xl sm:text-5xl font-black uppercase italic tracking-tighter mb-4">
-                <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                  {t('Trois Piliers d’Excellence')}
-                </span>
-              </h3>
-              <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-                {t('Une expérience de collection premium avec des mécaniques de jeu avancées')}
-              </p>
-            </motion.div>
-
-            <div className="space-y-32">
-              <DetailedFeature
-                icon={<PackageIcon size={40} />}
-                title={t('Système de Boosters Premium')}
-                description={t('Des packs exclusifs pour tous les collectionneurs')}
-                image="/showcase-boosters.png"
-                features={[
-                  { icon: <CrownIcon size={18} />, text: t('Pack Carbon, Icon & Legendary avec raretés exclusives') },
-                  { icon: <SparklesIcon size={18} />, text: t('Animation d’ouverture cinématique immersive') },
-                  { icon: <TrophyIcon size={18} />, text: t('Cartes garanties selon la rareté du pack') },
-                  { icon: <ZapIcon size={18} />, text: t('Distribution équilibrée avec anti-doublon intelligent') }
-                ]}
-                gradient="from-blue-500/20 to-cyan-500/20"
-                index={0}
-              />
-
-              <DetailedFeature
-                icon={<StoreIcon size={40} />}
-                title={t('Marketplace Mondial')}
-                description={t('Achetez, vendez et dominez l’économie')}
-                image="/showcase-marketplace.png"
-                features={[
-                  { icon: <CoinsIcon size={18} />, text: t('Transactions en Apex Points (AP) - Monnaie premium') },
-                  { icon: <TrendingUpIcon size={18} />, text: t('Fixez vos propres prix et stratégies de vente') },
-                  { icon: <ShieldCheckIcon size={18} />, text: t('Système anti-fraude et transactions sécurisées') },
-                  { icon: <UsersIcon size={18} />, text: t('Marché en temps réel avec autres collectionneurs') }
-                ]}
-                gradient="from-indigo-500/20 to-purple-500/20"
-                index={1}
-                reverse
-              />
-
-              <DetailedFeature
-                icon={<TrophyIcon size={40} />}
-                title={t('Missions & Contrats')}
-                description={t('Complétez des défis pour gagner des récompenses')}
-                image="/showcase-missions.png"
-                features={[
-                  { icon: <TargetIcon size={18} />, text: t('Contrats quotidiens avec objectifs progressifs') },
-                  { icon: <CoinsIcon size={18} />, text: t('Récompenses en AP pour chaque mission complétée') },
-                  { icon: <ZapIcon size={18} />, text: t('Suivi automatique de progression en temps réel') },
-                  { icon: <CrownIcon size={18} />, text: t('Défis spéciaux pour débloquer des cartes exclusives') }
-                ]}
-                gradient="from-purple-500/20 to-pink-500/20"
-                index={2}
-              />
+              <a href="#concept" className="paddock-ghost inline-flex min-h-[54px] items-center gap-3 px-6 font-['Barlow_Condensed'] text-[14px] font-black uppercase tracking-[.13em]">
+                THE EXPERIENCE <ArrowUpRight size={17} aria-hidden="true"/>
+              </a>
             </div>
+          </motion.div>
+          <div className="mt-16 flex items-center gap-4 border-t border-white/30 pt-5 font-mono text-[10px] font-bold uppercase tracking-[.12em] text-white/65">
+            <span className="text-[#F0EFEB]">AC // THE COLLECTION</span>
+            <span className="h-px flex-1 bg-white/25"/>
+            <span className="hidden sm:inline">GARAGE · BOOSTERS · MARKET</span>
+            <span>01 / 03</span>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CTA Section */}
-        <section className="py-32 px-8 relative">
-          <div className="max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="relative bg-gradient-to-br from-blue-600/20 via-indigo-600/20 to-purple-600/20 border border-white/10 rounded-[28px] sm:rounded-[40px] p-6 sm:p-16 text-center overflow-hidden"
-            >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-                className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl"
-              />
-              <motion.div
-                animate={{ rotate: -360 }}
-                transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-                className="absolute -bottom-32 -left-32 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl"
-              />
+      <div className="race-ticker" aria-label="Apex Collector, Garage, Boosters, Marketplace">
+        <div className="race-ticker-track" aria-hidden="true">
+          {Array.from({ length: 4 }, (_, i) => (
+            <span key={i}>APEX COLLECTOR <span className="mx-7 text-[#D32F35]">✦</span> MOTORSPORT CULTURE <span className="mx-7">{"///"}</span> THE GARAGE <span className="mx-7 text-[#D32F35]">✦</span> OPEN THE PACKS <span className="mx-7">{"///"}</span></span>
+          ))}
+        </div>
+      </div>
 
-              <div className="relative z-10">
-                <h3 className="text-3xl sm:text-5xl font-black uppercase italic tracking-tighter mb-6">
-                  <span className="bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                    {t('Rejoignez l’Élite')}
-                  </span>
-                </h3>
-                <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-                  {t('Créez votre compte gratuitement et recevez votre premier pack de bienvenue pour démarrer votre collection.')}
-                </p>
-                <Link
-                  href="/login"
-                  className="inline-flex items-center gap-4 bg-white text-black hover:bg-blue-50 px-12 py-6 rounded-2xl text-sm font-black uppercase tracking-[0.2em] transition-all shadow-2xl shadow-white/20 group"
-                >
-                  {t('Créer mon Garage Elite')}
-                  <ArrowRightIcon size={20} className="group-hover:translate-x-2 transition-transform" />
-                </Link>
+      <section id="concept" className="mx-auto max-w-[1600px] px-5 py-16 sm:px-10 sm:py-24 lg:px-16">
+        <div className="grid items-end gap-7 border-b border-white/25 pb-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <div>
+            <p className="race-eyebrow">02 / THE CONCEPT</p>
+            <h2 className="race-display mt-5 max-w-[900px]">BUILT FOR <span className="text-[#D32F35]">COLLECTORS.</span></h2>
+          </div>
+          <p className="border-l-4 border-[#D32F35] pl-5 text-[15px] font-medium leading-relaxed text-gray-300">
+            {t('Une expérience de collection premium avec des mécaniques de jeu avancées')}
+          </p>
+        </div>
+
+        <div className="mt-9 grid gap-3 lg:grid-cols-3">
+          {sectors.map((sector, index) => {
+            const Icon = sector.icon;
+            return (
+              <motion.article key={sector.id} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: .4, delay: index * .08 }}
+                className="group relative flex min-h-[420px] flex-col overflow-hidden rounded-[18px] border border-[#8198d8]/25 bg-[#111c33] shadow-[0_15px_45px_rgba(0,0,0,.22)]">
+                <div className="relative h-[205px] overflow-hidden bg-[#0b152a] sm:h-[250px]">
+                  <img src={sector.image} alt="" loading="lazy" className="h-full w-full object-cover opacity-80 transition duration-500 group-hover:scale-105 group-hover:opacity-100"/>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#111c33] to-transparent"/>
+                  <span className="absolute left-5 top-5 rounded-md bg-gradient-to-r from-[#e7375b] to-[#7250bd] px-3 py-1 font-['Barlow_Condensed'] text-[13px] font-black text-[#F0EFEB]">{sector.id} / 03</span>
+                  <div className="absolute bottom-0 right-2 font-['Barlow_Condensed'] text-[110px] font-black leading-[.75] text-white/10">{sector.id}</div>
+                </div>
+                <div className="relative flex flex-1 flex-col p-6">
+                  <p className="race-eyebrow">{sector.tag}</p>
+                  <h3 className="mt-3 font-['Barlow_Condensed'] text-[34px] font-black uppercase leading-[.87] text-white sm:text-[41px]">{t(sector.key)}</h3>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-gray-400">{t(sector.text)}</p>
+                  <Link href={sector.href} className="mt-7 flex items-center justify-between border-t border-white/15 pt-4 font-['Barlow_Condensed'] text-[13px] font-bold tracking-[.08em] text-[#a5baff] hover:text-white">
+                    <span>{t('How to play')}</span><Icon size={22} aria-hidden="true"/>
+                  </Link>
+                </div>
+              </motion.article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section id="race-journey" className="apx-showcase-section px-5 py-16 text-white sm:px-10 sm:py-20 lg:px-16">
+        <div className="mx-auto max-w-[1500px]">
+          <p className="font-['Barlow_Condensed'] text-[12px] font-black uppercase tracking-[.2em]">03 / STARTING GRID</p>
+          <h2 className="mt-3 font-['Barlow_Condensed'] text-[clamp(4rem,9vw,9rem)] font-black uppercase leading-[.77] tracking-[-.055em]">YOUR ROAD TO THE TOP<span className="text-[#D32F35]">.</span></h2>
+          <div className="mt-12 grid gap-3 md:grid-cols-4">
+            {[
+              { id:'01', label:t('Créez votre compte'), icon:Flag },
+              { id:'02', label:t('Ouvrez des boosters'), icon:Zap },
+              { id:'03', label:t('Explorez votre garage'), icon:Gauge },
+              { id:'04', label:t('Suivez vos missions'), icon:Trophy },
+            ].map(({ id, label, icon: Icon }) => (
+              <div key={id} className="paddock-tile flex flex-col justify-between gap-7 p-5 sm:p-7">
+                <div className="flex items-start justify-between"><span className="font-['Barlow_Condensed'] text-[65px] font-black leading-[.75]">{id}</span><Icon size={29} aria-hidden="true"/></div>
+                <h3 className="max-w-[250px] font-['Barlow_Condensed'] text-[27px] font-black uppercase leading-[.88]">{label}</h3>
               </div>
-            </motion.div>
+            ))}
           </div>
-        </section>
+          <Link href="/how-to-play" className="paddock-ghost mt-8 inline-flex min-h-12 items-center gap-4 px-6 text-[14px] font-bold">
+            {t('How to play')} <ArrowUpRight size={18} aria-hidden="true"/>
+          </Link>
+        </div>
+      </section>
 
-      </div>
+      <section className="race-photo-soft relative overflow-hidden border-y border-white/20">
+        <div className="mx-auto flex min-h-[470px] max-w-[1500px] flex-col justify-end px-5 py-16 sm:px-10 lg:px-16">
+          <p className="race-eyebrow">APEX / DRIVER ACCESS</p>
+          <h2 className="race-display mt-4 max-w-[900px]">THE GRID <span className="text-[#F0EFEB]">IS WAITING.</span></h2>
+          <p className="mt-6 max-w-xl text-base text-gray-300">{t('Créez votre compte gratuitement et recevez votre premier pack de bienvenue pour démarrer votre collection.')}</p>
+          <Link href="/login" className="paddock-action mt-8 min-h-[52px] w-fit px-7">
+            {t('Créer mon Garage Elite')} <ArrowRight size={18} aria-hidden="true"/>
+          </Link>
+        </div>
+      </section>
+
+      <footer className="flex flex-wrap items-center justify-between gap-4 bg-[#090f20] px-5 py-6 text-[10px] font-extrabold uppercase tracking-[.14em] text-gray-500 sm:px-10">
+        <span className="text-white">APEX <span className="text-[#F0EFEB]">COLLECTOR</span> / RACING DEPARTMENT</span>
+        <span>COLLECT / DISCOVER / TRADE</span>
+        <Link href="/how-to-play" className="hover:text-[#F0EFEB]">{t('How to play')} ↗</Link>
+      </footer>
     </main>
-  );
-}
-
-function StatItem({ value, label, className = '' }: { value: string; label: string; className?: string }) {
-  return (
-    <div className={'flex min-w-0 flex-col items-center justify-center rounded-xl border border-white/5 bg-white/[0.03] px-3 py-4 text-center sm:px-4 sm:py-5 ' + className}>
-      <div className="font-mono text-2xl font-black tabular-nums text-white sm:text-3xl">{value}</div>
-      <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400 sm:text-xs">{label}</div>
-    </div>
-  );
-}
-
-function DetailedFeature({
-  icon,
-  title,
-  description,
-  image,
-  features,
-  gradient,
-  index,
-  reverse = false
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  image?: string;
-  features: { icon: React.ReactNode; text: string }[];
-  gradient: string;
-  index: number;
-  reverse?: boolean;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
-      className={`grid md:grid-cols-2 gap-12 items-center ${reverse ? 'md:flex-row-reverse' : ''}`}
-    >
-      <motion.div
-        whileHover={{ scale: 1.02 }}
-        className={`relative bg-gradient-to-br ${gradient} border border-white/10 rounded-3xl p-12 overflow-hidden ${reverse ? 'md:order-2' : ''}`}
-      >
-        {image && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="mb-8 rounded-2xl overflow-hidden border border-white/20 shadow-2xl"
-          >
-            <img
-              src={image}
-              alt={title}
-              className="w-full h-auto"
-            />
-          </motion.div>
-        )}
-        <motion.div
-          whileHover={{ rotate: 5, scale: 1.1 }}
-          className="w-20 h-20 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl flex items-center justify-center text-white mb-8"
-        >
-          {icon}
-        </motion.div>
-        <h4 className="text-3xl font-black uppercase tracking-tight mb-3">{title}</h4>
-        <p className="text-gray-400 leading-relaxed">{description}</p>
-      </motion.div>
-
-      <div className={`space-y-4 ${reverse ? 'md:order-1' : ''}`}>
-        {features.map((feature, idx) => (
-          <motion.div
-            key={idx}
-            initial={{ opacity: 0, x: reverse ? 50 : -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.3 + idx * 0.1 }}
-            whileHover={{ x: reverse ? -10 : 10 }}
-            className="flex items-start gap-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-5 group hover:border-blue-500/30 transition-all"
-          >
-            <div className="w-10 h-10 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 flex-shrink-0 group-hover:scale-110 transition-transform">
-              {feature.icon}
-            </div>
-            <p className="text-sm text-gray-300 leading-relaxed pt-1">{feature.text}</p>
-          </motion.div>
-        ))}
-      </div>
-    </motion.div>
   );
 }

@@ -62,52 +62,50 @@ export default function BoostersPage() {
 
   if (loading) return (
     <div className="flex min-h-screen bg-black items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#555D65]"></div>
     </div>
   );
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white">
+    <div className="apex-paddock flex min-h-screen text-white">
       <Sidebar />
-      <main className="min-w-0 flex-1 flex flex-col">
-        <div className="p-4 sm:p-6 lg:p-8 flex-1">
-          <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-black uppercase italic tracking-tighter bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent mb-2">
-                {t('Boutique Officielle')}
-              </h1>
-              <p className="text-gray-500 font-mono text-sm">{t('Débloquez de nouvelles mécaniques et agrandissez votre garage.')}</p>
-            </div>
-
-            {profile && (
-              <div className="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-4 shadow-2xl">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
-                  <span className="text-blue-500 text-xl font-bold">▲</span>
-                </div>
-                <div>
-                  <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">{t('Votre Solde')}</div>
-                  <div className="text-xl font-black italic tracking-tighter">{profile.ap} <span className="text-xs not-italic text-blue-500">AP</span></div>
+      <main className="min-w-0 flex-1">
+        <div className="paddock-shell px-4 py-6 pb-28 sm:px-7 sm:py-8 lg:px-10 lg:pb-12">
+          <header className="race-photo-soft relative mb-7 overflow-hidden rounded-[22px] border border-[#7084bc]/25">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0a1227]/95 via-[#101b39]/80 to-[#0b1228]/40" aria-hidden="true"/>
+            <div className="relative z-10 grid min-h-[255px] items-center gap-5 px-5 py-7 sm:px-8 lg:grid-cols-[minmax(0,1fr)_260px] lg:py-9">
+              <div>
+                <p className="paddock-eyebrow mb-3">APEX COLLECTOR / BOOSTERS</p>
+                <h1 className="font-['Barlow_Condensed'] text-[clamp(2.9rem,6vw,5.6rem)] font-black italic leading-[.86] tracking-[-.035em] text-white">
+                  {t('Boutique Officielle')}
+                </h1>
+                <p className="mt-4 max-w-[430px] text-[13px] leading-relaxed text-[#c2cfea] sm:text-[15px]">
+                  {t('Débloquez de nouvelles mécaniques et agrandissez votre garage.')}
+                </p>
+                <div className="mt-5 flex items-center gap-3">
+                  <span className="rounded-full border border-[#7294ef]/35 bg-[#18294d]/70 px-3 py-1.5 text-[11px] font-bold text-[#bad1ff]">
+                    {Object.keys(PACKS).length} {t('Boosters')}
+                  </span>
                 </div>
               </div>
-            )}
+              <div className="apx-hud flex items-center justify-between gap-4 px-5 py-4 lg:flex-col lg:items-start lg:gap-3">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#a8b7d6]">{t('Votre Solde')}</span>
+                <span className="font-['Barlow_Condensed'] text-[clamp(2rem,4vw,3.8rem)] font-black leading-none tabular-nums text-white">
+                  {profile ? new Intl.NumberFormat('fr-FR').format(Number(profile.ap) || 0) : '—'} <span className="text-[20px] text-[#f5c66d]">AP</span>
+                </span>
+              </div>
+            </div>
+            <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[3px] bg-gradient-to-r from-[#ec3b5c] via-[#765cf1] to-[#60b8ff]"/>
           </header>
-
-          {dailyBoosterError && (
-            <p role="alert" className="mb-6 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-amber-200">
-              {dailyBoosterError}
-            </p>
-          )}
+          {dailyBoosterError && <p role="alert" className="mb-6 border-l-4 border-[#D32F35] bg-red-900/20 p-4 text-sm text-red-200">{dailyBoosterError}</p>}
 
           {dailyBoosters.length > 0 && (
-            <section aria-labelledby="daily-boosters-heading" className="mb-8 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] p-4 sm:p-6">
-              <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300">{t('Récompenses de connexion')}</p>
-                  <h2 id="daily-boosters-heading" className="mt-1 text-xl font-black">{t('Boosters offerts à ouvrir')}</h2>
-                </div>
-                <span className="text-xs text-gray-400">{dailyBoosters.length} {t(dailyBoosters.length === 1 ? 'booster disponible' : 'boosters disponibles')}</span>
+            <section aria-labelledby="daily-boosters-heading" className="paddock-panel mb-9 overflow-hidden">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#d6a2ff]/20 bg-gradient-to-r from-[#36235b] to-[#182d58] px-4 py-3 text-white sm:px-6">
+                <h2 id="daily-boosters-heading" className="font-['Barlow_Condensed'] text-[24px] font-black uppercase leading-none">{t('Boosters offerts à ouvrir')}</h2>
+                <span className="font-mono text-[11px] font-bold uppercase">{dailyBoosters.length} {t(dailyBoosters.length === 1 ? 'booster disponible' : 'boosters disponibles')}</span>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-3 p-4 sm:grid-cols-2 sm:p-6 xl:grid-cols-3">
                 {dailyBoosters.map((dailyBooster) => {
                   const pack = PACKS[dailyBooster.pack_slug];
                   if (!pack) {
@@ -115,20 +113,15 @@ export default function BoostersPage() {
                     return null;
                   }
                   return (
-                    <article key={dailyBooster.id} className="flex min-w-0 items-center gap-3 rounded-xl border border-white/10 bg-black/30 p-3">
-                      <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-lg">
+                    <article key={dailyBooster.id} className="flex min-w-0 items-center gap-3 rounded-xl border border-white/10 bg-[#0c1830]/80 p-3">
+                      <div className="relative h-[94px] w-[67px] shrink-0 overflow-hidden rounded-lg bg-[#0d1528] shadow-[0_7px_17px_rgba(0,0,0,.4)]">
                         <SafeImage src={pack.imageUrl} alt={pack.name} fill className="object-cover" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="truncate text-sm font-black">{t(pack.name)}</h3>
-                        <p className="mt-1 text-xs text-cyan-200/70">{t('Jour {day}/7', { day: dailyBooster.streak_day })}</p>
-                        <button
-                          type="button"
-                          onClick={() => router.push(`/open?daily_booster=${encodeURIComponent(dailyBooster.id)}`)}
-                          className="mt-2 min-h-10 rounded-lg bg-cyan-300 px-3 py-2 text-xs font-black text-slate-950 transition hover:bg-cyan-200"
-                        >
-                          {t('Ouvrir ce booster offert')}
-                        </button>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#adbbff]">{t('Récompenses de connexion')} / {dailyBooster.streak_day} / 7</p>
+                        <h3 className="mt-1 truncate font-['Barlow_Condensed'] text-[23px] font-black uppercase leading-none">{t(pack.name)}</h3>
+                        <button type="button" onClick={() => router.push(`/open?daily_booster=${encodeURIComponent(dailyBooster.id)}`)}
+                          className="paddock-action mt-3 min-h-10 px-3 py-2">{t('Ouvrir ce booster offert')}</button>
                       </div>
                     </article>
                   );
@@ -137,64 +130,53 @@ export default function BoostersPage() {
             </section>
           )}
 
-          <div className="grid grid-cols-2 gap-x-2 gap-y-3 py-3 sm:grid-cols-2 sm:gap-6 sm:py-4 xl:grid-cols-3">
+          <div className="race-section-heading mb-5">
+            <div className="flex-1">
+              <p className="race-eyebrow">PIT SUPPLY / PICK YOUR PACK</p>
+              <h2 className="paddock-section-title mt-2">{t('Boosters')}</h2>
+            </div>
+            <span className="hidden font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[.16em] text-[#F0EFEB] sm:block">COLLECT / UNSEAL / DISCOVER</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
             {Object.values(PACKS).map((pack, i) => (
-              <motion.div
-                key={pack.slug}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="group relative"
-              >
-                {/* Glow Effect */}
-                <div className={`absolute -inset-0.5 bg-gradient-to-r ${pack.color} rounded-2xl blur opacity-20 group-hover:opacity-100 transition duration-500`}></div>
-
-                <div className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0a0a0a] p-2.5 sm:rounded-2xl sm:p-6">
-                  {/* Decorative Gradient Top */}
-                  <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${pack.color}`}></div>
-
-                  <div className="flex-1">
-                    <div className="relative mx-auto mb-2.5 aspect-[3/4] w-[62%] overflow-hidden rounded-lg shadow-2xl transition-transform duration-500 group-hover:scale-[1.02] sm:mb-6 sm:w-[50%] sm:rounded-xl">
-                      <SafeImage
-                        src={pack.imageUrl}
-                        alt={pack.name}
-                        fill
-                        className="object-cover"
-                      />
-                      <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent`}></div>
-                    </div>
-
-                    <h2 className="mb-1 min-h-8 text-[13px] font-normal leading-4 sm:mb-2 sm:min-h-0 sm:text-2xl sm:leading-normal" style={{ fontFamily: '"Bebas Neue", Impact, "Arial Narrow", sans-serif' }}>{t(pack.name)}</h2>
-                    <p className="mb-2 text-[10px] leading-[1.35] text-gray-400 sm:mb-6 sm:text-sm sm:leading-relaxed">
-                      <span className="line-clamp-2 sm:line-clamp-none">{t(pack.description)}</span>
-                      <span className="mt-1 block text-[9px] italic text-white/60 sm:mt-2 sm:text-xs">
-                        {t('Contient')} {pack.cardCount} {t('cartes aléatoires')}
-                      </span>
-                    </p>
+              <motion.article key={pack.slug} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: .33, delay: i * .06 }} className="paddock-pack-card group flex min-w-0 flex-col">
+                <div className={`absolute left-0 right-0 top-0 z-10 h-[4px] bg-gradient-to-r ${pack.color}`} aria-hidden="true"/>
+                <div className="apx-pack-display relative overflow-hidden px-3 pb-3 pt-4 sm:px-6 sm:pb-5 sm:pt-6">
+                  <div aria-hidden="true" className={`pointer-events-none absolute inset-x-5 top-[23%] h-[62%] rounded-full bg-gradient-to-r ${pack.color} opacity-[.16] blur-[46px] transition-opacity duration-300 group-hover:opacity-[.26]`} />
+                  <div className="relative flex items-center justify-between gap-2">
+                    <span className="font-mono text-[10px] text-[#a6baff]">DROP // {String(i+1).padStart(2,'0')}</span>
+                    <span className="font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.08em] text-gray-300">{pack.cardCount} {t('Cartes')}</span>
                   </div>
+                  <span className="absolute -bottom-5 right-0 select-none font-['Barlow_Condensed'] text-[130px] font-black leading-none text-white/[.035] sm:text-[200px]" aria-hidden="true">{String(i + 1).padStart(2,'0')}</span>
+                  <div className="relative mx-auto mt-3 aspect-[3/4] w-[65%] max-w-[185px] -rotate-3 overflow-hidden rounded-lg shadow-[0_15px_32px_rgba(0,0,0,.48),0_0_25px_rgba(101,95,239,.18)] transition-transform duration-300 group-hover:rotate-0 group-hover:scale-[1.06] sm:mt-5 sm:w-[55%]">
+                    <SafeImage src={pack.imageUrl} alt={pack.name} fill className="object-cover" />
+                  </div>
+                </div>
 
-                  <div className="mt-2 sm:mt-8">
-                    <div className="mb-2 flex min-w-0 items-center justify-between gap-1 sm:mb-4 sm:px-2">
-                      <span className="whitespace-nowrap text-base font-black italic tracking-tighter sm:text-2xl">
-                        <span className="mr-0.5 text-xs not-italic text-blue-500 sm:mr-1 sm:text-base">▲</span>{pack.price}<span className="ml-1 text-[9px] not-italic text-blue-400 sm:hidden">AP</span>
-                      </span>
-                      <span className="hidden text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600 sm:inline">{t('Apex Points')}</span>
+                <div className="flex flex-1 flex-col px-3 pb-3 pt-3 sm:px-6 sm:pb-6 sm:pt-5">
+                  <h3 className="min-h-[38px] font-['Barlow_Condensed'] text-[25px] font-black uppercase leading-[.85] tracking-[-.02em] text-white sm:min-h-[48px] sm:text-[39px]">{t(pack.name)}</h3>
+                  <p className="mt-2 line-clamp-2 text-[10px] leading-[1.45] text-gray-400 sm:mt-3 sm:text-sm">{t(pack.description)}</p>
+                  <p className="mt-2 text-[10px] font-bold uppercase tracking-[.07em] text-gray-500 sm:text-xs">{t('Contient')} {pack.cardCount} {t('cartes aléatoires')}</p>
+                  <div className="mt-auto pt-4">
+                    <div className="mb-3 flex items-end justify-between gap-1 border-t border-white/20 pt-3">
+                      <div className="flex items-baseline gap-1">
+                        <span className="font-['Barlow_Condensed'] text-[32px] font-black leading-none tabular-nums text-[#f5c66d] sm:text-[44px]">{pack.price}</span>
+                        <span className="font-mono text-[10px] font-bold text-[#f5c66d]">AP</span>
+                      </div>
+                      <span className="hidden font-['Barlow_Condensed'] text-[11px] font-bold uppercase tracking-[.14em] text-gray-500 sm:block">APEX POINTS</span>
                     </div>
-
                     <button
-                      disabled={profile && profile.ap < pack.price}
+                      type="button"
+                      disabled={Boolean(profile && profile.ap < pack.price)}
                       onClick={() => router.push(`/open?pack=${pack.slug}`)}
-                      className={`min-h-10 w-full rounded-lg px-1 py-2 text-[9px] font-black uppercase leading-tight tracking-normal shadow-lg shadow-black/40 transition-all duration-300 sm:rounded-xl sm:py-4 sm:text-xs sm:tracking-[0.2em] 
-                        ${profile && profile.ap < pack.price
-                          ? 'bg-gray-800 text-gray-600 grayscale cursor-not-allowed border border-white/5'
-                          : `bg-gradient-to-r ${pack.color} text-white hover:scale-[1.02] active:scale-[0.98] hover:shadow-2xl hover:shadow-black/50`
-                        }`}
-                    >
+                      className="paddock-action min-h-[42px] w-full px-1.5 py-3 text-center text-[11px] leading-tight sm:min-h-[48px] sm:text-[14px]">
                       {profile && profile.ap < pack.price ? t('Solde Insuffisant') : t('Acheter le pack')}
                     </button>
                   </div>
                 </div>
-              </motion.div>
+              </motion.article>
             ))}
           </div>
         </div>

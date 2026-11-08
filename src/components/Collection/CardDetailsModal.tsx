@@ -217,7 +217,7 @@ export default function CardDetailsModal({
       {card && (
         <motion.div
           key={String(card.card_id || card.id)}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-0 backdrop-blur-sm sm:p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-[#040815]/85 p-0 backdrop-blur-md sm:p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -227,14 +227,14 @@ export default function CardDetailsModal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="card-details-title"
-            className="grid h-[100dvh] max-h-[100dvh] w-full max-w-4xl grid-cols-1 grid-rows-[32dvh_minmax(0,1fr)] overflow-hidden border border-white/10 bg-[#0a0a0a] text-white shadow-2xl sm:h-auto sm:max-h-[90dvh] sm:grid-rows-[minmax(0,auto)_minmax(0,1fr)] sm:rounded-2xl md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:grid-rows-1"
+            className="apx-card-details-dialog grid h-[100dvh] max-h-[100dvh] w-full max-w-4xl grid-cols-1 grid-rows-[32dvh_minmax(0,1fr)] overflow-hidden border border-[#a1b8f3]/25 bg-[#0c1429] text-white shadow-[0_36px_120px_rgba(0,0,0,.68)] sm:h-auto sm:max-h-[90dvh] sm:grid-rows-[minmax(0,auto)_minmax(0,1fr)] sm:rounded-[22px] md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:grid-rows-1"
             initial={{ opacity: 0, scale: 0.94, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 12 }}
             transition={{ duration: 0.22, ease: 'easeOut' }}
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="relative min-h-0 bg-black md:min-h-[32rem]">
+            <div className="apx-card-details-photo relative min-h-0 bg-[#060d1c] md:min-h-[32rem]">
               <SafeImage
                 src={image}
                 fallback={isVehicle ? IMAGE_PATHS.PLACEHOLDERS.VEHICLE_CARD : isDriver ? IMAGE_PATHS.PLACEHOLDERS.PILOT_CARD : IMAGE_PATHS.PLACEHOLDERS.CIRCUIT_CARD}
@@ -242,8 +242,11 @@ export default function CardDetailsModal({
                 fill
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
-              {/* Mobile only: rarity-colored photo outline; desktop photo stays unchanged. */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#070b18]/90 via-[#11162a]/10 to-[#050a1a]/35" />
+              <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[3px]"
+                style={{ background: `linear-gradient(90deg, transparent, ${getRarityColor(String(card.rarity || 'Common'))}, transparent)`,
+                  boxShadow: `0 0 20px ${getRarityColor(String(card.rarity || 'Common'))}` }} />
+              {/* Mobile-only outline still tracks the real rarity. */}
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-0 z-10 border-[3px] sm:hidden"
@@ -251,19 +254,19 @@ export default function CardDetailsModal({
               />
             </div>
 
-            <div className="relative min-h-0 overflow-y-auto p-5 sm:p-7">
+            <div className="apx-card-details-content relative min-h-0 overflow-y-auto p-5 sm:p-7">
               <button
                 type="button"
                 aria-label={t('Fermer les détails')}
                 onClick={onClose}
-                className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-black/70 text-gray-200 transition-colors hover:text-white"
+                className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-xl border border-[#9bb9f7]/25 bg-[#182440]/85 text-[#dce7ff] transition-colors hover:bg-[#2b3965] hover:text-white"
               >
                 <X size={18} />
               </button>
 
               <div className="mb-6 pr-10">
-                <p className="mb-2 text-xs font-bold uppercase text-blue-400">{t(isVehicle ? 'Véhicule' : isDriver ? 'Pilote' : 'Circuit')}</p>
-                <h2 id="card-details-title" className="text-2xl uppercase italic leading-tight sm:text-3xl">
+                <p className="mb-2 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#97baff]">{t(isVehicle ? 'Véhicule' : isDriver ? 'Pilote' : 'Circuit')}</p>
+                <h2 id="card-details-title" className="font-['Barlow_Condensed'] text-[32px] font-black italic leading-[.95] tracking-[-.02em] text-white sm:text-[40px]">
                   {isVehicle ? (
                     <>
                       <span className="font-black">{card.make}</span>
@@ -276,17 +279,10 @@ export default function CardDetailsModal({
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-gray-400">
                   {card.rarity && (
                     <>
-                      <span
-                        className="rounded border px-2 py-1 font-bold sm:hidden"
-                        style={{
-                          color: getRarityColor(String(card.rarity)),
-                          borderColor: getRarityColor(String(card.rarity)),
-                        }}
-                      >
-                        {card.rarity}
-                      </span>
-                      <span className="hidden rounded border border-white/10 px-2 py-1 sm:inline">
-                        {card.rarity}
+                      <span className="rounded-lg border bg-white/[.04] px-2.5 py-1 font-bold"
+                        style={{ color: getRarityColor(String(card.rarity)),
+                          borderColor: getRarityColor(String(card.rarity)) }}>
+                        {t(String(card.rarity))}
                       </span>
                     </>
                   )}
@@ -317,8 +313,8 @@ export default function CardDetailsModal({
               )}
 
               {card && (
-                <section aria-live="polite" className="mb-5 rounded-xl border border-amber-300/15 bg-amber-300/[0.04] p-4">
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-amber-200">
+                <section aria-live="polite" className="mb-5 rounded-xl border border-[#81aaff]/25 bg-[#436bc8]/[.08] p-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#b5cfff]">
                     {t('Plus grand détenteur de cette carte')}
                   </p>
                   {topCardOwnerLoading ? (
@@ -359,8 +355,8 @@ export default function CardDetailsModal({
               )}
 
               {nextLevelUnlock && (
-                <section className="mb-6 rounded-xl border border-cyan-300/15 bg-cyan-300/[0.05] p-4">
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-cyan-200">
+                <section className="mb-6 rounded-xl border border-[#8d9cff]/25 bg-[#5e74df]/[.09] p-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#b7c9ff]">
                     {upgradeLevel > 0 ? t('Niveau {level}', { level: upgradeLevel }) : t('Niveau de base')}
                   </p>
                   <p className="mt-2 text-sm font-semibold text-white">
@@ -376,7 +372,7 @@ export default function CardDetailsModal({
                       type="button"
                       disabled={upgradePending}
                       onClick={onUpgrade}
-                      className="mt-3 rounded-lg border border-cyan-300/30 bg-cyan-500 px-3 py-2 text-xs font-black text-white transition hover:bg-cyan-400 disabled:cursor-wait disabled:opacity-60"
+                      className="mt-3 rounded-lg border border-[#91b8ff]/40 bg-gradient-to-r from-[#476acf] to-[#7051bd] px-3 py-2 text-xs font-black text-white shadow-[0_4px_18px_rgba(82,94,212,.25)] transition hover:brightness-110 disabled:cursor-wait disabled:opacity-60"
                     >
                       {upgradePending
                         ? t('Achat…')
@@ -396,9 +392,9 @@ export default function CardDetailsModal({
               )}
 
               {cardDetails.length > 0 && (
-                <dl className="grid grid-cols-2 gap-2">
+                <dl className="grid grid-cols-2 gap-2.5">
                   {cardDetails.map(({ label, value }) => (
-                    <div key={label} className="min-w-0 border-t border-white/10 py-3">
+                    <div key={label} className="apx-detail-stat min-w-0 rounded-lg p-3">
                       <dt className="text-[10px] font-bold uppercase text-gray-500">{label}</dt>
                       <dd className="mt-1 break-words text-sm font-semibold text-gray-100">
                         {isVehicle && label === t('Pays') ? (

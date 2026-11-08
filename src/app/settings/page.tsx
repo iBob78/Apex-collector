@@ -21,20 +21,21 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="apex-paddock flex min-h-screen">
       <Sidebar />
-      <main className="min-w-0 flex-1 p-4 sm:p-8 space-y-6">
-        <header className="space-y-2">
-          <h1 className="text-3xl font-bold">{t('Réglages')}</h1>
-          <p className="text-sm text-gray-400">{t('Les préférences sont enregistrées sur votre profil.')}</p>
+      <main className="min-w-0 flex-1 space-y-6 px-4 py-6 sm:px-8 sm:py-9">
+        <header className="paddock-header space-y-2">
+          <p className="paddock-eyebrow">APEX / GARAGE SETTINGS</p>
+          <h1 className="paddock-title mt-3">{t('Réglages')}</h1>
+          <p className="paddock-subtitle">{t('Les préférences sont enregistrées sur votre profil.')}</p>
         </header>
 
-        <section className="max-w-2xl space-y-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-6">
+        <section className="paddock-panel max-w-2xl space-y-6 p-5 sm:p-7">
           <div className="space-y-2">
             <label htmlFor="site-language" className="block text-sm font-semibold">{t('Langue')}</label>
             <select
               id="site-language"
-              className="w-full rounded-lg border border-white/10 bg-gray-800 p-3 text-white"
+              className="paddock-field min-h-11 w-full rounded-lg p-3"
               value={language}
               disabled={saving}
               onChange={(event) => {
@@ -52,7 +53,7 @@ export default function SettingsPage() {
             <label htmlFor="unit-system" className="block text-sm font-semibold">{t('Unités')}</label>
             <select
               id="unit-system"
-              className="w-full rounded-lg border border-white/10 bg-gray-800 p-3 text-white"
+              className="paddock-field min-h-11 w-full rounded-lg p-3"
               value={units}
               disabled={saving}
               onChange={(event) => {

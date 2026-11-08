@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { fetchAllPages } from '@/lib/fetchAllPages';
 import { getGarageProgress } from '@/lib/garage-level';
 import Sidebar from '@/components/Sidebar';
-import { ArrowRight, ArrowUpRight, Gauge, Layers3, Lightbulb, ShoppingBag, Trophy, Wallet } from 'lucide-react';
+import { ArrowUpRight, Gauge, Lightbulb, Wallet } from 'lucide-react';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 export default function DashboardPage() {
@@ -67,173 +67,136 @@ export default function DashboardPage() {
   const formatAverage = (value: number) => new Intl.NumberFormat(language, { maximumFractionDigits: 1 }).format(value);
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white">
+    <div className="apex-paddock flex min-h-screen text-white">
       <Sidebar />
       <main className="min-w-0 flex-1">
-        <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-7 px-4 py-6 sm:gap-9 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
-          {/* Keep AP in a compact, persistent top-right header instead of the statistics grid. */}
-          <header className="sticky top-0 z-40 -mx-4 -mt-6 flex items-start justify-between gap-2 border-b border-white/10 bg-[#050505]/95 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:-mt-8 sm:items-center sm:px-6 sm:py-4 lg:-mx-10 lg:-mt-10 lg:px-10">
-            <div className="min-w-0">
-              <h1
-                className="bg-gradient-to-r from-white to-slate-400 bg-clip-text text-[27px] font-normal uppercase not-italic leading-none tracking-[0.035em] text-transparent sm:text-4xl"
-                style={{ fontFamily: '"Bebas Neue", Impact, "Arial Narrow", sans-serif' }}
-              >
-                {t('Tableau de bord')}
-              </h1>
-              <p className="mt-1 hidden text-xs text-gray-400 sm:block sm:text-sm">
-                {t('Gérez votre écurie et vos actifs.')}
-              </p>
-            </div>
-
-            <div className="flex shrink-0 items-center gap-2">
-              <div
-                aria-label={t('Balance AP')}
-                className="flex min-h-9 flex-col justify-center rounded-lg border border-emerald-400/25 bg-[#0e1a17] px-2 py-1 text-right shadow-[0_1px_16px_rgba(0,0,0,0.18)]"
-              >
-                <span className="text-[8px] font-bold uppercase leading-tight tracking-normal text-emerald-200/70">
-                  {t('Balance AP')}
-                </span>
-                <span className="max-w-[35vw] truncate font-mono text-xs font-black leading-tight tabular-nums text-emerald-200 sm:max-w-[12rem] sm:text-sm" title={formatNumber(apBalance) + ' AP'}>
-                  ▲ {formatNumber(apBalance)} AP
-                </span>
+        <header className="sticky top-0 z-40 flex min-h-[62px] items-center justify-between gap-3 border-b border-white/10 bg-[#0a1021]/95 px-4 py-2 backdrop-blur-xl sm:px-6">
+          <div className="min-w-0">
+            <p className="text-[10px] font-black uppercase tracking-[.16em] text-[#8d9fce]">APEX / GARAGE</p>
+            <h1 className="truncate text-[14px] font-bold text-white sm:text-[16px]">{t('Tableau de bord')}</h1>
+          </div>
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <div aria-label={t('Balance AP')} className="apx-hud flex min-h-[43px] items-center gap-2 px-3 sm:px-4">
+              <Wallet size={17} className="text-[#ffcf68]" aria-hidden="true" />
+              <div className="text-right">
+                <p className="text-[9px] font-semibold uppercase tracking-wider text-[#a3b2d1]">{t('Balance AP')}</p>
+                <p className="font-mono text-[13px] font-bold tabular-nums text-white">{formatNumber(apBalance)} AP</p>
               </div>
-              {user && (
-                <button
-                  type="button"
-                  onClick={() => router.push('/profile')}
-                  aria-label={t('PROFIL PILOTE')}
-                  title={t('PROFIL PILOTE')}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-[#11151c] text-sm font-bold text-white transition hover:border-blue-400/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-                >
-                  {user.email?.[0]?.toUpperCase() || 'A'}
-                </button>
-              )}
             </div>
-          </header>
-
-          {/* Smaller cards, more practical numbers, and no duplicate AP balance. */}
-          <section aria-label={t('Statistiques du garage')}>
-            <div className="mb-4 flex items-center gap-3">
-              <span className="h-5 w-1 rounded-full bg-blue-500" aria-hidden="true" />
-              <h2 className="text-sm font-black uppercase tracking-[0.16em] text-gray-300">
-                {t('Statistiques du garage')}
-              </h2>
-            </div>
-
-            {statsError && (
-              <p role="alert" className="mb-4 rounded-lg border border-red-400/20 bg-red-950/30 px-3 py-2 text-sm text-red-200">
-                {statsError}
-              </p>
+            {user && (
+              <button type="button" onClick={() => router.push('/profile')} title={t('PROFIL PILOTE')}
+                aria-label={t('PROFIL PILOTE')}
+                className="apx-hud flex h-[43px] w-[43px] items-center justify-center rounded-full text-[16px] font-black text-[#bacaff] transition hover:border-[#9caaff]">
+                {user.email?.[0]?.toUpperCase() || 'A'}
+              </button>
             )}
+          </div>
+        </header>
 
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
-              <article className="flex min-w-0 flex-col rounded-2xl border border-blue-400/20 bg-[#101722] p-4 sm:p-5">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-blue-200 sm:text-xs">
-                    {t('Mon Garage')}
-                  </h3>
-                  <Layers3 size={20} className="shrink-0 text-blue-300" aria-hidden="true" />
-                </div>
-                <p className="mt-3 font-mono text-3xl font-black tabular-nums text-white sm:text-4xl">
-                  {formatNumber(stats.uniqueCards)}
-                </p>
-                <p className="mt-1 text-xs text-gray-400">{t('Modèles uniques')}</p>
-                <div className="mt-auto space-y-2 border-t border-white/10 pt-3 text-xs sm:mt-5">
-                  <div className="flex flex-wrap items-center justify-between gap-1 text-gray-400">
-                    <span>{t('Niveau écurie')}</span>
-                    <strong className="font-mono text-blue-200">{garageProgress.level}</strong>
-                  </div>
-                  <Link
-                    href="/collection"
-                    className="inline-flex min-h-8 items-center gap-1 font-bold text-blue-300 transition hover:text-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-                  >
-                    {t('MA COLLECTION')}
-                    <ArrowRight size={15} aria-hidden="true" />
-                  </Link>
-                </div>
-              </article>
-
-              <article className="flex min-w-0 flex-col rounded-2xl border border-violet-400/15 bg-[#13131c] p-4 sm:p-5">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-[11px] font-bold uppercase tracking-wider text-violet-200 sm:text-xs">
-                    {t('Cartes totales')}
-                  </h3>
-                  <Layers3 size={20} className="shrink-0 text-violet-300" aria-hidden="true" />
-                </div>
-                <p className="mt-3 font-mono text-3xl font-black tabular-nums text-white sm:text-4xl">
-                  {formatNumber(stats.totalCards)}
-                </p>
-                <p className="mt-1 text-xs text-gray-400">{t('Exemplaires')}</p>
-                <div className="mt-auto space-y-2 border-t border-white/10 pt-3 text-xs sm:mt-5">
-                  <div className="flex flex-wrap items-center justify-between gap-1">
-                    <span className="text-gray-400">{t('Doublons')}</span>
-                    <strong className="font-mono text-gray-100">{formatNumber(duplicateCards)}</strong>
-                  </div>
-                  <div className="flex flex-wrap items-center justify-between gap-1">
-                    <span className="text-gray-400">{t('Moyenne par modèle')}</span>
-                    <strong className="font-mono text-gray-100">{formatAverage(averageCopies)}</strong>
-                  </div>
-                </div>
-              </article>
-
-              <article className="col-span-2 min-w-0 self-start rounded-2xl border border-amber-400/15 bg-[#171610] p-3 sm:p-4 lg:col-span-1">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <Gauge size={17} className="shrink-0 text-amber-300" aria-hidden="true" />
-                    <div className="min-w-0">
-                      <h3 className="text-[11px] font-bold uppercase tracking-wider text-amber-200 sm:text-xs">
-                        {t('Niveau écurie')}
-                      </h3>
-                      <p className="truncate text-[10px] text-gray-400 sm:text-xs">{t(garageProgress.tierTitle)}</p>
-                    </div>
-                  </div>
-                  <strong className="font-mono text-xl font-black tabular-nums text-white sm:text-2xl">
-                    {garageProgress.level}
-                  </strong>
-                </div>
-                <div className="mt-3 flex items-center justify-between gap-3 text-[11px] text-gray-400">
-                  <span>{t('Vers le prochain niveau')}</span>
-                  <span className="shrink-0 font-mono tabular-nums text-amber-200">{progressCount}/10</span>
-                </div>
-                <div
-                  role="progressbar"
-                  aria-label={t('Vers le prochain niveau')}
-                  aria-valuemin={0}
-                  aria-valuemax={10}
-                  aria-valuenow={progressCount}
-                  className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/10"
-                >
-                  <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-200" style={{ width: progressPercent + '%' }} />
-                </div>
-              </article>
-            </div>
-          </section>
-
-          {/* Direct links instead of a promotional booster listing. */}
-          <section aria-label={t('Accès rapide')}>
-            <div className="mb-4 flex items-center gap-3">
-              <span className="h-5 w-1 rounded-full bg-blue-500" aria-hidden="true" />
-              <h2 className="text-sm font-black uppercase tracking-[0.16em] text-gray-300">
-                {t('Accès rapide')}
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <DashboardShortcut href="/collection" label={t('MA COLLECTION')} icon={<Layers3 size={22} aria-hidden="true" />} />
-              <DashboardShortcut href="/missions" label={t('CONTRATS')} icon={<Trophy size={22} aria-hidden="true" />} />
-              <DashboardShortcut href="/marketplace" label={t('Marketplace')} icon={<ShoppingBag size={22} aria-hidden="true" />} />
-            </div>
-          </section>
-
-          <aside className="flex items-start gap-3 rounded-2xl border border-blue-500/15 bg-[#0c1421] p-4 sm:p-5">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-300">
-              <Lightbulb size={19} aria-hidden="true" />
-            </span>
-            <div className="min-w-0">
-              <h2 className="text-sm font-bold text-gray-100">{t('Conseil du jour')}</h2>
-              <p className="mt-1 text-sm leading-relaxed text-gray-400">
-                {t('N’oubliez pas d’échanger vos doublons au marché pour optimiser votre progression.')}
+        <div className="paddock-shell space-y-6 px-3 py-4 pb-28 sm:px-6 sm:py-6 lg:px-8 lg:pb-12">
+          {statsError && <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">{statsError}</div>}
+          <section className="apx-dashboard-hero flex min-h-[380px] flex-col justify-center px-5 py-9 sm:min-h-[415px] sm:px-10 lg:px-12" aria-label="Apex Collector">
+            <div className="relative z-10 max-w-[650px]">
+              <p className="paddock-eyebrow mb-5">THE ULTIMATE CAR COLLECTION</p>
+              <div className="font-['Barlow_Condensed'] text-[clamp(3.5rem,9vw,7rem)] font-black italic uppercase leading-[.72] tracking-[-.055em] text-white drop-shadow-2xl">
+                APEX <span className="block mt-3 text-[.72em] tracking-[-.035em] text-[#f7f8ff]">COLLECTOR<span className="text-[#ed344f]">.</span></span>
+              </div>
+              <p className="mt-7 max-w-md text-[14px] leading-relaxed text-[#e0e6f2] sm:text-[16px]">
+                {t('Collectionnez les plus belles voitures et faites grandir votre écurie.')}
               </p>
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                <Link href="/boosters" className="paddock-action min-h-12 px-6">{t('Ouvrir un Booster')} <ArrowUpRight size={17} aria-hidden="true"/></Link>
+                <Link href="/collection" className="paddock-ghost inline-flex min-h-12 items-center gap-2 px-5 text-[13px] font-bold">
+                  {t('MA COLLECTION')} <ArrowUpRight size={16} aria-hidden="true"/>
+                </Link>
+              </div>
             </div>
+            <div className="apx-hero-garage-pass absolute bottom-6 right-7 hidden w-[245px] p-4 xl:block" aria-hidden="true">
+              <p className="mb-3 flex items-center justify-between text-[10px] font-black uppercase tracking-[.16em] text-[#adbfed]">
+                GARAGE STATUS <span className="apx-status-light" />
+              </p>
+              <div className="grid grid-cols-2 gap-2 border-y border-white/15 py-3">
+                <div>
+                  <span className="block font-mono text-[24px] font-black leading-none tabular-nums text-white">{formatNumber(stats.uniqueCards)}</span>
+                  <span className="mt-1 block text-[9px] uppercase tracking-[.08em] text-[#a9b8d9]">{t('Modèles uniques')}</span>
+                </div>
+                <div>
+                  <span className="block font-mono text-[24px] font-black leading-none tabular-nums text-white">{formatNumber(stats.totalCards)}</span>
+                  <span className="mt-1 block text-[9px] uppercase tracking-[.08em] text-[#a9b8d9]">{t('Cartes totales')}</span>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <span className="text-[11px] font-bold text-[#c8d5f7]">{t('Niveau écurie')}</span>
+                <span className="font-mono text-[17px] font-black text-[#8ac5ff]">{String(garageProgress.level).padStart(2, '0')}</span>
+              </div>
+              <div className="paddock-meter mt-2"><div style={{width: `${progressPercent}%`}} /></div>
+            </div>
+            <span aria-hidden="true" className="absolute bottom-4 right-5 font-mono text-[10px] tracking-[.15em] text-white/55 xl:hidden">APEX COLLECTOR / GARAGE</span>
+          </section>
+
+          <section aria-label={t('Accès rapide')}>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h2 className="paddock-section-title text-[28px] sm:text-[35px]">{t('Accès rapide')}</h2>
+              <span className="hidden text-[10px] font-bold uppercase tracking-wider text-[#8397bd] sm:block">DÉCOUVRIR · COLLECTIONNER · ÉVOLUER</span>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Link href="/boosters" className="apx-shortcut group">
+                <img src="/showcase-boosters.png" alt="" className="apx-shortcut-image shrink-0" />
+                <div className="relative z-10 min-w-0">
+                  <p className="mb-1 text-[10px] font-bold uppercase tracking-[.13em] text-[#f38ba6]">BOOSTER / 01</p>
+                  <h3 className="text-[19px] font-black leading-[1.08] text-white sm:text-[22px]">{t('Ouvrir un Booster')}</h3>
+                  <ArrowUpRight size={18} className="mt-3 text-[#ff6485]" aria-hidden="true"/>
+                </div>
+              </Link>
+              <Link href="/collection" className="apx-shortcut group">
+                <img src="/showcase-card.png" alt="" className="apx-shortcut-image shrink-0" />
+                <div className="relative z-10 min-w-0">
+                  <p className="mb-1 text-[10px] font-bold uppercase tracking-[.13em] text-[#94bdfd]">GARAGE / 02</p>
+                  <h3 className="text-[19px] font-black leading-[1.08] text-white sm:text-[22px]">{t('MA COLLECTION')}</h3>
+                  <ArrowUpRight size={18} className="mt-3 text-[#69aeff]" aria-hidden="true"/>
+                </div>
+              </Link>
+              <Link href="/missions" className="apx-shortcut group">
+                <img src="/showcase-missions.png" alt="" className="apx-shortcut-image shrink-0" />
+                <div className="relative z-10 min-w-0">
+                  <p className="mb-1 text-[10px] font-bold uppercase tracking-[.13em] text-[#c2a0ff]">MISSIONS / 03</p>
+                  <h3 className="text-[19px] font-black leading-[1.08] text-white sm:text-[22px]">{t('CONTRATS')}</h3>
+                  <ArrowUpRight size={18} className="mt-3 text-[#ac8bff]" aria-hidden="true"/>
+                </div>
+              </Link>
+            </div>
+          </section>
+
+          <section className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_270px]" aria-label={t('Statistiques du garage')}>
+            <div className="paddock-panel p-4 sm:p-6">
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="paddock-section-title">{t('Statistiques du garage')}</h2>
+                <span className="paddock-micro">COLLECTOR / STATS</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <GarageMetric value={formatNumber(stats.uniqueCards)} label={t('Modèles uniques')} />
+                <GarageMetric value={formatNumber(stats.totalCards)} label={t('Cartes totales')} />
+                <GarageMetric value={formatNumber(duplicateCards)} label={t('Doublons')} />
+                <GarageMetric value={formatAverage(averageCopies)} label={t('Moyenne par modèle')} />
+              </div>
+            </div>
+            <div className="paddock-panel flex flex-col justify-between p-5">
+              <div className="flex items-center justify-between gap-3">
+                <span className="paddock-micro">{t('Niveau écurie')}</span>
+                <Gauge size={19} className="text-[#8caafa]" aria-hidden="true"/>
+              </div>
+              <div className="mt-4 flex items-end justify-between gap-3">
+                <span className="paddock-stat-number text-[#f7f9ff]">{garageProgress.level}</span>
+                <span className="mb-2 text-[11px] font-semibold text-[#c0cae3]">{t(garageProgress.tierTitle)}</span>
+              </div>
+              <p className="mt-3 text-[11px] text-[#b3bfd8]">{t('Vers le prochain niveau')} <strong className="float-right font-mono text-[#86bbff]">{progressCount}/10</strong></p>
+              <div className="paddock-meter mt-2"><div style={{width:`${progressPercent}%`}} /></div>
+            </div>
+          </section>
+          <aside className="paddock-panel flex flex-wrap items-center gap-3 px-4 py-4 sm:px-6">
+            <Lightbulb size={20} className="shrink-0 text-[#9ea6ff]" aria-hidden="true"/>
+            <p className="min-w-0 flex-1 text-[13px] text-[#b3bdd5]">{t('N’oubliez pas d’échanger vos doublons au marché pour optimiser votre progression.')}</p>
+            <Link href="/marketplace" className="inline-flex items-center gap-2 text-[12px] font-bold text-[#99bfff] hover:text-white">{t('Marketplace')} <ArrowUpRight size={16}/></Link>
           </aside>
         </div>
       </main>
@@ -241,27 +204,11 @@ export default function DashboardPage() {
   );
 }
 
-function DashboardShortcut({
-  href,
-  label,
-  icon,
-}: {
-  href: string;
-  label: string;
-  icon: React.ReactNode;
-}) {
+function GarageMetric({ value, label }: { value: string; label: string }) {
   return (
-    <Link
-      href={href}
-      className="group flex min-h-[76px] items-center gap-3 rounded-2xl border border-white/10 bg-[#10131a] p-4 transition hover:border-blue-400/40 hover:bg-[#151d2b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-    >
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/5 text-blue-300">
-        {icon}
-      </span>
-      <span className="min-w-0 flex-1 text-xs font-black uppercase tracking-wide text-gray-100 sm:text-sm">
-        {label}
-      </span>
-      <ArrowUpRight size={17} className="shrink-0 text-gray-500 transition group-hover:text-blue-300" aria-hidden="true" />
-    </Link>
+    <div className="apx-dashboard-metric min-w-0">
+      <p className="truncate font-['Barlow_Condensed'] text-[clamp(2.3rem,4vw,3.8rem)] font-black leading-none tabular-nums text-white">{value}</p>
+      <p className="mt-2 text-[11px] font-semibold text-[#a8b9df]">{label}</p>
+    </div>
   );
 }

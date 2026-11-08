@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Exo:wght@700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@400;500;600;700;800&family=Bebas+Neue&family=Exo:wght@700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -632,4 +632,448 @@ html, body {
     animation: none;
     opacity: 0.35;
   }
+}
+
+/* ===========================================================
+   APEX COLLECTOR / NIGHT DRIVE · collection-first visual system
+   Experiment scope: sandbox PR #17; card rarities untouched.
+   =========================================================== */
+.apex-paddock{
+  --apx-bg:#070c18;--apx-bg2:#0d1425;--apx-panel:#111a2b;
+  --apx-line:rgba(160,185,234,.18);--apx-blue:#59b9ff;
+  --apx-red:#ed344f;--apx-purple:#8a66ff;--apx-ink:#f2f5ff;
+  --apx-cyan:#71ceff;--apx-gold:#eac78a;
+  --race-accent:#ed344f;--race-red:#ed344f;
+  min-height:100vh;color:var(--apx-ink);
+  font-family:"Barlow",Arial,sans-serif;position:relative;isolation:isolate;
+  background:radial-gradient(ellipse 60% 37% at 83% -15%,rgba(86,65,151,.26),transparent 72%),
+             radial-gradient(ellipse 48% 40% at -15% 63%,rgba(37,85,165,.2),transparent 78%),
+             linear-gradient(137deg,#080d19,#0b1020 50%,#070b15);
+}
+.apex-paddock::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.28;
+  background-image:linear-gradient(90deg,rgba(112,158,240,.055) 1px,transparent 1px),
+                   linear-gradient(rgba(112,158,240,.045) 1px,transparent 1px);
+  background-size:88px 88px;
+  mask-image:linear-gradient(to bottom,#000,transparent 90%);
+}
+.apex-paddock>main{position:relative;z-index:1;min-width:0}
+.apex-paddock ::selection{background:#4b73fb;color:white}
+.paddock-shell{width:100%;max-width:1600px;margin-inline:auto}
+.paddock-header,.paddock-panel,.paddock-tile,.paddock-data-card,.race-card-outline,.race-pit-tile{
+  position:relative;isolation:isolate;border:1px solid var(--apx-line);
+  background:linear-gradient(145deg,rgba(21,31,53,.96),rgba(11,17,31,.97));
+  box-shadow:0 16px 44px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.045);
+  border-radius:17px;overflow:hidden
+}
+.paddock-header{padding:clamp(18px,3vw,34px);border-radius:23px}
+.paddock-header:after{content:"";pointer-events:none;position:absolute;right:-90px;top:-160px;width:360px;height:360px;border:1px solid rgba(149,172,250,.12);border-radius:50%;box-shadow:0 0 0 60px rgba(153,111,255,.018),0 0 0 120px rgba(153,111,255,.012)}
+.paddock-header>*{position:relative;z-index:1}
+.paddock-panel{border-radius:20px}.paddock-tile,.paddock-data-card{border-radius:16px}
+.paddock-panel::before,.paddock-tile::before{content:"";pointer-events:none;position:absolute;inset:0 20px auto;height:1px;background:linear-gradient(90deg,transparent,rgba(167,205,255,.3),transparent)}
+.paddock-data-card{transition:transform .22s ease,border-color .22s ease}
+.paddock-data-card:hover{transform:translateY(-2px);border-color:rgba(118,159,255,.5)}
+.paddock-eyebrow,.race-eyebrow{
+  display:inline-flex;align-items:center;gap:9px;
+  color:#94bfff;font:800 11px/1.25 "Barlow Condensed",Arial,sans-serif;
+  letter-spacing:.2em;text-transform:uppercase
+}
+.paddock-eyebrow:before,.race-eyebrow:before{content:"";width:17px;height:3px;background:#ed344f;flex-shrink:0;border-radius:2px}
+.paddock-title,.paddock-section-title,.paddock-stat-number,.race-display,.race-number{
+  font-family:"Barlow Condensed",Impact,Arial,sans-serif;
+  font-weight:800;font-style:italic;text-transform:none;letter-spacing:-.025em;
+}
+.paddock-title{font-size:clamp(2.6rem,5.8vw,5.8rem);line-height:.96;color:#fff}
+.paddock-section-title{font-size:clamp(1.65rem,2.9vw,2.75rem);line-height:.98;color:#f4f6ff}
+.paddock-stat-number{font-size:clamp(2.5rem,4vw,4.5rem);line-height:1}
+.paddock-subtitle{max-width:65ch;margin-top:10px;font-size:.91rem;line-height:1.65;color:#a8b7d1}
+.paddock-micro{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#a4b2cf}
+.paddock-rule{height:1px;background:linear-gradient(90deg,rgba(99,174,255,.6),rgba(150,109,255,.35),transparent)}
+.paddock-action{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  background:linear-gradient(110deg,#ef3d55,#c91c42)!important;color:#fff!important;
+  border:1px solid rgba(255,131,158,.52)!important;border-radius:11px!important;
+  box-shadow:0 7px 24px rgba(203,34,75,.29),inset 0 1px rgba(255,255,255,.22);
+  font:800 13px/1.2 "Barlow",Arial,sans-serif;letter-spacing:.05em;
+  text-transform:none;transition:transform .2s ease,filter .2s ease,box-shadow .2s ease;
+}
+.paddock-action:hover{transform:translateY(-2px);filter:brightness(1.12);box-shadow:0 9px 28px rgba(219,37,84,.4)}
+.paddock-action:disabled{opacity:.48;filter:grayscale(.6);cursor:not-allowed;transform:none}
+.paddock-ghost{
+  background:rgba(43,55,84,.6)!important;border:1px solid rgba(164,187,238,.28)!important;
+  border-radius:11px!important;color:#e1e9ff!important;
+  transition:background .2s ease,border-color .2s ease;
+}
+.paddock-ghost:hover{background:rgba(67,82,119,.72)!important;border-color:rgba(128,176,255,.67)!important}
+.paddock-field{
+  color:#f3f7ff!important;background:rgba(9,16,31,.76)!important;
+  border:1px solid rgba(149,174,225,.28)!important;border-radius:10px!important;
+}
+.paddock-field:focus{outline:2px solid rgba(121,172,255,.55);outline-offset:1px}
+.paddock-meter{height:8px;overflow:hidden;border-radius:99px;background:rgba(142,155,197,.2)}
+.paddock-meter>div{height:100%;border-radius:inherit;background:linear-gradient(90deg,#51b8ff,#5d74ef,#a64cff);box-shadow:0 0 16px rgba(96,110,255,.55)}
+.paddock-pack-card{position:relative;overflow:hidden;border:1px solid rgba(155,186,239,.2);border-radius:19px!important;background:linear-gradient(155deg,#192744,#0b1226 78%);box-shadow:0 15px 42px rgba(0,0,0,.32);transition:transform .25s ease,border-color .25s ease}
+.paddock-pack-card:hover{transform:translateY(-5px);border-color:rgba(119,168,255,.7)}
+.paddock-pack-card::after{content:"";pointer-events:none;position:absolute;inset:auto 0 0;height:2px;background:linear-gradient(90deg,#4a8efb,#a455fe,#f44e6c)}
+.paddock-pack-image{box-shadow:0 18px 32px rgba(0,0,0,.48)}
+.paddock-hero,.race-hero{
+  position:relative;isolation:isolate;overflow:hidden;border:1px solid rgba(166,191,240,.23);
+  border-radius:21px;background:linear-gradient(126deg,#18294a,#080e1c);
+  box-shadow:0 20px 60px rgba(0,0,0,.29)
+}
+.paddock-hero::after{content:"";pointer-events:none;position:absolute;inset:0;background:radial-gradient(ellipse 45% 70% at 80% 30%,rgba(91,130,238,.13),transparent 80%);z-index:-1}
+.paddock-telemetry{background-image:repeating-linear-gradient(90deg,rgba(106,150,249,.32) 0 2px,transparent 2px 13px)}
+.paddock-landing{background:linear-gradient(150deg,#090e1c,#0e1426 60%,#080e1b)}
+.paddock-landing-title{font:italic 900 clamp(4rem,10vw,10rem)/.85 "Barlow Condensed",Impact,sans-serif}
+.paddock-landing-image{filter:drop-shadow(0 24px 50px rgba(0,0,0,.6));transform:rotate(-5deg);transition:transform .4s ease}
+.paddock-landing-image:hover{transform:rotate(0deg) translateY(-4px)}
+.paddock-sidebar{
+  background:linear-gradient(170deg,rgba(12,19,37,.98),rgba(7,12,24,.99));
+  border-right:1px solid rgba(154,180,242,.19);
+  box-shadow:12px 0 50px rgba(0,0,0,.2)
+}
+.paddock-mobile-nav{background:rgba(11,17,33,.96);border-top:1px solid rgba(124,152,222,.33);box-shadow:0 -12px 34px rgba(0,0,0,.4)}
+.paddock-mobile-sheet{background:linear-gradient(155deg,#18233e,#0b1327);border:1px solid rgba(153,190,255,.3);border-radius:16px;box-shadow:0 25px 70px #0009}
+.race-display{font-size:clamp(4rem,10vw,10rem);line-height:.82;letter-spacing:-.05em}
+.race-number{font-size:clamp(4rem,10vw,8rem);line-height:.82}
+.race-lead{font-size:16px;line-height:1.65;color:#bdc9e5}
+.race-grid{background-image:linear-gradient(rgba(131,179,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(131,179,255,.07) 1px,transparent 1px);background-size:40px 40px}
+.race-checkered{background:linear-gradient(90deg,rgba(91,128,226,.09),transparent),repeating-conic-gradient(rgba(245,247,255,.12) 0 25%,transparent 0 50%) 0/24px 24px}
+.race-stripes{height:3px;background:linear-gradient(90deg,#ef3750,#8261fb,#43bdff,transparent)}
+.race-index{font:800 12px "Barlow Condensed",sans-serif;letter-spacing:.15em;color:#c7d9ff}
+.race-section-heading{display:flex;align-items:end;gap:12px;border-bottom:1px solid rgba(154,184,240,.19);padding-bottom:12px}
+.race-section-heading:before{content:"";width:4px;min-height:30px;border-radius:4px;background:linear-gradient(#f34e67,#8b72ff)}
+.race-ghost-numeral{font:900 clamp(8rem,20vw,21rem)/.85 "Barlow Condensed",sans-serif;color:rgba(255,255,255,.05)}
+.race-photo{
+  background-image:linear-gradient(90deg,rgba(7,12,25,.9),rgba(10,16,36,.28)),
+                   linear-gradient(0deg,rgba(8,13,27,.96),transparent 75%),
+                   url("https://images.pexels.com/photos/14905468/pexels-photo-14905468.jpeg?auto=compress&cs=tinysrgb&w=1600");
+  background-position:center;background-size:cover
+}
+.race-photo-soft{
+  background-image:linear-gradient(90deg,rgba(8,12,26,.86),rgba(8,12,29,.18)),
+                   linear-gradient(0deg,rgba(8,13,27,.92),transparent 65%),
+                   url("https://images.pexels.com/photos/14905469/pexels-photo-14905469.jpeg?auto=compress&cs=tinysrgb&w=1600");
+  background-position:center;background-size:cover
+}
+.race-hero{min-height:clamp(320px,47vw,550px)}
+.race-hero:after{content:"";pointer-events:none;position:absolute;inset:auto 0 0;height:3px;background:linear-gradient(90deg,#f03a5b,#7062fb,#55bfff,transparent)}
+.race-hero-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:start;justify-content:end;min-height:inherit;padding:clamp(24px,4vw,50px)}
+.race-poster-label{display:inline-block;padding:6px 11px;border-radius:6px;background:linear-gradient(115deg,#ed4057,#ba1f56);color:#fff;font:800 11px "Barlow",sans-serif;letter-spacing:.08em}
+.race-pit-tile{border-radius:16px}
+.race-pit-tile:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:#646dfb}
+.race-pit-tile:after{content:"";pointer-events:none;position:absolute;right:-35px;top:-40px;width:130px;height:180px;transform:skew(-20deg);background:rgba(127,95,241,.05)}
+.race-timing{font:800 clamp(2.5rem,4.4vw,4rem)/1 "Barlow Condensed",sans-serif;color:#fff}
+.race-progress-dial{position:relative;aspect-ratio:1;border-radius:50%;padding:8px;background:conic-gradient(#705bff var(--race-progress,0%),#2d3653 0);box-shadow:0 0 26px rgba(91,112,252,.2)}
+.race-progress-dial:before{content:"";position:absolute;inset:8px;border-radius:50%;background:#101b30}
+.race-progress-dial>div{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%}
+.race-ticker{overflow:hidden;border-block:1px solid rgba(137,163,234,.27);background:linear-gradient(90deg,#24365d,#141d37);color:#dce7ff}
+.race-ticker-track{display:flex;gap:50px;align-items:center;min-height:44px;white-space:nowrap;font:800 13px "Barlow Condensed",sans-serif;letter-spacing:.2em;animation:race-ticker-move 32s linear infinite}
+.race-ticker-track>*{flex-shrink:0}
+@keyframes race-ticker-move{to{transform:translateX(-50%)}}
+.race-feature-index{font:900 clamp(3rem,5vw,5rem) "Barlow Condensed",sans-serif;color:#72c1ff}
+.race-card-outline:before{content:"";pointer-events:none;position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,#f34c72,#7b6cf1,#54bfff)}
+.race-card-outline:hover{border-color:rgba(142,171,255,.6)}
+
+/* Collection: scenic headline, filters / gallery / detail inspector. */
+.collector-hero{position:relative;overflow:hidden;border:1px solid rgba(156,186,249,.2);border-radius:22px;min-height:220px;
+  background:linear-gradient(90deg,rgba(9,15,33,.91),rgba(12,20,45,.54)),url("https://images.pexels.com/photos/14905469/pexels-photo-14905469.jpeg?auto=compress&cs=tinysrgb&w=1600") center/cover}
+.collector-hero:after{content:"";position:absolute;pointer-events:none;inset:auto 0 0;height:3px;background:linear-gradient(90deg,#f54a63 0 35%,#6661ed 35% 65%,#5abefe 65% 100%)}
+.collector-rail,.collector-gallery,.collector-inspector{
+  background:linear-gradient(145deg,rgba(17,26,46,.98),rgba(9,15,29,.98));
+  border:1px solid rgba(157,179,225,.2);border-radius:17px;min-width:0;
+  box-shadow:0 20px 45px rgba(0,0,0,.16),inset 0 1px rgba(255,255,255,.045)
+}
+.collector-rail{padding:16px}
+.collector-gallery{padding:clamp(12px,2vw,22px)}
+.collector-inspector{position:sticky;top:18px;align-self:start;padding:16px}
+.collector-rail-heading{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#c4d5ff}
+.collector-divider{border-top:1px solid rgba(168,189,235,.14);margin-block:16px}
+.collector-stat{border-radius:12px;border:1px solid rgba(172,187,245,.2);background:rgba(13,20,42,.55);padding:12px}
+.collector-card-selected{border-radius:13px;box-shadow:0 0 0 2px rgba(111,151,255,.65),0 0 20px rgba(110,105,236,.23)}
+.collector-card-wrap{transition:transform .22s ease}.collector-card-wrap:hover{transform:translateY(-4px)}
+.collector-inspector-card{max-width:230px;margin-inline:auto;filter:drop-shadow(0 0 17px rgba(70,126,245,.2))}
+.collector-inspector .paddock-action{width:100%}
+.collector-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.collector-tab{min-height:39px;border-radius:9px;padding:6px;font:800 11px "Barlow",sans-serif;color:#9eafd2;background:rgba(28,41,66,.75)}
+.collector-tab[aria-pressed="true"]{background:linear-gradient(110deg,#db3152,#804be3);color:white;box-shadow:0 0 16px rgba(139,76,215,.3)}
+
+/* Immersive dashboard & booster stage */
+.apx-dashboard-hero{position:relative;isolation:isolate;min-height:330px;overflow:hidden;border-radius:21px;
+  border:1px solid rgba(163,190,249,.22);
+  background:linear-gradient(90deg,rgba(8,14,32,.94) 0%,rgba(10,18,40,.61) 52%,rgba(8,13,31,.06) 100%),
+    url("https://images.pexels.com/photos/21404862/pexels-photo-21404862.jpeg?auto=compress&cs=tinysrgb&w=1600") center/cover;
+  box-shadow:0 25px 70px rgba(0,0,0,.3)}
+.apx-dashboard-hero:after{content:"";position:absolute;inset:auto 0 0;height:3px;background:linear-gradient(90deg,#ed3554,#806aff,#5fbbff)}
+.apx-hud{border:1px solid rgba(176,188,237,.22);border-radius:13px;background:rgba(12,19,40,.75);backdrop-filter:blur(14px);box-shadow:inset 0 1px rgba(255,255,255,.08)}
+.apx-shortcut{position:relative;display:flex;min-height:154px;align-items:center;gap:15px;overflow:hidden;
+  border:1px solid rgba(163,184,239,.23);border-radius:16px;background:linear-gradient(125deg,#182a4a,#10192c);
+  padding:16px;transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
+.apx-shortcut:hover{transform:translateY(-3px);border-color:rgba(118,171,255,.65);box-shadow:0 13px 38px rgba(41,68,172,.2)}
+.apx-shortcut:before{content:"";pointer-events:none;position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(#fa466a,#7259f6)}
+.apx-shortcut-image{width:43%;max-width:125px;object-fit:contain;filter:drop-shadow(0 13px 18px rgba(0,0,0,.45))}
+.apx-dashboard-metric{border:1px solid rgba(175,188,234,.16);border-radius:14px;padding:16px;background:linear-gradient(145deg,rgba(20,30,54,.9),rgba(11,17,30,.95))}
+.apx-pack-display{background:radial-gradient(ellipse at 50% 55%,rgba(72,95,188,.18),transparent 63%),linear-gradient(180deg,#131c34,#0b1122);border-bottom:1px solid rgba(160,181,239,.17)}
+.apx-reveal-stage{min-height:100vh;background:radial-gradient(ellipse 62% 34% at 50% 15%,rgba(86,91,176,.27),transparent),radial-gradient(ellipse 65% 35% at 50% 55%,rgba(51,93,149,.23),transparent),#060a14}
+.apx-reveal-header{text-align:center;border-bottom:1px solid rgba(155,182,245,.15);padding:24px 16px}
+.apx-reveal-header h1{font:italic 900 clamp(2rem,5vw,3.7rem) "Barlow Condensed",sans-serif;letter-spacing:.03em}
+
+/* Keep actual rarity colors and holo layers from Card.tsx intact. */
+.apex-paddock .group\/card>[role="button"]{transition:transform .2s ease,filter .2s ease;transform-origin:center}
+.apex-paddock .group\/card>[role="button"]:hover{filter:brightness(1.08)}
+.apx-showcase-section{background:linear-gradient(145deg,#141d36,#0a1022)}
+.apex-paddock a:focus-visible,.apex-paddock button:focus-visible,.apex-paddock [role="button"]:focus-visible,.paddock-field:focus-visible{
+  outline:2px solid #87b0ff;outline-offset:3px
+}
+@media(max-width:767px){
+  .paddock-header{padding:18px;border-radius:16px}
+  .paddock-title{font-size:clamp(2.5rem,10vw,4rem)}
+  .race-hero{min-height:365px}
+  .race-hero-content{padding:24px}
+  .collector-hero{min-height:195px;border-radius:16px}
+  .collector-rail,.collector-gallery{border-radius:14px}
+  .apx-dashboard-hero{min-height:400px}
+  .race-ticker-track{font-size:11px;gap:28px}
+}
+@media(max-width:639px){.collector-gallery{padding:10px}.collector-rail{padding:12px}.apx-shortcut{min-height:116px;padding:12px}.apx-shortcut-image{max-width:82px}.paddock-landing-title{font-size:clamp(3.3rem,14vw,5.5rem)}}
+@media(prefers-reduced-motion:reduce){
+  .race-ticker-track{animation:none}
+  .paddock-action,.paddock-data-card,.paddock-pack-card,.paddock-landing-image,.collector-card-wrap,.apx-shortcut{transition:none}
+  .paddock-action:hover,.paddock-data-card:hover,.paddock-pack-card:hover,.paddock-landing-image:hover,.collector-card-wrap:hover,.apx-shortcut:hover{transform:none}
+}
+
+
+/* ============================================================
+   Night Drive V5 / collector vault and premium interaction layer
+   Decorates only the sandbox components, never card rarity rules.
+   ============================================================ */
+.apex-paddock .collector-hero{
+  background-position:center 53%;
+  box-shadow:0 28px 66px rgba(0,0,0,.27),inset 0 1px rgba(236,244,255,.07);
+}
+.apex-paddock .collector-hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 10%,rgba(169,176,245,.035) 45%,transparent 62%),
+             radial-gradient(ellipse 55% 80% at 90% 18%,rgba(111,88,240,.13),transparent 75%);
+  z-index:0;
+}
+.apex-paddock .collector-rail,.apex-paddock .collector-gallery,.apex-paddock .collector-inspector{
+  border-color:rgba(163,190,255,.24);
+  background:linear-gradient(147deg,rgba(19,31,54,.97),rgba(8,14,29,.98) 77%);
+  box-shadow:0 18px 44px rgba(0,0,0,.19),inset 0 1px rgba(242,248,255,.055);
+}
+.apex-paddock .collector-gallery{
+  background-image:radial-gradient(ellipse 55% 20% at 50% 0%,rgba(64,103,190,.085),transparent 100%),
+    linear-gradient(147deg,rgba(19,31,54,.97),rgba(8,14,29,.98) 77%);
+}
+.collector-completion-wheel{
+  --collector-progress:0%;display:grid;flex:0 0 78px;place-items:center;width:78px;height:78px;
+  border-radius:50%;padding:7px;
+  background:conic-gradient(from -90deg,#59c6ee 0%,#7765ff var(--collector-progress),rgba(118,137,188,.24) var(--collector-progress),rgba(118,137,188,.24) 100%);
+  box-shadow:0 0 20px rgba(97,109,241,.25),inset 0 0 0 1px rgba(230,238,255,.12);
+}
+.collector-completion-wheel>div{
+  display:grid;place-items:center;width:100%;height:100%;border-radius:50%;
+  background:radial-gradient(circle at 40% 30%,#243759,#0b1427 73%);
+}
+.collector-completion-wheel strong{
+  font:900 23px/1 "Barlow Condensed",Impact,sans-serif;
+  font-style:italic;color:#f8faff;font-variant-numeric:tabular-nums;
+}
+.collector-rarity-shelf{
+  display:flex;gap:8px;max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;
+  padding:2px 1px 9px;scrollbar-width:thin;scrollbar-color:rgba(132,155,219,.3) transparent;
+}
+.collector-rarity-chip{
+  --chip-rarity-color:#89a9ff;display:inline-flex;align-items:center;justify-content:center;
+  flex:0 0 auto;gap:7px;min-height:38px;padding:7px 11px;
+  border:1px solid rgba(155,182,243,.22);border-radius:10px;
+  background:linear-gradient(145deg,rgba(30,40,68,.84),rgba(16,26,48,.9));
+  color:#bfcbe7;font:700 11px/1.15 "Barlow",Arial,sans-serif;white-space:nowrap;
+  transition:border-color .2s,background .2s,box-shadow .2s,color .2s;
+}
+.collector-rarity-chip:hover{border-color:rgba(185,203,255,.6);color:#fff}
+.collector-rarity-chip[aria-pressed="true"]{
+  border-color:var(--chip-rarity-color);color:#fff;
+  background:linear-gradient(145deg,rgba(57,66,105,.85),rgba(24,34,62,.95));
+  box-shadow:inset 0 1px rgba(255,255,255,.08),0 0 14px rgba(106,116,245,.19);
+}
+.collector-rarity-dot{
+  display:block;width:9px;height:9px;flex:0 0 9px;border-radius:3px;
+  background:var(--chip-rarity-color);box-shadow:0 0 9px var(--chip-rarity-color);
+  transform:rotate(45deg);
+}
+.collector-rarity-count{
+  display:inline-grid;min-width:24px;min-height:21px;place-items:center;padding:1px 5px;
+  border:1px solid rgba(168,191,234,.16);border-radius:5px;background:rgba(0,0,0,.2);
+  color:#e4eaff;font:700 10px/1 "Barlow",Arial,sans-serif;font-variant-numeric:tabular-nums;
+}
+.apex-paddock .collector-card-wrap{
+  position:relative;border-radius:13px;isolation:isolate;
+}
+.apex-paddock .collector-card-wrap:focus-within{
+  outline:2px solid #91b9ff;outline-offset:4px;
+}
+.apex-paddock .collector-card-selected{box-shadow:none}
+@media(min-width:1536px){
+  .apex-paddock .collector-card-selected{
+    box-shadow:0 0 0 2px var(--collector-selected-glow,#83aaff),
+      0 0 21px rgba(92,120,232,.3),inset 0 0 14px rgba(90,114,213,.08);
+  }
+}
+.collector-inspector-stage{
+  --inspector-rarity:#8baeff;position:relative;isolation:isolate;
+  overflow:hidden;display:flex;flex-direction:column;align-items:center;
+  padding:20px 12px 14px;border-radius:15px;
+  border:1px solid rgba(170,187,237,.21);
+  background:radial-gradient(ellipse at 50% 40%,rgba(52,70,118,.58),transparent 74%),
+             linear-gradient(155deg,rgba(21,34,64,.95),rgba(7,14,29,.98));
+}
+.collector-inspector-stage::before{
+  content:"";position:absolute;z-index:0;left:50%;top:15%;width:190px;height:220px;
+  transform:translateX(-50%);background:var(--inspector-rarity);filter:blur(50px);
+  opacity:.23;pointer-events:none;animation:apx-vault-ambience 5s ease-in-out infinite alternate;
+}
+.collector-inspector-stage::after{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,transparent 0 42px,rgba(180,201,255,.025) 43px 44px),
+             linear-gradient(180deg,transparent 80%,rgba(137,168,255,.07));
+}
+.collector-inspector-horizon{
+  position:absolute;z-index:0;top:42%;left:-10%;width:120%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--inspector-rarity),transparent);
+  opacity:.45;box-shadow:0 0 16px var(--inspector-rarity);
+  transform:rotate(-9deg);
+}
+.collector-inspector-card{
+  width:100%;max-width:216px;filter:drop-shadow(0 12px 24px rgba(0,0,0,.48));
+}
+.apex-paddock .collector-inspector{
+  background-image:radial-gradient(ellipse 70% 24% at 50% 0%,rgba(73,104,220,.14),transparent),
+    linear-gradient(147deg,rgba(19,31,54,.97),rgba(8,14,29,.98) 77%);
+}
+.apex-paddock .collector-inspector .paddock-action{box-shadow:0 5px 18px rgba(218,43,86,.2)}
+.apex-paddock .paddock-field:hover{border-color:rgba(153,186,255,.47)!important}
+.apex-paddock .paddock-field:focus-visible{outline:2px solid rgba(144,193,255,.75)!important}
+.apex-paddock .paddock-sidebar nav a[aria-current="page"]{
+  box-shadow:0 0 20px rgba(99,111,255,.22),inset 0 1px rgba(255,255,255,.18);
+}
+.apex-paddock .apx-dashboard-hero::before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 38% 58% at 77% 55%,rgba(111,101,224,.095),transparent 100%),
+             linear-gradient(0deg,rgba(6,9,20,.23),transparent 43%);
+}
+.apx-hero-garage-pass{
+  border:1px solid rgba(163,190,249,.28);border-radius:15px;
+  background:linear-gradient(150deg,rgba(27,38,68,.73),rgba(10,16,32,.78));
+  box-shadow:0 15px 45px rgba(0,0,0,.35),inset 0 1px rgba(255,255,255,.095);
+  backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);
+}
+.apx-status-light{
+  width:7px;height:7px;border-radius:50%;background:#61dcbd;
+  box-shadow:0 0 0 4px rgba(74,234,197,.12),0 0 12px rgba(92,238,199,.55);
+  animation:apx-status-pulse 3.3s ease-in-out infinite;
+}
+@keyframes apx-status-pulse{50%{box-shadow:0 0 0 6px rgba(74,234,197,.05),0 0 15px rgba(92,238,199,.55)}}
+.apex-paddock .apx-shortcut{isolation:isolate}
+.apex-paddock .apx-shortcut::after{
+  content:"";position:absolute;inset:-50% auto -50% -65%;width:38%;
+  background:linear-gradient(90deg,transparent,rgba(193,215,255,.085),transparent);
+  transform:skewX(-18deg) translateX(0);transition:transform .65s ease;pointer-events:none;
+}
+.apex-paddock .apx-shortcut:hover::after{transform:skewX(-18deg) translateX(620%)}
+.apex-paddock .apx-shortcut-image{transition:transform .4s ease,filter .4s ease}
+.apex-paddock .apx-shortcut:hover .apx-shortcut-image{
+  transform:rotate(-4deg) scale(1.07);filter:drop-shadow(0 17px 24px rgba(50,71,168,.42));
+}
+.apex-paddock .paddock-pack-card{isolation:isolate}
+.apex-paddock .paddock-pack-card::before{
+  content:"";position:absolute;inset:0 0 auto;height:55%;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(110,134,255,.19),transparent 70%);
+}
+.apex-paddock .paddock-pack-card:hover{
+  box-shadow:0 20px 55px rgba(0,0,0,.36),0 0 24px rgba(94,111,242,.16);
+}
+.apx-reveal-track{
+  border:1px solid rgba(141,171,234,.25);border-radius:12px;
+  background:rgba(13,21,43,.72);box-shadow:inset 0 1px rgba(255,255,255,.04);
+  backdrop-filter:blur(8px);
+}
+.apx-reveal-track-bar{height:6px;overflow:hidden;border-radius:99px;background:rgba(132,148,194,.21)}
+.apx-reveal-track-bar>div{
+  height:100%;border-radius:inherit;background:linear-gradient(90deg,#4eafff,#8b61fb,#db4cb5);
+  box-shadow:0 0 12px rgba(110,112,245,.5);transition:width .5s cubic-bezier(.2,.8,.2,1);
+}
+.apex-paddock.apx-reveal-stage::before{
+  content:"";position:absolute;z-index:0;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 36% 50% at 49% 18%,rgba(143,151,254,.13),transparent 80%),
+    repeating-conic-gradient(from 30deg at 50% -10%,transparent 0 13deg,rgba(126,148,255,.023) 15deg 16deg,transparent 18deg 28deg);
+  mask-image:linear-gradient(#000,transparent 90%);
+}
+@keyframes apx-vault-ambience{
+  0%{opacity:.16;transform:translateX(-50%) scale(.94)}
+  100%{opacity:.27;transform:translateX(-50%) scale(1.08)}
+}
+@media(max-width:1279px){
+  .apex-paddock .collector-rail{padding:13px 14px}
+}
+@media(max-width:639px){
+  .collector-rarity-shelf{margin-inline:-2px;padding-inline:2px}
+  .collector-rarity-chip{min-height:35px;padding:6px 9px;gap:5px;font-size:10px}
+  .collector-completion-wheel{width:64px;height:64px;flex-basis:64px}
+  .apex-paddock .collector-gallery{background-image:linear-gradient(155deg,rgba(19,31,54,.97),rgba(8,14,29,.98))}
+}
+@media(prefers-reduced-motion:reduce){
+  .collector-inspector-stage::before,.apx-status-light{animation:none!important}
+  .apex-paddock .apx-shortcut::after,.apex-paddock .apx-shortcut-image,.apx-reveal-track-bar>div,
+  .collector-rarity-chip{transition:none!important}
+  .apex-paddock .apx-shortcut:hover::after{transform:none}
+  .apex-paddock .apx-shortcut:hover .apx-shortcut-image{transform:none;filter:none}
+}
+
+
+/* Card-details showroom (also visible on phones). */
+.apex-paddock .apx-card-details-dialog{
+  isolation:isolate;background:#0c1429;
+  box-shadow:0 32px 100px rgba(0,0,0,.65),0 0 48px rgba(91,111,223,.09),inset 0 1px rgba(255,255,255,.08);
+}
+.apex-paddock .apx-card-details-photo{
+  isolation:isolate;
+  background:radial-gradient(ellipse at 50% 32%,rgba(99,128,233,.22),transparent 75%),#060b19;
+}
+.apex-paddock .apx-card-details-content{
+  background-image:radial-gradient(ellipse 90% 24% at 50% 0%,rgba(92,116,217,.15),transparent 100%),
+    linear-gradient(152deg,rgba(17,27,51,.96),rgba(7,13,29,.98));
+}
+.apex-paddock .apx-card-details-content:before{
+  content:"";position:absolute;inset:0 0 auto;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(164,197,255,.42),transparent);
+}
+.apex-paddock .apx-detail-stat{
+  border:1px solid rgba(141,170,234,.13);
+  background:linear-gradient(150deg,rgba(30,44,74,.52),rgba(16,25,47,.58));
+  box-shadow:inset 0 1px rgba(255,255,255,.035);
+}
+.apex-paddock .apx-detail-stat dt{color:#91a7cf}
+.apex-paddock .apx-detail-stat dd{color:#eef3ff}
+@media(max-width:639px){
+  .apex-paddock .apx-card-details-content{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+}
+
+
+/* Bottom navigation: active arcade-game light pool instead of a flat underline. */
+.paddock-mobile-nav a[aria-current="page"]{
+  background:radial-gradient(ellipse 66% 58% at 50% 32%,rgba(106,128,255,.24),transparent 88%);
+  color:#eef4ff;text-shadow:0 0 9px rgba(128,158,255,.23);
+}
+.paddock-mobile-nav a[aria-current="page"] svg{
+  filter:drop-shadow(0 0 7px rgba(112,150,255,.48));
+}
+.paddock-mobile-nav{
+  background:linear-gradient(180deg,rgba(19,29,53,.93),rgba(9,15,29,.98));
+  border-top:1px solid rgba(129,167,243,.38);
+  box-shadow:0 -12px 32px rgba(0,0,0,.36),0 -1px 15px rgba(91,124,245,.1);
+}
+@media(prefers-reduced-motion:reduce){
+  .paddock-mobile-nav a[aria-current="page"] svg{filter:none}
 }
