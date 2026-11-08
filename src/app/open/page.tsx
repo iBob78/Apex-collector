@@ -331,7 +331,7 @@ function OpenContent() {
   if (loading) return null;
 
   return (
-    <div className="min-h-screen bg-[#050505] overflow-x-hidden flex flex-col items-center justify-center p-4 relative">
+    <div className="apex-paddock relative flex min-h-screen flex-col items-center justify-center overflow-x-hidden px-4 py-9 sm:px-6 sm:py-14">
 
       {/* Background Ambience */}
       <div className={`absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-60 z-0`}></div>
@@ -346,9 +346,14 @@ function OpenContent() {
             exit={{ scale: 1.5, opacity: 0, filter: 'blur(20px)' }}
             className="relative z-10 flex flex-col items-center"
           >
+            <div className="mb-8 text-center">
+              <p className="paddock-eyebrow">APEX / PACK UNSEAL</p>
+              <h1 className="paddock-section-title mt-3">{t(pack.name)}</h1>
+              <p className="mt-2 text-xs uppercase tracking-[.15em] text-slate-400">{pack.cardCount} {t('Cartes')}</p>
+            </div>
             <motion.div
               ref={packRef}
-              className={`w-64 h-96 bg-gradient-to-br ${pack.color} rounded-2xl p-1 shadow-2xl shadow-black relative overflow-hidden group`}
+              className={`group relative h-96 w-64 overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br ${pack.color} p-1 shadow-[0_30px_90px_rgba(0,0,0,.65),0_0_35px_rgba(82,202,236,.17)]`}
             >
               {/* Pack Interior Design */}
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 backdrop-blur-[2px]">
@@ -448,7 +453,7 @@ function OpenContent() {
                   animate={{ opacity: 1 }}
                   disabled={Boolean(dailyBoosterId && (!dailyPackSlug || dailyBoosterError))}
                   onClick={handleOpenPack}
-                  className="mt-12 rounded-full bg-white px-12 py-4 text-sm font-bold uppercase tracking-widest text-black transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="paddock-action mt-10 min-h-12 px-9 py-4 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {t('Ouvrir le booster')}
                 </motion.button>
@@ -474,17 +479,18 @@ function OpenContent() {
             key="reveal"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="w-full max-w-[1400px] z-10 flex flex-col items-center"
+            className="relative z-10 flex w-full max-w-[1400px] flex-col items-center"
           >
-            <header className="mb-8 text-center">
+            <header className="paddock-header mb-6 w-full text-center">
+              <p className="paddock-eyebrow mb-3">APEX / CARD REVEAL</p>
               <motion.h2
                 initial={{ y: -20 }}
                 animate={{ y: 0 }}
-                className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent"
+                className="paddock-title"
               >
                 {t('Tes cartes sont là !')}
               </motion.h2>
-              <p className="mt-2 text-gray-500">{t('Clique sur une carte pour la retourner, ou révèle-les toutes.')}</p>
+              <p className="mx-auto mt-3 max-w-xl text-sm text-slate-400">{t('Clique sur une carte pour la retourner, ou révèle-les toutes.')}</p>
               {discoverySaveError && (
                 <p role="alert" className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
                   {discoverySaveError}
@@ -500,7 +506,7 @@ function OpenContent() {
             <button
               type="button"
               onClick={flipAllCards}
-              className="mb-8 rounded-full border border-blue-400/40 bg-blue-500/15 px-6 py-3 text-xs font-bold uppercase tracking-widest text-blue-200 transition hover:bg-blue-500/25"
+              className="paddock-ghost mb-8 min-h-11 rounded-xl px-6 py-3 text-xs font-bold uppercase tracking-widest text-cyan-100"
             >
               {flippedCards.size === drawnCards.length
                 ? t('Retourner les cartes face cachée')
@@ -585,7 +591,7 @@ function OpenContent() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.5 }}
               onClick={() => router.push('/boosters')}
-              className="px-8 py-3 bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition-colors"
+              className="paddock-ghost rounded-xl px-8 py-3 text-sm font-bold transition-colors"
             >
               {t('Retour à la boutique')}
             </motion.button>

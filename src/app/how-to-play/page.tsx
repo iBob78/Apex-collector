@@ -15,13 +15,13 @@ export default function HowToPlayPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#050505] px-5 py-16 text-white sm:px-8">
+    <main className="apex-paddock min-h-screen px-5 py-12 text-white sm:px-8 sm:py-16">
       <div className="mx-auto max-w-4xl">
-        <header className="mb-12">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.3em] text-blue-400">
+        <header className="paddock-header mb-10">
+          <p className="paddock-eyebrow mb-3">
             {t('Guide du pilote')}
           </p>
-          <h1 className="text-4xl font-black uppercase italic tracking-tighter sm:text-5xl">
+          <h1 className="paddock-title">
             {t('How to play')}
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-400 sm:text-base">
@@ -33,19 +33,19 @@ export default function HowToPlayPage() {
           {steps.map((step) => (
             <li
               key={step.number}
-              className="grid gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:grid-cols-[3.5rem_1fr] sm:gap-6 sm:p-7"
+              className="paddock-data-card grid gap-4 p-5 sm:grid-cols-[3.5rem_1fr] sm:gap-6 sm:p-7"
             >
-              <span className="text-sm font-black tracking-widest text-blue-400">
+              <span className="paddock-stat-number text-[#e7c18a]">
                 {step.number}
               </span>
               <div>
-                <h2 className="text-lg font-black uppercase italic tracking-tight">{t(step.title)}</h2>
+                <h2 className="paddock-section-title">{t(step.title)}</h2>
                 <p className="mt-2 text-sm leading-6 text-gray-400">
                   {t(step.description)}
                 </p>
                 <Link
                   href={step.href}
-                  className="mt-4 inline-flex text-xs font-bold uppercase tracking-wider text-blue-400 transition-colors hover:text-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                  className="mt-4 inline-flex text-xs font-bold uppercase tracking-wider text-cyan-200 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                 >
                   {t(step.linkLabel)}
                   <span aria-hidden="true" className="ml-2">→</span>
