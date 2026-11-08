@@ -57,19 +57,19 @@ function LoginForm() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-md"
+      className="relative z-10 w-full max-w-md"
     >
-      <div className="bg-[#0a0a0a] border border-white/10 rounded-[24px] sm:rounded-[32px] p-5 sm:p-10 shadow-2xl relative overflow-hidden">
+      <div className="paddock-panel relative overflow-hidden p-6 shadow-2xl sm:p-10">
         {/* Background Gradients */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[80px] -mr-10 -mt-10" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 blur-[80px] -ml-10 -mb-10" />
 
         <div className="relative z-10">
-          <header className="mb-10 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-500 mb-6">
+          <header className="mb-9 text-center"><p className="paddock-eyebrow mb-5">APEX / DRIVER ACCESS</p>
+            <div className="mb-5 inline-flex h-16 w-16 items-center justify-center rounded-xl border border-cyan-200/30 bg-cyan-300/[0.09] text-cyan-200">
               {isLogin ? <LogInIcon size={28} /> : <UserPlusIcon size={28} />}
             </div>
-            <h2 className="text-3xl font-black uppercase italic tracking-tighter text-white">
+            <h2 className="paddock-title">
               {t(isLogin ? 'Accès Pilote' : 'Nouvelle Écurie')}
             </h2>
           </header>
@@ -83,7 +83,7 @@ function LoginForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-blue-500/50 transition-all placeholder:text-gray-700"
+                className="paddock-field w-full rounded-xl px-5 py-4 text-sm transition-all placeholder:text-slate-500"
               />
             </div>
 
@@ -95,7 +95,7 @@ function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-blue-500/50 transition-all placeholder:text-gray-700"
+                className="paddock-field w-full rounded-xl px-5 py-4 text-sm transition-all placeholder:text-slate-500"
               />
             </div>
 
@@ -115,7 +115,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-blue-500/20 flex items-center justify-center gap-3 group overflow-hidden relative"
+              className="paddock-action group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-xl py-4 disabled:opacity-50"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -145,14 +145,32 @@ function LoginForm() {
 export default function LoginPage() {
   const { t } = useSitePreferences();
   return (
-    <main className="flex items-center justify-center min-h-screen bg-[#050505] text-white p-4 sm:p-6 relative overflow-hidden">
+    <main className="apex-paddock relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12 text-white sm:px-6 lg:py-20">
       {/* Dynamic Background Elements */}
       <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-blue-600/5 blur-[150px] rounded-full animate-pulse" />
       <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-indigo-600/5 blur-[150px] rounded-full animate-pulse delay-1000" />
 
-      <Suspense fallback={<div className="text-gray-500 font-mono text-xs uppercase animate-pulse">{t('Chargement système...')}</div>}>
-        <LoginForm />
-      </Suspense>
+      <div className="relative z-10 grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)]">
+        <div className="flex justify-center lg:justify-start">
+          <Suspense fallback={<div className="text-gray-500 font-mono text-xs uppercase animate-pulse">{t('Chargement système...')}</div>}>
+            <LoginForm />
+          </Suspense>
+        </div>
+        <aside className="paddock-hero relative hidden min-h-[540px] items-center justify-center p-10 lg:flex" aria-label="Apex Collector">
+          <div className="absolute left-8 top-8">
+            <p className="paddock-eyebrow">APEX / COLLECTOR</p>
+            <h2 className="paddock-section-title mt-2">THE PRIVATE PADDOCK</h2>
+          </div>
+          <div className="relative mt-12 w-[65%] max-w-[300px]">
+            <div className="absolute -inset-9 rounded-full border border-cyan-200/15" aria-hidden="true" />
+            <img src="/showcase-card.png" alt="Apex Collector" className="paddock-landing-image relative w-full rounded-xl" />
+          </div>
+          <div className="absolute bottom-8 left-8 right-8 flex items-center justify-between border-t border-cyan-100/15 pt-4">
+            <span className="paddock-micro">BUILD YOUR GARAGE</span>
+            <span className="font-mono text-xs text-[#e7c18a]">001 / APEX</span>
+          </div>
+        </aside>
+      </div>
     </main>
   );
 }
