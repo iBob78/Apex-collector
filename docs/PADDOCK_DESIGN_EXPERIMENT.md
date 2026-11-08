@@ -1,12 +1,12 @@
-# APEX RACING DEPARTMENT — refonte motorsport, itération 2
+# APEX RACING DEPARTMENT — refonte motorsport GT Endurance, itération 3
 
-> **Prototype uniquement** sur la branche `feat/visual-overhaul-paddock-20261108` / PR #17 (brouillon). La précédente direction « paddock premium » a été jugée trop proche du site d'origine. Cette itération est une **refonte de composition**, pas une simple recoloration. Ne pas fusionner ni toucher à `main` sans validation explicite.
+> **Prototype uniquement** sur la branche `feat/visual-overhaul-paddock-20261108` / PR #17 (brouillon). La précédente direction « paddock premium » a été jugée trop proche du site d'origine. Cette itération est une **refonte de composition**, pas une simple recoloration. L'itération 3 conserve la structure racing tout en appliquant la palette **GT Endurance** validée. Ne pas fusionner ni toucher à `main` sans validation explicite.
 
 ## Nouvelle direction artistique
 
 **Concept :** grille de départ, endurance, affiches de course, paddock de compétition et chronométrage. Moins de « cartes SaaS » : grands blocs éditoriaux, photographies de course nocturne, rangées techniques, grandes données et navigations numérotées.
 
-- **Palette :** noir carbone `#0a0c0c`, graphite `#171c17`, jaune compétition `#dbff35`, rouge drapeau `#f4523d`, blanc cassé `#f4f5ef`.
+- **Palette GT Endurance validée :** carbone `#101215`, rouge racing `#D32F35`, titane `#F0EFEB` et gris mécanique `#555D65`. Les panneaux utilisent des nuances neutres dérivées, sans jaune fluo, cyan, bleu néon ou champagne dans l'identité.
 - **Typographie :** Barlow Condensed (titres/course/télémétrie), Barlow (texte) et Bebas Neue conservée pour les cartes/packs quand elle est spécifiée. Chargement via l'import Google Fonts de `src/app/globals.css`; pas de dépendance npm.
 - **Identité :** rubans « starting grid », damiers, bandes diagonales, index 01 / 02 / 03, contenu en blocs asymétriques, séparateurs francs (coins carrés), panneaux de télémétrie et marque APEX très visible.
 - **Animations :** ruban de texte horizontal, élévation discrète au survol, transitions courtes. `prefers-reduced-motion` désactive le défilement du ruban et les mouvements non essentiels. Pas de changement des animations de rareté et de retournement des cartes.
@@ -37,7 +37,7 @@
 - **Tirages :** probabilités, prix AP, débit, boosters quotidiens offerts, code de sauvegarde, déchirure du sachet, flip, scintillement/halo selon rareté et badge `NEW!` préservés. Pas d'affichage de niveaux pendant un tirage.
 - **Comptes :** auth Supabase, permissions admin, showroom privé/public, niveau calculé, solde AP réel et règles RLS inchangés. **Aucune migration ni accès aux données de production**.
 - **Langues :** contenus fonctionnels traduits par `t()` ; les libellés décoratifs anglais sont le langage d'édition « racing / paddock » et restent purement décoratifs.
-- **Accessibilité :** navigation clavier, aria-labels, éléments réactifs et réduction de mouvement. Vérifier notamment la lisibilité du jaune sur le noir et l'absence de défilement horizontal sur 360/390/430 px.
+- **Accessibilité :** navigation clavier, aria-labels, éléments réactifs et réduction de mouvement. Pour les petits textes, privilégier le titane sur carbone ; réserver le rouge aux surfaces, accents et grandes typographies. Vérifier l'absence de défilement horizontal sur 360/390/430 px.
 - **Images :** deux images Pexels décoratives externes ; pas de téléchargement ou d'utilisation du compte privé de l'utilisateur.
 
 ## Contrôles nécessaires
@@ -49,3 +49,5 @@
 5. Confirmer la stabilité des photographies externes, l'option de protection du Preview Vercel et l'absence de débordements sur mobile.
 
 **Statut :** design radical « motorsport » prêt pour prévisualisation et feedback utilisateur. Toute fusion vers `main` reste soumise à demande explicite.
+
+**Couleurs fonctionnelles préservées :** les raretés, halos des cartes, badge de découverte `NEW!` et retours succès/erreur conservent leur signification. Ne pas appliquer mécaniquement la palette d'interface à ces signaux.

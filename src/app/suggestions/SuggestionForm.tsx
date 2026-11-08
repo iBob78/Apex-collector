@@ -97,7 +97,7 @@ export default function SuggestionForm({ initialCompetitionTypes }: { initialCom
                 .map((field) => (
                 <label key={field.name} className={`block min-w-0 ${field.name === 'image_url' ? 'sm:col-span-2' : ''}`}>
                   <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">
-                    {field.label}{(field.required || (field.name === 'record_description' && details.is_record === 'true')) && <span className="ml-1 text-cyan-300">*</span>}
+                    {field.label}{(field.required || (field.name === 'record_description' && details.is_record === 'true')) && <span className="ml-1 text-[#D32F35]">*</span>}
                   </span>
                   {field.type === 'select' ? (
                     <select
@@ -113,7 +113,7 @@ export default function SuggestionForm({ initialCompetitionTypes }: { initialCom
                       ).map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                     </select>
                   ) : field.type === 'checkbox' ? (
-                    <span className="flex min-h-12 items-center gap-3 rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3">
+                    <span className="flex min-h-12 items-center gap-3 rounded-xl border border-white/10 bg-[#171A1E] px-3.5 py-3">
                       <input
                         type="checkbox"
                         checked={details[field.name] === 'true'}
@@ -122,7 +122,7 @@ export default function SuggestionForm({ initialCompetitionTypes }: { initialCom
                           [field.name]: event.target.checked ? 'true' : '',
                           ...(field.name === 'is_record' && !event.target.checked ? { record_description: '' } : {}),
                         }))}
-                        className="h-4 w-4 accent-cyan-300"
+                        className="h-4 w-4 accent-[#D32F35]"
                       />
                       <span className="text-sm text-slate-200">Cette voiture détient un record</span>
                     </span>

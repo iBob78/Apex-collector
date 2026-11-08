@@ -105,7 +105,7 @@ export default function ShowroomPage() {
         <div className="paddock-shell px-4 py-6 sm:px-7 sm:py-9 lg:px-10">
           {loading ? (
             <div className="flex min-h-[60vh] items-center justify-center">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#555D65] border-t-transparent" />
             </div>
           ) : !showroom ? (
             <section className="paddock-panel mx-auto mt-16 max-w-lg p-8 text-center">
@@ -163,7 +163,7 @@ export default function ShowroomPage() {
                   <div className="absolute inset-0 -z-0 bg-gradient-to-r from-black via-black/75 to-black/5 sm:via-black/55" />
                   <div className="absolute inset-0 -z-0 bg-gradient-to-t from-black/90 via-transparent to-black/20" />
                   <div className="relative z-10 flex min-h-[430px] flex-col justify-between p-5 sm:min-h-[520px] sm:p-9 lg:p-12">
-                    <span className="w-fit rounded-md border border-[#e7c18a]/40 bg-[#ac7b46]/85 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider">
+                    <span className="w-fit rounded-md border border-[#F0EFEB]/40 bg-[#555D65]/85 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider">
                       {t('Voiture vedette')}
                     </span>
                     <div className="max-w-md">
@@ -192,7 +192,7 @@ export default function ShowroomPage() {
                   </div>
                 </section>
               ) : (
-                <div className="rounded-3xl border border-dashed border-white/15 bg-[#0a0a0a] p-10 text-center text-sm text-gray-400">
+                <div className="rounded-3xl border border-dashed border-white/15 bg-[#101215] p-10 text-center text-sm text-gray-400">
                   {t('Aucune voiture n’est actuellement exposée.')}
                 </div>
               )}
@@ -247,7 +247,7 @@ export default function ShowroomPage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 text-sm text-gray-400">
+                    <p className="rounded-2xl border border-white/10 bg-[#101215] p-5 text-sm text-gray-400">
                       {t('Aucune carte véhicule améliorée pour le moment.')}
                     </p>
                   )}
@@ -257,15 +257,15 @@ export default function ShowroomPage() {
               {showroom.isPublic && showroom.hasCollectionHighlights && (
                 <section className="mt-8">
                   <div className="mb-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-300">{t('Palmarès du pilote')}</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#F0EFEB]">{t('Palmarès du pilote')}</p>
                     <h2 className="paddock-section-title mt-1">{t('Succès débloqués')}</h2>
                   </div>
                   {showroom.achievements.length > 0 ? (
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {showroom.achievements.map((achievement, index) => (
                         <article key={`${achievement.title}-${index}`} className="paddock-tile p-4">
-                          <div className="flex items-center gap-2 text-sm font-bold text-purple-100">
-                            <Medal size={16} className="shrink-0 text-purple-300" />
+                          <div className="flex items-center gap-2 text-sm font-bold text-[#F0EFEB]">
+                            <Medal size={16} className="shrink-0 text-[#F0EFEB]" />
                             <span>{t(achievement.title)}</span>
                           </div>
                           {achievement.description && (
@@ -275,7 +275,7 @@ export default function ShowroomPage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 text-sm text-gray-400">
+                    <p className="rounded-2xl border border-white/10 bg-[#101215] p-5 text-sm text-gray-400">
                       {t('Aucun succès réclamé pour le moment.')}
                     </p>
                   )}
@@ -331,7 +331,7 @@ function ShowroomStat({
         <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{label}</span>
         <span className="text-red-300">{icon}</span>
       </div>
-      <p className="paddock-stat-number mt-3 tabular-nums text-[#e7c18a]">{new Intl.NumberFormat(language).format(value)}</p>
+      <p className="paddock-stat-number mt-3 tabular-nums text-[#F0EFEB]">{new Intl.NumberFormat(language).format(value)}</p>
     </article>
   );
 }

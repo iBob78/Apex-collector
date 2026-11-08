@@ -403,7 +403,7 @@ function OpenContent() {
                   {tearProgress > 0 && (
                     <div
                       aria-hidden="true"
-                      className="pointer-events-none absolute bottom-0 left-0 h-2 translate-y-1/2 bg-gradient-to-r from-cyan-200 via-white to-cyan-200 shadow-[0_2px_10px_rgba(103,232,249,0.9)]"
+                      className="pointer-events-none absolute bottom-0 left-0 h-2 translate-y-1/2 bg-gradient-to-r from-cyan-200 via-white to-[#F0EFEB] shadow-[0_2px_10px_rgba(240,239,235,0.9)]"
                       style={{
                         width: `${tearProgress * 100}%`,
                         clipPath: 'polygon(0 45%, 8% 0, 16% 65%, 24% 20%, 33% 100%, 42% 30%, 51% 75%, 61% 10%, 70% 85%, 80% 25%, 90% 70%, 100% 35%, 100% 100%, 0 100%)',
@@ -419,7 +419,7 @@ function OpenContent() {
                       onPointerUp={endTear}
                       onPointerCancel={endTear}
                       onKeyDown={handleTearKeyDown}
-                      className="absolute bottom-0 left-0 z-30 flex h-11 w-12 touch-none cursor-ew-resize items-center justify-center rounded-r-lg border border-cyan-200/70 bg-cyan-300/25 text-xl font-black text-white shadow-[0_0_18px_rgba(103,232,249,0.5)] active:bg-cyan-200/50"
+                      className="absolute bottom-0 left-0 z-30 flex h-11 w-12 touch-none cursor-ew-resize items-center justify-center rounded-r-lg border border-[#555D65]/70 bg-[#D32F35]/25 text-xl font-black text-white shadow-[0_0_18px_rgba(240,239,235,0.5)] active:bg-[#D32F35]/50"
                       style={{
                         transform: `translate(${tearProgress * Math.max(0, (packRef.current?.clientWidth ?? 256) - 48) - tearProgress * 72}px, -50%)`,
                       }}
@@ -439,7 +439,7 @@ function OpenContent() {
             {!isPrepared && !isOpening && (
               <>
                 {dailyBoosterId && (
-                  <p className="mt-6 max-w-sm text-center text-sm text-cyan-200">
+                  <p className="mt-6 max-w-sm text-center text-sm text-[#F0EFEB]">
                     {t('Booster offert : aucune dépense d’AP ne sera effectuée.')}
                   </p>
                 )}
@@ -461,14 +461,14 @@ function OpenContent() {
             )}
 
             {isOpening && (
-              <p className="mt-8 text-blue-400 font-mono animate-pulse tracking-widest uppercase text-sm">
+              <p className="mt-8 text-[#F0EFEB] font-mono animate-pulse tracking-widest uppercase text-sm">
                 {t('Ouverture en cours...')}
               </p>
             )}
 
             {isPrepared && !isTorn && (
               <div className="mt-8 text-center">
-                <p className="font-mono text-sm uppercase tracking-widest text-blue-300">
+                <p className="font-mono text-sm uppercase tracking-widest text-[#F0EFEB]">
                   {t('Attrape la languette et fais-la glisser jusqu’au bord droit.')}
                 </p>
               </div>
@@ -481,7 +481,7 @@ function OpenContent() {
             animate={{ opacity: 1 }}
             className="relative z-10 flex w-full max-w-[1400px] flex-col items-center"
           >
-            <header className="race-hero mb-6 w-full bg-[#171e17] px-4 py-6 text-center sm:px-8">
+            <header className="race-hero mb-6 w-full bg-[#171A1E] px-4 py-6 text-center sm:px-8">
               <p className="race-eyebrow mb-3 justify-center">APEX / CARD REVEAL</p>
               <motion.h2
                 initial={{ y: -20 }}
@@ -542,13 +542,13 @@ function OpenContent() {
                         tabIndex={flippedCards.has(idx) ? -1 : 0}
                         onClick={() => flipCard(idx)}
                         aria-label={t('Retourner la carte {number}', { number: idx + 1 })}
-                        className="absolute inset-0 overflow-hidden border-2 border-[#dbff35]/50 bg-[repeating-linear-gradient(125deg,#161c17_0px,#161c17_18px,#202821_18px,#202821_36px)] shadow-[0_12px_30px_rgba(0,0,0,0.5)]"
+                        className="absolute inset-0 overflow-hidden border-2 border-[#D32F35]/50 bg-[repeating-linear-gradient(125deg,#161c17_0px,#161c17_18px,#202821_18px,#202821_36px)] shadow-[0_12px_30px_rgba(0,0,0,0.5)]"
                         style={{ backfaceVisibility: 'hidden' }}
                       >
-                        <div className="absolute inset-2 border border-[#dbff35]/55" />
+                        <div className="absolute inset-2 border border-[#D32F35]/55" />
                         <div className="absolute inset-4 border border-white/15" />
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_center,rgba(219,255,53,0.14),transparent_65%)]">
-                          <span className="text-[65px] font-black uppercase tracking-tighter text-[#dbff35] drop-shadow-[0_0_20px_rgba(219,255,53,0.4)]">A</span>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_center,rgba(211,47,53,0.14),transparent_65%)]">
+                          <span className="text-[65px] font-black uppercase tracking-tighter text-[#F0EFEB] drop-shadow-[0_0_20px_rgba(211,47,53,0.4)]">A</span>
                           <span className="mt-1 text-[12px] font-black uppercase tracking-[.2em] text-white/70">Apex Collector</span>
                         </div>
                         <span className="absolute bottom-3 left-0 right-0 text-center text-[8px] font-bold uppercase tracking-[0.3em] text-white/40">

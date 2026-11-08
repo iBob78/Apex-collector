@@ -35,7 +35,7 @@ export default function HowToPlayPage() {
               key={step.number}
               className="paddock-data-card grid gap-4 p-5 sm:grid-cols-[3.5rem_1fr] sm:gap-6 sm:p-7"
             >
-              <span className="paddock-stat-number text-[#e7c18a]">
+              <span className="paddock-stat-number text-[#F0EFEB]">
                 {step.number}
               </span>
               <div>
@@ -45,7 +45,7 @@ export default function HowToPlayPage() {
                 </p>
                 <Link
                   href={step.href}
-                  className="mt-4 inline-flex text-xs font-bold uppercase tracking-wider text-cyan-200 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                  className="mt-4 inline-flex text-xs font-bold uppercase tracking-wider text-[#F0EFEB] transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                 >
                   {t(step.linkLabel)}
                   <span aria-hidden="true" className="ml-2">→</span>

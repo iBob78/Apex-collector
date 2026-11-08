@@ -66,7 +66,7 @@ export default function CardShowcasePage() {
 
     if (loading) return (
         <div className="min-h-screen bg-black flex items-center justify-center">
-            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-12 h-12 border-4 border-[#555D65] border-t-transparent rounded-full animate-spin"></div>
         </div>
     );
 
@@ -111,7 +111,7 @@ export default function CardShowcasePage() {
                                 style={{ backgroundColor: getRarityColor(card.rarity) }}
                             />
 
-                            <div className="relative h-full w-full overflow-hidden rounded-[24px] border border-cyan-100/20 shadow-[0_30px_90px_rgba(0,0,0,.5)]">
+                            <div className="relative h-full w-full overflow-hidden rounded-[24px] border border-[#555D65]/20 shadow-[0_30px_90px_rgba(0,0,0,.5)]">
                                 <SafeImage
                                     src={card.image_url}
                                     fallback={IMAGE_PATHS.PLACEHOLDERS.VEHICLE_CARD}
@@ -122,8 +122,8 @@ export default function CardShowcasePage() {
                             </div>
 
                             {/* Owned Badge */}
-                            <div className="absolute -bottom-5 -right-2 rounded-xl border-2 border-[#101a27] bg-gradient-to-br from-[#185c76] to-[#102638] px-4 py-3 shadow-2xl sm:-right-6 sm:px-6 sm:py-4">
-                                <div className="text-[10px] font-black uppercase tracking-widest text-blue-100">{t('Exemplaires')}</div>
+                            <div className="absolute -bottom-5 -right-2 rounded-xl border-2 border-[#101215] bg-gradient-to-br from-[#555D65] to-[#232930] px-4 py-3 shadow-2xl sm:-right-6 sm:px-6 sm:py-4">
+                                <div className="text-[10px] font-black uppercase tracking-widest text-[#F0EFEB]">{t('Exemplaires')}</div>
                                 <div className="text-3xl font-black italic tracking-tighter">x{ownedCount}</div>
                             </div>
                         </motion.div>
@@ -193,7 +193,7 @@ export default function CardShowcasePage() {
 function SpecItem({ icon, label, value, sub }: { icon: any, label: string, value: string | number, sub?: string }) {
     return (
         <div className="paddock-tile group p-3 transition-all sm:p-4">
-            <div className="text-blue-500 mb-3 group-hover:scale-110 transition-transform origin-left">{icon}</div>
+            <div className="text-[#F0EFEB] mb-3 group-hover:scale-110 transition-transform origin-left">{icon}</div>
             <div className="text-[9px] uppercase font-black tracking-widest text-gray-600 mb-1">{label}</div>
             <div className="text-sm font-black italic tracking-tighter">{value}</div>
             {sub && <div className="text-[9px] font-mono text-gray-500 mt-1 uppercase">{sub}</div>}
