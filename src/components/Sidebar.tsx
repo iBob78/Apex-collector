@@ -143,20 +143,22 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="hidden w-[280px] shrink-0 h-screen bg-[#080808] border-r border-white/5 p-8 flex-col gap-10 sticky top-0 z-50 md:flex">
+      <aside className="paddock-sidebar hidden w-[280px] shrink-0 h-screen p-6 flex-col gap-7 sticky top-0 z-50 md:flex lg:w-[294px]">
       {/* Brand Logo */}
-      <div className="flex flex-col">
-        <h1 className="text-2xl font-black uppercase italic tracking-tighter leading-none">
-          Apex <span className="text-blue-500">Collector</span>
+      <div className="border-b border-cyan-100/15 pb-6">
+        <div className="mb-4 inline-flex items-center gap-2 rounded-md border border-cyan-300/20 bg-cyan-300/[0.06] px-2 py-1 text-[9px] font-black tracking-[0.18em] text-cyan-200">
+          <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_#85eaff]" /> APEX / PADDOCK
+        </div>
+        <h1 className="text-[35px] font-normal uppercase leading-[.83] tracking-wide" style={{ fontFamily: '"Bebas Neue", Impact, sans-serif' }}>
+          APEX <span className="text-[#e7c18a]">COLLECTOR</span>
         </h1>
-        <div className="flex items-center gap-2 mt-2">
-          <div className="h-1 w-8 bg-blue-500 rounded-full"></div>
-          <span className="text-[10px] font-mono tracking-[0.3em] text-gray-500 uppercase">{t('Season One')}</span>
+        <div className="mt-4 flex items-center gap-2"><span className="h-px w-7 bg-[#e7c18a]" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.23em] text-slate-400">{t('Season One')}</span>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+      <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto pr-1" aria-label={t("Navigation principale")}>
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = isActivePath(href);
           const isLocked = authLoaded && !user && href !== '/login';
@@ -166,16 +168,16 @@ export default function Sidebar() {
               key={href}
               href={isLocked ? '/login' : href}
               className={`group relative flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 ${isActive
-                ? 'bg-blue-500/10 text-white'
+                ? 'border border-cyan-300/25 bg-cyan-200/[0.09] text-white'
                 : isLocked
                   ? 'text-gray-700 cursor-not-allowed opacity-50'
-                  : 'text-gray-500 hover:text-white hover:bg-white/5'
+                  : 'border border-transparent text-slate-400 hover:border-white/10 hover:text-white hover:bg-white/[0.05]'
                 }`}
             >
               {isActive && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute left-0 w-1 h-6 bg-blue-500 rounded-full"
+                  className="absolute left-0 w-[3px] h-6 bg-[#e7c18a] rounded-full shadow-[0_0_15px_rgba(231,193,138,.55)]"
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}
@@ -199,7 +201,7 @@ export default function Sidebar() {
               type="button"
               aria-expanded={adminMenuOpen}
               onClick={() => setAdminMenuOpen((open) => !open)}
-              className={`group flex w-full items-center gap-4 rounded-xl px-4 py-3 text-left transition-all ${pathname.startsWith('/admin/') ? 'bg-blue-500/10 text-white' : 'text-gray-500 hover:bg-white/5 hover:text-white'}`}
+              className={`group flex w-full items-center gap-4 rounded-xl px-4 py-3 text-left transition-all ${pathname.startsWith('/admin/') ? 'border border-cyan-300/25 bg-cyan-200/[0.09] text-white' : 'text-gray-500 hover:bg-white/5 hover:text-white'}`}
             >
               <ShieldCheckIcon size={20} className={pathname.startsWith('/admin/') ? 'text-blue-500' : 'group-hover:text-blue-400'} />
               <span className="flex-1 text-xs font-black tracking-widest">{t('ADMIN')}</span>
@@ -229,7 +231,7 @@ export default function Sidebar() {
 
       {/* Pilot Stats Mini Card */}
       {!authLoaded ? null : user ? (
-        <div className="mt-auto p-4 bg-gradient-to-br from-[#111] to-black rounded-2xl border border-white/5 relative overflow-hidden group">
+        <div className="paddock-panel mt-auto p-4 relative overflow-hidden group">
           <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="flex items-center gap-3 relative z-10">
             <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
@@ -237,17 +239,13 @@ export default function Sidebar() {
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-tighter text-gray-500 font-bold">{t('Rang Actuel')}</div>
-              <div className="text-sm font-black uppercase italic tracking-tighter">{t('Écurie Platine')}</div>
+              <div className="max-w-[155px] truncate text-xs font-bold text-white" title={user.email || undefined}>{user.email || t('PROFIL PILOTE')}</div>
             </div>
           </div>
 
-          <div className="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-            <div className="h-full w-[65%] bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
-          </div>
-          <div className="flex justify-between mt-2 text-[9px] font-mono text-gray-500 uppercase tracking-widest">
-            <span>{t('XP PILOTE')}</span>
-            <span>65%</span>
-          </div>
+          <Link href="/profile" className="mt-4 flex items-center justify-between border-t border-white/10 pt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-cyan-200 transition hover:text-white">
+            <span>{t('PROFIL PILOTE')}</span><span aria-hidden="true">↗</span>
+          </Link>
         </div>
       ) : (
         <Link
@@ -263,7 +261,7 @@ export default function Sidebar() {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[55] md:hidden">
           <button type="button" aria-label={t('Fermer le menu')} onClick={() => setMobileMenuOpen(false)} className="absolute inset-0 bg-black/75" />
-          <nav id="apex-mobile-more-menu" aria-label={t('Navigation secondaire')} className="absolute inset-x-3 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-h-[75dvh] overflow-y-auto rounded-2xl border border-white/15 bg-[#0e111a] p-3 shadow-2xl">
+          <nav id="apex-mobile-more-menu" aria-label={t('Navigation secondaire')} className="paddock-mobile-sheet absolute inset-x-3 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-h-[75dvh] overflow-y-auto rounded-2xl p-3">
             <div className="flex items-center justify-between px-3 pb-3 pt-1">
               <span className="text-sm font-black uppercase tracking-widest">{t('Plus')}</span>
               <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label={t('Fermer le menu')} className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
@@ -319,7 +317,7 @@ export default function Sidebar() {
         </div>
       )}
 
-      <nav aria-label={t('Navigation principale')} className="fixed inset-x-0 bottom-0 z-[60] border-t border-white/10 bg-[#080b11]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_25px_rgba(0,0,0,0.35)] backdrop-blur-lg md:hidden">
+      <nav aria-label={t('Navigation principale')} className="paddock-mobile-nav fixed inset-x-0 bottom-0 z-[60] pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden">
         <div className="mx-auto flex h-16 max-w-md items-stretch px-1">
           {navItems.slice(0, 4).map(({ href, label, icon: Icon }) => {
             const active = isActivePath(href);
