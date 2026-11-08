@@ -841,3 +841,192 @@ html, body {
   .paddock-action,.paddock-data-card,.paddock-pack-card,.paddock-landing-image,.collector-card-wrap,.apx-shortcut{transition:none}
   .paddock-action:hover,.paddock-data-card:hover,.paddock-pack-card:hover,.paddock-landing-image:hover,.collector-card-wrap:hover,.apx-shortcut:hover{transform:none}
 }
+
+
+/* ============================================================
+   Night Drive V5 / collector vault and premium interaction layer
+   Decorates only the sandbox components, never card rarity rules.
+   ============================================================ */
+.apex-paddock .collector-hero{
+  background-position:center 53%;
+  box-shadow:0 28px 66px rgba(0,0,0,.27),inset 0 1px rgba(236,244,255,.07);
+}
+.apex-paddock .collector-hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 10%,rgba(169,176,245,.035) 45%,transparent 62%),
+             radial-gradient(ellipse 55% 80% at 90% 18%,rgba(111,88,240,.13),transparent 75%);
+  z-index:0;
+}
+.apex-paddock .collector-rail,.apex-paddock .collector-gallery,.apex-paddock .collector-inspector{
+  border-color:rgba(163,190,255,.24);
+  background:linear-gradient(147deg,rgba(19,31,54,.97),rgba(8,14,29,.98) 77%);
+  box-shadow:0 18px 44px rgba(0,0,0,.19),inset 0 1px rgba(242,248,255,.055);
+}
+.apex-paddock .collector-gallery{
+  background-image:radial-gradient(ellipse 55% 20% at 50% 0%,rgba(64,103,190,.085),transparent 100%),
+    linear-gradient(147deg,rgba(19,31,54,.97),rgba(8,14,29,.98) 77%);
+}
+.collector-completion-wheel{
+  --collector-progress:0%;display:grid;flex:0 0 78px;place-items:center;width:78px;height:78px;
+  border-radius:50%;padding:7px;
+  background:conic-gradient(from -90deg,#59c6ee 0%,#7765ff var(--collector-progress),rgba(118,137,188,.24) var(--collector-progress),rgba(118,137,188,.24) 100%);
+  box-shadow:0 0 20px rgba(97,109,241,.25),inset 0 0 0 1px rgba(230,238,255,.12);
+}
+.collector-completion-wheel>div{
+  display:grid;place-items:center;width:100%;height:100%;border-radius:50%;
+  background:radial-gradient(circle at 40% 30%,#243759,#0b1427 73%);
+}
+.collector-completion-wheel strong{
+  font:900 23px/1 "Barlow Condensed",Impact,sans-serif;
+  font-style:italic;color:#f8faff;font-variant-numeric:tabular-nums;
+}
+.collector-rarity-shelf{
+  display:flex;gap:8px;max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;
+  padding:2px 1px 9px;scrollbar-width:thin;scrollbar-color:rgba(132,155,219,.3) transparent;
+}
+.collector-rarity-chip{
+  --chip-rarity-color:#89a9ff;display:inline-flex;align-items:center;justify-content:center;
+  flex:0 0 auto;gap:7px;min-height:38px;padding:7px 11px;
+  border:1px solid rgba(155,182,243,.22);border-radius:10px;
+  background:linear-gradient(145deg,rgba(30,40,68,.84),rgba(16,26,48,.9));
+  color:#bfcbe7;font:700 11px/1.15 "Barlow",Arial,sans-serif;white-space:nowrap;
+  transition:border-color .2s,background .2s,box-shadow .2s,color .2s;
+}
+.collector-rarity-chip:hover{border-color:rgba(185,203,255,.6);color:#fff}
+.collector-rarity-chip[aria-pressed="true"]{
+  border-color:var(--chip-rarity-color);color:#fff;
+  background:linear-gradient(145deg,rgba(57,66,105,.85),rgba(24,34,62,.95));
+  box-shadow:inset 0 1px rgba(255,255,255,.08),0 0 14px rgba(106,116,245,.19);
+}
+.collector-rarity-dot{
+  display:block;width:9px;height:9px;flex:0 0 9px;border-radius:3px;
+  background:var(--chip-rarity-color);box-shadow:0 0 9px var(--chip-rarity-color);
+  transform:rotate(45deg);
+}
+.collector-rarity-count{
+  display:inline-grid;min-width:24px;min-height:21px;place-items:center;padding:1px 5px;
+  border:1px solid rgba(168,191,234,.16);border-radius:5px;background:rgba(0,0,0,.2);
+  color:#e4eaff;font:700 10px/1 "Barlow",Arial,sans-serif;font-variant-numeric:tabular-nums;
+}
+.apex-paddock .collector-card-wrap{
+  position:relative;border-radius:13px;isolation:isolate;
+}
+.apex-paddock .collector-card-wrap:focus-within{
+  outline:2px solid #91b9ff;outline-offset:4px;
+}
+.apex-paddock .collector-card-selected{box-shadow:none}
+@media(min-width:1536px){
+  .apex-paddock .collector-card-selected{
+    box-shadow:0 0 0 2px var(--collector-selected-glow,#83aaff),
+      0 0 21px rgba(92,120,232,.3),inset 0 0 14px rgba(90,114,213,.08);
+  }
+}
+.collector-inspector-stage{
+  --inspector-rarity:#8baeff;position:relative;isolation:isolate;
+  overflow:hidden;display:flex;flex-direction:column;align-items:center;
+  padding:20px 12px 14px;border-radius:15px;
+  border:1px solid rgba(170,187,237,.21);
+  background:radial-gradient(ellipse at 50% 40%,rgba(52,70,118,.58),transparent 74%),
+             linear-gradient(155deg,rgba(21,34,64,.95),rgba(7,14,29,.98));
+}
+.collector-inspector-stage::before{
+  content:"";position:absolute;z-index:0;left:50%;top:15%;width:190px;height:220px;
+  transform:translateX(-50%);background:var(--inspector-rarity);filter:blur(50px);
+  opacity:.23;pointer-events:none;animation:apx-vault-ambience 5s ease-in-out infinite alternate;
+}
+.collector-inspector-stage::after{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,transparent 0 42px,rgba(180,201,255,.025) 43px 44px),
+             linear-gradient(180deg,transparent 80%,rgba(137,168,255,.07));
+}
+.collector-inspector-horizon{
+  position:absolute;z-index:0;top:42%;left:-10%;width:120%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--inspector-rarity),transparent);
+  opacity:.45;box-shadow:0 0 16px var(--inspector-rarity);
+  transform:rotate(-9deg);
+}
+.collector-inspector-card{
+  width:100%;max-width:216px;filter:drop-shadow(0 12px 24px rgba(0,0,0,.48));
+}
+.apex-paddock .collector-inspector{
+  background-image:radial-gradient(ellipse 70% 24% at 50% 0%,rgba(73,104,220,.14),transparent),
+    linear-gradient(147deg,rgba(19,31,54,.97),rgba(8,14,29,.98) 77%);
+}
+.apex-paddock .collector-inspector .paddock-action{box-shadow:0 5px 18px rgba(218,43,86,.2)}
+.apex-paddock .paddock-field:hover{border-color:rgba(153,186,255,.47)!important}
+.apex-paddock .paddock-field:focus-visible{outline:2px solid rgba(144,193,255,.75)!important}
+.apex-paddock .paddock-sidebar nav a[aria-current="page"]{
+  box-shadow:0 0 20px rgba(99,111,255,.22),inset 0 1px rgba(255,255,255,.18);
+}
+.apex-paddock .apx-dashboard-hero::before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 38% 58% at 77% 55%,rgba(111,101,224,.095),transparent 100%),
+             linear-gradient(0deg,rgba(6,9,20,.23),transparent 43%);
+}
+.apx-hero-garage-pass{
+  border:1px solid rgba(163,190,249,.28);border-radius:15px;
+  background:linear-gradient(150deg,rgba(27,38,68,.73),rgba(10,16,32,.78));
+  box-shadow:0 15px 45px rgba(0,0,0,.35),inset 0 1px rgba(255,255,255,.095);
+  backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);
+}
+.apx-status-light{
+  width:7px;height:7px;border-radius:50%;background:#61dcbd;
+  box-shadow:0 0 0 4px rgba(74,234,197,.12),0 0 12px rgba(92,238,199,.55);
+  animation:apx-status-pulse 3.3s ease-in-out infinite;
+}
+@keyframes apx-status-pulse{50%{box-shadow:0 0 0 6px rgba(74,234,197,.05),0 0 15px rgba(92,238,199,.55)}}
+.apex-paddock .apx-shortcut{isolation:isolate}
+.apex-paddock .apx-shortcut::after{
+  content:"";position:absolute;inset:-50% auto -50% -65%;width:38%;
+  background:linear-gradient(90deg,transparent,rgba(193,215,255,.085),transparent);
+  transform:skewX(-18deg) translateX(0);transition:transform .65s ease;pointer-events:none;
+}
+.apex-paddock .apx-shortcut:hover::after{transform:skewX(-18deg) translateX(620%)}
+.apex-paddock .apx-shortcut-image{transition:transform .4s ease,filter .4s ease}
+.apex-paddock .apx-shortcut:hover .apx-shortcut-image{
+  transform:rotate(-4deg) scale(1.07);filter:drop-shadow(0 17px 24px rgba(50,71,168,.42));
+}
+.apex-paddock .paddock-pack-card{isolation:isolate}
+.apex-paddock .paddock-pack-card::before{
+  content:"";position:absolute;inset:0 0 auto;height:55%;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(110,134,255,.19),transparent 70%);
+}
+.apex-paddock .paddock-pack-card:hover{
+  box-shadow:0 20px 55px rgba(0,0,0,.36),0 0 24px rgba(94,111,242,.16);
+}
+.apx-reveal-track{
+  border:1px solid rgba(141,171,234,.25);border-radius:12px;
+  background:rgba(13,21,43,.72);box-shadow:inset 0 1px rgba(255,255,255,.04);
+  backdrop-filter:blur(8px);
+}
+.apx-reveal-track-bar{height:6px;overflow:hidden;border-radius:99px;background:rgba(132,148,194,.21)}
+.apx-reveal-track-bar>div{
+  height:100%;border-radius:inherit;background:linear-gradient(90deg,#4eafff,#8b61fb,#db4cb5);
+  box-shadow:0 0 12px rgba(110,112,245,.5);transition:width .5s cubic-bezier(.2,.8,.2,1);
+}
+.apex-paddock.apx-reveal-stage::before{
+  content:"";position:absolute;z-index:0;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 36% 50% at 49% 18%,rgba(143,151,254,.13),transparent 80%),
+    repeating-conic-gradient(from 30deg at 50% -10%,transparent 0 13deg,rgba(126,148,255,.023) 15deg 16deg,transparent 18deg 28deg);
+  mask-image:linear-gradient(#000,transparent 90%);
+}
+@keyframes apx-vault-ambience{
+  0%{opacity:.16;transform:translateX(-50%) scale(.94)}
+  100%{opacity:.27;transform:translateX(-50%) scale(1.08)}
+}
+@media(max-width:1279px){
+  .apex-paddock .collector-rail{padding:13px 14px}
+}
+@media(max-width:639px){
+  .collector-rarity-shelf{margin-inline:-2px;padding-inline:2px}
+  .collector-rarity-chip{min-height:35px;padding:6px 9px;gap:5px;font-size:10px}
+  .collector-completion-wheel{width:64px;height:64px;flex-basis:64px}
+  .apex-paddock .collector-gallery{background-image:linear-gradient(155deg,rgba(19,31,54,.97),rgba(8,14,29,.98))}
+}
+@media(prefers-reduced-motion:reduce){
+  .collector-inspector-stage::before,.apx-status-light{animation:none!important}
+  .apex-paddock .apx-shortcut::after,.apex-paddock .apx-shortcut-image,.apx-reveal-track-bar>div,
+  .collector-rarity-chip{transition:none!important}
+  .apex-paddock .apx-shortcut:hover::after{transform:none}
+  .apex-paddock .apx-shortcut:hover .apx-shortcut-image{transform:none;filter:none}
+}
