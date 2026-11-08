@@ -491,6 +491,20 @@ function OpenContent() {
                 {t('Tes cartes sont là !')}
               </motion.h2>
               <p className="mx-auto mt-3 max-w-xl text-sm text-slate-400">{t('Clique sur une carte pour la retourner, ou révèle-les toutes.')}</p>
+              <div className="apx-reveal-track mx-auto mt-5 w-full max-w-[390px] px-4 py-3" aria-live="polite">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold text-[#bccbfa]">
+                  <span>{t('Cartes révélées')} <strong className="ml-1 font-mono text-white">{flippedCards.size} / {drawnCards.length}</strong></span>
+                  {[...firstTimeCardIndices].some((index) => flippedCards.has(index)) && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[#7bf5af]/10 px-2 py-1 font-bold text-[#9df7c2]">
+                      {[...firstTimeCardIndices].filter((index) => flippedCards.has(index)).length} NEW!
+                    </span>
+                  )}
+                </div>
+                <div className="apx-reveal-track-bar mt-2.5" role="progressbar" aria-label={t('Cartes révélées')}
+                  aria-valuemin={0} aria-valuemax={drawnCards.length} aria-valuenow={flippedCards.size}>
+                  <div style={{width: `${drawnCards.length ? Math.min(100, (flippedCards.size / drawnCards.length) * 100) : 0}%`}} />
+                </div>
+              </div>
               {discoverySaveError && (
                 <p role="alert" className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
                   {discoverySaveError}
