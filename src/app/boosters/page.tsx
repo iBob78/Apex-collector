@@ -69,48 +69,43 @@ export default function BoostersPage() {
   return (
     <div className="apex-paddock flex min-h-screen text-white">
       <Sidebar />
-      <main className="min-w-0 flex-1 flex flex-col">
-        <div className="paddock-shell flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-9 lg:py-10">
-          <header className="paddock-header mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-center">
-            <div className="relative z-10 min-w-0">
-              <p className="paddock-eyebrow">APEX / BOOSTER LAB</p>
-              <h1 className="paddock-title mt-3">{t('Boutique Officielle')}<span className="text-[#e7c18a]">.</span></h1>
-              <p className="paddock-subtitle">{t('Débloquez de nouvelles mécaniques et agrandissez votre garage.')}</p>
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                <span className="rounded-md border border-cyan-300/20 bg-cyan-300/[0.05] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-cyan-100">{Object.keys(PACKS).length} {t('Boosters')}</span>
-                <span className="rounded-md border border-[#e7c18a]/25 bg-[#e7c18a]/[0.06] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-[#e7c18a]">{t('Apex Points')}</span>
+      <main className="min-w-0 flex-1">
+        <div className="paddock-shell px-4 py-6 pb-28 sm:px-7 sm:py-8 lg:px-10 lg:pb-12">
+          <header className="relative mb-8 overflow-hidden border border-white/20 bg-[#101510]">
+            <div className="race-photo-soft absolute inset-0 opacity-65" aria-hidden="true" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0b0e0b] via-[#10150e]/90 to-[#10150e]/50" />
+            <div className="relative grid gap-6 px-5 py-8 sm:px-9 sm:py-10 lg:grid-cols-[minmax(0,1fr)_245px] lg:items-end">
+              <div className="min-w-0">
+                <p className="race-eyebrow">02 / THE PIT SUPPLY</p>
+                <h1 className="paddock-title mt-5 max-w-[690px]">{t('Boutique Officielle')}<span className="text-[#dbff35]">.</span></h1>
+                <p className="mt-5 max-w-lg border-l-[3px] border-[#f4523d] pl-4 text-sm leading-relaxed text-gray-300">
+                  {t('Débloquez de nouvelles mécaniques et agrandissez votre garage.')}
+                </p>
+                <div className="mt-6 flex items-center gap-3 font-['Barlow_Condensed'] text-[13px] font-black uppercase tracking-[.15em] text-[#dbff35]">
+                  <span className="h-2 w-2 bg-[#f4523d]"/>
+                  {Object.keys(PACKS).length} {t('Boosters')} <span className="text-gray-500">/ PACK CATALOGUE</span>
+                </div>
+              </div>
+              <div className="relative flex flex-col justify-between border-l-4 border-[#dbff35] bg-[#181f17] px-5 py-4 shadow-[0_15px_42px_rgba(0,0,0,.3)]">
+                <span className="font-['Barlow_Condensed'] text-[13px] font-black uppercase tracking-[.13em] text-gray-400">{t('Votre Solde')}</span>
+                <span className="mt-2 font-['Barlow_Condensed'] text-[51px] font-black leading-none tabular-nums text-[#dbff35]">
+                  {profile ? new Intl.NumberFormat('fr-FR').format(Number(profile.ap) || 0) : '—'} <span className="text-[18px]">AP</span>
+                </span>
+                <span className="mt-2 font-mono text-[10px] uppercase tracking-[.08em] text-gray-400">APEX POINTS / BALANCE</span>
               </div>
             </div>
-
-            {profile && (
-              <div className="paddock-panel relative z-10 flex items-center gap-3 px-4 py-3 shadow-2xl sm:px-6 sm:py-4">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
-                  <span className="text-blue-500 text-xl font-bold">▲</span>
-                </div>
-                <div>
-                  <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">{t('Votre Solde')}</div>
-                  <div className="text-xl font-black italic tracking-tighter">{profile.ap} <span className="text-xs not-italic text-blue-500">AP</span></div>
-                </div>
-              </div>
-            )}
+            <div className="race-stripes" aria-hidden="true" />
           </header>
 
-          {dailyBoosterError && (
-            <p role="alert" className="mb-6 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-amber-200">
-              {dailyBoosterError}
-            </p>
-          )}
+          {dailyBoosterError && <p role="alert" className="mb-6 border-l-4 border-[#f4523d] bg-red-900/20 p-4 text-sm text-red-200">{dailyBoosterError}</p>}
 
           {dailyBoosters.length > 0 && (
-            <section aria-labelledby="daily-boosters-heading" className="paddock-panel mb-8 p-4 sm:p-6">
-              <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300">{t('Récompenses de connexion')}</p>
-                  <h2 id="daily-boosters-heading" className="mt-1 text-xl font-black">{t('Boosters offerts à ouvrir')}</h2>
-                </div>
-                <span className="text-xs text-gray-400">{dailyBoosters.length} {t(dailyBoosters.length === 1 ? 'booster disponible' : 'boosters disponibles')}</span>
+            <section aria-labelledby="daily-boosters-heading" className="mb-10 border border-[#dbff35]/35 bg-[#1d2519]">
+              <div className="flex flex-wrap items-center justify-between gap-2 bg-[#dbff35] px-4 py-3 text-[#10140e] sm:px-6">
+                <h2 id="daily-boosters-heading" className="font-['Barlow_Condensed'] text-[24px] font-black uppercase leading-none">{t('Boosters offerts à ouvrir')}</h2>
+                <span className="font-mono text-[11px] font-bold uppercase">{dailyBoosters.length} {t(dailyBoosters.length === 1 ? 'booster disponible' : 'boosters disponibles')}</span>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-3 p-4 sm:grid-cols-2 sm:p-6 xl:grid-cols-3">
                 {dailyBoosters.map((dailyBooster) => {
                   const pack = PACKS[dailyBooster.pack_slug];
                   if (!pack) {
@@ -118,20 +113,15 @@ export default function BoostersPage() {
                     return null;
                   }
                   return (
-                    <article key={dailyBooster.id} className="paddock-tile flex min-w-0 items-center gap-3 p-3">
-                      <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-lg">
+                    <article key={dailyBooster.id} className="flex min-w-0 items-center gap-3 border border-white/20 bg-[#121711] p-3">
+                      <div className="relative h-[94px] w-[67px] shrink-0 overflow-hidden bg-[#090c09]">
                         <SafeImage src={pack.imageUrl} alt={pack.name} fill className="object-cover" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="truncate text-sm font-black">{t(pack.name)}</h3>
-                        <p className="mt-1 text-xs text-cyan-200/70">{t('Jour {day}/7', { day: dailyBooster.streak_day })}</p>
-                        <button
-                          type="button"
-                          onClick={() => router.push(`/open?daily_booster=${encodeURIComponent(dailyBooster.id)}`)}
-                          className="mt-2 min-h-10 rounded-lg bg-cyan-300 px-3 py-2 text-xs font-black text-slate-950 transition hover:bg-cyan-200"
-                        >
-                          {t('Ouvrir ce booster offert')}
-                        </button>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#dbff35]">{t('Récompenses de connexion')} / {dailyBooster.streak_day} / 7</p>
+                        <h3 className="mt-1 truncate font-['Barlow_Condensed'] text-[23px] font-black uppercase leading-none">{t(pack.name)}</h3>
+                        <button type="button" onClick={() => router.push(`/open?daily_booster=${encodeURIComponent(dailyBooster.id)}`)}
+                          className="paddock-action mt-3 min-h-10 px-3 py-2">{t('Ouvrir ce booster offert')}</button>
                       </div>
                     </article>
                   );
@@ -140,75 +130,52 @@ export default function BoostersPage() {
             </section>
           )}
 
-          <div className="mb-4 flex items-end justify-between gap-3">
-            <div>
-              <p className="paddock-eyebrow">APEX / PACK CATALOGUE</p>
+          <div className="race-section-heading mb-5">
+            <div className="flex-1">
+              <p className="race-eyebrow">PIT SUPPLY / PICK YOUR PACK</p>
               <h2 className="paddock-section-title mt-2">{t('Boosters')}</h2>
             </div>
-            <span className="paddock-micro hidden sm:block">COLLECT / REVEAL / REPEAT</span>
+            <span className="hidden font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[.16em] text-[#dbff35] sm:block">COLLECT / UNSEAL / DISCOVER</span>
           </div>
-          <div className="grid grid-cols-2 gap-x-2 gap-y-3 py-3 sm:grid-cols-2 sm:gap-6 sm:py-4 xl:grid-cols-3">
+
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-3">
             {Object.values(PACKS).map((pack, i) => (
-              <motion.div
-                key={pack.slug}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="group relative"
-              >
-                {/* Glow Effect */}
-                <div className={`pointer-events-none absolute -inset-0.5 bg-gradient-to-r ${pack.color} rounded-2xl blur opacity-10 group-hover:opacity-30 transition duration-500`}></div>
-
-                <div className="paddock-pack-card relative flex h-full min-w-0 flex-col overflow-hidden p-2.5 sm:p-6">
-                  {/* Decorative Gradient Top */}
-                  <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${pack.color}`}></div>
-
-                  <div className="flex-1">
-                    <div className="mb-2 flex items-center justify-between gap-1 px-0.5 sm:mb-4">
-                      <span className="text-[9px] font-black uppercase tracking-[.16em] text-cyan-200/80 sm:text-[10px]">APX / {String(i + 1).padStart(2, '0')}</span>
-                      <span className="text-[9px] font-black uppercase tracking-wider text-[#e7c18a] sm:text-[10px]">{pack.cardCount} {t('Cartes')}</span>
-                    </div>
-                    <div className="paddock-pack-image relative mx-auto mb-2.5 aspect-[3/4] w-[62%] overflow-hidden rounded-lg transition-transform duration-500 group-hover:scale-[1.03] sm:mb-6 sm:w-[50%] sm:rounded-xl">
-                      <SafeImage
-                        src={pack.imageUrl}
-                        alt={pack.name}
-                        fill
-                        className="object-cover"
-                      />
-                      <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent`}></div>
-                    </div>
-
-                    <h2 className="mb-1 min-h-8 text-[16px] font-normal leading-4 tracking-[.04em] text-white sm:mb-2 sm:min-h-0 sm:text-[32px] sm:leading-none" style={{ fontFamily: '"Bebas Neue", Impact, "Arial Narrow", sans-serif' }}>{t(pack.name)}</h2>
-                    <p className="mb-2 text-[10px] leading-[1.35] text-[#aebecb] sm:mb-6 sm:text-sm sm:leading-relaxed">
-                      <span className="line-clamp-2 sm:line-clamp-none">{t(pack.description)}</span>
-                      <span className="mt-1 block text-[9px] italic text-white/60 sm:mt-2 sm:text-xs">
-                        {t('Contient')} {pack.cardCount} {t('cartes aléatoires')}
-                      </span>
-                    </p>
+              <motion.article key={pack.slug} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: .33, delay: i * .06 }} className="paddock-pack-card group flex min-w-0 flex-col">
+                <div className={`absolute left-0 right-0 top-0 z-10 h-[4px] bg-gradient-to-r ${pack.color}`} aria-hidden="true"/>
+                <div className="relative overflow-hidden border-b border-white/15 bg-[#090d0b] px-3 pb-3 pt-4 sm:px-6 sm:pb-5 sm:pt-6">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-[10px] text-[#dbff35]">DROP // {String(i+1).padStart(2,'0')}</span>
+                    <span className="font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.08em] text-gray-300">{pack.cardCount} {t('Cartes')}</span>
                   </div>
+                  <span className="absolute -bottom-5 right-0 select-none font-['Barlow_Condensed'] text-[130px] font-black leading-none text-white/[.035] sm:text-[200px]" aria-hidden="true">{String(i + 1).padStart(2,'0')}</span>
+                  <div className="relative mx-auto mt-3 aspect-[3/4] w-[65%] max-w-[185px] rotate-[-4deg] overflow-hidden shadow-[14px_18px_24px_rgba(0,0,0,.42)] transition-transform duration-300 group-hover:rotate-0 group-hover:scale-[1.03] sm:mt-5 sm:w-[55%]">
+                    <SafeImage src={pack.imageUrl} alt={pack.name} fill className="object-cover" />
+                  </div>
+                </div>
 
-                  <div className="mt-2 sm:mt-8">
-                    <div className="mb-2 flex min-w-0 items-center justify-between gap-1 border-t border-white/10 pt-2 sm:mb-4 sm:px-2 sm:pt-4">
-                      <span className="whitespace-nowrap font-mono text-base font-black tracking-tighter text-[#e7c18a] sm:text-2xl">
-                        <span className="mr-0.5 text-xs not-italic text-blue-500 sm:mr-1 sm:text-base">▲</span>{pack.price}<span className="ml-1 text-[9px] not-italic text-blue-400 sm:hidden">AP</span>
-                      </span>
-                      <span className="hidden text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600 sm:inline">{t('Apex Points')}</span>
+                <div className="flex flex-1 flex-col px-3 pb-3 pt-3 sm:px-6 sm:pb-6 sm:pt-5">
+                  <h3 className="min-h-[38px] font-['Barlow_Condensed'] text-[25px] font-black uppercase leading-[.85] tracking-[-.02em] text-white sm:min-h-[48px] sm:text-[39px]">{t(pack.name)}</h3>
+                  <p className="mt-2 line-clamp-2 text-[10px] leading-[1.45] text-gray-400 sm:mt-3 sm:text-sm">{t(pack.description)}</p>
+                  <p className="mt-2 text-[10px] font-bold uppercase tracking-[.07em] text-gray-500 sm:text-xs">{t('Contient')} {pack.cardCount} {t('cartes aléatoires')}</p>
+                  <div className="mt-auto pt-4">
+                    <div className="mb-3 flex items-end justify-between gap-1 border-t border-white/20 pt-3">
+                      <div className="flex items-baseline gap-1">
+                        <span className="font-['Barlow_Condensed'] text-[32px] font-black leading-none tabular-nums text-[#dbff35] sm:text-[44px]">{pack.price}</span>
+                        <span className="font-mono text-[10px] font-bold text-[#dbff35]">AP</span>
+                      </div>
+                      <span className="hidden font-['Barlow_Condensed'] text-[11px] font-bold uppercase tracking-[.14em] text-gray-500 sm:block">APEX POINTS</span>
                     </div>
-
                     <button
-                      disabled={profile && profile.ap < pack.price}
+                      type="button"
+                      disabled={Boolean(profile && profile.ap < pack.price)}
                       onClick={() => router.push(`/open?pack=${pack.slug}`)}
-                      className={`paddock-action min-h-10 w-full rounded-lg px-1 py-2 text-[9px] leading-tight tracking-normal sm:rounded-xl sm:py-4 sm:text-xs sm:tracking-[0.13em] 
-                        ${profile && profile.ap < pack.price
-                          ? 'bg-gray-800 text-gray-600 grayscale cursor-not-allowed border border-white/5'
-                          : `bg-gradient-to-r ${pack.color} text-white hover:scale-[1.02] active:scale-[0.98] hover:shadow-2xl hover:shadow-black/50`
-                        }`}
-                    >
+                      className="paddock-action min-h-[42px] w-full px-1.5 py-3 text-center text-[11px] leading-tight sm:min-h-[48px] sm:text-[14px]">
                       {profile && profile.ap < pack.price ? t('Solde Insuffisant') : t('Acheter le pack')}
                     </button>
                   </div>
                 </div>
-              </motion.div>
+              </motion.article>
             ))}
           </div>
         </div>
