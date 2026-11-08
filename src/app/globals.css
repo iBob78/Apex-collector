@@ -1030,3 +1030,32 @@ html, body {
   .apex-paddock .apx-shortcut:hover::after{transform:none}
   .apex-paddock .apx-shortcut:hover .apx-shortcut-image{transform:none;filter:none}
 }
+
+
+/* Card-details showroom (also visible on phones). */
+.apex-paddock .apx-card-details-dialog{
+  isolation:isolate;background:#0c1429;
+  box-shadow:0 32px 100px rgba(0,0,0,.65),0 0 48px rgba(91,111,223,.09),inset 0 1px rgba(255,255,255,.08);
+}
+.apex-paddock .apx-card-details-photo{
+  isolation:isolate;
+  background:radial-gradient(ellipse at 50% 32%,rgba(99,128,233,.22),transparent 75%),#060b19;
+}
+.apex-paddock .apx-card-details-content{
+  background-image:radial-gradient(ellipse 90% 24% at 50% 0%,rgba(92,116,217,.15),transparent 100%),
+    linear-gradient(152deg,rgba(17,27,51,.96),rgba(7,13,29,.98));
+}
+.apex-paddock .apx-card-details-content:before{
+  content:"";position:absolute;inset:0 0 auto;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(164,197,255,.42),transparent);
+}
+.apex-paddock .apx-detail-stat{
+  border:1px solid rgba(141,170,234,.13);
+  background:linear-gradient(150deg,rgba(30,44,74,.52),rgba(16,25,47,.58));
+  box-shadow:inset 0 1px rgba(255,255,255,.035);
+}
+.apex-paddock .apx-detail-stat dt{color:#91a7cf}
+.apex-paddock .apx-detail-stat dd{color:#eef3ff}
+@media(max-width:639px){
+  .apex-paddock .apx-card-details-content{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+}
