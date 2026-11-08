@@ -534,6 +534,26 @@ export default function CollectionPage() {
                   </select>
                 </div>
               </div>
+              {/* Fast rarity shelf; counts are calculated from real owned cards. */}
+              <nav aria-label={t('Toutes les raretés')} className="collector-rarity-shelf mb-5">
+                {(['All', 'Common', 'Rare', 'Epic', 'Legend'] as const).map((value) => {
+                  const label = value === 'All' ? t('Tous')
+                    : value === 'Common' ? t('Commun')
+                      : value === 'Epic' ? t('Épique')
+                        : value === 'Legend' ? t('Légendaire')
+                          : t('Rare');
+                  const count = value === 'All' ? stats.owned : (ownedRarityCounts[value] || 0);
+                  return (
+                    <button key={value} type="button" aria-pressed={rarityFilter === value}
+                      onClick={() => setRarityFilter(value)}
+                      className="collector-rarity-chip"
+                      style={{ '--chip-rarity-color': value === 'All' ? '#81a9ff' : getRarityColor(value) } as CSSProperties}>
+                      <span className="collector-rarity-dot" aria-hidden="true" />
+                      <span>{label}</span><span className="collector-rarity-count">{count.toLocaleString()}</span>
+                    </button>
+                  );
+                })}
+              </nav>
           {/* Grid of Cards */}
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 opacity-50">
@@ -572,6 +592,9 @@ export default function CollectionPage() {
                         exit={{ opacity: 0, scale: 0.9 }}
                         transition={{ duration: 0.2 }}
                         className={`collector-card-wrap ${inspectorCard && getCardId(inspectorCard) === cid ? 'collector-card-selected' : ''}`}
+                        style={inspectorCard && getCardId(inspectorCard) === cid
+                          ? { '--collector-selected-glow': getRarityColor(String(card.rarity || 'Common')) } as CSSProperties
+                          : undefined}
                       >
                         <Card
                           {...card}
@@ -658,9 +681,16 @@ export default function CollectionPage() {
                       {inspectorCard.collection_number ? `#${inspectorCard.collection_number}` : ''}
                     </span>
                   </div>
-                  <div className="collector-inspector-card">
-                    <Card {...inspectorCard} owned={true} compact showLevel={false}
-                      onCardClick={() => {setSelectedCard(inspectorCard);setDetailModalOpen(true);}}/>
+                  <div className="collector-inspector-stage"
+                    style={{ '--inspector-rarity': getRarityColor(String(inspectorCard.rarity || 'Common')) } as CSSProperties}>
+                    <div className="collector-inspector-horizon" aria-hidden="true" />
+                    <div className="collector-inspector-card relative z-10">
+                      <Card {...inspectorCard} owned={true} compact showLevel={false}
+                        onCardClick={() => {setSelectedCard(inspectorCard);setDetailModalOpen(true);}}/>
+                    </div>
+                    <span className="relative z-10 mt-4 block text-center font-mono text-[9px] font-bold uppercase tracking-[.2em] text-[#9caed2]">
+                      APEX / THE CARD VAULT
+                    </span>
                   </div>
                   <div className="mt-4 flex items-start justify-between gap-2">
                     <h3 className="min-w-0 text-lg font-black leading-tight text-white">{getCardCategory(inspectorCard) === 'vehicle' ? `${inspectorCard.make || ''} ${inspectorCard.model || ''}`.trim() : inspectorCard.name || ''}</h3>
