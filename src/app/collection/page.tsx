@@ -12,7 +12,8 @@ import { Rarity } from '@/types/game';
 import { getNextLevelUnlock } from '@/lib/level';
 import { purchaseCardUpgrade } from '@/lib/actions/card-upgrades';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
-import { Star } from 'lucide-react';
+import { Star, Search, Layers3, LayoutGrid, SlidersHorizontal, ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { getRarityColor } from '@/lib/rarity';
 import { resolveBrandLogo } from '@/lib/images';
 
 type FavoriteCategory = 'vehicle' | 'circuit' | 'driver';
@@ -44,6 +45,15 @@ export default function CollectionPage() {
   const [user, setUser] = useState<any>(null);
   const [cards, setCards] = useState<any[]>([]);
   const [selectedCard, setSelectedCard] = useState<any | null>(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [wideInspector, setWideInspector] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 1536px)');
+    const sync = () => setWideInspector(media.matches);
+    sync();
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
+  }, []);
   const [userCards, setUserCards] = useState<Record<string, number>>({});
   const [userCardLevels, setUserCardLevels] = useState<Record<string, number>>({});
   const [upgradingCardId, setUpgradingCardId] = useState<string | null>(null);
@@ -279,12 +289,13 @@ export default function CollectionPage() {
     return { total, owned, percentage, totalCopies };
   }, [cards, userCards]);
 
-  const handleToggleFavorite = async () => {
-    if (!user || !selectedCard || favoritePendingKey) return;
-    const category = getCardCategory(selectedCard);
-    const cardId = getCardEntityId(selectedCard);
-    const key = getFavoriteKey(selectedCard);
-    if ((userCards[getCardId(selectedCard)] || 0) <= 0) return;
+  const handleToggleFavorite = async (cardOverride?: any) => {
+    const target = cardOverride || selectedCard;
+    if (!user || !target || favoritePendingKey) return;
+    const category = getCardCategory(target);
+    const cardId = getCardEntityId(target);
+    const key = getFavoriteKey(target);
+    if ((userCards[getCardId(target)] || 0) <= 0) return;
 
     setFavoritePendingKey(key);
     setFavoritesError(null);
@@ -313,6 +324,7 @@ export default function CollectionPage() {
 
   const handleOpenCardDetails = async (card: any) => {
     setSelectedCard(card);
+    if (!wideInspector) setDetailModalOpen(true);
     const key = getFavoriteKey(card);
     if (!user || !newCardKeys.has(key)) return;
 
@@ -376,104 +388,66 @@ export default function CollectionPage() {
     }
   };
 
+
+  const inspectorCard = (selectedCard && filteredCards.some((item) => getCardId(item) === getCardId(selectedCard))
+    ? selectedCard
+    : null) || filteredCards.find((item) => (userCards[getCardId(item)] || 0) > 0) || null;
+  const inspectorIndex = inspectorCard ? filteredCards.findIndex((item) => getCardId(item) === getCardId(inspectorCard)) : -1;
+
   return (
     <div className="apex-paddock flex min-h-screen text-white">
       <Sidebar />
-
-      <main className="flex-1 min-w-0 flex flex-col">
-        <div className="paddock-shell flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-9 lg:py-10">
-          {/* Header & Stats */}
-          <header className="mb-8">
-            <div className="mb-5 grid gap-2 lg:grid-cols-[minmax(0,1.5fr)_minmax(220px,.65fr)]">
-              <div className="race-hero race-photo-soft min-h-[270px] sm:min-h-[315px]">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#101215] via-[#101215]/90 to-transparent" aria-hidden="true" />
-                <span className="absolute -right-6 -top-14 select-none font-['Barlow_Condensed'] text-[230px] font-black leading-none text-white/[.05]" aria-hidden="true">03</span>
-                <div className="relative z-10 flex h-full flex-col justify-end px-5 py-8 sm:px-8 sm:py-10">
-                  <p className="race-eyebrow">03 / THE COLLECTOR GRID</p>
-                  <h1 className="paddock-title mt-5 max-w-2xl">{t('Mon Garage')}<span className="text-[#F0EFEB]">.</span></h1>
-                  <p className="mt-5 max-w-[520px] border-l-[3px] border-[#D32F35] pl-4 text-sm leading-relaxed text-gray-300">
-                    {t('Collection complète des véhicules, circuits et pilotes d’exception.')}
-                  </p>
-                  <div className="mt-6 flex items-center gap-3 font-mono text-[10px] font-bold tracking-[.13em] text-[#F0EFEB]">
-                    <span>GARAGE // INVENTORY</span><span className="h-px w-12 bg-white/30"/><span>AC-003</span>
+      <main className="min-w-0 flex-1">
+        <div className="paddock-shell space-y-4 px-3 py-4 pb-28 sm:px-5 sm:py-6 lg:px-6 2xl:px-7">
+          <header className="collector-hero flex flex-col justify-end p-5 sm:min-h-[245px] sm:p-8">
+            <div className="relative z-10 flex flex-wrap items-end justify-between gap-5">
+              <div>
+                <p className="paddock-eyebrow">{t('Collection')}</p>
+                <h1 className="mt-3 font-['Barlow_Condensed'] text-[clamp(2.6rem,5vw,4.9rem)] font-black italic leading-[.85] tracking-[-.025em] text-white drop-shadow-xl">
+                  {t('Ma Collection')}
+                </h1>
+                <p className="mt-3 text-sm text-[#dce5f6]">{t('Collection complète des véhicules, circuits et pilotes d’exception.')}</p>
+                <div className="mt-4 max-w-[360px]">
+                  <p className="mb-2 text-[12px] font-bold tabular-nums text-white">{stats.owned.toLocaleString()} / {stats.total.toLocaleString()} {t('Cartes')} ({stats.percentage} %)</p>
+                  <div className="paddock-meter" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={stats.percentage} aria-label={t('Collection')}>
+                    <div style={{width: `${stats.percentage}%`}} />
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col border border-white/20 bg-[#232930]">
-                <div className="bg-[#D32F35] px-4 py-3 font-['Barlow_Condensed'] text-[13px] font-black uppercase tracking-[.16em] text-[#F0EFEB]">GARAGE / COMPLETION</div>
-                <div className="flex flex-1 flex-col justify-between gap-5 p-4 sm:p-6">
-                  <div>
-                    <p className="font-['Barlow_Condensed'] text-[74px] font-black leading-[.8] tabular-nums text-white sm:text-[92px]">{stats.percentage}<span className="text-[28px] text-[#F0EFEB]">%</span></p>
-                    <p className="mt-4 font-['Barlow_Condensed'] text-[13px] font-bold uppercase tracking-[.12em] text-gray-400">{t('Collection')}</p>
-                    <div className="paddock-meter mt-3"><div style={{ width: `${stats.percentage}%` }} /></div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 border-t border-white/15 pt-4">
-                    <div>
-                      <p className="font-['Barlow_Condensed'] text-[33px] font-black leading-none text-[#F0EFEB]">{stats.owned}<span className="text-[17px] text-gray-500">/{stats.total}</span></p>
-                      <span className="mt-1 block text-[10px] font-bold uppercase tracking-[.1em] text-gray-400">{t('Collection')}</span>
-                    </div>
-                    <div>
-                      <p className="font-['Barlow_Condensed'] text-[33px] font-black leading-none text-white">{stats.totalCopies}</p>
-                      <span className="mt-1 block text-[10px] font-bold uppercase tracking-[.1em] text-gray-400">{t('Exemplaires')}</span>
-                    </div>
-                  </div>
+              <div className="apx-hud hidden items-center gap-4 px-4 py-3 sm:flex">
+                <Layers3 size={23} className="text-[#7abaff]" aria-hidden="true" />
+                <div>
+                  <span className="block text-[10px] uppercase tracking-widest text-[#9eafd1]">{t('Exemplaires')}</span>
+                  <span className="font-mono text-xl font-bold tabular-nums">{stats.totalCopies.toLocaleString()}</span>
                 </div>
               </div>
             </div>
+          </header>
 
-            {/* Barre de Filtres */}
-            <div className="flex flex-col gap-3 border border-white/20 bg-[#232930] p-3 shadow-2xl sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 sm:p-4">
-              {/* Tabs */}
-              <div className="grid w-full grid-cols-4 gap-[2px] bg-[#171A1E] p-1 sm:flex sm:w-auto">
+          <div className="grid min-w-0 items-start gap-3 xl:grid-cols-[190px_minmax(0,1fr)] 2xl:grid-cols-[194px_minmax(0,1fr)_252px]">
+            <aside className="collector-rail" aria-label={t('Filtres')}>
+              <h2 className="flex items-center gap-2 text-sm font-bold text-white"><SlidersHorizontal size={17} className="text-[#91b5ff]" aria-hidden="true" /> {t('Filtres')}</h2>
+              <div className="collector-divider" />
+              <label className="relative block">
+                <span className="sr-only">{t('Rechercher une carte...')}</span>
+                <Search size={17} className="pointer-events-none absolute left-3 top-3.5 text-[#8193b8]" aria-hidden="true"/>
+                <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t('Rechercher une carte...')}
+                  className="paddock-field min-h-11 w-full pl-9 pr-3 text-[12px]" />
+              </label>
+              <div className="collector-divider" />
+              <p className="collector-rail-heading mb-3">{t('Collection')}</p>
+              <div className="grid grid-cols-2 gap-2 xl:grid-cols-1">
                 {(['all', 'vehicle', 'circuit', 'driver'] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`min-h-11 rounded-lg px-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all sm:px-4 sm:text-xs sm:tracking-widest ${activeTab === tab ? 'bg-[#D32F35] text-[#F0EFEB]' : 'bg-[#101215] text-gray-400 hover:bg-white/10 hover:text-white'
-                      }`}
-                  >
+                  <button key={tab} type="button" aria-pressed={activeTab === tab} onClick={() => setActiveTab(tab)}
+                    className={`min-h-9 rounded-lg px-3 py-2 text-left text-[12px] font-semibold transition ${activeTab === tab ? 'border border-[#7085ff]/70 bg-[#31447d] text-white' : 'border border-white/10 bg-[#0c1629] text-[#b6c1d7] hover:bg-[#24345a] hover:text-white'}`}>
                     {t(tab === 'all' ? 'Tous' : tab === 'vehicle' ? 'Véhicules' : tab === 'circuit' ? 'Circuits' : 'Pilotes')}
                   </button>
                 ))}
               </div>
-
-              <button
-                type="button"
-                aria-pressed={favoritesOnly}
-                onClick={() => setFavoritesOnly((current) => !current)}
-                className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${favoritesOnly ? 'border-amber-400/70 bg-amber-400/20 text-amber-200' : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'}`}
-              >
-                <Star size={18} fill={favoritesOnly ? 'currentColor' : 'none'} aria-hidden="true" />
-                {t('Favoris')} ({favoriteKeys.size})
-              </button>
-
-              <label className="flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-300 transition hover:bg-white/10 sm:w-auto">
-                <input
-                  type="checkbox"
-                  checked={hideLockedCards}
-                  onChange={(event) => setHideLockedCards(event.target.checked)}
-                  className="size-4 accent-[#D32F35]"
-                />
-                <span>{t('Masquer les cartes non déverrouillées')}</span>
-              </label>
-
-              {/* Search */}
-              <div className="w-full min-w-0 flex-1 sm:min-w-[200px]">
-                <input
-                  type="text"
-                  placeholder={t('Rechercher une carte...')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="paddock-field min-h-11 w-full rounded-xl px-4 py-2 text-base transition-colors sm:text-sm"
-                />
-              </div>
-
-              {/* Rarity Select */}
-              <select
-                value={rarityFilter}
-                onChange={(e) => setRarityFilter(e.target.value as any)}
-                className="paddock-field min-h-11 w-full min-w-0 px-3 py-2 text-base sm:w-auto sm:text-sm [&>option]:bg-[#101215] [&>option]:text-white"
-              >
+              <div className="collector-divider" />
+              <label className="mb-2 block collector-rail-heading">{t('Toutes les raretés')}</label>
+              <select value={rarityFilter} onChange={(e) => setRarityFilter(e.target.value as Rarity | 'All')} className="paddock-field min-h-11 w-full px-3 text-[12px]">
                 <option value="All">{t('Toutes les raretés')}</option>
                 <option value="Common">{t('Commun')}</option>
                 <option value="Uncommon">{t('Inhabituel')}</option>
@@ -482,47 +456,49 @@ export default function CollectionPage() {
                 <option value="Legend">{t('Légendaire')}</option>
                 <option value="Icon">{t('Icon')}</option>
               </select>
+              <div className="collector-divider" />
+              <label className="flex min-h-10 items-center gap-2 text-[12px] text-[#c4cde3]">
+                <input type="checkbox" checked={favoritesOnly} onChange={(e) => setFavoritesOnly(e.target.checked)}
+                  className="h-4 w-4 accent-[#8274f7]" />
+                <Star size={15} className="text-[#cda2ff]" aria-hidden="true" /> {t('Favoris')} ({favoriteKeys.size})
+              </label>
+              <label className="mt-2 flex min-h-10 items-center gap-2 text-[12px] text-[#c4cde3]">
+                <input type="checkbox" checked={hideLockedCards} onChange={(e) => setHideLockedCards(e.target.checked)} className="h-4 w-4 accent-[#8274f7]" />
+                <span>{t('Masquer les cartes non déverrouillées')}</span>
+              </label>
+              <div className="collector-divider" />
+              <button type="button" onClick={() => {setActiveTab('all');setRarityFilter('All');setFavoritesOnly(false);setHideLockedCards(false);setSearchQuery('');setSortBy('name');}}
+                className="paddock-ghost min-h-10 w-full px-3 text-[11px] font-semibold">
+                {t('Réinitialiser les filtres')}
+              </button>
+              {(favoritesError || discoveryError) && (
+                <p role="alert" className="mt-4 rounded-lg border border-red-400/30 bg-red-900/20 p-3 text-xs text-red-200">{favoritesError || discoveryError}</p>
+              )}
+            </aside>
 
-              {/* Sort Select */}
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="paddock-field min-h-11 w-full min-w-0 px-3 py-2 text-base sm:w-auto sm:text-sm [&>option]:bg-[#101215] [&>option]:text-white"
-              >
-                <option value="name">{t('Trier par Nom')}</option>
-                <option value="make-asc">{t('Marques, A à Z')}</option>
-                <option value="make-desc">{t('Marques, Z à A')}</option>
-                <option value="ip-desc">{t('IP, décroissant')}</option>
-                <option value="ip-asc">{t('IP, croissant')}</option>
-                <option value="level-asc">{t('Niveau, croissant')}</option>
-                <option value="level-desc">{t('Niveau, décroissant')}</option>
-                <option value="rarity">{t('Trier par Rareté')}</option>
-                <option value="newest">{t('Plus récent')}</option>
-              </select>
-            </div>
-            {favoritesError && (
-              <p role="alert" className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-200">
-                {favoritesError}
-              </p>
-            )}
-            {discoveryError && (
-              <p role="alert" className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-200">
-                {discoveryError}
-              </p>
-            )}
-          </header>
-
-          {/* Collection readout: only real filtered catalogue data. */}
-          <div className="race-section-heading mb-5 flex-wrap justify-between gap-3">
-            <div>
-              <p className="race-eyebrow">GARAGE / GRID SCAN</p>
-              <h2 className="paddock-section-title mt-2">{t('Collection')}</h2>
-            </div>
-            <div className="inline-flex items-center gap-2 border-l-[3px] border-[#D32F35] bg-[#232930] px-4 py-2 font-mono text-[12px] font-bold uppercase text-[#F0EFEB]">
-              <span className="font-mono font-bold tabular-nums">{filteredCards.length}</span>
-              <span className="font-bold uppercase tracking-[.1em]">{t('Cartes')}</span>
-            </div>
-          </div>
+            <section className="collector-gallery" aria-label={t('Ma Collection')}>
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+                <div className="flex items-center gap-2">
+                  <LayoutGrid size={18} className="text-[#9cafff]" aria-hidden="true"/>
+                  <span className="text-lg font-bold tabular-nums">{filteredCards.length.toLocaleString()}</span>
+                  <span className="text-sm text-[#aab7d1]">{t('Cartes')}</span>
+                </div>
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="hidden text-[11px] text-[#a3aec8] sm:block">{t('Trier par')}</span>
+                  <select value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                    className="paddock-field min-h-10 min-w-0 max-w-[220px] px-2 text-[11px]">
+                    <option value="name">{t('Trier par Nom')}</option>
+                    <option value="make-asc">{t('Marques, A à Z')}</option>
+                    <option value="make-desc">{t('Marques, Z à A')}</option>
+                    <option value="ip-desc">{t('IP, décroissant')}</option>
+                    <option value="ip-asc">{t('IP, croissant')}</option>
+                    <option value="level-asc">{t('Niveau, croissant')}</option>
+                    <option value="level-desc">{t('Niveau, décroissant')}</option>
+                    <option value="rarity">{t('Trier par Rareté')}</option>
+                    <option value="newest">{t('Plus récent')}</option>
+                  </select>
+                </div>
+              </div>
           {/* Grid of Cards */}
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 opacity-50">
@@ -535,7 +511,7 @@ export default function CollectionPage() {
               {filteredCards.length > 0 ? (
                 <motion.div
                   layout
-                  className="grid grid-cols-4 gap-x-1.5 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(min(100%,14rem),1fr))] sm:gap-x-6 sm:gap-y-8"
+                  className="grid grid-cols-4 gap-x-1.5 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(min(100%,10.5rem),1fr))] sm:gap-x-3 sm:gap-y-5 2xl:grid-cols-4"
                 >
                   {filteredCards.slice(0, visibleCount).flatMap((card, index, visibleCards) => {
                     const cid = getCardId(card);
@@ -560,6 +536,7 @@ export default function CollectionPage() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                         transition={{ duration: 0.2 }}
+                        className={`collector-card-wrap ${inspectorCard && getCardId(inspectorCard) === cid ? 'collector-card-selected' : ''}`}
                       >
                         <Card
                           {...card}
@@ -635,10 +612,73 @@ export default function CollectionPage() {
             )}
             </>
           )}
+            </section>
+
+            <aside className="collector-inspector hidden 2xl:block" aria-label={t('Détails de la carte')}>
+              {inspectorCard ? (
+                <div>
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <span className="collector-rail-heading">{t('Détails de la carte')}</span>
+                    <span className="rounded-md border border-white/20 bg-[#19243d] px-2 py-1 font-mono text-xs">
+                      {inspectorCard.collection_number ? `#${inspectorCard.collection_number}` : ''}
+                    </span>
+                  </div>
+                  <div className="collector-inspector-card">
+                    <Card {...inspectorCard} owned={true} compact showLevel={false}
+                      onCardClick={() => {setSelectedCard(inspectorCard);setDetailModalOpen(true);}}/>
+                  </div>
+                  <div className="mt-4 flex items-start justify-between gap-2">
+                    <h3 className="min-w-0 text-lg font-black leading-tight text-white">{getCardCategory(inspectorCard) === 'vehicle' ? `${inspectorCard.make || ''} ${inspectorCard.model || ''}`.trim() : inspectorCard.name || ''}</h3>
+                    <span className="shrink-0 rounded-lg border px-2 py-1 text-xs font-bold" style={{color:getRarityColor(String(inspectorCard.rarity || 'Common')),borderColor:getRarityColor(String(inspectorCard.rarity || 'Common'))}}>
+                      {t(String(inspectorCard.rarity || 'Common'))}
+                    </span>
+                  </div>
+                  <div className="collector-divider" />
+                  <dl className="space-y-3 text-[12px]">
+                    <div className="flex items-start justify-between gap-3">
+                      <dt className="text-[#97a5c2]">{t('Collection')}</dt>
+                      <dd className="max-w-[130px] text-right font-semibold">{inspectorCard.collection_name || inspectorCard.collection || '—'}</dd>
+                    </div>
+                    {getCardCategory(inspectorCard) === 'vehicle' && (
+                      <>
+                        <div className="flex justify-between gap-3"><dt className="text-[#97a5c2]">{t('Marque')}</dt><dd className="font-semibold">{inspectorCard.make || '—'}</dd></div>
+                        <div className="flex justify-between gap-3"><dt className="text-[#97a5c2]">{t('Année')}</dt><dd className="font-semibold">{inspectorCard.year || '—'}</dd></div>
+                      </>
+                    )}
+                    <div className="flex justify-between gap-3"><dt className="text-[#97a5c2]">{t('Exemplaires')}</dt><dd className="font-bold text-[#99deff]">{userCards[getCardId(inspectorCard)] || 0}</dd></div>
+                    <div className="flex justify-between gap-3"><dt className="text-[#97a5c2]">{t('Niveau')}</dt><dd className="font-semibold">{userCardLevels[getCardId(inspectorCard)] || 0}</dd></div>
+                  </dl>
+                  <div className="collector-divider" />
+                  <div className="flex gap-2">
+                    <button type="button" disabled={Boolean(favoritePendingKey)}
+                      onClick={() => void handleToggleFavorite(inspectorCard)}
+                      aria-label={t('Favoris')}
+                      className="paddock-ghost inline-flex h-11 w-11 shrink-0 items-center justify-center disabled:opacity-50">
+                      <Star size={18} fill={favoriteKeys.has(getFavoriteKey(inspectorCard)) ? 'currentColor' : 'none'}
+                        className={favoriteKeys.has(getFavoriteKey(inspectorCard)) ? 'text-[#f0c66b]' : 'text-white'} aria-hidden="true"/>
+                    </button>
+                    <button type="button" onClick={() => {setSelectedCard(inspectorCard);setDetailModalOpen(true);}}
+                      className="paddock-action min-h-11 flex-1 px-2 text-[12px]">{t('Voir les détails')} <ArrowUpRight size={16} aria-hidden="true"/></button>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
+                    <button type="button" aria-label={t('Carte précédente')} disabled={inspectorIndex <= 0}
+                      onClick={() => inspectorIndex > 0 && void handleOpenCardDetails(filteredCards[inspectorIndex - 1])}
+                      className="paddock-ghost flex h-9 w-10 items-center justify-center disabled:opacity-30"><ChevronLeft size={17}/></button>
+                    <span className="font-mono text-[11px] text-[#9aa9c7]">{inspectorIndex + 1} / {filteredCards.length}</span>
+                    <button type="button" aria-label={t('Carte suivante')} disabled={inspectorIndex < 0 || inspectorIndex >= filteredCards.length - 1}
+                      onClick={() => inspectorIndex >= 0 && inspectorIndex < filteredCards.length - 1 && void handleOpenCardDetails(filteredCards[inspectorIndex + 1])}
+                      className="paddock-ghost flex h-9 w-10 items-center justify-center disabled:opacity-30"><ChevronRight size={17}/></button>
+                  </div>
+                </div>
+              ) : (
+                <div className="py-12 text-center text-sm text-[#a8b5d0]">{t('Sélectionnez une carte de votre collection.')}</div>
+              )}
+            </aside>
+          </div>
         </div>
       </main>
       <CardDetailsModal
-        card={selectedCard}
+        card={detailModalOpen ? selectedCard : null}
         ownedCount={selectedCard ? userCards[getCardId(selectedCard)] || 0 : 0}
         upgradeLevel={selectedCard ? userCardLevels[getCardId(selectedCard)] || 0 : 0}
         upgradePending={upgradingCardId === (selectedCard ? getCardId(selectedCard) : null)}
@@ -646,18 +686,8 @@ export default function CollectionPage() {
         favoritePending={selectedCard ? favoritePendingKey === getFavoriteKey(selectedCard) : false}
         onToggleFavorite={() => void handleToggleFavorite()}
         onUpgrade={() => selectedCard && handleUpgrade(selectedCard)}
-        onClose={() => setSelectedCard(null)}
+        onClose={() => setDetailModalOpen(false)}
       />
-    </div>
-  );
-}
-
-function StatCard({ label, value, sub, color }: { label: string, value: string | number, sub: string, color: string }) {
-  return (
-    <div className="paddock-tile min-w-0 px-3 py-3 sm:min-w-[124px] sm:px-6">
-      <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1">{label}</div>
-      <div className={`paddock-stat-number text-2xl sm:text-3xl ${color}`}>{value}</div>
-      <div className="text-[10px] text-gray-400 mt-1 uppercase tracking-tight">{sub}</div>
     </div>
   );
 }
