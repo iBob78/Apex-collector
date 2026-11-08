@@ -227,7 +227,7 @@ export default function CardDetailsModal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="card-details-title"
-            className="apx-card-details-dialog grid h-[100dvh] max-h-[100dvh] w-full max-w-4xl grid-cols-1 grid-rows-[32dvh_minmax(0,1fr)] overflow-hidden border border-[#a1b8f3]/25 bg-[#0c1429] text-white shadow-[0_36px_120px_rgba(0,0,0,.68)] sm:h-auto sm:max-h-[90dvh] sm:grid-rows-[minmax(0,auto)_minmax(0,1fr)] sm:rounded-[22px] md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:grid-rows-1
+            className="apx-card-details-dialog grid h-[100dvh] max-h-[100dvh] w-full max-w-4xl grid-cols-1 grid-rows-[32dvh_minmax(0,1fr)] overflow-hidden border border-[#a1b8f3]/25 bg-[#0c1429] text-white shadow-[0_36px_120px_rgba(0,0,0,.68)] sm:h-auto sm:max-h-[90dvh] sm:grid-rows-[minmax(0,auto)_minmax(0,1fr)] sm:rounded-[22px] md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:grid-rows-1"
             initial={{ opacity: 0, scale: 0.94, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 12 }}
