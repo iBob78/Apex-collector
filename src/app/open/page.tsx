@@ -494,9 +494,9 @@ function OpenContent() {
               <div className="apx-reveal-track mx-auto mt-5 w-full max-w-[390px] px-4 py-3" aria-live="polite">
                 <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold text-[#bccbfa]">
                   <span>{t('Cartes révélées')} <strong className="ml-1 font-mono text-white">{flippedCards.size} / {drawnCards.length}</strong></span>
-                  {[...firstTimeCardIndices].some((index) => flippedCards.has(index)) && (
+                  {Array.from(firstTimeCardIndices).some((index) => flippedCards.has(index)) && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-[#7bf5af]/10 px-2 py-1 font-bold text-[#9df7c2]">
-                      {[...firstTimeCardIndices].filter((index) => flippedCards.has(index)).length} NEW!
+                      {Array.from(firstTimeCardIndices).filter((index) => flippedCards.has(index)).length} NEW!
                     </span>
                   )}
                 </div>
