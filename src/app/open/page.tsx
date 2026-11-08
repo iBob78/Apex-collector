@@ -481,8 +481,8 @@ function OpenContent() {
             animate={{ opacity: 1 }}
             className="relative z-10 flex w-full max-w-[1400px] flex-col items-center"
           >
-            <header className="paddock-header mb-6 w-full text-center">
-              <p className="paddock-eyebrow mb-3">APEX / CARD REVEAL</p>
+            <header className="race-hero mb-6 w-full bg-[#171e17] px-4 py-6 text-center sm:px-8">
+              <p className="race-eyebrow mb-3 justify-center">APEX / CARD REVEAL</p>
               <motion.h2
                 initial={{ y: -20 }}
                 animate={{ y: 0 }}
@@ -506,7 +506,7 @@ function OpenContent() {
             <button
               type="button"
               onClick={flipAllCards}
-              className="paddock-ghost mb-8 min-h-11 rounded-xl px-6 py-3 text-xs font-bold uppercase tracking-widest text-cyan-100"
+              className="paddock-action mb-8 min-h-12 px-6 py-3 text-xs font-black uppercase tracking-widest"
             >
               {flippedCards.size === drawnCards.length
                 ? t('Retourner les cartes face cachée')
@@ -542,14 +542,14 @@ function OpenContent() {
                         tabIndex={flippedCards.has(idx) ? -1 : 0}
                         onClick={() => flipCard(idx)}
                         aria-label={t('Retourner la carte {number}', { number: idx + 1 })}
-                        className="absolute inset-0 overflow-hidden rounded-xl border-2 border-white/30 bg-gradient-to-br from-slate-900 via-blue-950 to-black shadow-[0_12px_30px_rgba(0,0,0,0.5)]"
+                        className="absolute inset-0 overflow-hidden border-2 border-[#dbff35]/50 bg-[repeating-linear-gradient(125deg,#161c17_0px,#161c17_18px,#202821_18px,#202821_36px)] shadow-[0_12px_30px_rgba(0,0,0,0.5)]"
                         style={{ backfaceVisibility: 'hidden' }}
                       >
-                        <div className="absolute inset-2 rounded-lg border border-blue-300/40" />
-                        <div className="absolute inset-4 rounded-lg border border-white/10" />
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.3),transparent_65%)]">
-                          <span className="text-5xl font-black italic tracking-tighter text-white drop-shadow-[0_0_18px_rgba(96,165,250,0.8)]">A</span>
-                          <span className="mt-2 text-[9px] font-bold uppercase tracking-[0.35em] text-blue-200/80">Apex Collector</span>
+                        <div className="absolute inset-2 border border-[#dbff35]/55" />
+                        <div className="absolute inset-4 border border-white/15" />
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_center,rgba(219,255,53,0.14),transparent_65%)]">
+                          <span className="text-[65px] font-black uppercase tracking-tighter text-[#dbff35] drop-shadow-[0_0_20px_rgba(219,255,53,0.4)]">A</span>
+                          <span className="mt-1 text-[12px] font-black uppercase tracking-[.2em] text-white/70">Apex Collector</span>
                         </div>
                         <span className="absolute bottom-3 left-0 right-0 text-center text-[8px] font-bold uppercase tracking-[0.3em] text-white/40">
                           {t('Cliquez pour révéler')}
@@ -591,7 +591,7 @@ function OpenContent() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.5 }}
               onClick={() => router.push('/boosters')}
-              className="paddock-ghost rounded-xl px-8 py-3 text-sm font-bold transition-colors"
+              className="paddock-ghost px-8 py-3 text-sm font-bold transition-colors"
             >
               {t('Retour à la boutique')}
             </motion.button>
