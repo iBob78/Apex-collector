@@ -1,53 +1,47 @@
-# APEX RACING DEPARTMENT — refonte motorsport GT Endurance, itération 3
+# APEX COLLECTOR — Night Drive / Collection-first UI (sandbox v4)
 
-> **Prototype uniquement** sur la branche `feat/visual-overhaul-paddock-20261108` / PR #17 (brouillon). La précédente direction « paddock premium » a été jugée trop proche du site d'origine. Cette itération est une **refonte de composition**, pas une simple recoloration. L'itération 3 conserve la structure racing tout en appliquant la palette **GT Endurance** validée. Ne pas fusionner ni toucher à `main` sans validation explicite.
+> Expérimentation graphique **sur la branche `feat/visual-overhaul-paddock-20261108` / PR #17 uniquement**. Ne pas fusionner dans `main` ni déployer en production sans validation explicite.
 
-## Nouvelle direction artistique
+## Origine du changement
 
-**Concept :** grille de départ, endurance, affiches de course, paddock de compétition et chronométrage. Moins de « cartes SaaS » : grands blocs éditoriaux, photographies de course nocturne, rangées techniques, grandes données et navigations numérotées.
+Après des essais « paddock premium », puis motorsport et « GT Endurance », l’utilisateur a fourni **trois captures de référence** d’interfaces de collection automobile. Elles sont des **références visuelles**, pas des données de jeu et ne doivent pas être utilisées comme images de fond : elles montrent principalement :
 
-- **Palette GT Endurance validée :** carbone `#101215`, rouge racing `#D32F35`, titane `#F0EFEB` et gris mécanique `#555D65`. Les panneaux utilisent des nuances neutres dérivées, sans jaune fluo, cyan, bleu néon ou champagne dans l'identité.
-- **Typographie :** Barlow Condensed (titres/course/télémétrie), Barlow (texte) et Bebas Neue conservée pour les cartes/packs quand elle est spécifiée. Chargement via l'import Google Fonts de `src/app/globals.css`; pas de dépendance npm.
-- **Identité :** rubans « starting grid », damiers, bandes diagonales, index 01 / 02 / 03, contenu en blocs asymétriques, séparateurs francs (coins carrés), panneaux de télémétrie et marque APEX très visible.
-- **Animations :** ruban de texte horizontal, élévation discrète au survol, transitions courtes. `prefers-reduced-motion` désactive le défilement du ruban et les mouvements non essentiels. Pas de changement des animations de rareté et de retournement des cartes.
-- **Photographies de circuit externes :** photos Pexels **de Tom Verdoot** (« Car on the Racing Course at Dusk », photo 14905468 ; « Racecar Parked on a Pit Stop », photo 14905469), sources :
-  - https://www.pexels.com/photo/car-on-the-racing-course-at-dusk-14905468/
-  - https://www.pexels.com/photo/racecar-parked-on-a-pit-stop-14905469/
-  Les URL `images.pexels.com` sont utilisées en **fond CSS uniquement** dans `race-photo` et `race-photo-soft` ; le fond sombre reste lisible si ces ressources sont indisponibles. Si la politique d'assets du projet l'impose à terme, remplacer ces URL par des médias hébergés et crédités. Ne pas réutiliser les images de course pour présenter une voiture comme possédée par le joueur.
+1. Un **garage en trois colonnes** (filtres à gauche, grille dense au centre, aperçu de carte à droite), sur un grand bandeau automobile panoramique.
+2. Un **accueil automobile immersif**, avec accès illustrés à la collection, aux boosters et aux activités ; un tirage à plusieurs cartes éclairé selon la rareté.
+3. Un langage **bleu nuit, verre fumé, contours électriques, marque APEX rouge/blanc et fonds automobiles au crépuscule**, sans abandonner la lisibilité ou les effets de collection.
 
-## Ruptures de layout développées
+La quatrième itération est désormais intitulée **« Night Drive / Collection-first »**. Elle remplace la présentation « GT Endurance » des surfaces expérimentales. Ce n'est pas une modification du système de raretés.
 
-| Écran | Nouveau langage motorsport |
-| --- | --- |
-| `/` | Affiche pleine largeur de course nocturne, titres démesurés, bande animée « race ticker », trois secteurs illustrés, grille de départ jaune et CTA photo |
-| Navigation | Branding de team de course en grand ; menus desktop par numéros de secteur, marquage jaune vif, mobile bottom nav « pit lane », admin toujours accessible selon permissions |
-| `/dashboard` | Immense visuel de stand, bloc identité garage, jauge circulaire sur les vraies données, chronométrage à quatre chiffres de collection et accès rapides en modules 01–03 |
-| `/collection` | En-tête illustré de type affichage de course, indicateur de complétion réel, nouvelles zones de filtres, grille de cartes inchangée |
-| `/boosters` | Boutique façon « pit supply », large visuel et vrai solde AP, packs format boîtes d'équipement avec numéros, prix et CTA marqués, boosters gratuits conservés |
-| `/open` | Dos des cartes aux couleurs racing, interface de révélation renforcée, sans modifier le mécanisme du tirage |
-| `/marketplace` | Trading floor avec grande photo, total réel des annonces et onglets très visibles ; ventes et achats inchangés |
-| `/profile` | Carte d'identité de pilote et licence de compétition avec vrai niveau collectionneur, bloc de statistiques et showroom |
-| `/login` | Identité racing pour la connexion/inscription avec photographie des stands en grand écran |
-| Écrans secondaires | Contrats/succès, guide, showrooms publics/privés, suggestions, classements et détails de véhicule bénéficient du thème global scoped `apex-paddock`/`paddock-*` ; leurs actions métier restent inchangées |
+## Direction graphique et composants
 
-## Protections fonctionnelles
+- Palette de l'interface : fond bleu nuit `#070c18`, panneaux `#111a2b`, accents bleu `#59b9ff`, rouge `#ed344f`, violet `#8a66ff` ; texte ivoire et gris lavande. Les couleurs des **raretés** ne sont **pas** remplacées par cette palette.
+- `src/app/globals.css` : classes `apex-paddock`, `paddock-*`, `collector-*`, `apx-*`, `race-*` rétrocompatibles pour tous les écrans de la PR. Les effets de rareté et les animations existantes sont conservés **en dehors** du bloc expérimental.
+- Navigation `Sidebar.tsx` : logo APEX plus proche des références ; menu et accès admin existants, menu mobile bas, état actif lumineux bleu/violet. L'accès à l'administration reste contrôlé par les permissions existantes.
+- Dashboard : bandeau automobile, vrai solde AP, accès illustrés à **boosters / collection / contrats**, statistiques réelles et progression réelle du garage. L'atelier admin n'est pas montré comme accessible à tous.
+- Collection : bandeau panoramique + vraie jauge complétion ; filtres de catégories, raretés, recherche et favoris à gauche ; grille au centre ; **aperçu sélectionné à droite dès 1536 px**. L'aperçu ne peut montrer **que des cartes possédées** ; les flèches naviguent uniquement parmi ces cartes. La modale détaillée reste accessible au clic sur mobile/tablette et par un bouton sur grand écran. La grille mobile conserve **4 cartes par rangée**.
+- Boutique : bandeau panoramique, solde AP réel, boosters quotidiens réels, packs illustrés et numérotés. La boutique mobile conserve **2 packs par rangée**.
+- Ouverture de booster : scène lumineuse bleu/violet, dos de carte repensés ; la grille mobile conserve **3 cartes par rangée** ; la déchirure, le flip, le badge `NEW!`, l'absence de niveau sur un tirage et le halo de rareté sont préservés.
+- Marketplace, profil, connexion, accueil public : contenus réorganisés et thème bleu nuit harmonisé ; achats, annonces, showroom privé/public et authentification inchangés.
+- Les écrans secondaires restent stylés par les classes expérimentales communes. Aucune route, migration Supabase, permission ou dépendance npm nouvelle.
 
-- **Collection mobile : quatre cartes par ligne**, onglets Tous/Véhicules/Circuits/Pilotes, filtres et favoris, détails et niveaux conservés.
-- **Booster mobile : deux packs par ligne** dans la boutique et **trois cartes par ligne** pendant le reveal.
-- **Tirages :** probabilités, prix AP, débit, boosters quotidiens offerts, code de sauvegarde, déchirure du sachet, flip, scintillement/halo selon rareté et badge `NEW!` préservés. Pas d'affichage de niveaux pendant un tirage.
-- **Comptes :** auth Supabase, permissions admin, showroom privé/public, niveau calculé, solde AP réel et règles RLS inchangés. **Aucune migration ni accès aux données de production**.
-- **Langues :** contenus fonctionnels traduits par `t()` ; les libellés décoratifs anglais sont le langage d'édition « racing / paddock » et restent purement décoratifs.
-- **Accessibilité :** navigation clavier, aria-labels, éléments réactifs et réduction de mouvement. Pour les petits textes, privilégier le titane sur carbone ; réserver le rouge aux surfaces, accents et grandes typographies. Vérifier l'absence de défilement horizontal sur 360/390/430 px.
-- **Images :** deux images Pexels décoratives externes ; pas de téléchargement ou d'utilisation du compte privé de l'utilisateur.
+## Photographie / assets
 
-## Contrôles nécessaires
+- Le nouveau bandeau dashboard utilise une **photo Pexels gratuite d'Abdullah Alsaibaie**, « Black Toyota Supra at Sunset », photo #21404862 :
+  https://www.pexels.com/photo/black-toyota-supra-at-sunset-21404862/
+- Les photos Pexels préexistantes #14905468 et #14905469 sont encore utilisées comme ambiances de fond sur certaines pages :
+  https://www.pexels.com/photo/car-on-the-racing-course-at-dusk-14905468/
+  https://www.pexels.com/photo/racecar-parked-on-a-pit-stop-14905469/
+- Les images d'accès `/showcase-boosters.png`, `/showcase-card.png`, `/showcase-missions.png` sont déjà présentes dans `public/`.
+- Les photos externes sont chargées **uniquement comme fond CSS** avec couleur/gradient de secours. Si la politique d'hébergement impose des assets internes, les intégrer après validation des droits et licences ; ne jamais prétendre qu'une voiture décorative est possédée par un joueur.
 
-1. Attendre les checks GitHub (lint, Jest, compilation, revue des dépendances). Séparer un échec antérieur Dependency Review/Snyk d'une erreur introduite par ce code.
-2. Inspecter le Preview Vercel sur PC, tablette, mobile 360, 390 et 430 px. Comparer au site actuel **sans toucher à main**.
-3. Tester le parcours connexion → dashboard → collection (4 colonnes) → cartes/niveaux/favoris → boosters (2 colonnes, 3 en reveal, halo/NEW!) → marketplace (achat, vente).
-4. Tester le booster gratuit, le classement, les langues, réglages, profil, showrooms privé/public et admin.
-5. Confirmer la stabilité des photographies externes, l'option de protection du Preview Vercel et l'absence de débordements sur mobile.
+## Tests manuels avant acceptation
 
-**Statut :** design radical « motorsport » prêt pour prévisualisation et feedback utilisateur. Toute fusion vers `main` reste soumise à demande explicite.
+1. Desktop large (1536/1920 px) : valider le garage **filtres / cartes / aperçu**, clic sur une carte, détails, favoris, navigation gauche/droite parmi **les seules cartes possédées**. Vérifier les infos censurées pour les cartes inconnues.
+2. Desktop médian (1024/1280 px), tablette et téléphone (360/390/430 px) : aucun débordement, sidebar à `md`, menu mobile, **4 cartes/ligne** dans la collection, modale détails sur mobile.
+3. Booster boutique : **2 packs/ligne sur téléphone**, solde AP, achats et booster quotidien. Reveal : **3 cartes/ligne sur téléphone**, badge `NEW!`, halo de la bonne rareté, pas de niveaux, déchirure et retour.
+4. Catalogue complet : pagination par chargement progressif toujours fonctionnelle après 2 000 cartes. Recherche, rareté, catégories, tri (notamment marque), mise à niveau, favoris et suppression de l'indicateur `NEW!` après consultation.
+5. Autres écrans : marketplace (achat/vente), profil/showroom (privé/public), connexion, classement, réglages, contrats/succès, ateliers admin et multilingue FR/EN/ES.
+6. Respect du mode `prefers-reduced-motion`, focus clavier, contraste des textes et images externes.
+7. Exécuter CI/lint/tests/build sur la **PR #17** et contrôler le lien de Preview Vercel avant de demander un avis.
 
-**Couleurs fonctionnelles préservées :** les raretés, halos des cartes, badge de découverte `NEW!` et retours succès/erreur conservent leur signification. Ne pas appliquer mécaniquement la palette d'interface à ces signaux.
+**Statut :** prototype v4 en revue. Aucun déploiement de production ni fusion `main` autorisé.
