@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, type CSSProperties } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { fetchAllPages } from '@/lib/fetchAllPages';
 import Sidebar from '@/components/Sidebar';
@@ -12,7 +12,7 @@ import { Rarity } from '@/types/game';
 import { getNextLevelUnlock } from '@/lib/level';
 import { purchaseCardUpgrade } from '@/lib/actions/card-upgrades';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
-import { Star, Search, Layers3, LayoutGrid, SlidersHorizontal, ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, Search, Layers3, LayoutGrid, SlidersHorizontal, ArrowUpRight, ChevronLeft, ChevronRight, ChevronDown, Sparkles } from 'lucide-react';
 import { getRarityColor } from '@/lib/rarity';
 import { resolveBrandLogo } from '@/lib/images';
 
@@ -47,6 +47,7 @@ export default function CollectionPage() {
   const [selectedCard, setSelectedCard] = useState<any | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [wideInspector, setWideInspector] = useState(false);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
   useEffect(() => {
     const media = window.matchMedia('(min-width: 1536px)');
     const sync = () => setWideInspector(media.matches);
@@ -289,6 +290,17 @@ export default function CollectionPage() {
     return { total, owned, percentage, totalCopies };
   }, [cards, userCards]);
 
+  // Count only discovered/owned models for the visual rarity shortcut shelf.
+  const ownedRarityCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const card of cards) {
+      if ((userCards[getCardId(card)] || 0) <= 0) continue;
+      const rarity = String(card.rarity || 'Common');
+      counts[rarity] = (counts[rarity] || 0) + 1;
+    }
+    return counts;
+  }, [cards, userCards]);
+
   const handleToggleFavorite = async (cardOverride?: any) => {
     const target = cardOverride || selectedCard;
     if (!user || !target || favoritePendingKey) return;
@@ -417,10 +429,21 @@ export default function CollectionPage() {
                 </div>
               </div>
               <div className="apx-hud hidden items-center gap-4 px-4 py-3 sm:flex">
-                <Layers3 size={23} className="text-[#7abaff]" aria-hidden="true" />
-                <div>
-                  <span className="block text-[10px] uppercase tracking-widest text-[#9eafd1]">{t('Exemplaires')}</span>
-                  <span className="font-mono text-xl font-bold tabular-nums">{stats.totalCopies.toLocaleString()}</span>
+                <div className="collector-completion-wheel" role="progressbar" aria-valuemin={0} aria-valuemax={100}
+                  aria-valuenow={stats.percentage} aria-label={t('Collection')}
+                  style={{ '--collector-progress': `${stats.percentage}%` } as CSSProperties}>
+                  <div><strong>{stats.percentage}%</strong></div>
+                </div>
+                <div className="min-w-0">
+                  <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-[#9eafd1]">
+                    <Layers3 size={13} aria-hidden="true" /> {t('Exemplaires')}
+                  </span>
+                  <span className="mt-1 block font-mono text-xl font-bold tabular-nums text-white">{stats.totalCopies.toLocaleString()}</span>
+                  {newCardKeys.size > 0 && (
+                    <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[#72dfaf]/10 px-2 py-0.5 text-[10px] font-bold text-[#a9f7c9]">
+                      <Sparkles size={11} aria-hidden="true"/> {newCardKeys.size} NEW!
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -428,7 +451,15 @@ export default function CollectionPage() {
 
           <div className="grid min-w-0 items-start gap-3 xl:grid-cols-[190px_minmax(0,1fr)] 2xl:grid-cols-[194px_minmax(0,1fr)_252px]">
             <aside className="collector-rail" aria-label={t('Filtres')}>
-              <h2 className="flex items-center gap-2 text-sm font-bold text-white"><SlidersHorizontal size={17} className="text-[#91b5ff]" aria-hidden="true" /> {t('Filtres')}</h2>
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="flex items-center gap-2 text-sm font-bold text-white"><SlidersHorizontal size={17} className="text-[#91b5ff]" aria-hidden="true" /> {t('Filtres')}</h2>
+                <button type="button" aria-expanded={filtersExpanded} aria-controls="collector-filter-controls"
+                  onClick={() => setFiltersExpanded((current) => !current)}
+                  className="paddock-ghost inline-flex min-h-10 items-center gap-2 px-3 text-xs font-bold xl:hidden">
+                  {filtersExpanded ? t('Masquer') : t('Afficher')} <ChevronDown size={15} aria-hidden="true"
+                    className={`transition-transform ${filtersExpanded ? 'rotate-180' : ''}`}/>
+                </button>
+              </div>
               <div className="collector-divider" />
               <label className="relative block">
                 <span className="sr-only">{t('Rechercher une carte...')}</span>
@@ -437,6 +468,7 @@ export default function CollectionPage() {
                   placeholder={t('Rechercher une carte...')}
                   className="paddock-field min-h-11 w-full pl-9 pr-3 text-[12px]" />
               </label>
+              <div id="collector-filter-controls" className={`pt-1 ${filtersExpanded ? 'block' : 'hidden'} xl:block`}>
               <div className="collector-divider" />
               <p className="collector-rail-heading mb-3">{t('Collection')}</p>
               <div className="grid grid-cols-2 gap-2 xl:grid-cols-1">
@@ -473,6 +505,7 @@ export default function CollectionPage() {
                 className="paddock-ghost min-h-10 w-full px-3 text-[11px] font-semibold">
                 {t('Réinitialiser les filtres')}
               </button>
+              </div>
               {(favoritesError || discoveryError) && (
                 <p role="alert" className="mt-4 rounded-lg border border-red-400/30 bg-red-900/20 p-3 text-xs text-red-200">{favoritesError || discoveryError}</p>
               )}
