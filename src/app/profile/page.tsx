@@ -337,34 +337,42 @@ export default function ProfilePage() {
       <Sidebar />
       <main className="min-w-0 flex-1 pb-28 md:pb-10">
         <div className="paddock-shell space-y-8 px-4 py-6 sm:px-7 sm:py-9 lg:px-10">
-          <header className="paddock-header flex flex-wrap items-center justify-between gap-5">
-            <div className="flex min-w-0 items-center gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-cyan-300/35 bg-gradient-to-br from-cyan-300/15 to-[#e7c18a]/10 text-[36px] font-normal uppercase text-[#e7c18a]" style={{ fontFamily: '"Bebas Neue", Impact, sans-serif' }}>
-                {displayName[0]}
+          <header className="grid overflow-hidden border border-white/25 lg:grid-cols-[minmax(0,1fr)_250px]">
+            <div className="race-photo-soft relative isolate flex min-h-[270px] flex-col justify-between px-5 py-6 sm:min-h-[330px] sm:px-9 sm:py-9">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0a0e0b] via-[#0a0e0b]/90 to-[#0a0e0b]/35" aria-hidden="true" />
+              <span className="absolute -right-5 -top-16 select-none font-['Barlow_Condensed'] text-[270px] font-black leading-none text-white/[.05]" aria-hidden="true">{String(collectorProgress.level).padStart(2,'0')}</span>
+              <div className="relative z-10 flex flex-wrap items-start justify-between gap-4">
+                <p className="race-eyebrow">DRIVER PROFILE / IDENTIFICATION</p>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => router.push('/settings')}
+                    className="paddock-ghost inline-flex min-h-10 items-center gap-2 px-3 font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.1em]">
+                    <Settings size={16} aria-hidden="true"/><span className="hidden sm:inline">{t('Réglages')}</span>
+                  </button>
+                  <button type="button" onClick={() => void signOut()} aria-label={t('Se déconnecter')} title={t('Se déconnecter')}
+                    className="flex h-10 w-10 items-center justify-center border border-[#f4523d]/40 bg-[#f4523d]/20 text-[#ff897a] transition hover:bg-[#f4523d]/35">
+                    <LogOut size={17} aria-hidden="true" />
+                  </button>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="paddock-eyebrow" >{t('Identité pilote')}</p>
-                <h1 className="paddock-title mt-1 truncate">{displayName}</h1>
+              <div className="relative z-10 flex min-w-0 items-end gap-5">
+                <div className="hidden h-[90px] w-[90px] shrink-0 items-center justify-center border-[3px] border-[#dbff35] bg-[#1a2419] font-['Barlow_Condensed'] text-[57px] font-black uppercase text-[#dbff35] sm:flex" aria-hidden="true">
+                  {displayName[0]}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[.2em] text-[#dbff35]">{t('Identité pilote')} / APEX</p>
+                  <h1 className="mt-3 break-words font-['Barlow_Condensed'] text-[clamp(3.4rem,7vw,7rem)] font-black uppercase leading-[.73] tracking-[-.05em]">{displayName}</h1>
+                  <p className="mt-4 font-mono text-[10px] uppercase tracking-[.12em] text-gray-300">RACING DEPARTMENT / MEMBER</p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => router.push('/settings')}
-                className="paddock-ghost inline-flex min-h-10 items-center gap-2 rounded-xl px-3 text-xs font-bold uppercase tracking-wider"
-              >
-                <Settings size={15} /> <span className="hidden sm:inline">{t('Réglages')}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => void signOut()}
-                aria-label={t('Se déconnecter')}
-                title={t('Se déconnecter')}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-red-400/20 bg-red-500/10 text-red-300 transition hover:bg-red-500/20"
-              >
-                <LogOut size={16} />
-              </button>
-            </div>
+            <aside className="flex flex-col justify-between bg-[#dbff35] px-6 py-6 text-[#111610] sm:px-8 sm:py-8">
+              <p className="font-['Barlow_Condensed'] text-[14px] font-black uppercase tracking-[.17em]">DRIVER / LEVEL</p>
+              <strong className="font-['Barlow_Condensed'] text-[118px] font-black leading-[.79] tracking-[-.085em] sm:text-[150px]">{String(collectorProgress.level).padStart(2,'0')}</strong>
+              <div className="border-t-2 border-[#182516]/30 pt-4">
+                <p className="font-['Barlow_Condensed'] text-[22px] font-black uppercase leading-none">{t('Niveau')} {collectorProgress.level}</p>
+                <p className="mt-2 font-mono text-[11px] font-bold">{collectorProgress.progress} / 10 {t('points')}</p>
+              </div>
+            </aside>
           </header>
 
           {pageError && (
@@ -373,7 +381,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label={t('Statistiques du profil')}>
+          <section className="grid gap-[2px] border border-white/15 bg-white/15 sm:grid-cols-2 xl:grid-cols-4" aria-label={t('Statistiques du profil')}>
             <StatCard language={language} label={t('Cartes possédées')} value={stats.totalCards} icon={<CarFront size={18} />} />
             <StatCard language={language} label={t('Cartes légendaires')} value={stats.legendaryCards} icon={<Medal size={18} />} />
             <StatCard language={language} label={t('Constructeurs collectionnés')} value={stats.manufacturers} icon={<Users size={18} />} />
@@ -590,7 +598,7 @@ function StatCard({ language, label, value, icon }: { language: string; label: s
         <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{label}</span>
         <span className="text-blue-300">{icon}</span>
       </div>
-      <p className="paddock-stat-number mt-3 tabular-nums text-[#e7c18a]">{new Intl.NumberFormat(language).format(value)}</p>
+      <p className="paddock-stat-number mt-3 tabular-nums text-[#dbff35]">{new Intl.NumberFormat(language).format(value)}</p>
     </article>
   );
 }
