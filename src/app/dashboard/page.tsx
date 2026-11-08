@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { fetchAllPages } from '@/lib/fetchAllPages';
 import { getGarageProgress } from '@/lib/garage-level';
 import Sidebar from '@/components/Sidebar';
-import { ArrowRight, ArrowUpRight, Gauge, Layers3, Lightbulb, ShoppingBag, Trophy, Wallet } from 'lucide-react';
+import { ArrowUpRight, Gauge, Lightbulb, Wallet } from 'lucide-react';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 export default function DashboardPage() {
@@ -70,138 +70,113 @@ export default function DashboardPage() {
     <div className="apex-paddock flex min-h-screen text-white">
       <Sidebar />
       <main className="min-w-0 flex-1">
-        {/* Persistent, compact balance / profile header across screen sizes. */}
-        <header className="sticky top-0 z-40 flex min-h-[67px] items-center justify-between gap-3 border-b border-white/15 bg-[#101215]/95 px-4 py-2 backdrop-blur-xl sm:px-7 lg:px-10">
+        <header className="sticky top-0 z-40 flex min-h-[62px] items-center justify-between gap-3 border-b border-white/10 bg-[#0a1021]/95 px-4 py-2 backdrop-blur-xl sm:px-6">
           <div className="min-w-0">
-            <p className="race-eyebrow">01 / RACING DEPARTMENT</p>
-            <h1 className="mt-1 truncate font-['Barlow_Condensed'] text-[20px] font-black uppercase tracking-[.05em] text-white sm:text-[25px]">{t('Tableau de bord')}</h1>
+            <p className="text-[10px] font-black uppercase tracking-[.16em] text-[#8d9fce]">APEX / GARAGE</p>
+            <h1 className="truncate text-[14px] font-bold text-white sm:text-[16px]">{t('Tableau de bord')}</h1>
           </div>
-          <div className="flex shrink-0 items-center gap-2.5">
-            <div aria-label={t('Balance AP')} className="flex h-11 items-center gap-2 border-l-[3px] border-[#D32F35] bg-[#232930] px-3 sm:px-4">
-              <Wallet size={16} className="hidden text-[#F0EFEB] sm:block" aria-hidden="true" />
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <div aria-label={t('Balance AP')} className="apx-hud flex min-h-[43px] items-center gap-2 px-3 sm:px-4">
+              <Wallet size={17} className="text-[#ffcf68]" aria-hidden="true" />
               <div className="text-right">
-                <p className="text-[8px] font-bold uppercase tracking-[.14em] text-[#B6BABE]">{t('Balance AP')}</p>
-                <p className="font-mono text-[12px] font-bold tabular-nums text-[#F0EFEB] sm:text-sm" title={formatNumber(apBalance) + ' AP'}>▲ {formatNumber(apBalance)} AP</p>
+                <p className="text-[9px] font-semibold uppercase tracking-wider text-[#a3b2d1]">{t('Balance AP')}</p>
+                <p className="font-mono text-[13px] font-bold tabular-nums text-white">{formatNumber(apBalance)} AP</p>
               </div>
             </div>
             {user && (
-              <button
-                type="button"
-                onClick={() => router.push('/profile')}
-                title={t('PROFIL PILOTE')}
+              <button type="button" onClick={() => router.push('/profile')} title={t('PROFIL PILOTE')}
                 aria-label={t('PROFIL PILOTE')}
-                className="flex h-11 w-11 items-center justify-center border border-white/25 bg-white/[.08] font-['Barlow_Condensed'] text-lg font-black uppercase text-white transition hover:border-[#D32F35]"
-              >
+                className="apx-hud flex h-[43px] w-[43px] items-center justify-center rounded-full text-[16px] font-black text-[#bacaff] transition hover:border-[#9caaff]">
                 {user.email?.[0]?.toUpperCase() || 'A'}
               </button>
             )}
           </div>
         </header>
 
-        <div className="paddock-shell flex flex-col gap-8 px-4 py-6 pb-28 sm:gap-11 sm:px-7 sm:py-8 lg:px-10 lg:pb-12">
-          {statsError && (
-            <p role="alert" className="border-l-4 border-red-500 bg-red-900/25 px-4 py-3 text-sm text-red-100">{statsError}</p>
-          )}
-
-          {/* The layout is a race poster, not three old dashboard tiles. */}
-          <section className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1.7fr)_minmax(275px,.65fr)]" aria-label={t('Mon Garage')}>
-            <div className="race-hero race-photo">
-              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,10,9,.96)_0%,rgba(8,10,9,.76)_43%,rgba(8,10,9,.15)_100%)]" />
-              <div className="absolute -right-5 top-0 select-none font-['Barlow_Condensed'] text-[12rem] font-black leading-none text-white/[.045] sm:text-[20rem]" aria-hidden="true">01</div>
-              <div className="race-hero-content">
-                <span className="race-poster-label mb-6">APEX // DRIVER TERMINAL</span>
-                <p className="race-eyebrow mb-3">RACE SEASON / GARAGE 001</p>
-                <h2 className="race-display max-w-[630px]">
-                  {t('Mon Garage')}<span className="text-[#F0EFEB]">.</span>
-                </h2>
-                <p className="mt-6 max-w-md text-sm font-medium leading-relaxed text-white/80 sm:text-base">
-                  {t('Gérez votre écurie et vos actifs.')}
-                </p>
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <Link href="/collection" className="paddock-action min-h-[49px] px-6">
-                    {t('MA COLLECTION')} <ArrowUpRight size={18} aria-hidden="true" />
-                  </Link>
-                  <Link href="/boosters" className="paddock-ghost inline-flex min-h-[49px] items-center gap-2 px-5 font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[.1em]">
-                    {t('BOUTIQUE PACKS')} <ArrowUpRight size={15} aria-hidden="true" />
-                  </Link>
-                </div>
-                <div className="mt-9 flex items-center gap-4 border-t border-white/25 pt-4">
-                  <span className="font-mono text-[10px] tracking-widest text-[#F0EFEB]">AC / 001</span>
-                  <span className="h-px flex-1 bg-white/20" />
-                  <span className="text-[10px] font-bold uppercase tracking-[.12em] text-gray-300">{t('Niveau écurie')} {garageProgress.level}</span>
-                </div>
+        <div className="paddock-shell space-y-6 px-3 py-4 pb-28 sm:px-6 sm:py-6 lg:px-8 lg:pb-12">
+          {statsError && <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">{statsError}</div>}
+          <section className="apx-dashboard-hero flex min-h-[380px] flex-col justify-center px-5 py-9 sm:min-h-[415px] sm:px-10 lg:px-12" aria-label="Apex Collector">
+            <div className="relative z-10 max-w-[650px]">
+              <p className="paddock-eyebrow mb-5">THE ULTIMATE CAR COLLECTION</p>
+              <div className="font-['Barlow_Condensed'] text-[clamp(3.5rem,9vw,7rem)] font-black italic uppercase leading-[.72] tracking-[-.055em] text-white drop-shadow-2xl">
+                APEX <span className="block mt-3 text-[.72em] tracking-[-.035em] text-[#f7f8ff]">COLLECTOR<span className="text-[#ed344f]">.</span></span>
+              </div>
+              <p className="mt-7 max-w-md text-[14px] leading-relaxed text-[#e0e6f2] sm:text-[16px]">
+                {t('Collectionnez les plus belles voitures et faites grandir votre écurie.')}
+              </p>
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                <Link href="/boosters" className="paddock-action min-h-12 px-6">{t('Ouvrir un Booster')} <ArrowUpRight size={17} aria-hidden="true"/></Link>
+                <Link href="/collection" className="paddock-ghost inline-flex min-h-12 items-center gap-2 px-5 text-[13px] font-bold">
+                  {t('MA COLLECTION')} <ArrowUpRight size={16} aria-hidden="true"/>
+                </Link>
               </div>
             </div>
-
-            <aside className="flex min-w-0 flex-col border border-white/20 bg-[#232930]">
-              <div className="flex items-center justify-between border-b border-white/15 bg-[#D32F35] px-4 py-3 text-[#F0EFEB]">
-                <span className="font-['Barlow_Condensed'] text-[13px] font-black uppercase tracking-[.18em]">GARAGE / STATUS</span>
-                <Gauge size={19} aria-hidden="true" />
-              </div>
-              <div className="flex flex-1 flex-col justify-between gap-7 p-5 sm:p-6">
-                <div>
-                  <p className="race-eyebrow">{t('Niveau écurie')}</p>
-                  <p className="mt-3 font-['Barlow_Condensed'] text-[92px] font-black leading-[.72] tracking-[-.07em] text-[#F0EFEB] sm:text-[110px]">
-                    {String(garageProgress.level).padStart(2, '0')}
-                  </p>
-                  <p className="mt-4 text-[12px] font-bold uppercase tracking-[.13em] text-gray-300">{t(garageProgress.tierTitle)}</p>
-                </div>
-                <div className="flex items-center gap-5">
-                  <div className="race-progress-dial w-[114px] shrink-0" style={{ background: `conic-gradient(#D32F35 ${progressPercent}%,#555D65 0)` }} role="progressbar" aria-label={t('Vers le prochain niveau')} aria-valuemin={0} aria-valuemax={10} aria-valuenow={progressCount}>
-                    <div>
-                      <strong className="font-['Barlow_Condensed'] text-[37px] font-black leading-none text-white">{progressCount}<span className="text-[18px] text-[#F0EFEB]">/10</span></strong>
-                      <span className="mt-0.5 text-[8px] font-bold uppercase tracking-widest text-gray-400">PROGRESS</span>
-                    </div>
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[11px] font-black uppercase tracking-[.13em] text-white">{t('Vers le prochain niveau')}</p>
-                    <p className="mt-2 text-xs leading-relaxed text-gray-400">{t('Modèles uniques')} / GARAGE XP</p>
-                  </div>
-                </div>
-                <div className="race-stripes opacity-80" aria-hidden="true" />
-              </div>
-            </aside>
-          </section>
-
-          {/* A timing tower made exclusively of the player's real inventory counts. */}
-          <section aria-label={t('Statistiques du garage')}>
-            <div className="race-section-heading mb-4">
-              <div className="min-w-0 flex-1">
-                <p className="race-eyebrow">02 / GARAGE TELEMETRY</p>
-                <h2 className="paddock-section-title mt-2">{t('Statistiques du garage')}</h2>
-              </div>
-              <span className="hidden font-mono text-[10px] font-bold tracking-widest text-[#F0EFEB] sm:block">DATA / AC-001</span>
-            </div>
-            <div className="grid grid-cols-2 gap-[2px] border border-white/20 bg-white/15 md:grid-cols-4">
-              <Metric value={formatNumber(stats.uniqueCards)} label={t('Modèles uniques')} index="01" accent />
-              <Metric value={formatNumber(stats.totalCards)} label={t('Cartes totales')} index="02" />
-              <Metric value={formatNumber(duplicateCards)} label={t('Doublons')} index="03" />
-              <Metric value={formatAverage(averageCopies)} label={t('Moyenne par modèle')} index="04" />
-            </div>
+            <span aria-hidden="true" className="absolute bottom-4 right-5 font-mono text-[10px] tracking-[.15em] text-white/55">APEX COLLECTOR / GARAGE</span>
           </section>
 
           <section aria-label={t('Accès rapide')}>
-            <div className="race-section-heading mb-4">
-              <div>
-                <p className="race-eyebrow">03 / YOUR NEXT MOVE</p>
-                <h2 className="paddock-section-title mt-2">{t('Accès rapide')}</h2>
-              </div>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h2 className="paddock-section-title text-[28px] sm:text-[35px]">{t('Accès rapide')}</h2>
+              <span className="hidden text-[10px] font-bold uppercase tracking-wider text-[#8397bd] sm:block">DÉCOUVRIR · COLLECTIONNER · ÉVOLUER</span>
             </div>
-            <div className="grid gap-3 md:grid-cols-3">
-              <AccessPanel href="/collection" index="01" title={t('MA COLLECTION')} eyebrow="THE GARAGE" icon={<Layers3 size={24} aria-hidden="true" />} />
-              <AccessPanel href="/missions" index="02" title={t('CONTRATS')} eyebrow="RACE OBJECTIVES" icon={<Trophy size={24} aria-hidden="true" />} />
-              <AccessPanel href="/marketplace" index="03" title={t('Marketplace')} eyebrow="THE TRADING PADDOCK" icon={<ShoppingBag size={24} aria-hidden="true" />} />
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Link href="/boosters" className="apx-shortcut group">
+                <img src="/showcase-boosters.png" alt="" className="apx-shortcut-image shrink-0" />
+                <div className="relative z-10 min-w-0">
+                  <p className="mb-1 text-[10px] font-bold uppercase tracking-[.13em] text-[#f38ba6]">BOOSTER / 01</p>
+                  <h3 className="text-[19px] font-black leading-[1.08] text-white sm:text-[22px]">{t('Ouvrir un Booster')}</h3>
+                  <ArrowUpRight size={18} className="mt-3 text-[#ff6485]" aria-hidden="true"/>
+                </div>
+              </Link>
+              <Link href="/collection" className="apx-shortcut group">
+                <img src="/showcase-card.png" alt="" className="apx-shortcut-image shrink-0" />
+                <div className="relative z-10 min-w-0">
+                  <p className="mb-1 text-[10px] font-bold uppercase tracking-[.13em] text-[#94bdfd]">GARAGE / 02</p>
+                  <h3 className="text-[19px] font-black leading-[1.08] text-white sm:text-[22px]">{t('MA COLLECTION')}</h3>
+                  <ArrowUpRight size={18} className="mt-3 text-[#69aeff]" aria-hidden="true"/>
+                </div>
+              </Link>
+              <Link href="/missions" className="apx-shortcut group">
+                <img src="/showcase-missions.png" alt="" className="apx-shortcut-image shrink-0" />
+                <div className="relative z-10 min-w-0">
+                  <p className="mb-1 text-[10px] font-bold uppercase tracking-[.13em] text-[#c2a0ff]">MISSIONS / 03</p>
+                  <h3 className="text-[19px] font-black leading-[1.08] text-white sm:text-[22px]">{t('CONTRATS')}</h3>
+                  <ArrowUpRight size={18} className="mt-3 text-[#ac8bff]" aria-hidden="true"/>
+                </div>
+              </Link>
             </div>
           </section>
 
-          <aside className="race-pit-tile flex flex-col gap-3 px-5 py-5 sm:flex-row sm:items-center sm:gap-6 sm:px-7">
-            <div className="flex shrink-0 items-center gap-2 text-[#F0EFEB]">
-              <Lightbulb size={19} aria-hidden="true" />
-              <span className="font-['Barlow_Condensed'] text-[16px] font-black uppercase tracking-[.1em]">PIT RADIO</span>
+          <section className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_270px]" aria-label={t('Statistiques du garage')}>
+            <div className="paddock-panel p-4 sm:p-6">
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="paddock-section-title">{t('Statistiques du garage')}</h2>
+                <span className="paddock-micro">COLLECTOR / STATS</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <GarageMetric value={formatNumber(stats.uniqueCards)} label={t('Modèles uniques')} />
+                <GarageMetric value={formatNumber(stats.totalCards)} label={t('Cartes totales')} />
+                <GarageMetric value={formatNumber(duplicateCards)} label={t('Doublons')} />
+                <GarageMetric value={formatAverage(averageCopies)} label={t('Moyenne par modèle')} />
+              </div>
             </div>
-            <span className="hidden h-8 w-px bg-white/20 sm:block" aria-hidden="true"/>
-            <p className="text-sm leading-relaxed text-gray-300">{t('N’oubliez pas d’échanger vos doublons au marché pour optimiser votre progression.')}</p>
-            <Link href="/marketplace" className="inline-flex shrink-0 items-center gap-2 text-[11px] font-black uppercase tracking-[.12em] text-[#F0EFEB] hover:text-white sm:ml-auto">{t('Marketplace')} <ArrowUpRight size={15} aria-hidden="true" /></Link>
+            <div className="paddock-panel flex flex-col justify-between p-5">
+              <div className="flex items-center justify-between gap-3">
+                <span className="paddock-micro">{t('Niveau écurie')}</span>
+                <Gauge size={19} className="text-[#8caafa]" aria-hidden="true"/>
+              </div>
+              <div className="mt-4 flex items-end justify-between gap-3">
+                <span className="paddock-stat-number text-[#f7f9ff]">{garageProgress.level}</span>
+                <span className="mb-2 text-[11px] font-semibold text-[#c0cae3]">{t(garageProgress.tierTitle)}</span>
+              </div>
+              <p className="mt-3 text-[11px] text-[#b3bfd8]">{t('Vers le prochain niveau')} <strong className="float-right font-mono text-[#86bbff]">{progressCount}/10</strong></p>
+              <div className="paddock-meter mt-2"><div style={{width:`${progressPercent}%`}} /></div>
+            </div>
+          </section>
+          <aside className="paddock-panel flex flex-wrap items-center gap-3 px-4 py-4 sm:px-6">
+            <Lightbulb size={20} className="shrink-0 text-[#9ea6ff]" aria-hidden="true"/>
+            <p className="min-w-0 flex-1 text-[13px] text-[#b3bdd5]">{t('N’oubliez pas d’échanger vos doublons au marché pour optimiser votre progression.')}</p>
+            <Link href="/marketplace" className="inline-flex items-center gap-2 text-[12px] font-bold text-[#99bfff] hover:text-white">{t('Marketplace')} <ArrowUpRight size={16}/></Link>
           </aside>
         </div>
       </main>
@@ -209,32 +184,11 @@ export default function DashboardPage() {
   );
 }
 
-function Metric({ value, label, index, accent = false }: { value: string; label: string; index: string; accent?: boolean }) {
+function GarageMetric({ value, label }: { value: string; label: string }) {
   return (
-    <article className={`group relative min-w-0 overflow-hidden bg-[#171A1E] px-4 py-5 sm:px-6 sm:py-7 ${accent ? 'bg-[#232930]' : ''}`}>
-      <div className="flex items-center justify-between gap-2">
-        <span className="font-mono text-[10px] text-gray-500">G / {index}</span>
-        <span className="h-[2px] w-9 bg-[#D32F35] opacity-40 transition-opacity group-hover:opacity-100" />
-      </div>
-      <p className="mt-6 truncate font-['Barlow_Condensed'] text-[clamp(2.6rem,5vw,5.5rem)] font-black leading-none tracking-[-.05em] tabular-nums text-white">{value}</p>
-      <h3 className="mt-3 max-w-[180px] font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[.12em] text-[#F0EFEB]">{label}</h3>
-    </article>
-  );
-}
-
-function AccessPanel({ href, index, title, eyebrow, icon }: { href: string; index: string; title: string; eyebrow: string; icon: React.ReactNode }) {
-  return (
-    <Link href={href} className="race-card-outline group flex min-h-[160px] flex-col justify-between gap-5 px-5 py-5 transition hover:-translate-y-1 sm:px-6 sm:py-6">
-      <div className="flex items-start justify-between gap-4">
-        <span className="font-['Barlow_Condensed'] text-[58px] font-black leading-[.85] tracking-[-.06em] text-white/20 group-hover:text-[#F0EFEB]">{index}</span>
-        <span className="text-[#F0EFEB]">{icon}</span>
-      </div>
-      <div className="flex items-end justify-between gap-3">
-        <div><p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#B6BABE]">{eyebrow}</p>
-          <h3 className="mt-1 font-['Barlow_Condensed'] text-[27px] font-black uppercase leading-none tracking-tight text-white">{title}</h3>
-        </div>
-        <ArrowUpRight size={20} className="shrink-0 text-[#F0EFEB]" aria-hidden="true" />
-      </div>
-    </Link>
+    <div className="apx-dashboard-metric min-w-0">
+      <p className="truncate font-['Barlow_Condensed'] text-[clamp(2.3rem,4vw,3.8rem)] font-black leading-none tabular-nums text-white">{value}</p>
+      <p className="mt-2 text-[11px] font-semibold text-[#a8b9df]">{label}</p>
+    </div>
   );
 }
