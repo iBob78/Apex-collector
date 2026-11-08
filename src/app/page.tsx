@@ -137,7 +137,7 @@ export default function LandingPage() {
       <section id="race-journey" className="bg-[#F0EFEB] px-5 py-16 text-[#101215] sm:px-10 sm:py-20 lg:px-16">
         <div className="mx-auto max-w-[1500px]">
           <p className="font-['Barlow_Condensed'] text-[12px] font-black uppercase tracking-[.2em]">03 / STARTING GRID</p>
-          <h2 className="mt-3 font-['Barlow_Condensed'] text-[clamp(4rem,9vw,9rem)] font-black uppercase leading-[.77] tracking-[-.055em]">YOUR ROAD TO THE TOP<span className="text-[#F0EFEB]">.</span></h2>
+          <h2 className="mt-3 font-['Barlow_Condensed'] text-[clamp(4rem,9vw,9rem)] font-black uppercase leading-[.77] tracking-[-.055em]">YOUR ROAD TO THE TOP<span className="text-[#D32F35]">.</span></h2>
           <div className="mt-12 grid gap-[2px] bg-[#101215]/25 md:grid-cols-4">
             {[
               { id:'01', label:t('Créez votre compte'), icon:Flag },
@@ -151,7 +151,7 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-          <Link href="/how-to-play" className="mt-8 inline-flex min-h-12 items-center gap-4 border border-[#101215] bg-[#171A1E] px-6 font-['Barlow_Condensed'] text-[14px] font-black uppercase tracking-[.15em] text-white transition hover:bg-[#2b3526]">
+          <Link href="/how-to-play" className="mt-8 inline-flex min-h-12 items-center gap-4 border border-[#101215] bg-[#171A1E] px-6 font-['Barlow_Condensed'] text-[14px] font-black uppercase tracking-[.15em] text-white transition hover:bg-[#555D65]">
             {t('How to play')} <ArrowUpRight size={18} aria-hidden="true"/>
           </Link>
         </div>

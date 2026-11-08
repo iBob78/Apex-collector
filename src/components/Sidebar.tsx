@@ -223,7 +223,7 @@ export default function Sidebar() {
           <nav id="apex-mobile-more-menu" aria-label={t('Navigation secondaire')} className="paddock-mobile-sheet absolute inset-x-3 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-h-[75dvh] overflow-y-auto p-3">
             <div className="flex items-center justify-between px-3 pb-3 pt-1">
               <span className="text-sm font-black uppercase tracking-widest">{t('Plus')}</span>
-              <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label={t('Fermer le menu')} className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
+              <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label={t('Fermer le menu')} className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D32F35]">
                 <XIcon size={22} />
               </button>
             </div>
@@ -232,7 +232,7 @@ export default function Sidebar() {
               const locked = authLoaded && !user;
               return (
                 <Link key={href} href={locked ? '/login' : href} aria-current={active ? 'page' : undefined} onClick={() => setMobileMenuOpen(false)}
-                  className={`flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${active ? 'bg-[#D32F35]/15 text-[#F0EFEB]' : 'text-gray-200 hover:bg-white/10'}`}>
+                  className={`flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D32F35] ${active ? 'bg-[#D32F35]/15 text-[#F0EFEB]' : 'text-gray-200 hover:bg-white/10'}`}>
                   <Icon size={20} aria-hidden="true" />
                   <span>{t(label)}</span>
                   {locked && <LockIcon className="ml-auto text-gray-500" size={15} aria-hidden="true" />}

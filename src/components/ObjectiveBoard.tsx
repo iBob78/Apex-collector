@@ -206,7 +206,7 @@ export default function ObjectiveBoard({
                                 <span className="shrink-0 font-black text-[#F0EFEB]">{current} / {requirement.target_count}</span>
                               </div>
                               <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-                                <div className="h-full rounded-full bg-cyan-400" style={{ width: `${requirementPercent}%` }} />
+                                <div className="h-full rounded-full bg-[#D32F35]" style={{ width: `${requirementPercent}%` }} />
                               </div>
                             </li>
                           );
@@ -219,7 +219,7 @@ export default function ObjectiveBoard({
                         type="button"
                         onClick={() => void handleClaim(item.id)}
                         disabled={claimingId === item.id}
-                        className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#D32F35]/30 bg-[#D32F35] px-4 py-3 text-xs font-black uppercase tracking-widest text-[#F0EFEB] transition hover:bg-[#F0EFEB] disabled:opacity-60"
+                        className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#D32F35]/30 bg-[#D32F35] px-4 py-3 text-xs font-black uppercase tracking-widest text-[#F0EFEB] transition hover:bg-[#555D65] disabled:opacity-60"
                       >
                         {claimingId === item.id ? <LoaderCircle size={15} className="animate-spin" /> : <Gift size={15} />}
                         {t('Réclamer la récompense')}

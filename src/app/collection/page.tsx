@@ -429,7 +429,7 @@ export default function CollectionPage() {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`min-h-11 rounded-lg px-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all sm:px-4 sm:text-xs sm:tracking-widest ${activeTab === tab ? 'bg-[#D32F35] text-[#171A1E]' : 'bg-[#101215] text-gray-400 hover:bg-white/10 hover:text-white'
+                    className={`min-h-11 rounded-lg px-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all sm:px-4 sm:text-xs sm:tracking-widest ${activeTab === tab ? 'bg-[#D32F35] text-[#F0EFEB]' : 'bg-[#101215] text-gray-400 hover:bg-white/10 hover:text-white'
                       }`}
                   >
                     {t(tab === 'all' ? 'Tous' : tab === 'vehicle' ? 'Véhicules' : tab === 'circuit' ? 'Circuits' : 'Pilotes')}
@@ -627,7 +627,7 @@ export default function CollectionPage() {
                 <button
                   type="button"
                   onClick={() => setVisibleCount((count) => count + 24)}
-                  className="paddock-ghost min-h-12 rounded-xl px-6 py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                  className="paddock-ghost min-h-12 rounded-xl px-6 py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D32F35]"
                 >
                   {t('Afficher plus')} ({Math.min(visibleCount, filteredCards.length)}/{filteredCards.length})
                 </button>
