@@ -59,14 +59,14 @@ function LoginForm() {
       animate={{ opacity: 1, y: 0 }}
       className="relative z-10 w-full max-w-md"
     >
-      <div className="paddock-panel relative overflow-hidden p-6 shadow-2xl sm:p-10">
+      <div className="relative overflow-hidden border-l-[5px] border-[#dbff35] bg-[#171c17] p-6 shadow-[0_25px_65px_rgba(0,0,0,.35)] sm:p-10">
         {/* Background Gradients */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[80px] -mr-10 -mt-10" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 blur-[80px] -ml-10 -mb-10" />
 
         <div className="relative z-10">
-          <header className="mb-9 text-center"><p className="paddock-eyebrow mb-5">APEX / DRIVER ACCESS</p>
-            <div className="mb-5 inline-flex h-16 w-16 items-center justify-center rounded-xl border border-cyan-200/30 bg-cyan-300/[0.09] text-cyan-200">
+          <header className="mb-9 text-center"><p className="race-eyebrow mb-5 justify-center">APEX / DRIVER ACCESS</p>
+            <div className="mb-5 inline-flex h-16 w-16 items-center justify-center border-2 border-[#dbff35] bg-[#dbff35]/10 text-[#dbff35]">
               {isLogin ? <LogInIcon size={28} /> : <UserPlusIcon size={28} />}
             </div>
             <h2 className="paddock-title">
@@ -156,18 +156,19 @@ export default function LoginPage() {
             <LoginForm />
           </Suspense>
         </div>
-        <aside className="paddock-hero relative hidden min-h-[540px] items-center justify-center p-10 lg:flex" aria-label="Apex Collector">
-          <div className="absolute left-8 top-8">
-            <p className="paddock-eyebrow">APEX / COLLECTOR</p>
-            <h2 className="paddock-section-title mt-2">THE PRIVATE PADDOCK</h2>
+        <aside className="race-hero race-photo relative hidden min-h-[610px] flex-col justify-between lg:flex" aria-label="Apex Collector">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0c0f0c]/80 to-transparent"/>
+          <span className="absolute -right-10 top-5 select-none font-['Barlow_Condensed'] text-[220px] font-black leading-none text-white/[.07]" aria-hidden="true">01</span>
+          <div className="relative z-10 p-9">
+            <p className="race-eyebrow">APEX / DRIVER ACCESS</p>
+            <span className="race-poster-label mt-5">THE PRIVATE PADDOCK / 001</span>
           </div>
-          <div className="relative mt-12 w-[65%] max-w-[300px]">
-            <div className="absolute -inset-9 rounded-full border border-cyan-200/15" aria-hidden="true" />
-            <img src="/showcase-card.png" alt="Apex Collector" className="paddock-landing-image relative w-full rounded-xl" />
-          </div>
-          <div className="absolute bottom-8 left-8 right-8 flex items-center justify-between border-t border-cyan-100/15 pt-4">
-            <span className="paddock-micro">BUILD YOUR GARAGE</span>
-            <span className="font-mono text-xs text-[#e7c18a]">001 / APEX</span>
+          <div className="relative z-10 p-9">
+            <h2 className="race-display max-w-[480px]">RACE. <span className="text-[#dbff35]">COLLECT.</span> REPEAT.</h2>
+            <div className="mt-7 flex items-center justify-between border-t border-white/30 pt-4">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-[.17em] text-[#dbff35]">BUILD YOUR GARAGE</span>
+              <span className="font-mono text-[10px] font-bold text-gray-300">AC / 001</span>
+            </div>
           </div>
         </aside>
       </div>
