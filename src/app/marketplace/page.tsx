@@ -78,36 +78,38 @@ export default function MarketplacePage() {
       <main className="min-w-0 flex-1 flex flex-col">
         <div className="paddock-shell flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-9 lg:py-10">
           {/* Header */}
-          <header className="paddock-header mb-7">
-            <div className="relative z-10">
-              <p className="paddock-eyebrow">APEX / TRADING FLOOR</p>
-              <h1 className="paddock-title mt-3">Marketplace<span className="text-[#e7c18a]">.</span></h1>
-              <p className="paddock-subtitle">{t('Échangez et achetez des pièces rares pour votre écurie.')}</p>
+          <header className="mb-8 overflow-hidden border border-white/20 bg-[#101510]">
+            <div className="race-photo-soft relative isolate overflow-hidden px-5 py-9 sm:px-9 sm:py-11">
+              <div className="absolute inset-0 -z-0 bg-gradient-to-r from-[#0c120c] via-[#0c120c]/85 to-transparent"/>
+              <span className="absolute -right-2 -top-12 select-none font-['Barlow_Condensed'] text-[210px] font-black leading-none text-white/[.05] sm:text-[290px]" aria-hidden="true">04</span>
+              <div className="relative z-10">
+                <p className="race-eyebrow">04 / TRADING PADDOCK</p>
+                <h1 className="paddock-title mt-5 max-w-4xl">MARKET<span className="text-[#dbff35]">PLACE.</span></h1>
+                <p className="mt-5 max-w-lg border-l-[3px] border-[#f4523d] pl-4 text-sm leading-relaxed text-gray-300">
+                  {t('Échangez et achetez des pièces rares pour votre écurie.')}
+                </p>
+                <div className="mt-7 inline-flex gap-3 border border-white/20 bg-[#151b13]/90 px-4 py-3">
+                  <span className="font-['Barlow_Condensed'] text-[44px] font-black leading-[.85] text-[#dbff35]">{listings.length}</span>
+                  <span className="self-end font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.14em] text-gray-300">CARDS / MARKET INVENTORY</span>
+                </div>
+              </div>
             </div>
-
-            {/* Navigation Tabs */}
-            <div className="relative z-10 mt-7 flex flex-wrap gap-6 border-b border-cyan-100/15">
-              <button
-                onClick={() => setActiveTab('browse')}
-                className={`pb-4 px-2 text-sm font-black tracking-widest uppercase transition-all relative ${activeTab === 'browse' ? 'text-cyan-200' : 'text-slate-400 hover:text-white'
-                  }`}
-              >
-                {t('Parcourir')}
-                {activeTab === 'browse' && <motion.div layoutId="mkt_tab" className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-[#e7c18a]" />}
+            <nav className="flex gap-[2px] bg-[#313a2d] p-[2px]" aria-label={t('Marketplace')}>
+              <button type="button" onClick={() => setActiveTab('browse')}
+                aria-pressed={activeTab === 'browse'}
+                className={`relative flex min-h-12 flex-1 items-center justify-center gap-3 px-4 font-['Barlow_Condensed'] text-[15px] font-black uppercase tracking-[.1em] transition-colors ${activeTab === 'browse' ? 'bg-[#dbff35] text-[#111510]' : 'bg-[#151a16] text-gray-300 hover:text-white'}`}>
+                <span className="text-[11px] opacity-60">01</span>{t('Parcourir')}
               </button>
-              <button
-                onClick={() => setActiveTab('my_listings')}
-                className={`pb-4 px-2 text-sm font-black tracking-widest uppercase transition-all relative ${activeTab === 'my_listings' ? 'text-cyan-200' : 'text-slate-400 hover:text-white'
-                  }`}
-              >
-                {t('Mes Ventes')}
-                {activeTab === 'my_listings' && <motion.div layoutId="mkt_tab" className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-[#e7c18a]" />}
+              <button type="button" onClick={() => setActiveTab('my_listings')}
+                aria-pressed={activeTab === 'my_listings'}
+                className={`relative flex min-h-12 flex-1 items-center justify-center gap-3 px-4 font-['Barlow_Condensed'] text-[15px] font-black uppercase tracking-[.1em] transition-colors ${activeTab === 'my_listings' ? 'bg-[#dbff35] text-[#111510]' : 'bg-[#151a16] text-gray-300 hover:text-white'}`}>
+                <span className="text-[11px] opacity-60">02</span>{t('Mes Ventes')}
               </button>
-            </div>
+            </nav>
           </header>
 
           {/* Filters Bar */}
-          <div className="paddock-panel mb-7 flex flex-wrap items-center gap-3 p-4 sm:gap-4">
+          <div className="mb-7 flex flex-wrap items-center gap-3 border border-white/20 bg-[#1b211a] p-4 sm:gap-4">
             <div className="relative w-full min-w-0 flex-1 sm:min-w-[240px]">
               <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
               <input
@@ -119,14 +121,10 @@ export default function MarketplacePage() {
               />
             </div>
 
-            <button className="paddock-ghost flex min-h-11 items-center gap-3 rounded-xl px-5 py-3 text-slate-200">
-              <FilterIcon size={18} className="text-blue-400" />
-              <span className="text-xs font-bold uppercase tracking-widest">{t('Filtres')}</span>
-            </button>
 
             <button
               onClick={() => setIsSellModalOpen(true)}
-              className="paddock-action flex min-h-11 items-center gap-3 rounded-xl px-5 py-3"
+              className="paddock-action flex min-h-11 items-center gap-3 px-5 py-3"
             >
               <TagIcon size={18} />
               <span className="text-xs font-bold uppercase tracking-widest">{t('Vendre une carte')}</span>
@@ -134,12 +132,12 @@ export default function MarketplacePage() {
           </div>
 
           {/* Edition readout: no fabricated live market statistics. */}
-          <div className="mb-5 flex items-end justify-between gap-3 border-b border-cyan-100/10 pb-4">
+          <div className="race-section-heading mb-5 justify-between gap-3">
             <div>
               <p className="paddock-eyebrow">APEX / MARKET INVENTORY</p>
               <h2 className="paddock-section-title mt-2">{t('Parcourir')}</h2>
             </div>
-            <div className="rounded-lg border border-[#e7c18a]/25 bg-[#e7c18a]/[.05] px-3 py-2 font-mono text-xs text-[#e7c18a]">
+            <div className="border-l-[3px] border-[#dbff35] bg-[#1c2519] px-3 py-2 font-mono text-xs text-[#dbff35]">
               {listings.length} {t('Cartes')}
             </div>
           </div>
