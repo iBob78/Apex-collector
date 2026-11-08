@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Exo:wght@700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@400;500;600;700;800&family=Bebas+Neue&family=Exo:wght@700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -634,46 +634,247 @@ html, body {
   }
 }
 
-/* APEX / PADDOCK — sandbox visual identity, opt-in by page. */
-.apex-paddock{--apx-line:rgba(153,194,220,.16);--apx-cyan:#89e5f7;--apx-gold:#e8c38e;position:relative;isolation:isolate;color:#f1f7fc;background:radial-gradient(ellipse 60% 30% at 75% -8%,rgba(28,111,152,.23),transparent 80%),radial-gradient(ellipse 44% 28% at 0% 64%,rgba(26,72,119,.16),transparent 80%),linear-gradient(130deg,#0b111d,#080c13 65%,#06090f)}
-.apex-paddock::before{content:"";pointer-events:none;position:fixed;inset:0;z-index:0;opacity:.22;background-image:linear-gradient(rgba(143,205,234,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(143,205,234,.12) 1px,transparent 1px);background-size:56px 56px;mask-image:linear-gradient(180deg,#000,transparent 85%)}
-.apex-paddock>main{position:relative;z-index:1}
-.paddock-shell{width:100%;max-width:1520px;margin-inline:auto}
-.paddock-header{position:relative;overflow:hidden;border:1px solid var(--apx-line);border-radius:24px;background:linear-gradient(115deg,rgba(17,36,55,.97),rgba(10,16,27,.94));padding:clamp(20px,3vw,34px);box-shadow:0 20px 70px rgba(0,0,0,.21)}
-.paddock-header::after{content:"";position:absolute;pointer-events:none;right:-90px;top:-180px;width:300px;height:300px;border:1px solid rgba(138,225,255,.16);border-radius:50%;box-shadow:0 0 0 34px rgba(138,225,255,.025),0 0 0 75px rgba(138,225,255,.017)}
-.paddock-eyebrow{display:inline-flex;align-items:center;gap:10px;color:#98ddea;font-size:10px;font-weight:800;letter-spacing:.2em;line-height:1.4;text-transform:uppercase}
-.paddock-eyebrow::before{content:"";width:18px;height:2px;background:var(--apx-gold);flex-shrink:0}
-.paddock-title,.paddock-section-title,.paddock-stat-number{font-family:"Bebas Neue",Impact,"Arial Narrow",sans-serif;font-style:normal;font-weight:400;text-transform:uppercase}
-.paddock-title{font-size:clamp(2.6rem,4.6vw,4.9rem);line-height:.95;letter-spacing:.025em;color:#f5f8fe}
-.paddock-section-title{font-size:clamp(1.6rem,2.4vw,2.25rem);line-height:1.05;letter-spacing:.05em;color:#f1f8ff}
-.paddock-stat-number{font-size:clamp(2.6rem,4.6vw,4rem);line-height:1;letter-spacing:.02em}
-.paddock-subtitle{max-width:65ch;margin-top:12px;color:#a9bdd0;font-size:.88rem;line-height:1.7}
-.paddock-micro{color:#9baec1;font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-.paddock-rule{height:1px;background:linear-gradient(90deg,rgba(126,221,246,.42),rgba(231,193,138,.38),transparent)}
-.paddock-panel,.paddock-tile,.paddock-data-card{position:relative;border:1px solid var(--apx-line);background:linear-gradient(148deg,rgba(24,39,58,.95),rgba(10,16,27,.98) 74%);box-shadow:0 18px 45px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.04)}
-.paddock-panel{border-radius:22px}.paddock-tile,.paddock-data-card{border-radius:20px;overflow:hidden}
-.paddock-panel::before,.paddock-tile::before{content:"";pointer-events:none;position:absolute;top:0;left:25px;right:25px;height:1px;background:linear-gradient(90deg,transparent,rgba(138,234,255,.42),transparent)}
-.paddock-data-card{transition:transform .22s ease,border-color .22s ease}.paddock-data-card:hover{transform:translateY(-2px);border-color:rgba(142,229,252,.48)}
-.paddock-action{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:1px solid rgba(146,227,254,.35);border-radius:12px;background:linear-gradient(115deg,#19708e,#174568);box-shadow:inset 0 1px rgba(255,255,255,.16),0 12px 26px rgba(0,91,140,.2);color:white;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;transition:filter .2s ease,transform .2s ease}
-.paddock-action:hover{filter:brightness(1.17);transform:translateY(-2px)}.paddock-action:disabled{opacity:.48;filter:grayscale(1);transform:none;cursor:not-allowed}
-.paddock-ghost{border:1px solid rgba(169,198,219,.23);background:rgba(14,25,39,.86);color:#deedf7;transition:border-color .2s ease,background .2s ease}
-.paddock-ghost:hover{border-color:rgba(140,235,255,.52);background:rgba(28,54,75,.95)}
-.paddock-field{border:1px solid rgba(164,195,225,.25)!important;background:rgba(5,13,24,.75)!important;color:#edf7ff!important}.paddock-field:focus{outline:2px solid rgba(133,233,250,.55);outline-offset:1px}
-.paddock-meter{height:6px;overflow:hidden;border-radius:10px;background:rgba(255,255,255,.11)}.paddock-meter>div{height:100%;border-radius:inherit;background:linear-gradient(90deg,#258faf,#8ae9f9,#e7c18a)}
-.paddock-pack-card{position:relative;border:1px solid rgba(155,194,221,.23);border-radius:20px;background:linear-gradient(156deg,#192b3c,#0a121e 72%);box-shadow:0 20px 55px rgba(0,0,0,.32),inset 0 1px rgba(255,255,255,.04);transition:border-color .2s ease,transform .2s ease}
-.paddock-pack-card:hover{border-color:rgba(153,226,245,.65);transform:translateY(-4px)}.paddock-pack-card::after{content:"";pointer-events:none;position:absolute;inset:auto 0 0;height:1px;background:linear-gradient(90deg,transparent,rgba(232,195,142,.65),transparent)}
-.paddock-pack-image{box-shadow:0 18px 36px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.1)}
-.paddock-hero{position:relative;overflow:hidden;border:1px solid rgba(152,196,220,.23);border-radius:27px;background:radial-gradient(ellipse at 85% 30%,rgba(20,122,162,.2),transparent 55%),linear-gradient(130deg,#17283a,#0b121e 76%);box-shadow:0 30px 70px rgba(0,0,0,.25)}
-.paddock-hero::after{content:"";pointer-events:none;position:absolute;left:-55px;bottom:-90px;width:260px;height:260px;border:1px solid rgba(135,234,255,.2);border-radius:50%;box-shadow:0 0 0 38px rgba(135,234,255,.025),0 0 0 90px rgba(135,234,255,.016)}
-.paddock-telemetry{background-image:repeating-linear-gradient(90deg,rgba(137,231,250,.24) 0 1px,transparent 1px 13px);mask-image:linear-gradient(90deg,transparent,black 12%,black 88%,transparent)}
-.paddock-landing{background:linear-gradient(145deg,#07101c,#0b101c 60%,#060b12)}.paddock-landing-title{font:400 clamp(3.5rem,9vw,8.8rem)/.85 "Bebas Neue",Impact,sans-serif;letter-spacing:.03em}.paddock-landing-image{filter:drop-shadow(0 26px 65px rgba(0,0,0,.6));transform:rotate(5deg);transition:transform .5s ease}.paddock-landing-image:hover{transform:rotate(1deg) translateY(-6px)}
-.paddock-sidebar{border-right:1px solid rgba(139,189,222,.2);background:radial-gradient(ellipse at top left,#17273a,#0d1624 38%,#080d16);box-shadow:15px 0 65px rgba(0,0,0,.2)}
-.paddock-mobile-nav{border-top:1px solid rgba(131,201,226,.26);background:rgba(8,17,29,.96);box-shadow:0 -14px 42px rgba(0,0,0,.46),inset 0 1px rgba(255,255,255,.05)}.paddock-mobile-sheet{border:1px solid rgba(161,204,226,.29);background:linear-gradient(145deg,#1a2a3d,#0b131f);box-shadow:0 30px 80px rgba(0,0,0,.7)}
-@media(max-width:639px){.paddock-header{padding:19px;border-radius:18px}.paddock-pack-card{border-radius:14px}.paddock-landing-title{font-size:clamp(3.2rem,15vw,5rem)}.paddock-landing-image{max-height:340px;transform:rotate(2deg)}}
-@media(prefers-reduced-motion:reduce){.paddock-data-card,.paddock-action,.paddock-pack-card,.paddock-landing-image{transition:none}.paddock-data-card:hover,.paddock-action:hover,.paddock-pack-card:hover,.paddock-landing-image:hover{transform:none}}
-
-/* Visible keyboard focus is part of the sandbox design language. */
-.paddock-action:focus-visible,.paddock-ghost:focus-visible,.paddock-field:focus-visible{
-  outline:2px solid #9eeeff;
-  outline-offset:3px;
+/* ================================================================
+   APEX RACING DEPARTMENT — Motorsport concept / design iteration 02
+   All selectors scoped to the experimental interface, not admin tools.
+   No gameplay-related classes, booster rarity effects or card data touched.
+   ================================================================ */
+.apex-paddock {
+  --race-yellow:#dbff35;
+  --race-red:#f4523d;
+  --race-black:#090b0b;
+  --race-panel:#111515;
+  --race-line:rgba(255,255,255,.16);
+  --apx-cyan:var(--race-yellow);
+  --apx-gold:var(--race-yellow);
+  --apx-line:var(--race-line);
+  position:relative;
+  isolation:isolate;
+  color:#f4f5ef;
+  background:#0a0c0c;
+  font-family:"Barlow",Arial,sans-serif;
+}
+.apex-paddock::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  opacity:.25;
+  background-image:repeating-linear-gradient(0deg,transparent 0 39px,rgba(255,255,255,.026) 40px),repeating-linear-gradient(90deg,transparent 0 79px,rgba(255,255,255,.023) 80px);
+}
+.apex-paddock>main{position:relative;z-index:1;min-width:0;}
+.apex-paddock ::selection{background:#dbff35;color:#111}
+.paddock-shell{max-width:1600px;margin-inline:auto;width:100%;}
+.paddock-header {
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(110deg,#1a1e1e 0%,#0e1110 62%,#161916 100%);
+  border:1px solid rgba(255,255,255,.2);
+  border-left:5px solid #dbff35;
+  border-radius:0;
+  box-shadow:0 17px 50px rgba(0,0,0,.25);
+  padding:clamp(18px,3.4vw,38px);
+}
+.paddock-header::after{
+  content:"";
+  position:absolute;
+  z-index:0;
+  pointer-events:none;
+  right:-50px;top:-80px;
+  width:260px;height:280px;
+  transform:skew(-20deg);
+  background:repeating-linear-gradient(90deg,transparent 0 30px,rgba(219,255,53,.13) 30px 33px,transparent 33px 54px);
+  opacity:.55;
+}
+.paddock-header>*{position:relative;z-index:1}
+.paddock-eyebrow {
+  display:inline-flex;
+  gap:9px;align-items:center;
+  color:var(--race-yellow);
+  font:800 11px/1 "Barlow Condensed",Arial,sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.22em;
+}
+.paddock-eyebrow::before{content:"";height:8px;width:8px;flex-shrink:0;background:var(--race-red);transform:skew(-18deg)}
+.paddock-title,.paddock-section-title,.paddock-stat-number,.race-display,.race-number {
+  font-family:"Barlow Condensed","Bebas Neue",Impact,sans-serif;
+  font-style:normal;
+  font-weight:900;
+  text-transform:uppercase;
+}
+.paddock-title{
+  max-width:100%;
+  font-size:clamp(3.5rem,7.2vw,7.8rem);
+  line-height:.79;
+  letter-spacing:-.015em;
+  color:#f4f5ef;
+}
+.paddock-section-title{font-size:clamp(1.65rem,3.2vw,3.1rem);line-height:.9;letter-spacing:-.015em}
+.paddock-stat-number{font-size:clamp(3.1rem,5vw,5.1rem);line-height:.9;letter-spacing:-.035em}
+.paddock-subtitle{font:500 clamp(.85rem,1.5vw,1rem)/1.6 "Barlow",Arial,sans-serif;max-width:65ch;color:#aab1ac;margin-top:18px}
+.paddock-micro{font:800 10px/1.3 "Barlow Condensed",Arial,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#bac2b6}
+.paddock-rule{height:3px;background:linear-gradient(90deg,#dbff35 0 27%,#f4523d 27% 38%,rgba(255,255,255,.18) 38% 100%)}
+.paddock-panel,.paddock-tile,.paddock-data-card{
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:0;
+  background:linear-gradient(155deg,#1d2120,#111514 74%);
+  box-shadow:inset 0 1px rgba(255,255,255,.065),0 16px 42px rgba(0,0,0,.19);
+}
+.paddock-panel::before,.paddock-tile::before{content:"";position:absolute;top:0;left:0;width:38px;height:3px;background:var(--race-yellow);pointer-events:none}
+.paddock-data-card{transition:transform .22s ease,border-color .22s ease,background .22s ease}
+.paddock-data-card:hover{border-color:rgba(219,255,53,.65);background:#222925;transform:translateY(-3px)}
+.paddock-action{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  position:relative;
+  border:1px solid #dbff35;
+  border-radius:0!important;
+  background:#dbff35!important;
+  color:#0b0d0c!important;
+  box-shadow:5px 5px 0 rgba(255,255,255,.12);
+  font:900 13px/1 "Barlow Condensed",Arial,sans-serif;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;
+}
+.paddock-action:hover{filter:brightness(1.06);transform:translate(-2px,-2px);box-shadow:7px 7px 0 rgba(255,255,255,.18)}
+.paddock-action:disabled{cursor:not-allowed;opacity:.55;filter:grayscale(1);transform:none}
+.paddock-ghost{
+  border:1px solid rgba(255,255,255,.3)!important;
+  background:#181c1a!important;
+  color:#e7ece6!important;
+  border-radius:0!important;
+  transition:border-color .2s ease,color .2s ease;
+}
+.paddock-ghost:hover{border-color:#dbff35!important;color:#dbff35!important}
+.paddock-field{
+  border:1px solid #3c4640!important;
+  border-radius:0!important;
+  background:#0d1210!important;
+  color:#f3f6f0!important;
+}
+.paddock-field:focus{outline:2px solid rgba(219,255,53,.67);outline-offset:1px}
+.paddock-meter{height:8px;overflow:hidden;border:1px solid rgba(255,255,255,.13);border-radius:0;background:#30362e}
+.paddock-meter>div{height:100%;border-radius:0;background:repeating-linear-gradient(110deg,#dbff35 0 14px,#b4d72c 14px 17px)}
+.paddock-pack-card{
+  position:relative;
+  overflow:hidden;
+  background:#151918;
+  border:1px solid #383e39;
+  border-top:4px solid var(--race-yellow);
+  border-radius:0!important;
+  box-shadow:0 12px 40px rgba(0,0,0,.32);
+  transition:transform .25s ease,border-color .25s ease;
+}
+.paddock-pack-card:hover{transform:translateY(-5px);border-color:#dbff35}
+.paddock-pack-card::after{content:"";position:absolute;right:8px;bottom:8px;width:28px;height:28px;opacity:.28;background:repeating-linear-gradient(45deg,white 0 6px,transparent 6px 12px);pointer-events:none}
+.paddock-pack-image{box-shadow:10px 15px 30px rgba(0,0,0,.5);transform:rotate(-3deg);transition:transform .3s ease}
+.paddock-pack-card:hover .paddock-pack-image{transform:rotate(0deg) scale(1.035)}
+.paddock-hero{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:0;
+  background:linear-gradient(117deg,#222822,#0b0e0c 73%);
+  box-shadow:0 24px 55px rgba(0,0,0,.28);
+}
+.paddock-hero::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  z-index:-1;
+  right:-20%;top:-90%;
+  width:65%;height:225%;
+  background:rgba(219,255,53,.085);
+  transform:skew(-23deg);
+}
+.paddock-telemetry{background-image:repeating-linear-gradient(90deg,rgba(219,255,53,.45) 0 2px,transparent 2px 12px);mask-image:linear-gradient(90deg,transparent,black 12%,black 90%,transparent)}
+.paddock-landing{background:#0a0d0c}
+.paddock-landing-title{font:900 clamp(4.6rem,11vw,12rem)/.72 "Barlow Condensed",Impact,sans-serif;letter-spacing:-.05em}
+.paddock-landing-image{filter:drop-shadow(0 22px 54px rgba(0,0,0,.65));transform:rotate(-7deg);transition:transform .4s ease}
+.paddock-landing-image:hover{transform:rotate(-2deg) translateY(-5px)}
+.paddock-sidebar{
+  border-right:2px solid #303830;
+  background:linear-gradient(175deg,#191d1b,#0c0f0e 66%);
+  box-shadow:12px 0 45px rgba(0,0,0,.25);
+}
+.paddock-mobile-nav{
+  border-top:3px solid #dbff35;
+  background:#101411;
+  box-shadow:0 -12px 36px rgba(0,0,0,.7);
+}
+.paddock-mobile-sheet{border:1px solid #4d5a4a;background:#161c17;box-shadow:0 30px 80px #000a}
+.race-eyebrow{display:flex;align-items:center;gap:10px;font:800 11px "Barlow Condensed",sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#dbff35}
+.race-eyebrow:before{content:"//";color:#f4523d;font-weight:900;font-size:16px}
+.race-display{font-size:clamp(4rem,11vw,10.8rem);line-height:.75;letter-spacing:-.055em}
+.race-number{font-size:clamp(4rem,10vw,8.4rem);line-height:.76;letter-spacing:-.06em}
+.race-lead{font:700 16px/1.6 "Barlow",Arial,sans-serif;color:#bec6bf}
+.race-grid{background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:38px 38px}
+.race-checkered{background-color:#151917;background-image:conic-gradient(#eef3e7 25%,transparent 0 50%,#eef3e7 0 75%,transparent 0);background-size:24px 24px}
+.race-stripes{background:repeating-linear-gradient(110deg,#dbff35 0 11px,#141614 11px 15px,#dbff35 15px 22px);height:12px}
+.race-index{font:900 13px/1 "Barlow Condensed",sans-serif;color:#dbff35;letter-spacing:.15em}
+.race-section-heading{display:flex;align-items:end;gap:16px;border-bottom:1px solid #444b43;padding-bottom:12px}
+.race-section-heading:before{content:"";width:7px;min-height:32px;background:#f4523d;transform:skew(-12deg)}
+.race-ghost-numeral{font:900 clamp(8rem,21vw,23rem)/.85 "Barlow Condensed",Impact,sans-serif;letter-spacing:-.08em;color:rgba(255,255,255,.055);pointer-events:none;user-select:none}
+.race-photo{
+  background-image:linear-gradient(90deg,#090b0b 2%,rgba(9,11,11,.3) 60%),linear-gradient(0deg,#090b0b 0%,transparent 46%),url("https://images.pexels.com/photos/14905468/pexels-photo-14905468.jpeg?auto=compress&cs=tinysrgb&w=1600");
+  background-position:center;
+  background-size:cover;
+}
+.race-photo-soft{
+  background-image:linear-gradient(90deg,#101311 0%,rgba(13,17,14,.54) 48%,rgba(13,17,14,.1) 100%),linear-gradient(0deg,#131713 0%,transparent 50%),url("https://images.pexels.com/photos/14905469/pexels-photo-14905469.jpeg?auto=compress&cs=tinysrgb&w=1600");
+  background-position:center;
+  background-size:cover;
+}
+.race-hero{
+  position:relative;
+  isolation:isolate;
+  min-height:clamp(420px,54vw,650px);
+  overflow:hidden;
+  background-color:#121917;
+  border:1px solid #4e574d;
+  box-shadow:0 35px 85px #0008;
+}
+.race-hero:after{content:"";position:absolute;bottom:0;left:0;width:100%;height:8px;background:linear-gradient(90deg,#dbff35 0 56%,#f4523d 56% 62%,white 62% 64%,transparent 64%)}
+.race-hero-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:start;justify-content:end;min-height:inherit;padding:clamp(24px,5vw,66px)}
+.race-poster-label{display:inline-block;background:#dbff35;color:#111510;padding:6px 10px;font:900 11px/1 "Barlow Condensed",sans-serif;letter-spacing:.18em;text-transform:uppercase;transform:skew(-8deg)}
+.race-pit-tile{position:relative;border:1px solid #3c453b;background:#171c17;overflow:hidden}
+.race-pit-tile:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#dbff35}
+.race-pit-tile:after{content:"";pointer-events:none;position:absolute;right:-38px;top:-40px;width:130px;height:170px;transform:skew(-20deg);background:rgba(219,255,53,.045)}
+.race-timing{font:900 clamp(2.5rem,5vw,4.3rem)/.9 "Barlow Condensed",sans-serif;letter-spacing:-.025em;color:#f5f5f0}
+.race-progress-dial{position:relative;border-radius:50%;aspect-ratio:1;background:conic-gradient(#dbff35 var(--race-progress,0%),#333c33 0);padding:9px}
+.race-progress-dial:before{content:"";position:absolute;inset:9px;border-radius:50%;background:#141915}
+.race-progress-dial>div{position:relative;z-index:1;display:flex;height:100%;flex-direction:column;align-items:center;justify-content:center}
+.race-ticker{border-block:1px solid #384238;background:#dbff35;color:#101510;overflow:hidden}
+.race-ticker-track{white-space:nowrap;display:flex;gap:50px;align-items:center;min-height:44px;animation:race-ticker-move 30s linear infinite;font:900 14px "Barlow Condensed",sans-serif;letter-spacing:.2em;text-transform:uppercase}
+.race-ticker-track>*{flex-shrink:0}
+@keyframes race-ticker-move{to{transform:translateX(-50%)}}
+.race-feature-index{font:900 clamp(3rem,5vw,5rem)/.8 "Barlow Condensed",sans-serif;color:#dbff35}
+.race-card-outline{border:1px solid #3c443e;background:#131714;position:relative}
+.race-card-outline:before{content:"";position:absolute;pointer-events:none;inset:0 0 auto;height:4px;background:linear-gradient(90deg,#dbff35 0 38%,#f4523d 38% 54%,transparent 54%)}
+.race-card-outline:hover{border-color:#b8d747}
+.apex-paddock a:focus-visible,.apex-paddock button:focus-visible,.paddock-action:focus-visible,.paddock-ghost:focus-visible,.paddock-field:focus-visible{
+  outline:2px solid #dbff35;outline-offset:3px;
+}
+@media(max-width:767px){
+  .paddock-header{border-left-width:3px;padding:20px}
+  .paddock-title{font-size:clamp(3.1rem,11vw,5rem)}
+  .race-hero{min-height:490px}
+  .race-hero-content{padding:23px}
+  .race-ticker-track{font-size:12px;gap:30px}
+}
+@media(max-width:639px){
+  .paddock-landing-title{font-size:clamp(4rem,17vw,6.8rem)}
+  .race-number{font-size:clamp(3.5rem,15vw,6rem)}
+}
+@media(prefers-reduced-motion:reduce){
+  .race-ticker-track{animation:none}
+  .paddock-data-card,.paddock-action,.paddock-pack-card,.paddock-landing-image{transition:none}
+  .paddock-data-card:hover,.paddock-action:hover,.paddock-pack-card:hover,.paddock-landing-image:hover{transform:none}
 }
