@@ -59,14 +59,14 @@ function LoginForm() {
       animate={{ opacity: 1, y: 0 }}
       className="relative z-10 w-full max-w-md"
     >
-      <div className="relative overflow-hidden border-l-[5px] border-[#D32F35] bg-[#171A1E] p-6 shadow-[0_25px_65px_rgba(0,0,0,.35)] sm:p-10">
+      <div className="paddock-panel relative overflow-hidden p-6 shadow-[0_25px_65px_rgba(0,0,0,.35)] sm:p-10">
         {/* Background Gradients */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-[#D32F35]/10 blur-[80px] -mr-10 -mt-10" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 blur-[80px] -ml-10 -mb-10" />
 
         <div className="relative z-10">
           <header className="mb-9 text-center"><p className="race-eyebrow mb-5 justify-center">APEX / DRIVER ACCESS</p>
-            <div className="mb-5 inline-flex h-16 w-16 items-center justify-center border-2 border-[#D32F35] bg-[#D32F35]/10 text-[#F0EFEB]">
+            <div className="mb-5 inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-[#8ba7ff]/35 bg-[#34456e]/35 text-[#c1d7ff]">
               {isLogin ? <LogInIcon size={28} /> : <UserPlusIcon size={28} />}
             </div>
             <h2 className="paddock-title">
@@ -156,15 +156,15 @@ export default function LoginPage() {
             <LoginForm />
           </Suspense>
         </div>
-        <aside className="race-hero race-photo relative hidden min-h-[610px] flex-col justify-between lg:flex" aria-label="Apex Collector">
+        <aside className="race-hero race-photo relative hidden min-h-[610px] flex-col justify-between rounded-[22px] lg:flex" aria-label="Apex Collector">
           <div className="absolute inset-0 bg-gradient-to-r from-[#101215]/80 to-transparent"/>
           <span className="absolute -right-10 top-5 select-none font-['Barlow_Condensed'] text-[220px] font-black leading-none text-white/[.07]" aria-hidden="true">01</span>
           <div className="relative z-10 p-9">
-            <p className="race-eyebrow">APEX / DRIVER ACCESS</p>
+            <p className="paddock-eyebrow">APEX / COLLECTIONNEUR</p>
             <span className="race-poster-label mt-5">THE PRIVATE PADDOCK / 001</span>
           </div>
           <div className="relative z-10 p-9">
-            <h2 className="race-display max-w-[480px]">RACE. <span className="text-[#F0EFEB]">COLLECT.</span> REPEAT.</h2>
+            <h2 className="font-['Barlow_Condensed'] text-[clamp(3.3rem,6vw,6.1rem)] font-black italic leading-[.9] text-white">Construis ton <span className="text-[#9bb6ff]">garage de rêve.</span></h2>
             <div className="mt-7 flex items-center justify-between border-t border-white/30 pt-4">
               <span className="font-mono text-[10px] font-bold uppercase tracking-[.17em] text-[#F0EFEB]">BUILD YOUR GARAGE</span>
               <span className="font-mono text-[10px] font-bold text-gray-300">AC / 001</span>
