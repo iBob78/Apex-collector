@@ -111,7 +111,27 @@ export default function DashboardPage() {
                 </Link>
               </div>
             </div>
-            <span aria-hidden="true" className="absolute bottom-4 right-5 font-mono text-[10px] tracking-[.15em] text-white/55">APEX COLLECTOR / GARAGE</span>
+            <div className="apx-hero-garage-pass absolute bottom-6 right-7 hidden w-[245px] p-4 xl:block" aria-hidden="true">
+              <p className="mb-3 flex items-center justify-between text-[10px] font-black uppercase tracking-[.16em] text-[#adbfed]">
+                GARAGE STATUS <span className="apx-status-light" />
+              </p>
+              <div className="grid grid-cols-2 gap-2 border-y border-white/15 py-3">
+                <div>
+                  <span className="block font-mono text-[24px] font-black leading-none tabular-nums text-white">{formatNumber(stats.uniqueCards)}</span>
+                  <span className="mt-1 block text-[9px] uppercase tracking-[.08em] text-[#a9b8d9]">{t('Modèles uniques')}</span>
+                </div>
+                <div>
+                  <span className="block font-mono text-[24px] font-black leading-none tabular-nums text-white">{formatNumber(stats.totalCards)}</span>
+                  <span className="mt-1 block text-[9px] uppercase tracking-[.08em] text-[#a9b8d9]">{t('Cartes totales')}</span>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <span className="text-[11px] font-bold text-[#c8d5f7]">{t('Niveau écurie')}</span>
+                <span className="font-mono text-[17px] font-black text-[#8ac5ff]">{String(garageProgress.level).padStart(2, '0')}</span>
+              </div>
+              <div className="paddock-meter mt-2"><div style={{width: `${progressPercent}%`}} /></div>
+            </div>
+            <span aria-hidden="true" className="absolute bottom-4 right-5 font-mono text-[10px] tracking-[.15em] text-white/55 xl:hidden">APEX COLLECTOR / GARAGE</span>
           </section>
 
           <section aria-label={t('Accès rapide')}>
