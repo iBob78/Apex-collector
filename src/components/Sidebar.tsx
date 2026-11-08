@@ -143,87 +143,103 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="paddock-sidebar sticky top-0 z-50 hidden h-screen w-[264px] shrink-0 flex-col md:flex lg:w-[280px]">
-        <Link href="/dashboard" className="group relative block overflow-hidden border-b border-white/20 px-5 pb-7 pt-8">
-          <span className="absolute -right-8 -top-12 h-40 w-24 skew-x-[-25deg] bg-[#D32F35]/[.07]" aria-hidden="true"/>
-          <div className="mb-5 flex items-center gap-2 font-['Barlow_Condensed'] text-[11px] font-extrabold uppercase tracking-[.2em] text-[#F0EFEB]">
-            <span className="h-[7px] w-[7px] bg-[#D32F35]" /> RACING DEPARTMENT
-          </div>
-          <h1 className="font-['Barlow_Condensed'] text-[60px] font-black uppercase leading-[.7] tracking-[-.065em] text-white transition group-hover:text-[#F0EFEB]">
-            APEX<span className="mt-2 block text-[49px] tracking-[-.045em] text-[#F0EFEB] group-hover:text-white">COLLECTOR</span>
-          </h1>
-          <div className="mt-6 flex items-center gap-2 border-t border-white/20 pt-3">
-            <span className="h-[2px] w-6 bg-[#D32F35]" />
-            <span className="font-mono text-[10px] uppercase tracking-[.1em] text-gray-400">{t('Season One')} / AC-001</span>
+
+      <aside className="paddock-sidebar sticky top-0 z-50 hidden h-screen w-[228px] shrink-0 flex-col md:flex 2xl:w-[252px]">
+        <Link href="/dashboard" className="relative block overflow-hidden border-b border-white/10 px-5 pb-7 pt-8" aria-label="Apex Collector">
+          <div className="pointer-events-none absolute -left-10 top-16 h-28 w-48 rounded-full bg-red-600/10 blur-[55px]" />
+          <span className="relative flex items-center gap-3">
+            <span aria-hidden="true" className="relative mt-1 inline-flex h-10 w-11 shrink-0 skew-x-[-20deg] flex-col gap-1.5">
+              <span className="block h-2.5 w-full bg-[#f13b57] shadow-[0_0_17px_rgba(238,49,76,.45)]"/>
+              <span className="ml-2 block h-2.5 w-[70%] bg-[#ba1c48]"/>
+            </span>
+            <span className="font-['Barlow_Condensed'] text-[33px] font-black italic uppercase leading-[.66] tracking-[-.065em] text-white">
+              APEX <span className="mt-2 block text-[25px] tracking-[-.025em]">COLLECTOR</span>
+            </span>
+          </span>
+          <div className="mt-6 flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[.15em] text-slate-500">
+            <span className="h-[2px] w-7 rounded-full bg-[#ed344f]"/>
+            {t('Season One')}
           </div>
         </Link>
-        <div className="flex items-center justify-between gap-2 border-b border-white/10 px-5 py-4 font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.17em]">
-          <span className="text-gray-400">MAIN / NAVIGATION</span><span className="text-[#F0EFEB]">10 SECTORS</span>
-        </div>
-        <nav aria-label={t('Navigation principale')} className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-3">
-          {navItems.map(({ href, label, icon: Icon }, index) => {
+        <nav aria-label={t('Navigation principale')} className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 py-5">
+          {navItems.map(({ href, label, icon: Icon }) => {
             const active = isActivePath(href);
             const locked = authLoaded && !user && href !== '/login';
             return (
-              <Link key={href} href={locked ? '/login' : href} aria-current={active ? 'page' : undefined}
-                className={`group relative flex min-h-[47px] items-center gap-3 border-l-[3px] px-3 py-2 transition-colors ${active
-                  ? 'border-[#D32F35] bg-[#D32F35] text-[#F0EFEB]'
-                  : locked ? 'border-transparent text-gray-600 opacity-60'
-                    : 'border-transparent text-[#C2C5C9] hover:border-[#D32F35] hover:bg-white/[.07] hover:text-white'
-                  }`}>
-                <span className={`w-[21px] shrink-0 font-mono text-[10px] font-bold ${active ? 'text-[#F0EFEB]' : 'text-gray-600 group-hover:text-[#F0EFEB]'}`}>{String(index + 1).padStart(2, '0')}</span>
-                <Icon size={18} className="shrink-0" aria-hidden="true"/>
-                <span className="min-w-0 flex-1 font-['Barlow_Condensed'] text-[14px] font-extrabold uppercase tracking-[.06em]">{t(label)}</span>
-                {locked ? <LockIcon size={13} aria-hidden="true" /> : active ? <span className="h-2 w-2 rotate-45 bg-[#D32F35]" aria-hidden="true" /> : null}
+              <Link
+                key={href}
+                href={locked ? '/login' : href}
+                aria-current={active ? 'page' : undefined}
+                className={`group relative flex min-h-[46px] items-center gap-3 rounded-xl border px-3 py-2.5 transition-all ${active
+                  ? 'border-[#8a86ff]/60 bg-gradient-to-r from-[#324b94]/75 via-[#302a66]/80 to-[#161c36] text-white shadow-[0_0_17px_rgba(99,111,255,.23),inset_0_1px_0_rgba(255,255,255,.18)]'
+                  : locked
+                    ? 'border-transparent text-slate-600 opacity-60'
+                    : 'border-transparent text-[#acb6d1] hover:border-white/10 hover:bg-[#1b2845]/65 hover:text-white'
+                }`}
+              >
+                {active && <span aria-hidden="true" className="absolute inset-y-2 left-0 w-[3px] rounded-full bg-[#65b8ff] shadow-[0_0_9px_rgba(80,161,255,.8)]" />}
+                <Icon size={20} className={active ? 'shrink-0 text-[#bdc8ff]' : 'shrink-0 text-[#8795b4] group-hover:text-white'} aria-hidden="true"/>
+                <span className="min-w-0 flex-1 text-[12px] font-bold tracking-[.01em]">{t(label)}</span>
+                {locked && <LockIcon size={13} aria-hidden="true" />}
               </Link>
             );
           })}
           {isAdmin && (
-            <div className="mt-3 border-t border-white/20 pt-3">
-              <button type="button" aria-expanded={adminMenuOpen} onClick={() => setAdminMenuOpen((open) => !open)}
-                className={`flex min-h-11 w-full items-center gap-3 border-l-[3px] px-3 py-2 text-left font-['Barlow_Condensed'] text-[14px] font-extrabold uppercase tracking-[.09em] transition ${pathname.startsWith('/admin/') ? 'border-[#D32F35] text-[#F0EFEB]' : 'border-transparent text-gray-400 hover:text-white'}`}>
-                <ShieldCheckIcon size={18} aria-hidden="true"/><span className="flex-1">{t('ADMIN')}</span>
-                <ChevronDownIcon size={16} className={`transition-transform ${adminMenuOpen ? 'rotate-180' : ''}`} aria-hidden="true"/>
+            <div className="mt-4 border-t border-white/10 pt-3">
+              <button
+                type="button"
+                aria-expanded={adminMenuOpen}
+                onClick={() => setAdminMenuOpen((open) => !open)}
+                className={`flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-xs font-bold transition ${pathname.startsWith('/admin/') ? 'bg-[#233c70] text-white' : 'text-[#b1bcd7] hover:bg-white/10 hover:text-white'}`}
+              >
+                <ShieldCheckIcon size={19} aria-hidden="true" />
+                <span className="flex-1">{t('ADMIN')}</span>
+                <ChevronDownIcon size={15} className={`transition-transform ${adminMenuOpen ? 'rotate-180' : ''}`} aria-hidden="true"/>
               </button>
               {adminMenuOpen && (
-                <div className="mt-1 space-y-1 pl-4">
+                <div className="mt-1 space-y-1 pl-3">
                   {visibleAdminItems.map(({ href, label, icon: Icon }) => {
                     const active = isActivePath(href);
-                    return <Link key={href} href={href} aria-current={active ? 'page' : undefined}
-                      className={`flex min-h-10 items-center gap-3 border-l-2 px-3 py-2 font-['Barlow_Condensed'] text-[12px] font-bold uppercase tracking-[.04em] ${active ? 'border-[#D32F35] bg-white/10 text-[#F0EFEB]' : 'border-transparent text-gray-400 hover:border-white/30 hover:text-white'}`}>
-                      <Icon size={16} aria-hidden="true"/><span>{t(label)}</span>
-                    </Link>;
+                    return (
+                      <Link key={href} href={href} aria-current={active ? 'page' : undefined}
+                        className={`flex min-h-10 items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-semibold ${active ? 'bg-[#354b93]/55 text-white' : 'text-slate-400 hover:bg-white/10 hover:text-white'}`}>
+                        <Icon size={17} aria-hidden="true"/><span>{t(label)}</span>
+                      </Link>
+                    );
                   })}
                 </div>
               )}
             </div>
           )}
         </nav>
-        {!authLoaded ? null : user ? (
-          <Link href="/profile" className="group block border-t border-white/20 bg-[#232930] px-5 py-5 transition-colors hover:bg-[#26301e]">
-            <div className="mb-3 flex items-center justify-between gap-2">
-              <span className="font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.16em] text-[#F0EFEB]">DRIVER / IDENTITY</span>
-              <CrownIcon size={17} className="text-[#F0EFEB]" aria-hidden="true"/>
+        {authLoaded && (
+          <div className="relative overflow-hidden border-t border-white/10 bg-[#0e1730]/75 px-4 py-5">
+            <div className="pointer-events-none absolute -bottom-10 -right-10 h-28 w-28 rounded-full bg-indigo-600/20 blur-3xl"/>
+            <div className="relative flex items-center gap-3">
+              <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#8ba9ef]/30 bg-[#2c385d] text-[#c3d5ff]">
+                <UserIcon size={21}/>
+              </span>
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-[.14em] text-[#95a4cf]">{t('PROFIL PILOTE')}</p>
+                {user ? (
+                  <Link href="/profile" className="block truncate text-[11px] font-bold text-white hover:text-[#8bd5ff]" title={user.email || undefined}>
+                    {user.email || t('PROFIL PILOTE')}
+                  </Link>
+                ) : (
+                  <Link href="/login" className="text-xs font-bold text-[#8bd5ff] hover:text-white">{t('Se Connecter')}</Link>
+                )}
+              </div>
             </div>
-            <p className="truncate font-mono text-[11px] text-white" title={user.email || undefined}>{user.email || t('PROFIL PILOTE')}</p>
-            <div className="mt-3 flex items-center justify-between border-t border-white/15 pt-2 font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.1em] text-gray-400">
-              <span>{t('PROFIL PILOTE')}</span><span className="text-[#F0EFEB] transition-transform group-hover:translate-x-1">↗</span>
-            </div>
-          </Link>
-        ) : (
-          <Link href="/login" className="m-3 flex min-h-12 items-center justify-center bg-[#D32F35] px-3 font-['Barlow_Condensed'] text-[15px] font-black uppercase tracking-[.1em] text-[#F0EFEB] transition hover:bg-white">
-            {t('Se Connecter')}
-          </Link>
+          </div>
         )}
       </aside>
-
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[55] md:hidden">
           <button type="button" aria-label={t('Fermer le menu')} onClick={() => setMobileMenuOpen(false)} className="absolute inset-0 bg-black/75" />
           <nav id="apex-mobile-more-menu" aria-label={t('Navigation secondaire')} className="paddock-mobile-sheet absolute inset-x-3 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] max-h-[75dvh] overflow-y-auto p-3">
             <div className="flex items-center justify-between px-3 pb-3 pt-1">
               <span className="text-sm font-black uppercase tracking-widest">{t('Plus')}</span>
-              <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label={t('Fermer le menu')} className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D32F35]">
+              <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label={t('Fermer le menu')} className="flex h-11 w-11 items-center justify-center rounded-xl text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#89bbff]">
                 <XIcon size={22} />
               </button>
             </div>
@@ -232,7 +248,7 @@ export default function Sidebar() {
               const locked = authLoaded && !user;
               return (
                 <Link key={href} href={locked ? '/login' : href} aria-current={active ? 'page' : undefined} onClick={() => setMobileMenuOpen(false)}
-                  className={`flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D32F35] ${active ? 'bg-[#D32F35]/15 text-[#F0EFEB]' : 'text-gray-200 hover:bg-white/10'}`}>
+                  className={`flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#89bbff] ${active ? 'bg-[#586cef]/15 text-[#F0EFEB]' : 'text-gray-200 hover:bg-white/10'}`}>
                   <Icon size={20} aria-hidden="true" />
                   <span>{t(label)}</span>
                   {locked && <LockIcon className="ml-auto text-gray-500" size={15} aria-hidden="true" />}
@@ -261,7 +277,7 @@ export default function Sidebar() {
                           href={href}
                           aria-current={active ? 'page' : undefined}
                           onClick={() => setMobileMenuOpen(false)}
-                          className={`flex min-h-11 items-center gap-3 rounded-xl px-4 py-2 text-sm font-bold ${active ? 'bg-[#D32F35]/15 text-[#F0EFEB]' : 'text-gray-300 hover:bg-white/10'}`}
+                          className={`flex min-h-11 items-center gap-3 rounded-xl px-4 py-2 text-sm font-bold ${active ? 'bg-[#586cef]/15 text-[#F0EFEB]' : 'text-gray-300 hover:bg-white/10'}`}
                         >
                           <Icon size={18} aria-hidden="true" />
                           <span>{t(label)}</span>
@@ -284,8 +300,8 @@ export default function Sidebar() {
             const shortLabel = label === 'ACCUEIL' ? 'Accueil' : label === 'MA COLLECTION' ? 'Collection' : label === 'BOUTIQUE PACKS' ? 'Boosters' : 'Marché';
             return (
               <Link key={href} href={locked ? '/login' : href} aria-current={active ? 'page' : undefined}
-                className={`group relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.04em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D32F35] ${active ? 'text-[#F0EFEB]' : 'text-[#A8ADB3]'}`}>
-                {active && <span className="absolute -top-[3px] left-4 right-4 h-[3px] bg-[#D32F35]" aria-hidden="true" />}
+                className={`group relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.04em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#89bbff] ${active ? 'text-[#F0EFEB]' : 'text-[#A8ADB3]'}`}>
+                {active && <span className="absolute -top-[3px] left-4 right-4 h-[3px] bg-[#586cef]" aria-hidden="true" />}
                 <Icon size={22} strokeWidth={active ? 2.6 : 1.75} aria-hidden="true" />
                 <span className="truncate">{t(shortLabel)}</span>
               </Link>
@@ -293,7 +309,7 @@ export default function Sidebar() {
           })}
           <button type="button" aria-label={t('Plus')} aria-controls="apex-mobile-more-menu" aria-expanded={mobileMenuOpen}
             onClick={() => setMobileMenuOpen((open) => !open)}
-            className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.04em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D32F35] ${mobileMenuOpen || extraItems.some(({ href }) => isActivePath(href)) || (isAdmin && pathname.startsWith('/admin/')) ? 'text-[#F0EFEB]' : 'text-[#A8ADB3]'}`}>
+            className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.04em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#89bbff] ${mobileMenuOpen || extraItems.some(({ href }) => isActivePath(href)) || (isAdmin && pathname.startsWith('/admin/')) ? 'text-[#F0EFEB]' : 'text-[#A8ADB3]'}`}>
             <MenuIcon size={21} aria-hidden="true" />
             <span>{t('Plus')}</span>
           </button>
