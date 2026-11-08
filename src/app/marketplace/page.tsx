@@ -73,42 +73,41 @@ export default function MarketplacePage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white">
+    <div className="apex-paddock flex min-h-screen text-white">
       <Sidebar />
       <main className="min-w-0 flex-1 flex flex-col">
-        <div className="p-4 md:p-8 flex-1">
+        <div className="paddock-shell flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-9 lg:py-10">
           {/* Header */}
-          <header className="mb-10">
-            <h1 className="bg-gradient-to-r from-white to-gray-500 bg-clip-text text-3xl font-black uppercase italic tracking-tighter text-transparent sm:text-4xl">
-              Marketplace
-            </h1>
-            <p className="text-gray-500 font-mono text-sm mt-1">
-              {t('Échangez et achetez des pièces rares pour votre écurie.')}
-            </p>
+          <header className="paddock-header mb-7">
+            <div className="relative z-10">
+              <p className="paddock-eyebrow">APEX / TRADING FLOOR</p>
+              <h1 className="paddock-title mt-3">Marketplace<span className="text-[#e7c18a]">.</span></h1>
+              <p className="paddock-subtitle">{t('Échangez et achetez des pièces rares pour votre écurie.')}</p>
+            </div>
 
             {/* Navigation Tabs */}
-            <div className="flex gap-8 mt-8 border-b border-white/5">
+            <div className="relative z-10 mt-7 flex flex-wrap gap-6 border-b border-cyan-100/15">
               <button
                 onClick={() => setActiveTab('browse')}
-                className={`pb-4 px-2 text-sm font-black tracking-widest uppercase transition-all relative ${activeTab === 'browse' ? 'text-blue-500' : 'text-gray-500 hover:text-white'
+                className={`pb-4 px-2 text-sm font-black tracking-widest uppercase transition-all relative ${activeTab === 'browse' ? 'text-cyan-200' : 'text-slate-400 hover:text-white'
                   }`}
               >
                 {t('Parcourir')}
-                {activeTab === 'browse' && <motion.div layoutId="mkt_tab" className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500" />}
+                {activeTab === 'browse' && <motion.div layoutId="mkt_tab" className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-[#e7c18a]" />}
               </button>
               <button
                 onClick={() => setActiveTab('my_listings')}
-                className={`pb-4 px-2 text-sm font-black tracking-widest uppercase transition-all relative ${activeTab === 'my_listings' ? 'text-blue-500' : 'text-gray-500 hover:text-white'
+                className={`pb-4 px-2 text-sm font-black tracking-widest uppercase transition-all relative ${activeTab === 'my_listings' ? 'text-cyan-200' : 'text-slate-400 hover:text-white'
                   }`}
               >
                 {t('Mes Ventes')}
-                {activeTab === 'my_listings' && <motion.div layoutId="mkt_tab" className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500" />}
+                {activeTab === 'my_listings' && <motion.div layoutId="mkt_tab" className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-[#e7c18a]" />}
               </button>
             </div>
           </header>
 
           {/* Filters Bar */}
-          <div className="bg-[#0a0a0a] border border-white/5 rounded-2xl p-4 flex flex-wrap items-center gap-4 mb-8">
+          <div className="paddock-panel mb-7 flex flex-wrap items-center gap-3 p-4 sm:gap-4">
             <div className="relative w-full min-w-0 flex-1 sm:min-w-[240px]">
               <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
               <input
@@ -116,24 +115,34 @@ export default function MarketplacePage() {
                 placeholder={t('Rechercher une rareté, une marque...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="min-h-11 w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-12 pr-4 text-base transition-colors focus:border-blue-500/50 focus:outline-none sm:text-sm"
+                className="paddock-field min-h-11 w-full rounded-xl py-3 pl-12 pr-4 text-base transition-colors sm:text-sm"
               />
             </div>
 
-            <button className="bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-3 rounded-xl flex items-center gap-3 transition-all">
+            <button className="paddock-ghost flex min-h-11 items-center gap-3 rounded-xl px-5 py-3 text-slate-200">
               <FilterIcon size={18} className="text-blue-400" />
               <span className="text-xs font-bold uppercase tracking-widest">{t('Filtres')}</span>
             </button>
 
             <button
               onClick={() => setIsSellModalOpen(true)}
-              className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-xl flex items-center gap-3 transition-all shadow-lg shadow-blue-500/20"
+              className="paddock-action flex min-h-11 items-center gap-3 rounded-xl px-5 py-3"
             >
               <TagIcon size={18} />
               <span className="text-xs font-bold uppercase tracking-widest">{t('Vendre une carte')}</span>
             </button>
           </div>
 
+          {/* Edition readout: no fabricated live market statistics. */}
+          <div className="mb-5 flex items-end justify-between gap-3 border-b border-cyan-100/10 pb-4">
+            <div>
+              <p className="paddock-eyebrow">APEX / MARKET INVENTORY</p>
+              <h2 className="paddock-section-title mt-2">{t('Parcourir')}</h2>
+            </div>
+            <div className="rounded-lg border border-[#e7c18a]/25 bg-[#e7c18a]/[.05] px-3 py-2 font-mono text-xs text-[#e7c18a]">
+              {listings.length} {t('Cartes')}
+            </div>
+          </div>
           {/* Results Grid */}
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 opacity-50">
@@ -147,7 +156,7 @@ export default function MarketplacePage() {
                   key={item.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="group relative bg-[#0a0a0a] border border-white/5 rounded-3xl p-4 hover:border-blue-500/30 transition-all shadow-2xl"
+                  className="paddock-data-card group relative p-4 shadow-2xl"
                 >
                   <div className="relative aspect-[3/4] mb-4">
                     <Card {...item.card} owned={true} />
@@ -167,7 +176,7 @@ export default function MarketplacePage() {
                     <div className="text-[10px] text-gray-600 font-mono">{t('il y a 2h')}</div>
                   </div>
 
-                  <div className="bg-white/5 rounded-2xl p-4 flex items-center justify-between group-hover:bg-blue-500/10 transition-colors">
+                  <div className="flex items-center justify-between rounded-xl border border-cyan-100/10 bg-[#081420]/85 p-3 transition-colors group-hover:border-cyan-100/25 sm:p-4">
                     <div>
                       <div className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">{t('Prix d’achat')}</div>
                       <div className="text-lg font-black italic tracking-tighter">▲ {item.price} <span className="text-[10px] not-italic text-gray-400">AP</span></div>
@@ -175,7 +184,7 @@ export default function MarketplacePage() {
                     <button
                       onClick={() => handleBuy(item.id, item.price)}
                       disabled={processingId === item.id || (profile && profile.ap < item.price)}
-                      className="bg-white text-black px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-500 hover:text-white transition-all disabled:opacity-50 disabled:grayscale flex items-center gap-2"
+                      className="paddock-action flex min-h-10 items-center gap-2 rounded-lg px-3 py-2 text-xs disabled:opacity-50 sm:px-4"
                     >
                       {processingId === item.id ? <Loader2Icon size={14} className="animate-spin" /> : null}
                       {profile && profile.ap < item.price ? t('Solde Insuffisant') : t('Acheter')}
@@ -188,7 +197,7 @@ export default function MarketplacePage() {
         </div>
         {profile && (
           <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-3 z-40 lg:bottom-8 lg:right-8">
-            <div className="bg-blue-600 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-blue-400/30">
+            <div className="paddock-panel flex items-center gap-3 px-4 py-3 shadow-2xl sm:px-6 sm:py-4">
               <CoinsIcon size={24} className="text-blue-100" />
               <div>
                 <div className="text-[10px] uppercase font-black tracking-widest text-blue-200">{t('Balance AP')}</div>
@@ -215,7 +224,7 @@ export default function MarketplacePage() {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative flex h-[100dvh] max-h-[100dvh] w-full max-w-4xl flex-col overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-2xl sm:h-auto sm:max-h-[90dvh] sm:rounded-[32px]"
+              className="paddock-panel relative flex h-[100dvh] max-h-[100dvh] w-full max-w-4xl flex-col overflow-hidden shadow-2xl sm:h-auto sm:max-h-[90dvh] sm:rounded-[26px]"
             >
               <div className="flex items-center justify-between border-b border-white/5 p-4 sm:p-8">
                 <div>
