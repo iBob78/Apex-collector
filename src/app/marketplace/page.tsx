@@ -80,36 +80,36 @@ export default function MarketplacePage() {
           {/* Header */}
           <header className="mb-8 overflow-hidden border border-white/20 bg-[#101510]">
             <div className="race-photo-soft relative isolate overflow-hidden px-5 py-9 sm:px-9 sm:py-11">
-              <div className="absolute inset-0 -z-0 bg-gradient-to-r from-[#0c120c] via-[#0c120c]/85 to-transparent"/>
+              <div className="absolute inset-0 -z-0 bg-gradient-to-r from-[#101215] via-[#101215]/85 to-transparent"/>
               <span className="absolute -right-2 -top-12 select-none font-['Barlow_Condensed'] text-[210px] font-black leading-none text-white/[.05] sm:text-[290px]" aria-hidden="true">04</span>
               <div className="relative z-10">
                 <p className="race-eyebrow">04 / TRADING PADDOCK</p>
-                <h1 className="paddock-title mt-5 max-w-4xl">MARKET<span className="text-[#dbff35]">PLACE.</span></h1>
-                <p className="mt-5 max-w-lg border-l-[3px] border-[#f4523d] pl-4 text-sm leading-relaxed text-gray-300">
+                <h1 className="paddock-title mt-5 max-w-4xl">MARKET<span className="text-[#F0EFEB]">PLACE.</span></h1>
+                <p className="mt-5 max-w-lg border-l-[3px] border-[#D32F35] pl-4 text-sm leading-relaxed text-gray-300">
                   {t('Échangez et achetez des pièces rares pour votre écurie.')}
                 </p>
-                <div className="mt-7 inline-flex gap-3 border border-white/20 bg-[#151b13]/90 px-4 py-3">
-                  <span className="font-['Barlow_Condensed'] text-[44px] font-black leading-[.85] text-[#dbff35]">{listings.length}</span>
+                <div className="mt-7 inline-flex gap-3 border border-white/20 bg-[#171A1E]/90 px-4 py-3">
+                  <span className="font-['Barlow_Condensed'] text-[44px] font-black leading-[.85] text-[#F0EFEB]">{listings.length}</span>
                   <span className="self-end font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.14em] text-gray-300">CARDS / MARKET INVENTORY</span>
                 </div>
               </div>
             </div>
-            <nav className="flex gap-[2px] bg-[#313a2d] p-[2px]" aria-label={t('Marketplace')}>
+            <nav className="flex gap-[2px] bg-[#555D65] p-[2px]" aria-label={t('Marketplace')}>
               <button type="button" onClick={() => setActiveTab('browse')}
                 aria-pressed={activeTab === 'browse'}
-                className={`relative flex min-h-12 flex-1 items-center justify-center gap-3 px-4 font-['Barlow_Condensed'] text-[15px] font-black uppercase tracking-[.1em] transition-colors ${activeTab === 'browse' ? 'bg-[#dbff35] text-[#111510]' : 'bg-[#151a16] text-gray-300 hover:text-white'}`}>
+                className={`relative flex min-h-12 flex-1 items-center justify-center gap-3 px-4 font-['Barlow_Condensed'] text-[15px] font-black uppercase tracking-[.1em] transition-colors ${activeTab === 'browse' ? 'bg-[#D32F35] text-[#F0EFEB]' : 'bg-[#171A1E] text-gray-300 hover:text-white'}`}>
                 <span className="text-[11px] opacity-60">01</span>{t('Parcourir')}
               </button>
               <button type="button" onClick={() => setActiveTab('my_listings')}
                 aria-pressed={activeTab === 'my_listings'}
-                className={`relative flex min-h-12 flex-1 items-center justify-center gap-3 px-4 font-['Barlow_Condensed'] text-[15px] font-black uppercase tracking-[.1em] transition-colors ${activeTab === 'my_listings' ? 'bg-[#dbff35] text-[#111510]' : 'bg-[#151a16] text-gray-300 hover:text-white'}`}>
+                className={`relative flex min-h-12 flex-1 items-center justify-center gap-3 px-4 font-['Barlow_Condensed'] text-[15px] font-black uppercase tracking-[.1em] transition-colors ${activeTab === 'my_listings' ? 'bg-[#D32F35] text-[#F0EFEB]' : 'bg-[#171A1E] text-gray-300 hover:text-white'}`}>
                 <span className="text-[11px] opacity-60">02</span>{t('Mes Ventes')}
               </button>
             </nav>
           </header>
 
           {/* Filters Bar */}
-          <div className="mb-7 flex flex-wrap items-center gap-3 border border-white/20 bg-[#1b211a] p-4 sm:gap-4">
+          <div className="mb-7 flex flex-wrap items-center gap-3 border border-white/20 bg-[#232930] p-4 sm:gap-4">
             <div className="relative w-full min-w-0 flex-1 sm:min-w-[240px]">
               <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
               <input
@@ -137,14 +137,14 @@ export default function MarketplacePage() {
               <p className="paddock-eyebrow">APEX / MARKET INVENTORY</p>
               <h2 className="paddock-section-title mt-2">{t('Parcourir')}</h2>
             </div>
-            <div className="border-l-[3px] border-[#dbff35] bg-[#1c2519] px-3 py-2 font-mono text-xs text-[#dbff35]">
+            <div className="border-l-[3px] border-[#D32F35] bg-[#232930] px-3 py-2 font-mono text-xs text-[#F0EFEB]">
               {listings.length} {t('Cartes')}
             </div>
           </div>
           {/* Results Grid */}
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 opacity-50">
-              <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+              <div className="w-10 h-10 border-4 border-[#555D65] border-t-transparent rounded-full animate-spin mb-4"></div>
               <p className="font-mono text-xs uppercase tracking-[0.3em]">{t('Ouverture du marché...')}</p>
             </div>
           ) : (
@@ -174,7 +174,7 @@ export default function MarketplacePage() {
                     <div className="text-[10px] text-gray-600 font-mono">{t('il y a 2h')}</div>
                   </div>
 
-                  <div className="flex items-center justify-between rounded-xl border border-cyan-100/10 bg-[#081420]/85 p-3 transition-colors group-hover:border-cyan-100/25 sm:p-4">
+                  <div className="flex items-center justify-between rounded-xl border border-[#555D65]/10 bg-[#171A1E]/85 p-3 transition-colors group-hover:border-[#555D65]/25 sm:p-4">
                     <div>
                       <div className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">{t('Prix d’achat')}</div>
                       <div className="text-lg font-black italic tracking-tighter">▲ {item.price} <span className="text-[10px] not-italic text-gray-400">AP</span></div>
@@ -196,9 +196,9 @@ export default function MarketplacePage() {
         {profile && (
           <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-3 z-40 lg:bottom-8 lg:right-8">
             <div className="paddock-panel flex items-center gap-3 px-4 py-3 shadow-2xl sm:px-6 sm:py-4">
-              <CoinsIcon size={24} className="text-blue-100" />
+              <CoinsIcon size={24} className="text-[#F0EFEB]" />
               <div>
-                <div className="text-[10px] uppercase font-black tracking-widest text-blue-200">{t('Balance AP')}</div>
+                <div className="text-[10px] uppercase font-black tracking-widest text-[#F0EFEB]">{t('Balance AP')}</div>
                 <div className="text-xl font-black italic tracking-tighter text-white">▲ {profile.ap}</div>
               </div>
             </div>
@@ -279,8 +279,8 @@ function SellCardItem({ userCard, onSelect }: { userCard: any, onSelect: (price:
 
   if (isSettingPrice) {
     return (
-      <div className="bg-white/5 border border-blue-500/50 rounded-2xl p-4 flex flex-col items-center justify-center gap-4 animate-in fade-in zoom-in duration-200">
-        <div className="text-[10px] font-black uppercase tracking-widest text-blue-400">{t('Fixer le prix')}</div>
+      <div className="bg-white/5 border border-[#555D65]/50 rounded-2xl p-4 flex flex-col items-center justify-center gap-4 animate-in fade-in zoom-in duration-200">
+        <div className="text-[10px] font-black uppercase tracking-widest text-[#F0EFEB]">{t('Fixer le prix')}</div>
         <div className="flex items-center gap-2">
           <input
             type="number"
@@ -293,7 +293,7 @@ function SellCardItem({ userCard, onSelect }: { userCard: any, onSelect: (price:
         <div className="flex flex-col gap-2 w-full">
           <button
             onClick={() => onSelect(price)}
-            className="w-full bg-blue-600 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest"
+            className="w-full bg-[#D32F35] py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest"
           >
             {t('Confirmer')}
           </button>

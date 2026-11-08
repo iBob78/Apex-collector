@@ -62,7 +62,7 @@ export default function BoostersPage() {
 
   if (loading) return (
     <div className="flex min-h-screen bg-black items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#555D65]"></div>
     </div>
   );
 
@@ -73,22 +73,22 @@ export default function BoostersPage() {
         <div className="paddock-shell px-4 py-6 pb-28 sm:px-7 sm:py-8 lg:px-10 lg:pb-12">
           <header className="relative mb-8 overflow-hidden border border-white/20 bg-[#101510]">
             <div className="race-photo-soft absolute inset-0 opacity-65" aria-hidden="true" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0b0e0b] via-[#10150e]/90 to-[#10150e]/50" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#101215] via-[#171A1E]/90 to-[#171A1E]/50" />
             <div className="relative grid gap-6 px-5 py-8 sm:px-9 sm:py-10 lg:grid-cols-[minmax(0,1fr)_245px] lg:items-end">
               <div className="min-w-0">
                 <p className="race-eyebrow">02 / THE PIT SUPPLY</p>
-                <h1 className="paddock-title mt-5 max-w-[690px]">{t('Boutique Officielle')}<span className="text-[#dbff35]">.</span></h1>
-                <p className="mt-5 max-w-lg border-l-[3px] border-[#f4523d] pl-4 text-sm leading-relaxed text-gray-300">
+                <h1 className="paddock-title mt-5 max-w-[690px]">{t('Boutique Officielle')}<span className="text-[#F0EFEB]">.</span></h1>
+                <p className="mt-5 max-w-lg border-l-[3px] border-[#D32F35] pl-4 text-sm leading-relaxed text-gray-300">
                   {t('Débloquez de nouvelles mécaniques et agrandissez votre garage.')}
                 </p>
-                <div className="mt-6 flex items-center gap-3 font-['Barlow_Condensed'] text-[13px] font-black uppercase tracking-[.15em] text-[#dbff35]">
-                  <span className="h-2 w-2 bg-[#f4523d]"/>
+                <div className="mt-6 flex items-center gap-3 font-['Barlow_Condensed'] text-[13px] font-black uppercase tracking-[.15em] text-[#F0EFEB]">
+                  <span className="h-2 w-2 bg-[#D32F35]"/>
                   {Object.keys(PACKS).length} {t('Boosters')} <span className="text-gray-500">/ PACK CATALOGUE</span>
                 </div>
               </div>
-              <div className="relative flex flex-col justify-between border-l-4 border-[#dbff35] bg-[#181f17] px-5 py-4 shadow-[0_15px_42px_rgba(0,0,0,.3)]">
+              <div className="relative flex flex-col justify-between border-l-4 border-[#D32F35] bg-[#232930] px-5 py-4 shadow-[0_15px_42px_rgba(0,0,0,.3)]">
                 <span className="font-['Barlow_Condensed'] text-[13px] font-black uppercase tracking-[.13em] text-gray-400">{t('Votre Solde')}</span>
-                <span className="mt-2 font-['Barlow_Condensed'] text-[51px] font-black leading-none tabular-nums text-[#dbff35]">
+                <span className="mt-2 font-['Barlow_Condensed'] text-[51px] font-black leading-none tabular-nums text-[#F0EFEB]">
                   {profile ? new Intl.NumberFormat('fr-FR').format(Number(profile.ap) || 0) : '—'} <span className="text-[18px]">AP</span>
                 </span>
                 <span className="mt-2 font-mono text-[10px] uppercase tracking-[.08em] text-gray-400">APEX POINTS / BALANCE</span>
@@ -97,11 +97,11 @@ export default function BoostersPage() {
             <div className="race-stripes" aria-hidden="true" />
           </header>
 
-          {dailyBoosterError && <p role="alert" className="mb-6 border-l-4 border-[#f4523d] bg-red-900/20 p-4 text-sm text-red-200">{dailyBoosterError}</p>}
+          {dailyBoosterError && <p role="alert" className="mb-6 border-l-4 border-[#D32F35] bg-red-900/20 p-4 text-sm text-red-200">{dailyBoosterError}</p>}
 
           {dailyBoosters.length > 0 && (
-            <section aria-labelledby="daily-boosters-heading" className="mb-10 border border-[#dbff35]/35 bg-[#1d2519]">
-              <div className="flex flex-wrap items-center justify-between gap-2 bg-[#dbff35] px-4 py-3 text-[#10140e] sm:px-6">
+            <section aria-labelledby="daily-boosters-heading" className="mb-10 border border-[#D32F35]/35 bg-[#232930]">
+              <div className="flex flex-wrap items-center justify-between gap-2 bg-[#D32F35] px-4 py-3 text-[#F0EFEB] sm:px-6">
                 <h2 id="daily-boosters-heading" className="font-['Barlow_Condensed'] text-[24px] font-black uppercase leading-none">{t('Boosters offerts à ouvrir')}</h2>
                 <span className="font-mono text-[11px] font-bold uppercase">{dailyBoosters.length} {t(dailyBoosters.length === 1 ? 'booster disponible' : 'boosters disponibles')}</span>
               </div>
@@ -113,12 +113,12 @@ export default function BoostersPage() {
                     return null;
                   }
                   return (
-                    <article key={dailyBooster.id} className="flex min-w-0 items-center gap-3 border border-white/20 bg-[#121711] p-3">
-                      <div className="relative h-[94px] w-[67px] shrink-0 overflow-hidden bg-[#090c09]">
+                    <article key={dailyBooster.id} className="flex min-w-0 items-center gap-3 border border-white/20 bg-[#171A1E] p-3">
+                      <div className="relative h-[94px] w-[67px] shrink-0 overflow-hidden bg-[#101215]">
                         <SafeImage src={pack.imageUrl} alt={pack.name} fill className="object-cover" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#dbff35]">{t('Récompenses de connexion')} / {dailyBooster.streak_day} / 7</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#F0EFEB]">{t('Récompenses de connexion')} / {dailyBooster.streak_day} / 7</p>
                         <h3 className="mt-1 truncate font-['Barlow_Condensed'] text-[23px] font-black uppercase leading-none">{t(pack.name)}</h3>
                         <button type="button" onClick={() => router.push(`/open?daily_booster=${encodeURIComponent(dailyBooster.id)}`)}
                           className="paddock-action mt-3 min-h-10 px-3 py-2">{t('Ouvrir ce booster offert')}</button>
@@ -135,7 +135,7 @@ export default function BoostersPage() {
               <p className="race-eyebrow">PIT SUPPLY / PICK YOUR PACK</p>
               <h2 className="paddock-section-title mt-2">{t('Boosters')}</h2>
             </div>
-            <span className="hidden font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[.16em] text-[#dbff35] sm:block">COLLECT / UNSEAL / DISCOVER</span>
+            <span className="hidden font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[.16em] text-[#F0EFEB] sm:block">COLLECT / UNSEAL / DISCOVER</span>
           </div>
 
           <div className="grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-3">
@@ -143,9 +143,9 @@ export default function BoostersPage() {
               <motion.article key={pack.slug} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: .33, delay: i * .06 }} className="paddock-pack-card group flex min-w-0 flex-col">
                 <div className={`absolute left-0 right-0 top-0 z-10 h-[4px] bg-gradient-to-r ${pack.color}`} aria-hidden="true"/>
-                <div className="relative overflow-hidden border-b border-white/15 bg-[#090d0b] px-3 pb-3 pt-4 sm:px-6 sm:pb-5 sm:pt-6">
+                <div className="relative overflow-hidden border-b border-white/15 bg-[#101215] px-3 pb-3 pt-4 sm:px-6 sm:pb-5 sm:pt-6">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono text-[10px] text-[#dbff35]">DROP // {String(i+1).padStart(2,'0')}</span>
+                    <span className="font-mono text-[10px] text-[#F0EFEB]">DROP // {String(i+1).padStart(2,'0')}</span>
                     <span className="font-['Barlow_Condensed'] text-[12px] font-extrabold uppercase tracking-[.08em] text-gray-300">{pack.cardCount} {t('Cartes')}</span>
                   </div>
                   <span className="absolute -bottom-5 right-0 select-none font-['Barlow_Condensed'] text-[130px] font-black leading-none text-white/[.035] sm:text-[200px]" aria-hidden="true">{String(i + 1).padStart(2,'0')}</span>
@@ -161,8 +161,8 @@ export default function BoostersPage() {
                   <div className="mt-auto pt-4">
                     <div className="mb-3 flex items-end justify-between gap-1 border-t border-white/20 pt-3">
                       <div className="flex items-baseline gap-1">
-                        <span className="font-['Barlow_Condensed'] text-[32px] font-black leading-none tabular-nums text-[#dbff35] sm:text-[44px]">{pack.price}</span>
-                        <span className="font-mono text-[10px] font-bold text-[#dbff35]">AP</span>
+                        <span className="font-['Barlow_Condensed'] text-[32px] font-black leading-none tabular-nums text-[#F0EFEB] sm:text-[44px]">{pack.price}</span>
+                        <span className="font-mono text-[10px] font-bold text-[#F0EFEB]">AP</span>
                       </div>
                       <span className="hidden font-['Barlow_Condensed'] text-[11px] font-bold uppercase tracking-[.14em] text-gray-500 sm:block">APEX POINTS</span>
                     </div>

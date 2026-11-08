@@ -386,30 +386,30 @@ export default function CollectionPage() {
           <header className="mb-8">
             <div className="mb-5 grid gap-2 lg:grid-cols-[minmax(0,1.5fr)_minmax(220px,.65fr)]">
               <div className="race-hero race-photo-soft min-h-[270px] sm:min-h-[315px]">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0b100c] via-[#0b100c]/90 to-transparent" aria-hidden="true" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#101215] via-[#101215]/90 to-transparent" aria-hidden="true" />
                 <span className="absolute -right-6 -top-14 select-none font-['Barlow_Condensed'] text-[230px] font-black leading-none text-white/[.05]" aria-hidden="true">03</span>
                 <div className="relative z-10 flex h-full flex-col justify-end px-5 py-8 sm:px-8 sm:py-10">
                   <p className="race-eyebrow">03 / THE COLLECTOR GRID</p>
-                  <h1 className="paddock-title mt-5 max-w-2xl">{t('Mon Garage')}<span className="text-[#dbff35]">.</span></h1>
-                  <p className="mt-5 max-w-[520px] border-l-[3px] border-[#f4523d] pl-4 text-sm leading-relaxed text-gray-300">
+                  <h1 className="paddock-title mt-5 max-w-2xl">{t('Mon Garage')}<span className="text-[#F0EFEB]">.</span></h1>
+                  <p className="mt-5 max-w-[520px] border-l-[3px] border-[#D32F35] pl-4 text-sm leading-relaxed text-gray-300">
                     {t('Collection complète des véhicules, circuits et pilotes d’exception.')}
                   </p>
-                  <div className="mt-6 flex items-center gap-3 font-mono text-[10px] font-bold tracking-[.13em] text-[#dbff35]">
+                  <div className="mt-6 flex items-center gap-3 font-mono text-[10px] font-bold tracking-[.13em] text-[#F0EFEB]">
                     <span>GARAGE // INVENTORY</span><span className="h-px w-12 bg-white/30"/><span>AC-003</span>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col border border-white/20 bg-[#1a2018]">
-                <div className="bg-[#dbff35] px-4 py-3 font-['Barlow_Condensed'] text-[13px] font-black uppercase tracking-[.16em] text-[#111610]">GARAGE / COMPLETION</div>
+              <div className="flex flex-col border border-white/20 bg-[#232930]">
+                <div className="bg-[#D32F35] px-4 py-3 font-['Barlow_Condensed'] text-[13px] font-black uppercase tracking-[.16em] text-[#F0EFEB]">GARAGE / COMPLETION</div>
                 <div className="flex flex-1 flex-col justify-between gap-5 p-4 sm:p-6">
                   <div>
-                    <p className="font-['Barlow_Condensed'] text-[74px] font-black leading-[.8] tabular-nums text-white sm:text-[92px]">{stats.percentage}<span className="text-[28px] text-[#dbff35]">%</span></p>
+                    <p className="font-['Barlow_Condensed'] text-[74px] font-black leading-[.8] tabular-nums text-white sm:text-[92px]">{stats.percentage}<span className="text-[28px] text-[#F0EFEB]">%</span></p>
                     <p className="mt-4 font-['Barlow_Condensed'] text-[13px] font-bold uppercase tracking-[.12em] text-gray-400">{t('Collection')}</p>
                     <div className="paddock-meter mt-3"><div style={{ width: `${stats.percentage}%` }} /></div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 border-t border-white/15 pt-4">
                     <div>
-                      <p className="font-['Barlow_Condensed'] text-[33px] font-black leading-none text-[#dbff35]">{stats.owned}<span className="text-[17px] text-gray-500">/{stats.total}</span></p>
+                      <p className="font-['Barlow_Condensed'] text-[33px] font-black leading-none text-[#F0EFEB]">{stats.owned}<span className="text-[17px] text-gray-500">/{stats.total}</span></p>
                       <span className="mt-1 block text-[10px] font-bold uppercase tracking-[.1em] text-gray-400">{t('Collection')}</span>
                     </div>
                     <div>
@@ -422,14 +422,14 @@ export default function CollectionPage() {
             </div>
 
             {/* Barre de Filtres */}
-            <div className="flex flex-col gap-3 border border-white/20 bg-[#1b211a] p-3 shadow-2xl sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 sm:p-4">
+            <div className="flex flex-col gap-3 border border-white/20 bg-[#232930] p-3 shadow-2xl sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 sm:p-4">
               {/* Tabs */}
-              <div className="grid w-full grid-cols-4 gap-[2px] bg-[#111711] p-1 sm:flex sm:w-auto">
+              <div className="grid w-full grid-cols-4 gap-[2px] bg-[#171A1E] p-1 sm:flex sm:w-auto">
                 {(['all', 'vehicle', 'circuit', 'driver'] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`min-h-11 rounded-lg px-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all sm:px-4 sm:text-xs sm:tracking-widest ${activeTab === tab ? 'bg-[#dbff35] text-[#111710]' : 'bg-[#0d120e] text-gray-400 hover:bg-white/10 hover:text-white'
+                    className={`min-h-11 rounded-lg px-1 py-2 text-[9px] font-bold uppercase tracking-wide transition-all sm:px-4 sm:text-xs sm:tracking-widest ${activeTab === tab ? 'bg-[#D32F35] text-[#171A1E]' : 'bg-[#101215] text-gray-400 hover:bg-white/10 hover:text-white'
                       }`}
                   >
                     {t(tab === 'all' ? 'Tous' : tab === 'vehicle' ? 'Véhicules' : tab === 'circuit' ? 'Circuits' : 'Pilotes')}
@@ -452,7 +452,7 @@ export default function CollectionPage() {
                   type="checkbox"
                   checked={hideLockedCards}
                   onChange={(event) => setHideLockedCards(event.target.checked)}
-                  className="size-4 accent-[#dbff35]"
+                  className="size-4 accent-[#D32F35]"
                 />
                 <span>{t('Masquer les cartes non déverrouillées')}</span>
               </label>
@@ -472,7 +472,7 @@ export default function CollectionPage() {
               <select
                 value={rarityFilter}
                 onChange={(e) => setRarityFilter(e.target.value as any)}
-                className="paddock-field min-h-11 w-full min-w-0 px-3 py-2 text-base sm:w-auto sm:text-sm [&>option]:bg-[#111810] [&>option]:text-white"
+                className="paddock-field min-h-11 w-full min-w-0 px-3 py-2 text-base sm:w-auto sm:text-sm [&>option]:bg-[#101215] [&>option]:text-white"
               >
                 <option value="All">{t('Toutes les raretés')}</option>
                 <option value="Common">{t('Commun')}</option>
@@ -487,7 +487,7 @@ export default function CollectionPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="paddock-field min-h-11 w-full min-w-0 px-3 py-2 text-base sm:w-auto sm:text-sm [&>option]:bg-[#111810] [&>option]:text-white"
+                className="paddock-field min-h-11 w-full min-w-0 px-3 py-2 text-base sm:w-auto sm:text-sm [&>option]:bg-[#101215] [&>option]:text-white"
               >
                 <option value="name">{t('Trier par Nom')}</option>
                 <option value="make-asc">{t('Marques, A à Z')}</option>
@@ -518,7 +518,7 @@ export default function CollectionPage() {
               <p className="race-eyebrow">GARAGE / GRID SCAN</p>
               <h2 className="paddock-section-title mt-2">{t('Collection')}</h2>
             </div>
-            <div className="inline-flex items-center gap-2 border-l-[3px] border-[#dbff35] bg-[#1e261a] px-4 py-2 font-mono text-[12px] font-bold uppercase text-[#dbff35]">
+            <div className="inline-flex items-center gap-2 border-l-[3px] border-[#D32F35] bg-[#232930] px-4 py-2 font-mono text-[12px] font-bold uppercase text-[#F0EFEB]">
               <span className="font-mono font-bold tabular-nums">{filteredCards.length}</span>
               <span className="font-bold uppercase tracking-[.1em]">{t('Cartes')}</span>
             </div>
@@ -526,7 +526,7 @@ export default function CollectionPage() {
           {/* Grid of Cards */}
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 opacity-50">
-              <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+              <div className="w-12 h-12 border-4 border-[#555D65] border-t-transparent rounded-full animate-spin mb-4"></div>
               <p className="font-mono text-sm uppercase tracking-widest">{t('Initialisation du garage...')}</p>
             </div>
           ) : (
@@ -591,7 +591,7 @@ export default function CollectionPage() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
                         transition={{ duration: 0.2 }}
-                        className="col-span-full flex min-w-0 items-center gap-3 border-t border-cyan-100/10 pt-3 first:border-0 first:pt-0 sm:gap-4 sm:pt-5"
+                        className="col-span-full flex min-w-0 items-center gap-3 border-t border-[#555D65]/10 pt-3 first:border-0 first:pt-0 sm:gap-4 sm:pt-5"
                       >
                         <div className="paddock-tile relative flex h-10 w-10 shrink-0 items-center justify-center sm:h-12 sm:w-12">
                           <span aria-hidden="true" className="text-sm font-black text-white/60 sm:text-base">
@@ -607,10 +607,10 @@ export default function CollectionPage() {
                             />
                           )}
                         </div>
-                        <h2 className="shrink-0 text-base font-normal uppercase tracking-[0.09em] text-[#e7c18a] sm:text-xl" style={{ fontFamily: '"Bebas Neue", Impact, sans-serif' }}>
+                        <h2 className="shrink-0 text-base font-normal uppercase tracking-[0.09em] text-[#F0EFEB] sm:text-xl" style={{ fontFamily: '"Bebas Neue", Impact, sans-serif' }}>
                           {make}
                         </h2>
-                        <div aria-hidden="true" className="h-px min-w-0 flex-1 bg-gradient-to-r from-cyan-300/50 via-white/15 to-transparent" />
+                        <div aria-hidden="true" className="h-px min-w-0 flex-1 bg-gradient-to-r from-[#D32F35]/50 via-white/15 to-transparent" />
                       </motion.div>,
                       cardElement,
                     ];

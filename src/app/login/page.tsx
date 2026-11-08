@@ -59,14 +59,14 @@ function LoginForm() {
       animate={{ opacity: 1, y: 0 }}
       className="relative z-10 w-full max-w-md"
     >
-      <div className="relative overflow-hidden border-l-[5px] border-[#dbff35] bg-[#171c17] p-6 shadow-[0_25px_65px_rgba(0,0,0,.35)] sm:p-10">
+      <div className="relative overflow-hidden border-l-[5px] border-[#D32F35] bg-[#171A1E] p-6 shadow-[0_25px_65px_rgba(0,0,0,.35)] sm:p-10">
         {/* Background Gradients */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[80px] -mr-10 -mt-10" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#D32F35]/10 blur-[80px] -mr-10 -mt-10" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 blur-[80px] -ml-10 -mb-10" />
 
         <div className="relative z-10">
           <header className="mb-9 text-center"><p className="race-eyebrow mb-5 justify-center">APEX / DRIVER ACCESS</p>
-            <div className="mb-5 inline-flex h-16 w-16 items-center justify-center border-2 border-[#dbff35] bg-[#dbff35]/10 text-[#dbff35]">
+            <div className="mb-5 inline-flex h-16 w-16 items-center justify-center border-2 border-[#D32F35] bg-[#D32F35]/10 text-[#F0EFEB]">
               {isLogin ? <LogInIcon size={28} /> : <UserPlusIcon size={28} />}
             </div>
             <h2 className="paddock-title">
@@ -147,7 +147,7 @@ export default function LoginPage() {
   return (
     <main className="apex-paddock relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12 text-white sm:px-6 lg:py-20">
       {/* Dynamic Background Elements */}
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-blue-600/5 blur-[150px] rounded-full animate-pulse" />
+      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#D32F35]/5 blur-[150px] rounded-full animate-pulse" />
       <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-indigo-600/5 blur-[150px] rounded-full animate-pulse delay-1000" />
 
       <div className="relative z-10 grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)]">
@@ -157,16 +157,16 @@ export default function LoginPage() {
           </Suspense>
         </div>
         <aside className="race-hero race-photo relative hidden min-h-[610px] flex-col justify-between lg:flex" aria-label="Apex Collector">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0c0f0c]/80 to-transparent"/>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#101215]/80 to-transparent"/>
           <span className="absolute -right-10 top-5 select-none font-['Barlow_Condensed'] text-[220px] font-black leading-none text-white/[.07]" aria-hidden="true">01</span>
           <div className="relative z-10 p-9">
             <p className="race-eyebrow">APEX / DRIVER ACCESS</p>
             <span className="race-poster-label mt-5">THE PRIVATE PADDOCK / 001</span>
           </div>
           <div className="relative z-10 p-9">
-            <h2 className="race-display max-w-[480px]">RACE. <span className="text-[#dbff35]">COLLECT.</span> REPEAT.</h2>
+            <h2 className="race-display max-w-[480px]">RACE. <span className="text-[#F0EFEB]">COLLECT.</span> REPEAT.</h2>
             <div className="mt-7 flex items-center justify-between border-t border-white/30 pt-4">
-              <span className="font-mono text-[10px] font-bold uppercase tracking-[.17em] text-[#dbff35]">BUILD YOUR GARAGE</span>
+              <span className="font-mono text-[10px] font-bold uppercase tracking-[.17em] text-[#F0EFEB]">BUILD YOUR GARAGE</span>
               <span className="font-mono text-[10px] font-bold text-gray-300">AC / 001</span>
             </div>
           </div>

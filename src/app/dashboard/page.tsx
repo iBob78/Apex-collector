@@ -71,17 +71,17 @@ export default function DashboardPage() {
       <Sidebar />
       <main className="min-w-0 flex-1">
         {/* Persistent, compact balance / profile header across screen sizes. */}
-        <header className="sticky top-0 z-40 flex min-h-[67px] items-center justify-between gap-3 border-b border-white/15 bg-[#0a0d0b]/95 px-4 py-2 backdrop-blur-xl sm:px-7 lg:px-10">
+        <header className="sticky top-0 z-40 flex min-h-[67px] items-center justify-between gap-3 border-b border-white/15 bg-[#101215]/95 px-4 py-2 backdrop-blur-xl sm:px-7 lg:px-10">
           <div className="min-w-0">
             <p className="race-eyebrow">01 / RACING DEPARTMENT</p>
             <h1 className="mt-1 truncate font-['Barlow_Condensed'] text-[20px] font-black uppercase tracking-[.05em] text-white sm:text-[25px]">{t('Tableau de bord')}</h1>
           </div>
           <div className="flex shrink-0 items-center gap-2.5">
-            <div aria-label={t('Balance AP')} className="flex h-11 items-center gap-2 border-l-[3px] border-[#dbff35] bg-[#1b2419] px-3 sm:px-4">
-              <Wallet size={16} className="hidden text-[#dbff35] sm:block" aria-hidden="true" />
+            <div aria-label={t('Balance AP')} className="flex h-11 items-center gap-2 border-l-[3px] border-[#D32F35] bg-[#232930] px-3 sm:px-4">
+              <Wallet size={16} className="hidden text-[#F0EFEB] sm:block" aria-hidden="true" />
               <div className="text-right">
-                <p className="text-[8px] font-bold uppercase tracking-[.14em] text-[#9bac90]">{t('Balance AP')}</p>
-                <p className="font-mono text-[12px] font-bold tabular-nums text-[#dbff35] sm:text-sm" title={formatNumber(apBalance) + ' AP'}>▲ {formatNumber(apBalance)} AP</p>
+                <p className="text-[8px] font-bold uppercase tracking-[.14em] text-[#B6BABE]">{t('Balance AP')}</p>
+                <p className="font-mono text-[12px] font-bold tabular-nums text-[#F0EFEB] sm:text-sm" title={formatNumber(apBalance) + ' AP'}>▲ {formatNumber(apBalance)} AP</p>
               </div>
             </div>
             {user && (
@@ -90,7 +90,7 @@ export default function DashboardPage() {
                 onClick={() => router.push('/profile')}
                 title={t('PROFIL PILOTE')}
                 aria-label={t('PROFIL PILOTE')}
-                className="flex h-11 w-11 items-center justify-center border border-white/25 bg-white/[.08] font-['Barlow_Condensed'] text-lg font-black uppercase text-white transition hover:border-[#dbff35]"
+                className="flex h-11 w-11 items-center justify-center border border-white/25 bg-white/[.08] font-['Barlow_Condensed'] text-lg font-black uppercase text-white transition hover:border-[#D32F35]"
               >
                 {user.email?.[0]?.toUpperCase() || 'A'}
               </button>
@@ -112,7 +112,7 @@ export default function DashboardPage() {
                 <span className="race-poster-label mb-6">APEX // DRIVER TERMINAL</span>
                 <p className="race-eyebrow mb-3">RACE SEASON / GARAGE 001</p>
                 <h2 className="race-display max-w-[630px]">
-                  {t('Mon Garage')}<span className="text-[#dbff35]">.</span>
+                  {t('Mon Garage')}<span className="text-[#F0EFEB]">.</span>
                 </h2>
                 <p className="mt-6 max-w-md text-sm font-medium leading-relaxed text-white/80 sm:text-base">
                   {t('Gérez votre écurie et vos actifs.')}
@@ -126,30 +126,30 @@ export default function DashboardPage() {
                   </Link>
                 </div>
                 <div className="mt-9 flex items-center gap-4 border-t border-white/25 pt-4">
-                  <span className="font-mono text-[10px] tracking-widest text-[#dbff35]">AC / 001</span>
+                  <span className="font-mono text-[10px] tracking-widest text-[#F0EFEB]">AC / 001</span>
                   <span className="h-px flex-1 bg-white/20" />
                   <span className="text-[10px] font-bold uppercase tracking-[.12em] text-gray-300">{t('Niveau écurie')} {garageProgress.level}</span>
                 </div>
               </div>
             </div>
 
-            <aside className="flex min-w-0 flex-col border border-white/20 bg-[#1a1f1b]">
-              <div className="flex items-center justify-between border-b border-white/15 bg-[#dbff35] px-4 py-3 text-[#111610]">
+            <aside className="flex min-w-0 flex-col border border-white/20 bg-[#232930]">
+              <div className="flex items-center justify-between border-b border-white/15 bg-[#D32F35] px-4 py-3 text-[#F0EFEB]">
                 <span className="font-['Barlow_Condensed'] text-[13px] font-black uppercase tracking-[.18em]">GARAGE / STATUS</span>
                 <Gauge size={19} aria-hidden="true" />
               </div>
               <div className="flex flex-1 flex-col justify-between gap-7 p-5 sm:p-6">
                 <div>
                   <p className="race-eyebrow">{t('Niveau écurie')}</p>
-                  <p className="mt-3 font-['Barlow_Condensed'] text-[92px] font-black leading-[.72] tracking-[-.07em] text-[#dbff35] sm:text-[110px]">
+                  <p className="mt-3 font-['Barlow_Condensed'] text-[92px] font-black leading-[.72] tracking-[-.07em] text-[#F0EFEB] sm:text-[110px]">
                     {String(garageProgress.level).padStart(2, '0')}
                   </p>
                   <p className="mt-4 text-[12px] font-bold uppercase tracking-[.13em] text-gray-300">{t(garageProgress.tierTitle)}</p>
                 </div>
                 <div className="flex items-center gap-5">
-                  <div className="race-progress-dial w-[114px] shrink-0" style={{ background: `conic-gradient(#dbff35 ${progressPercent}%,#353d35 0)` }} role="progressbar" aria-label={t('Vers le prochain niveau')} aria-valuemin={0} aria-valuemax={10} aria-valuenow={progressCount}>
+                  <div className="race-progress-dial w-[114px] shrink-0" style={{ background: `conic-gradient(#D32F35 ${progressPercent}%,#555D65 0)` }} role="progressbar" aria-label={t('Vers le prochain niveau')} aria-valuemin={0} aria-valuemax={10} aria-valuenow={progressCount}>
                     <div>
-                      <strong className="font-['Barlow_Condensed'] text-[37px] font-black leading-none text-white">{progressCount}<span className="text-[18px] text-[#dbff35]">/10</span></strong>
+                      <strong className="font-['Barlow_Condensed'] text-[37px] font-black leading-none text-white">{progressCount}<span className="text-[18px] text-[#F0EFEB]">/10</span></strong>
                       <span className="mt-0.5 text-[8px] font-bold uppercase tracking-widest text-gray-400">PROGRESS</span>
                     </div>
                   </div>
@@ -170,7 +170,7 @@ export default function DashboardPage() {
                 <p className="race-eyebrow">02 / GARAGE TELEMETRY</p>
                 <h2 className="paddock-section-title mt-2">{t('Statistiques du garage')}</h2>
               </div>
-              <span className="hidden font-mono text-[10px] font-bold tracking-widest text-[#dbff35] sm:block">DATA / AC-001</span>
+              <span className="hidden font-mono text-[10px] font-bold tracking-widest text-[#F0EFEB] sm:block">DATA / AC-001</span>
             </div>
             <div className="grid grid-cols-2 gap-[2px] border border-white/20 bg-white/15 md:grid-cols-4">
               <Metric value={formatNumber(stats.uniqueCards)} label={t('Modèles uniques')} index="01" accent />
@@ -195,13 +195,13 @@ export default function DashboardPage() {
           </section>
 
           <aside className="race-pit-tile flex flex-col gap-3 px-5 py-5 sm:flex-row sm:items-center sm:gap-6 sm:px-7">
-            <div className="flex shrink-0 items-center gap-2 text-[#dbff35]">
+            <div className="flex shrink-0 items-center gap-2 text-[#F0EFEB]">
               <Lightbulb size={19} aria-hidden="true" />
               <span className="font-['Barlow_Condensed'] text-[16px] font-black uppercase tracking-[.1em]">PIT RADIO</span>
             </div>
             <span className="hidden h-8 w-px bg-white/20 sm:block" aria-hidden="true"/>
             <p className="text-sm leading-relaxed text-gray-300">{t('N’oubliez pas d’échanger vos doublons au marché pour optimiser votre progression.')}</p>
-            <Link href="/marketplace" className="inline-flex shrink-0 items-center gap-2 text-[11px] font-black uppercase tracking-[.12em] text-[#dbff35] hover:text-white sm:ml-auto">{t('Marketplace')} <ArrowUpRight size={15} aria-hidden="true" /></Link>
+            <Link href="/marketplace" className="inline-flex shrink-0 items-center gap-2 text-[11px] font-black uppercase tracking-[.12em] text-[#F0EFEB] hover:text-white sm:ml-auto">{t('Marketplace')} <ArrowUpRight size={15} aria-hidden="true" /></Link>
           </aside>
         </div>
       </main>
@@ -211,13 +211,13 @@ export default function DashboardPage() {
 
 function Metric({ value, label, index, accent = false }: { value: string; label: string; index: string; accent?: boolean }) {
   return (
-    <article className={`group relative min-w-0 overflow-hidden bg-[#141a16] px-4 py-5 sm:px-6 sm:py-7 ${accent ? 'bg-[#242c1d]' : ''}`}>
+    <article className={`group relative min-w-0 overflow-hidden bg-[#171A1E] px-4 py-5 sm:px-6 sm:py-7 ${accent ? 'bg-[#232930]' : ''}`}>
       <div className="flex items-center justify-between gap-2">
         <span className="font-mono text-[10px] text-gray-500">G / {index}</span>
-        <span className="h-[2px] w-9 bg-[#dbff35] opacity-40 transition-opacity group-hover:opacity-100" />
+        <span className="h-[2px] w-9 bg-[#D32F35] opacity-40 transition-opacity group-hover:opacity-100" />
       </div>
       <p className="mt-6 truncate font-['Barlow_Condensed'] text-[clamp(2.6rem,5vw,5.5rem)] font-black leading-none tracking-[-.05em] tabular-nums text-white">{value}</p>
-      <h3 className="mt-3 max-w-[180px] font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[.12em] text-[#d3e0c9]">{label}</h3>
+      <h3 className="mt-3 max-w-[180px] font-['Barlow_Condensed'] text-[13px] font-extrabold uppercase tracking-[.12em] text-[#F0EFEB]">{label}</h3>
     </article>
   );
 }
@@ -226,14 +226,14 @@ function AccessPanel({ href, index, title, eyebrow, icon }: { href: string; inde
   return (
     <Link href={href} className="race-card-outline group flex min-h-[160px] flex-col justify-between gap-5 px-5 py-5 transition hover:-translate-y-1 sm:px-6 sm:py-6">
       <div className="flex items-start justify-between gap-4">
-        <span className="font-['Barlow_Condensed'] text-[58px] font-black leading-[.85] tracking-[-.06em] text-white/20 group-hover:text-[#dbff35]">{index}</span>
-        <span className="text-[#dbff35]">{icon}</span>
+        <span className="font-['Barlow_Condensed'] text-[58px] font-black leading-[.85] tracking-[-.06em] text-white/20 group-hover:text-[#F0EFEB]">{index}</span>
+        <span className="text-[#F0EFEB]">{icon}</span>
       </div>
       <div className="flex items-end justify-between gap-3">
-        <div><p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#b0b9aa]">{eyebrow}</p>
+        <div><p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#B6BABE]">{eyebrow}</p>
           <h3 className="mt-1 font-['Barlow_Condensed'] text-[27px] font-black uppercase leading-none tracking-tight text-white">{title}</h3>
         </div>
-        <ArrowUpRight size={20} className="shrink-0 text-[#dbff35]" aria-hidden="true" />
+        <ArrowUpRight size={20} className="shrink-0 text-[#F0EFEB]" aria-hidden="true" />
       </div>
     </Link>
   );
