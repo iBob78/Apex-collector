@@ -55,10 +55,12 @@ describe('marketplace actions', () => {
   });
 
   it('purchases atomically without client-side credit or inventory writes', async () => {
-    rpc.mockResolvedValue({ data: { success: true, buyer_balance: 850 }, error: null });
+    rpc.mockResolvedValue({ data: { success: true, buyer_balance: 850, card_rarity: 'Rare' }, error: null });
     const result = await buyListing('buyer-1', 'listing-1');
     expect(rpc).toHaveBeenCalledWith('buy_market_listing', { p_listing_id: 'listing-1' });
     expect(result).toEqual({ success: true, balance: 850 });
+    expect(progress).toHaveBeenCalledWith('buyer-1', 'collection_count');
+    expect(progress).toHaveBeenCalledWith('buyer-1', 'rarity_card', 1, { rarity: 'Rare' });
     expect(supabase.from).not.toHaveBeenCalled();
   });
 
@@ -66,6 +68,7 @@ describe('marketplace actions', () => {
     rpc.mockResolvedValue({ data: null, error: { message: 'Annonce non disponible.' } });
     expect(await buyListing('buyer-1', 'listing-1'))
       .toEqual({ success: false, error: 'Annonce non disponible.' });
+    expect(progress).not.toHaveBeenCalled();
   });
 
   it('cancels only through the authenticated RPC', async () => {
