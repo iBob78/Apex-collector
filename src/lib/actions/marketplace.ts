@@ -1,164 +1,81 @@
 import { supabase } from '@/lib/supabaseClient';
-import { deductAP, getUserProfile } from './profile';
-import { ajouterCarteAuJoueur } from './carte';
-import { updateQuestProgress } from './quests';
+import { updateQuestProgress } from './objectives';
 
-/**
- * Récupère tous les listings actifs du marché.
- */
+type MarketActionResult = {
+  success: boolean;
+  error?: string;
+  balance?: number;
+};
+
+/** Only active listings are public, with the seller's pseudonym (not their balance). */
 export async function getMarketplaceListings() {
-    const { data, error } = await supabase
-        .from('marketplace_listings')
-        .select(`
-      *,
-      card:cards!inner(*),
-      seller:profiles(username, ap)
-    `)
-        .eq('status', 'active')
-        .eq('card.is_active', true)
-        .order('created_at', { ascending: false });
+  const { data, error } = await supabase.rpc('get_marketplace_listings');
+  if (error) {
+    console.error('[getMarketplaceListings] Erreur:', error.message);
+    return { data: [], error: error.message };
+  }
+  return { data: data ?? [], error: null };
+}
 
-    if (error) {
-        console.error('[getMarketplaceListings] Erreur:', error.message);
-        return { data: [], error: error.message };
-    }
+/** The seller can view their own active, sold and cancelled listings. */
+export async function getMyMarketplaceListings(sellerId: string) {
+  if (!sellerId) return { data: [], error: 'Connexion requise.' };
+  const { data, error } = await supabase
+    .from('marketplace_listings')
+    .select('*, card:cards!inner(*)')
+    .eq('seller_id', sellerId)
+    .order('created_at', { ascending: false });
 
-    return { data, error: null };
+  if (error) {
+    console.error('[getMyMarketplaceListings] Erreur:', error.message);
+    return { data: [], error: error.message };
+  }
+  return { data: data ?? [], error: null };
 }
 
 /**
- * Crée une nouvelle annonce sur le marché.
+ * Ownership, remaining unlisted copies and seller identity are verified by
+ * Supabase in one transaction. Never trust an arbitrary sellerId from the UI.
  */
-export async function createListing(sellerId: string, cardId: string, price: number) {
-    if (!sellerId || !cardId || price <= 0) return { success: false, error: 'Paramètres invalides' };
+export async function createListing(sellerId: string, cardId: string, price: number): Promise<MarketActionResult> {
+  if (!sellerId || !cardId || !Number.isSafeInteger(price) || price <= 0) {
+    return { success: false, error: 'Paramètres invalides.' };
+  }
 
-    try {
-        // 1. Vérifier si l'utilisateur possède la carte (count > 0)
-        const { data: userCard, error: cardError } = await supabase
-            .from('user_cards')
-            .select('id, count')
-            .eq('user_id', sellerId)
-            .eq('card_id', cardId)
-            .single();
+  const { data, error } = await supabase.rpc('create_market_listing', {
+    p_card_id: cardId,
+    p_price: price,
+  });
 
-        if (cardError || !userCard || userCard.count <= 0) {
-            return { success: false, error: 'Vous ne possédez pas cette carte.' };
-        }
+  if (error) return { success: false, error: error.message };
+  if (!data?.success) return { success: false, error: data?.error ?? 'Annonce non créée.' };
 
-        let { data: card, error: activeCardError } = await supabase
-            .from('cards')
-            .select('is_active')
-            .eq('card_id', cardId)
-            .maybeSingle();
-        if (!card && !activeCardError) {
-            const fallback = await supabase
-                .from('cards')
-                .select('is_active')
-                .eq('id', cardId)
-                .maybeSingle();
-            card = fallback.data;
-            activeCardError = fallback.error;
-        }
-        if (activeCardError) return { success: false, error: activeCardError.message };
-        if (!card || !card.is_active) return { success: false, error: 'Cette carte est désactivée.' };
-
-        // 2. Créer le listing
-        const { error: insertError } = await supabase
-            .from('marketplace_listings')
-            .insert({
-                seller_id: sellerId,
-                card_id: cardId,
-                price,
-                status: 'active'
-            });
-
-        if (insertError) {
-            console.error('[createListing] Erreur insertion:', insertError.message);
-            return { success: false, error: insertError.message };
-        }
-
-        // 3. (Optionnel) Réduire la quantité immédiatement ? 
-        // Pour l'instant on laisse comme ça, mais idéalement on "bloque" la carte.
-
-        // 4. Update Quest Progress
-        await updateQuestProgress(sellerId, 'marketplace_sell');
-
-        return { success: true };
-    } catch (err: any) {
-        return { success: false, error: err.message };
-    }
+  // Progress is only recorded after the transaction has succeeded.
+  await updateQuestProgress(sellerId, 'marketplace_listing');
+  return { success: true };
 }
 
-/**
- * Achète une carte listée.
- */
-export async function buyListing(buyerId: string, listingId: string) {
-    if (!buyerId || !listingId) return { success: false, error: 'Paramètres invalides' };
+/** Atomic purchase: credits and exactly one card transfer together, or nothing. */
+export async function buyListing(buyerId: string, listingId: string): Promise<MarketActionResult> {
+  if (!buyerId || !listingId) return { success: false, error: 'Paramètres invalides.' };
 
-    try {
-        // 1. Récupérer le listing
-        const { data: listing, error: listError } = await supabase
-            .from('marketplace_listings')
-            .select('*, card:cards!inner(*)')
-            .eq('id', listingId)
-            .single();
+  const { data, error } = await supabase.rpc('buy_market_listing', {
+    p_listing_id: listingId,
+  });
 
-        if (listError || !listing || listing.status !== 'active' || !listing.card?.is_active) {
-            return { success: false, error: 'Annonce non disponible.' };
-        }
+  if (error) return { success: false, error: error.message };
+  if (!data?.success) return { success: false, error: data?.error ?? 'Achat impossible.' };
+  return { success: true, balance: Number(data.buyer_balance) };
+}
 
-        if (listing.seller_id === buyerId) {
-            return { success: false, error: 'Vous ne pouvez pas acheter votre propre carte.' };
-        }
+export async function cancelListing(listingId: string): Promise<MarketActionResult> {
+  if (!listingId) return { success: false, error: 'Annonce invalide.' };
 
-        // 2. Déduire les AP de l'acheteur
-        const deduction = await deductAP(buyerId, listing.price);
-        if (!deduction.success) {
-            return { success: false, error: deduction.error };
-        }
+  const { data, error } = await supabase.rpc('cancel_market_listing', {
+    p_listing_id: listingId,
+  });
 
-        // 3. Transférer la carte à l'acheteur
-        await ajouterCarteAuJoueur(buyerId, listing.card_id, 'marketplace');
-
-        // 4. Ajouter les AP au vendeur
-        const { data: sellerProfile } = await getUserProfile(listing.seller_id);
-        if (sellerProfile) {
-            await supabase
-                .from('profiles')
-                .update({ ap: (sellerProfile.ap || 0) + listing.price })
-                .eq('id', listing.seller_id);
-        }
-
-        // 5. Marquer le listing comme vendu
-        await supabase
-            .from('marketplace_listings')
-            .update({ status: 'sold' })
-            .eq('id', listingId);
-
-        // 6. Retirer 1 de count au vendeur
-        const { data: sellerCard } = await supabase
-            .from('user_cards')
-            .select('id, count')
-            .eq('user_id', listing.seller_id)
-            .eq('card_id', listing.card_id)
-            .single();
-
-        if (sellerCard) {
-            if (sellerCard.count > 1) {
-                await supabase
-                    .from('user_cards')
-                    .update({ count: sellerCard.count - 1 })
-                    .eq('id', sellerCard.id);
-            } else {
-                await supabase
-                    .from('user_cards')
-                    .delete()
-                    .eq('id', sellerCard.id);
-            }
-        }
-
-        return { success: true };
-    } catch (err: any) {
-        return { success: false, error: err.message };
-    }
+  if (error) return { success: false, error: error.message };
+  if (!data?.success) return { success: false, error: data?.error ?? 'Annulation impossible.' };
+  return { success: true };
 }
