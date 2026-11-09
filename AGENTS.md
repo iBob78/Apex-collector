@@ -49,6 +49,7 @@ Le créateur du projet n'est pas développeur. Être concret et compréhensible,
 | Tableau de bord connecté | `src/app/dashboard/page.tsx` |
 | Sidebar PC et navigation mobile | `src/components/Sidebar.tsx` |
 | Collection, filtres et favoris | `src/app/collection/page.tsx` |
+| Market, ventes et achats | `src/app/marketplace/page.tsx`, `src/lib/actions/marketplace.ts` et SQL 044 (en préparation) |
 | Rendu des cartes | `src/components/Card.tsx` |
 | Détails d'une carte | `src/components/Collection/CardDetailsModal.tsx` |
 | Badge IP | `src/components/IPBadge.tsx` |
@@ -197,6 +198,15 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
 - **Récompenses de connexion quotidienne** : à la première connexion de chaque date de la base, `claim_daily_login_booster()` accorde un booster non ouvert une seule fois par joueur et par date. Le cycle consécutif dure 7 jours et revient au jour 1 au jour 8 ou après une date manquée : `common`, `uncommon`, `rare`, `ultrarare`, `prototype`, `mythic`, `carbon`. Les boosters restent dans `user_daily_boosters` jusqu'à leur ouverture ; `/boosters` les liste, et leur ouverture utilise `consume_daily_login_booster()` sans dépense d'AC. La date de référence est `CURRENT_DATE` côté Supabase. Migration `039_daily_login_boosters.sql` requise. Ne jamais autoriser le client à attribuer un booster, choisir son palier ou ouvrir le booster d'un autre joueur.
 - Événements connus : ouverture de boosters, collection de véhicules, circuits ou pilotes, rareté, annonce de marché, connexion sur différents jours.
 - Une récompense n'est pas acquise avant la réclamation prévue par le système ; respecter les fonctions RPC atomiques et la progression sauvegardée.
+
+## Correctif Market en préparation — SQL 044 (non déployé)
+
+- Diagnostic du 09/11/2026 : `src/app/marketplace/page.tsx` utilisait `marketplace_listings`, absente de la base active, tandis que la table historique `market` est vide et liée à l'ancien `public.users`. Le clic direct sur une carte du sélecteur « Vendre » utilisait également le comportement par défaut de `Card` et renvoyait vers `/collection/[card_id]`, alors que la page de détail recherchait seulement `cards.id` : affichage « Carte introuvable ».
+- Le correctif prévoit `supabase/migrations/044_marketplace_transactional_listings.sql` : table `marketplace_listings` dédiée aux **véhicules** (`cards.card_id` et `user_cards.card_id`), RLS en lecture, RPC authentifiées `get_marketplace_listings`, `create_market_listing`, `buy_market_listing` et `cancel_market_listing`. Les crédits AC, le transfert d'un exemplaire et l'état de vente sont modifiés dans **une même transaction SQL** ; le vendeur ne peut pas réserver plus d'exemplaires que ceux qu'il détient. Ne pas revenir aux mises à jour client séparées de `profiles.ap` et `user_cards`.
+- L'interface lance la fixation du prix au clic sur la carte dans le sélecteur ; le détail véhicule accepte `cards.card_id` et l'ancien `cards.id` et lit la possession depuis le `card_id` canonique. « Mes Ventes » distingue actives/vendues/annulées et permet l'annulation des actives.
+- **Déploiement non autorisé à ce stade :** ne pas appliquer SQL 044 en production, fusionner ou déployer l'application sans accord explicite. Après accord, appliquer 044 avant de déployer le code, puis tester avec deux comptes de recette : création, réservation de doublons, auto-achat interdit, achat concurrent, paiement/quantités, annulation, absence d'achat répété et détail des cartes.
+- Le Market de ce correctif concerne les **véhicules** seulement, comme le sélecteur actuel qui lit `user_cards` ; étendre aux circuits et aux pilotes nécessiterait un modèle de listing distinct et les trois inventaires. Les policies existantes de `profiles` et `user_cards` restent une préoccupation économique générale hors de cette correction.
+- Les tests Jest ajoutés vérifient la délégation aux RPC et le traitement des erreurs, mais ne remplacent **pas** les tests transactionnels Postgres ni une validation sur l'application déployée.
 
 ## 9. Supabase, administration et sécurité
 
