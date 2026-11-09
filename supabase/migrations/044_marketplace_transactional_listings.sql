@@ -3,11 +3,11 @@
 -- untouched for compatibility and create the table expected by the current UI.
 CREATE TABLE IF NOT EXISTS public.marketplace_listings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  seller_id UUID NOT NULL REFERENCES public.profiles(id),
+  seller_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   card_id UUID NOT NULL REFERENCES public.cards(card_id),
   price INTEGER NOT NULL CHECK (price > 0),
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'sold', 'cancelled')),
-  buyer_id UUID REFERENCES public.profiles(id),
+  buyer_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   sold_at TIMESTAMPTZ,
   CONSTRAINT marketplace_listings_sale_consistency CHECK (
