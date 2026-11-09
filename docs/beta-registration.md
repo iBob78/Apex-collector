@@ -21,3 +21,13 @@
 - Vérifier en base : e-mail non NULL, pseudo choisi, bonnes préférences, 20 000 AC.
 - Essayer un pseudo identique à un compte existant avec une casse différente : la création doit être refusée.
 - Vérifier qu'un compte existant conserve son solde. Tester achat de booster, marché et niveaux de carte.
+
+## Cadeaux de bienvenue (migration 042)
+
+- Après 041, appliquer `042_player_welcome_gift_boosters.sql` sur la base choisie avec accord explicite.
+- À l'insertion d'un nouveau profil, le trigger ajoute un **booster de bienvenue** (`gift_key='welcome_2026'`) contenant **10 cartes** avec la distribution du pack commun (dont le circuit garanti). Les boosters standards restent à 6 ou 8 cartes.
+- Le cadeau reste dans la rubrique "Boosters offerts à ouvrir" jusqu'à ouverture. Unicité `(user_id,gift_key)` et RPC propriétaire `consume_player_gift_booster` évitent les cadeaux répétés.
+- Pas de cadeau rétroactif : un compte déjà créé avant l'application de 042, comme les comptes de test, n'en recevra pas automatiquement. Un octroi spécifique doit être validé séparément.
+- Le dashboard annonce les boosters quotidiens et cadeaux en attente via une modale consultable une seule fois par cadeau et par navigateur ; fermer la modale ne consomme pas le booster.
+- Tests après déploiement : première inscription et premier accès à /dashboard, présence d'un quotidien et d'un cadeau distincts, ouverture 10 cartes sans débit AC, plusieurs rafraîchissements, seconde connexion, absence de doublons, essais de consommation d'un cadeau appartenant à un autre joueur.
+- Comme les boosters quotidiens actuels, l'ouverture consomme le droit avant d'enregistrer les cartes dans les possessions. La sauvegarde n'est pas une seule transaction SQL : si le réseau échoue entre ces opérations, une intervention de support peut être nécessaire. Ne pas prétendre à une atomicité absente.

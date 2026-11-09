@@ -236,3 +236,22 @@ describe('First-time booster discoveries', () => {
     )]).toEqual([1]);
   });
 });
+
+describe('welcome booster', () => {
+  it('draws ten cards using the existing common pack odds', () => {
+    const { WELCOME_GIFT_KEY, WELCOME_GIFT_PACK_SLUG, WELCOME_GIFT_CARD_COUNT } = require('../boosters');
+    expect(WELCOME_GIFT_KEY).toBe('welcome_2026');
+    expect(WELCOME_GIFT_PACK_SLUG).toBe('common');
+    expect(WELCOME_GIFT_CARD_COUNT).toBe(10);
+    expect(PACKS.common.cardCount).toBe(6); // Regular pack unchanged.
+    const cards = drawBoosterCards(
+      WELCOME_GIFT_PACK_SLUG,
+      [{ id: 'car1', rarity: 'Common' }],
+      [{ id: 'circuit1', rarity: 'Common', category: 'circuit' }],
+      WELCOME_GIFT_CARD_COUNT,
+      () => 0.1,
+    );
+    expect(cards).toHaveLength(10);
+    expect(cards.some(card => card.category === 'circuit')).toBe(true);
+  });
+});
