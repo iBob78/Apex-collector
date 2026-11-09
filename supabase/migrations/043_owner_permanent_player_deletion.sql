@@ -60,7 +60,8 @@ CREATE OR REPLACE FUNCTION public.permanently_delete_player_account(
   p_user_id UUID,
   p_expected_username TEXT,
   p_expected_email TEXT,
-  p_confirmation TEXT
+  p_confirmation TEXT,
+  p_password TEXT DEFAULT NULL
 )
 RETURNS JSONB
 LANGUAGE plpgsql SECURITY DEFINER
@@ -71,6 +72,7 @@ DECLARE
   v_site_owner UUID;
   v_email TEXT;
   v_username TEXT;
+  v_password_hash TEXT;
   v_deleted UUID;
 BEGIN
   IF v_actor IS NULL OR p_user_id IS NULL THEN
@@ -98,8 +100,9 @@ BEGIN
 
   -- Lock the target Auth row until all related deletes have committed.
   SELECT a.email,
-         COALESCE(p.username, split_part(a.email, '@', 1), 'Compte sans pseudo')
-  INTO v_email, v_username
+         COALESCE(p.username, split_part(a.email, '@', 1), 'Compte sans pseudo'),
+         a.encrypted_password
+  INTO v_email, v_username, v_password_hash
   FROM auth.users a
   LEFT JOIN public.profiles p ON p.id = a.id
   WHERE a.id = p_user_id
@@ -115,6 +118,16 @@ BEGIN
      OR p_confirmation IS DISTINCT FROM ('SUPPRIMER ' || v_username) THEN
     RAISE EXCEPTION 'La confirmation ne correspond pas au compte sélectionné.'
       USING ERRCODE = '22023';
+  END IF;
+
+  -- The player must prove their password inside the database function:
+  -- a direct RPC call cannot bypass the browser or server-action validation.
+  IF v_actor = p_user_id AND (
+    p_password IS NULL OR length(p_password) = 0 OR length(p_password) > 1024
+    OR v_password_hash IS NULL
+    OR extensions.crypt(p_password, v_password_hash) IS DISTINCT FROM v_password_hash
+  ) THEN
+    RAISE EXCEPTION 'Mot de passe incorrect ou absent.' USING ERRCODE = '42501';
   END IF;
 
   -- The owner may delete another admin. Preserve grants assigned by that
@@ -159,7 +172,7 @@ $function$;
 
 REVOKE ALL ON FUNCTION public.owner_search_player_accounts(TEXT, INT)
   FROM PUBLIC, anon, authenticated;
-REVOKE ALL ON FUNCTION public.permanently_delete_player_account(UUID, TEXT, TEXT, TEXT)
+REVOKE ALL ON FUNCTION public.permanently_delete_player_account(UUID, TEXT, TEXT, TEXT, TEXT)
   FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.owner_search_player_accounts(TEXT, INT) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.permanently_delete_player_account(UUID, TEXT, TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.permanently_delete_player_account(UUID, TEXT, TEXT, TEXT, TEXT) TO authenticated;
