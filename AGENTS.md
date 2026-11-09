@@ -338,5 +338,6 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
 
 ### 4. Discipline de déploiement et vérifications
 - L'ordre SQL sur la base de production a été **041 → 042 → 043**. Les PR applicatives associées sont **#18 → #19 → #20**. Fusionner un fichier de migration dans GitHub ne le déploie pas automatiquement dans Supabase ; ici, les trois migrations ont été exécutées explicitement via Supabase.
+- **Statut GitHub vérifié le 09/11/2026 : PR #18, PR #19 et PR #20 toutes fusionnées dans `main`.** PR #20 fusionnée via commit `cf69671cf4aa4a78a0a604033ba42a116396d38f`. Les migrations SQL 041, 042, 043 sont déjà appliquées ; aucun compte n'a été effacé pendant la mise en place.
 - PR #18 et #19 : tests et build GitHub réussis avant fusion. PR #20 : tests et build GitHub réussis sur la version contrôlée ; le contrôle externe `Dependency Review` échoue du fait de la configuration du dépôt et doit être distingué des tests applicatifs. Relancer/contrôler la CI si le commit HEAD change.
 - Ne jamais tester une suppression définitive sur un compte réel sans action explicite du propriétaire ou du joueur concerné. Un déploiement Vercel doit être vérifié séparément de l'état GitHub `main`.
