@@ -1,4 +1,4 @@
-import { drawBoosterCards, PACKS, getPackImageUrl, getFirstTimeBoosterCardIndices, getBoosterCardIdentity, getDailyLoginPackSlug } from '../boosters';
+import { drawBoosterCards, PACKS, getPackImageUrl, getFirstTimeBoosterCardIndices, getBoosterCardIdentity, getDailyLoginPackSlug, WELCOME_GIFT_KEY, WELCOME_GIFT_PACK_SLUG, WELCOME_GIFT_CARD_COUNT } from '../boosters';
 
 describe('Booster pack assets', () => {
   it('assigns increasingly valuable packs across the seven-day login streak', () => {
@@ -239,7 +239,6 @@ describe('First-time booster discoveries', () => {
 
 describe('welcome booster', () => {
   it('draws ten cards using the existing common pack odds', () => {
-    const { WELCOME_GIFT_KEY, WELCOME_GIFT_PACK_SLUG, WELCOME_GIFT_CARD_COUNT } = require('../boosters');
     expect(WELCOME_GIFT_KEY).toBe('welcome_2026');
     expect(WELCOME_GIFT_PACK_SLUG).toBe('common');
     expect(WELCOME_GIFT_CARD_COUNT).toBe(10);
