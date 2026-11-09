@@ -152,6 +152,11 @@ BEGIN
       USING ERRCODE = 'P0001';
   END IF;
 
+  -- The shared circuit catalog has a legacy optional creator reference with
+  -- ON DELETE CASCADE. Never erase catalog circuits or other players' cards
+  -- simply because their creator deleted their personal account.
+  UPDATE public.circuits SET user_id = NULL WHERE user_id = p_user_id;
+
   -- Legacy marketplace user rows are independent from auth.users;
   -- their FK is NO ACTION rather than CASCADE.
   DELETE FROM public.market WHERE seller_id = p_user_id;
