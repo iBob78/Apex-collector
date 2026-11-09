@@ -65,6 +65,9 @@ export async function buyListing(buyerId: string, listingId: string): Promise<Ma
 
   if (error) return { success: false, error: error.message };
   if (!data?.success) return { success: false, error: data?.error ?? 'Achat impossible.' };
+
+  await updateQuestProgress(buyerId, 'collection_count');
+  await updateQuestProgress(buyerId, 'rarity_card', 1, { rarity: data.card_rarity ?? undefined });
   return { success: true, balance: Number(data.buyer_balance) };
 }
 
