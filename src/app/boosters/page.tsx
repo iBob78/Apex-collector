@@ -16,6 +16,13 @@ type DailyBooster = {
   streak_day: number;
   created_at: string;
 };
+type GiftBooster = {
+  id: string;
+  gift_key: string;
+  pack_slug: string;
+  card_count: number;
+  granted_at: string;
+};
 
 export default function BoostersPage() {
   const router = useRouter();
@@ -23,12 +30,13 @@ export default function BoostersPage() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [dailyBoosters, setDailyBoosters] = useState<DailyBooster[]>([]);
+  const [giftBoosters, setGiftBoosters] = useState<GiftBooster[]>([]);
   const [dailyBoosterError, setDailyBoosterError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = useCallback(async (userId: string) => {
     try {
-      const [profileResult, dailyBoostersResult] = await Promise.all([
+      const [profileResult, dailyBoostersResult, giftBoostersResult] = await Promise.all([
         supabase.from('profiles').select('ap').eq('id', userId).single(),
         fetchAllPages((from, to) => supabase.from('user_daily_boosters')
           .select('id, pack_slug, streak_day, created_at')
@@ -37,10 +45,25 @@ export default function BoostersPage() {
           .order('created_at', { ascending: true })
           .order('id', { ascending: true })
           .range(from, to)),
+        supabase.from('user_gift_boosters')
+          .select('id, gift_key, pack_slug, card_count, granted_at')
+          .eq('user_id', userId)
+          .is('opened_at', null)
+          .order('granted_at', { ascending: true })
+          .limit(100),
       ]);
       if (profileResult.data) setProfile(profileResult.data);
       setDailyBoosterError(null);
       setDailyBoosters((dailyBoostersResult ?? []) as DailyBooster[]);
+      // Until migration 042 is deployed, keep the daily booster section working.
+      if (giftBoostersResult.error) {
+        if (!['PGRST205', '42P01'].includes(giftBoostersResult.error.code)) {
+          console.error('[BoostersPage] Impossible de charger les cadeaux:', giftBoostersResult.error.message);
+        }
+        setGiftBoosters([]);
+      } else {
+        setGiftBoosters((giftBoostersResult.data ?? []) as GiftBooster[]);
+      }
     } catch (error) {
       console.error('[BoostersPage] Impossible de charger les boosters quotidiens:', error);
       setDailyBoosterError(t('Impossible de charger vos boosters offerts.'));
@@ -96,6 +119,35 @@ export default function BoostersPage() {
             <p role="alert" className="mb-6 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-amber-200">
               {dailyBoosterError}
             </p>
+          )}
+
+          {giftBoosters.length > 0 && (
+            <section aria-labelledby="welcome-gifts-heading" className="mb-8 rounded-2xl border border-amber-300/25 bg-amber-300/[0.06] p-4 sm:p-6">
+              <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-amber-300">{t('Cadeaux de bienvenue')}</p>
+              <h2 id="welcome-gifts-heading" className="mb-4 text-xl font-black">{t('Vos cadeaux offerts')}</h2>
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {giftBoosters.map((gift) => {
+                  const pack = PACKS[gift.pack_slug];
+                  if (!pack) return null;
+                  return (
+                    <article key={gift.id} className="flex min-w-0 items-center gap-3 rounded-xl border border-amber-300/15 bg-black/30 p-3">
+                      <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-lg">
+                        <SafeImage src={pack.imageUrl} alt={t('Booster de bienvenue')} fill className="object-cover" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-sm font-black">{t(gift.gift_key === 'welcome_2026' ? 'Booster de bienvenue' : 'Cadeau spécial')}</h3>
+                        <p className="mt-1 text-xs text-amber-200">{t('{count} cartes offertes', { count: gift.card_count })}</p>
+                        <button type="button"
+                          onClick={() => router.push(`/open?gift_booster=${encodeURIComponent(gift.id)}`)}
+                          className="mt-2 min-h-10 rounded-lg bg-amber-300 px-3 py-2 text-xs font-black text-slate-950 transition hover:bg-amber-200">
+                          {t('Ouvrir ce cadeau')}
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
           )}
 
           {dailyBoosters.length > 0 && (
