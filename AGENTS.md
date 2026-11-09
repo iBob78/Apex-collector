@@ -290,3 +290,14 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
 - La migration `042_player_welcome_gift_boosters.sql` ajoute un cadeau de bienvenue unique par nouveau profil `gift_key=welcome_2026`, pack commun 10 cartes. Ne pas réattribuer rétroactivement aux comptes existants sans accord.
 - La disponibilité du cadeau est contrôlée par RLS et la consommation unique `consume_player_gift_booster`; l'ouverture suit le tirage et l'enregistrement existants (circuit garanti, badges NEW, statistiques). Ne jamais exposer un chemin qui évite la consommation du cadeau ou débite des AC pour un cadeau.
 - La modale de `/dashboard` détecte les boosters offerts non ouverts depuis Supabase et mémorise la prise de connaissance, sans les consommer. Les quotidiennes restent séparées des cadeaux de bienvenue.
+
+
+## Suppression définitive des comptes (migration 043)
+- /admin/players : réservé au propriétaire, recherche par e-mail/pseudo, suppression de tout autre utilisateur, y compris un administrateur délégué.
+- /settings : tout joueur peut supprimer son propre compte après saisie de son mot de passe actuel, phrase de confirmation exacte et case de compréhension. Mot de passe validé via Auth et à nouveau dans la fonction SQL.
+- Le compte propriétaire du site est protégé contre la suppression tant que sa propriété n'a pas été transférée (protection anti-verrouillage).
+- Migration 043_owner_permanent_player_deletion.sql : RPC owner_search_player_accounts (owner only) et permanently_delete_player_account (owner pour autrui, joueur pour soi), contrôles d'autorisation en SECURITY DEFINER, rôles/grants restrictifs. La migration ne supprime aucun utilisateur.
+- Suppression en transaction SQL : confirmation cible Auth ID+pseudo+email, verrouillage Auth, transfert de toute attribution de rôle admin vers le propriétaire, retrait du rôle du compte visé, nettoyage des anciennes tables market/users, suppression de profiles et auth.users avec cascades. Les circuits du catalogue commun sont préservés en détachant leur user_id facultatif.
+- Si le compte possède des fichiers Storage, la suppression entière est refusée jusqu'à un nettoyage via les API Storage (jamais supprimer seulement les métadonnées SQL). Les catalogues partagés sont conservés.
+- Les JWT émis peuvent rester valides jusqu'à expiration ; déconnexion locale après suppression personnelle. Les sauvegardes suivent la rétention Supabase.
+- Ne pas appliquer migration ni fusionner ni supprimer de comptes réels sans accord explicite. Tester la recette au préalable.
