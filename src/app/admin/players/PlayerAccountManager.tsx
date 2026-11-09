@@ -101,7 +101,7 @@ export default function PlayerAccountManager({ initialPlayers }: { initialPlayer
           <div className="mt-5 rounded-xl border border-red-400/20 bg-red-400/[0.05] p-4 text-sm text-red-200">
             <div className="flex items-center gap-2 font-bold"><AlertTriangle size={17} /> Suppression irréversible</div>
             <p className="mt-2 leading-6 text-red-100/80">
-              Le propriétaire et les administrateurs sont protégés. Si le joueur possède des fichiers
+              Le compte propriétaire reste protégé. Les autres comptes, y compris les administrateurs, peuvent être supprimés. Si le joueur possède des fichiers
               Supabase Storage, la suppression est refusée pour permettre leur nettoyage sécurisé
               préalable. Les sauvegardes techniques Supabase suivent leur propre rétention.
             </p>
