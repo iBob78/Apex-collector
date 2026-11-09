@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Sidebar from '@/components/Sidebar';
 import Card from '@/components/Card';
 import { supabase } from '@/lib/supabaseClient';
-import { getMarketplaceListings, buyListing, createListing } from '@/lib/actions/marketplace';
+import { getMarketplaceListings, getMyMarketplaceListings, buyListing, createListing, cancelListing } from '@/lib/actions/marketplace';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SearchIcon, FilterIcon, TagIcon, GavelIcon, CoinsIcon, Loader2Icon, XIcon, PlusIcon } from 'lucide-react';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
@@ -19,6 +19,7 @@ export default function MarketplacePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState<any[]>([]);
+  const [marketError, setMarketError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [isSellModalOpen, setIsSellModalOpen] = useState(false);
 
@@ -43,14 +44,17 @@ export default function MarketplacePage() {
 
   const refreshListings = async () => {
     setLoading(true);
-    const { data } = await getMarketplaceListings();
-    if (data) setListings(data);
+    const { data, error } = activeTab === 'my_listings' && user
+      ? await getMyMarketplaceListings(user.id)
+      : await getMarketplaceListings();
+    setListings(data ?? []);
+    setMarketError(error);
     setLoading(false);
   };
 
   useEffect(() => {
-    refreshListings();
-  }, []);
+    void refreshListings();
+  }, [activeTab, user?.id]);
 
   const handleBuy = async (listingId: string, price: number) => {
     if (!user) return alert(t('Veuillez vous connecter pour acheter.'));
@@ -64,8 +68,22 @@ export default function MarketplacePage() {
     if (result.success) {
       alert(t('Achat réussi ! La carte a été ajoutée à votre garage.'));
       refreshListings();
-      // Update local profile balance
-      setProfile({ ...profile, ap: profile.ap - price });
+      // The database returns the authoritative balance after an atomic trade.
+      if (Number.isFinite(result.balance)) {
+        setProfile((current: any) => current ? { ...current, ap: result.balance } : current);
+      }
+    } else {
+      alert(`${t('Erreur')}: ${result.error}`);
+    }
+    setProcessingId(null);
+  };
+
+  const handleCancel = async (listingId: string) => {
+    if (!confirm(t('Annuler cette annonce ?'))) return;
+    setProcessingId(listingId);
+    const result = await cancelListing(listingId);
+    if (result.success) {
+      await refreshListings();
     } else {
       alert(`${t('Erreur')}: ${result.error}`);
     }
@@ -134,6 +152,12 @@ export default function MarketplacePage() {
             </button>
           </div>
 
+          {marketError && (
+            <p role="alert" className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
+              {t('Impossible de charger le Market')} : {marketError}
+            </p>
+          )}
+
           {/* Results Grid */}
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 opacity-50">
@@ -155,16 +179,20 @@ export default function MarketplacePage() {
 
                   <div className="flex items-center justify-between mb-4 px-2">
                     <Link
-                      href={`/showroom/${encodeURIComponent(item.seller.username)}`}
+                      href={`/showroom/${encodeURIComponent(item.seller?.username ?? profile?.username ?? 'joueur')}`}
                       className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-                      aria-label={t('Voir le showroom de {username}', { username: item.seller.username })}
+                      aria-label={t('Voir le showroom de {username}', { username: item.seller?.username ?? profile?.username ?? 'joueur' })}
                     >
                       <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold">
-                        {item.seller.username[0]}
+                        {(item.seller?.username ?? profile?.username ?? 'J')[0]}
                       </div>
-                      <span className="text-[11px] text-gray-400 font-mono">@{item.seller.username}</span>
+                      <span className="text-[11px] text-gray-400 font-mono">@{item.seller?.username ?? profile?.username ?? 'joueur'}</span>
                     </Link>
-                    <div className="text-[10px] text-gray-600 font-mono">{t('il y a 2h')}</div>
+                    <span className="text-[10px] text-gray-600 font-mono">
+                      {activeTab === 'my_listings'
+                        ? (item.status === 'active' ? t('En vente') : item.status === 'sold' ? t('Vendue') : t('Annulée'))
+                        : new Date(item.created_at).toLocaleDateString()}
+                    </span>
                   </div>
 
                   <div className="bg-white/5 rounded-2xl p-4 flex items-center justify-between group-hover:bg-blue-500/10 transition-colors">
@@ -172,14 +200,25 @@ export default function MarketplacePage() {
                       <div className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">{t('Prix d’achat')}</div>
                       <div className="text-lg font-black italic tracking-tighter">▲ {item.price} <span className="text-[10px] not-italic text-gray-400">AC</span></div>
                     </div>
-                    <button
-                      onClick={() => handleBuy(item.id, item.price)}
-                      disabled={processingId === item.id || (profile && profile.ap < item.price)}
-                      className="bg-white text-black px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-500 hover:text-white transition-all disabled:opacity-50 disabled:grayscale flex items-center gap-2"
-                    >
-                      {processingId === item.id ? <Loader2Icon size={14} className="animate-spin" /> : null}
-                      {profile && profile.ap < item.price ? t('Solde Insuffisant') : t('Acheter')}
-                    </button>
+                    {activeTab === 'my_listings' ? (
+                      <button
+                        onClick={() => void handleCancel(item.id)}
+                        disabled={item.status !== 'active' || processingId === item.id}
+                        className="bg-white text-black px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-500 hover:text-white transition-all disabled:opacity-50 disabled:grayscale flex items-center gap-2"
+                      >
+                        {processingId === item.id ? <Loader2Icon size={14} className="animate-spin" /> : null}
+                        {t('Annuler')}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleBuy(item.id, item.price)}
+                        disabled={processingId === item.id || item.seller_id === user?.id || (profile && profile.ap < item.price)}
+                        className="bg-white text-black px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-500 hover:text-white transition-all disabled:opacity-50 disabled:grayscale flex items-center gap-2"
+                      >
+                        {processingId === item.id ? <Loader2Icon size={14} className="animate-spin" /> : null}
+                        {item.seller_id === user?.id ? t('Votre annonce') : profile && profile.ap < item.price ? t('Solde Insuffisant') : t('Acheter')}
+                      </button>
+                    )}
                   </div>
                 </motion.div>
               ))}
