@@ -34,13 +34,27 @@ export default function CardShowcasePage() {
         const fetchData = async () => {
             if (!id) return;
 
-            // Fetch Card
-            const { data: cardData } = await supabase
+            // Card links use the public card_id, but older links may use row id.
+            const cardId = Array.isArray(id) ? id[0] : id;
+            let { data: cardData, error: cardError } = await supabase
                 .from('cards')
                 .select('*')
-                .eq('id', id)
+                .eq('card_id', cardId)
                 .eq('is_active', true)
-                .single();
+                .maybeSingle();
+
+            if (!cardData && !cardError) {
+                const fallback = await supabase
+                    .from('cards')
+                    .select('*')
+                    .eq('id', cardId)
+                    .eq('is_active', true)
+                    .maybeSingle();
+                cardData = fallback.data;
+                cardError = fallback.error;
+            }
+
+            if (cardError) console.error('[CardShowcasePage] Carte inaccessible :', cardError.message);
 
             if (cardData) {
                 setCard(cardData);
@@ -52,7 +66,7 @@ export default function CardShowcasePage() {
                         .from('user_cards')
                         .select('count')
                         .eq('user_id', user.id)
-                        .eq('card_id', id)
+                        .eq('card_id', cardData.card_id)
                         .maybeSingle();
 
                     if (userCard) setOwnedCount(userCard.count);
