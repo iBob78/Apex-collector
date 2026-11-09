@@ -152,6 +152,7 @@ DECLARE
   v_seller_count INTEGER;
   v_buyer_card_id UUID;
   v_new_balance INTEGER;
+  v_card_rarity TEXT;
 BEGIN
   IF v_buyer_id IS NULL THEN
     RAISE EXCEPTION 'Connexion requise.';
@@ -169,10 +170,11 @@ BEGIN
   IF v_listing.seller_id = v_buyer_id THEN
     RAISE EXCEPTION 'Vous ne pouvez pas acheter votre propre carte.';
   END IF;
-  IF NOT EXISTS (
-    SELECT 1 FROM public.cards
-    WHERE card_id = v_listing.card_id AND is_active = TRUE
-  ) THEN
+  SELECT rarity INTO v_card_rarity
+  FROM public.cards
+  WHERE card_id = v_listing.card_id AND is_active = TRUE;
+
+  IF NOT FOUND THEN
     RAISE EXCEPTION 'Carte introuvable ou désactivée.';
   END IF;
 
@@ -230,6 +232,11 @@ BEGIN
   ELSE
     INSERT INTO public.user_cards (user_id, card_id, count, source)
     VALUES (v_buyer_id, v_listing.card_id, 1, 'marketplace');
+
+    -- Keep the collection's persistent NEW! badge for first-time discoveries.
+    INSERT INTO public.user_card_discoveries (user_id, category, card_id)
+    VALUES (v_buyer_id, 'vehicle', v_listing.card_id)
+    ON CONFLICT DO NOTHING;
   END IF;
 
   UPDATE public.profiles SET ap = COALESCE(ap, 0) - v_listing.price
@@ -241,7 +248,11 @@ BEGIN
   SET status = 'sold', buyer_id = v_buyer_id, sold_at = now()
   WHERE id = v_listing.id;
 
-  RETURN jsonb_build_object('success', TRUE, 'buyer_balance', v_new_balance);
+  RETURN jsonb_build_object(
+    'success', TRUE,
+    'buyer_balance', v_new_balance,
+    'card_rarity', v_card_rarity
+  );
 END;
 $$;
 
