@@ -59,6 +59,7 @@ Le créateur du projet n'est pas développeur. Être concret et compréhensible,
 | Ouverture et révélation des cartes des boosters | `src/app/open/page.tsx` |
 | Catalogue et atelier des pilotes | `src/app/admin/drivers/` |
 | Gestion des rôles administrateur | `src/app/admin/access/` |
+| Suppression des comptes (propriétaire) | `src/app/admin/players/` |
 | Suggestions publiques et boîte de réception admin | `src/app/suggestions/` ; `src/app/admin/suggestions/` |
 | Validation et sauvegarde des fiches pilote | `src/app/admin/drivers/actions.ts` |
 | Calcul de l'âge d'une fiche pilote | `src/lib/driverCards.ts` |
@@ -68,6 +69,7 @@ Le créateur du projet n'est pas développeur. Être concret et compréhensible,
 | Images et icônes | `src/lib/images/` ; `src/components/SafeImage.tsx` |
 | Conversions et statistiques véhicules | `src/lib/vehicleStats.ts` |
 | Langues et unités | `src/lib/preferences.ts` ; `src/contexts/SitePreferencesContext.tsx` |
+| Auto-suppression du compte joueur | `src/app/settings/` (`SelfAccountDeletion.tsx`, `actions.ts`) |
 | Autorisation admin | `src/lib/admin.ts` et gardes/permissions des pages/actions admin |
 | Scripts SQL | `supabase/migrations/` |
 
@@ -300,4 +302,5 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
 - Suppression en transaction SQL : confirmation cible Auth ID+pseudo+email, verrouillage Auth, transfert de toute attribution de rôle admin vers le propriétaire, retrait du rôle du compte visé, nettoyage des anciennes tables market/users, suppression de profiles et auth.users avec cascades. Les circuits du catalogue commun sont préservés en détachant leur user_id facultatif.
 - Si le compte possède des fichiers Storage, la suppression entière est refusée jusqu'à un nettoyage via les API Storage (jamais supprimer seulement les métadonnées SQL). Les catalogues partagés sont conservés.
 - Les JWT émis peuvent rester valides jusqu'à expiration ; déconnexion locale après suppression personnelle. Les sauvegardes suivent la rétention Supabase.
-- Ne pas appliquer migration ni fusionner ni supprimer de comptes réels sans accord explicite. Tester la recette au préalable.
+- **Statut vérifié le 9 novembre 2026 : la migration 043 a été appliquée à Supabase et inscrite dans l’historique.** Aucun compte n’a été supprimé lors de son application. Les fonctions sont réservées au rôle `authenticated`, puis vérifient les droits dans leur corps ; `anon` n’a pas EXECUTE.
+- Après le déploiement de l’interface, tester les protections avant toute suppression réelle ; ne jamais déclencher une suppression d’utilisateur sans confirmation explicite dans l’interface. Tout nouveau changement de schéma nécessite une autorisation adaptée.
