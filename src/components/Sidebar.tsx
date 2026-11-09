@@ -23,6 +23,7 @@ import {
   LightbulbIcon,
   ChevronDownIcon,
   ShieldCheckIcon,
+  UsersIcon,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabaseBrowser';
@@ -138,7 +139,7 @@ export default function Sidebar() {
 
   const extraItems = navItems.slice(4);
   const visibleAdminItems = isOwner
-    ? [...adminItems, { href: '/admin/access', label: 'GESTION DES ACCÈS', icon: ShieldCheckIcon }]
+    ? [...adminItems, { href: '/admin/access', label: 'GESTION DES ACCÈS', icon: ShieldCheckIcon }, { href: '/admin/players', label: 'GESTION DES JOUEURS', icon: UsersIcon }]
     : adminItems;
 
   return (
