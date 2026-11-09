@@ -173,7 +173,7 @@ function OpenContent() {
           return;
         }
       } else {
-        // 1. Deduct AP only for a pack bought from the shop.
+        // 1. Deduct AC only for a pack bought from the shop.
         const deduction = await deductAP(userId, pack.price);
         if (!deduction.success) {
           alert(`${t('Erreur')}: ${deduction.error}`);
@@ -435,7 +435,7 @@ function OpenContent() {
               <>
                 {dailyBoosterId && (
                   <p className="mt-6 max-w-sm text-center text-sm text-cyan-200">
-                    {t('Booster offert : aucune dépense d’AP ne sera effectuée.')}
+                    {t('Booster offert : aucune dépense d’AC ne sera effectuée.')}
                   </p>
                 )}
                 {dailyBoosterError && (

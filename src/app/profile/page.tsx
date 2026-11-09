@@ -377,7 +377,7 @@ export default function ProfilePage() {
             <StatCard language={language} label={t('Cartes possédées')} value={stats.totalCards} icon={<CarFront size={18} />} />
             <StatCard language={language} label={t('Cartes légendaires')} value={stats.legendaryCards} icon={<Medal size={18} />} />
             <StatCard language={language} label={t('Constructeurs collectionnés')} value={stats.manufacturers} icon={<Users size={18} />} />
-            <StatCard language={language} label={t('AP disponibles')} value={Number(profile?.ap) || 0} icon={<Wallet size={18} />} />
+            <StatCard language={language} label={t('AC disponibles')} value={Number(profile?.ap) || 0} icon={<Wallet size={18} />} />
           </section>
 
           <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)]">

@@ -380,7 +380,7 @@ export default function CardDetailsModal({
                     >
                       {upgradePending
                         ? t('Achat…')
-                        : t('Acheter le niveau {level} · {price} AP', {
+                        : t('Acheter le niveau {level} · {price} AC', {
                             level: nextLevelUnlock.nextLevel,
                             price: nextLevelUnlock.price,
                           })}
