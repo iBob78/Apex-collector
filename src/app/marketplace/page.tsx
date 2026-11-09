@@ -343,7 +343,7 @@ function SellCardItem({ userCard, onSelect }: { userCard: any, onSelect: (price:
   return (
     <div className="group relative">
       <div className="aspect-[63/88] opacity-80 group-hover:opacity-100 transition-opacity">
-        <Card {...userCard.card} owned={true} count={userCard.count} />
+        <Card {...userCard.card} owned={true} count={userCard.count} onCardClick={() => setIsSettingPrice(true)} />
       </div>
       <button
         onClick={() => setIsSettingPrice(true)}
