@@ -59,9 +59,9 @@ export async function permanentlyDeletePlayerAccount(
     return { success: false, error: 'Tu ne peux pas supprimer ton compte propriétaire.' };
   }
 
-  // This RPC repeats the ownership check, protects administrators and verifies
-  // the immutable UUID plus the currently stored username/email in one DB transaction.
-  const { data, error } = await auth.client.rpc('owner_permanently_delete_player', {
+  // The RPC repeats owner authorization, reassigns any delegated admin grants,
+  // and verifies the immutable UUID and stored username/email in one transaction.
+  const { data, error } = await auth.client.rpc('permanently_delete_player_account', {
     p_user_id: userId,
     p_expected_username: expectedUsername,
     p_expected_email: expectedEmail,
