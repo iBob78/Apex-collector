@@ -4,6 +4,10 @@ export type UnitSystem = 'metric' | 'imperial';
 const messages: Record<SiteLanguage, Record<string, string>> = {
   fr: {},
   en: {
+    'Pseudo': 'Username',
+    'Le pseudo doit contenir 3 à 24 caractères : lettres, chiffres, _ ou -.': 'Username must be 3 to 24 characters: letters, digits, _ or -.',
+    'Vérifiez votre boîte mail pour activer votre compte, puis connectez-vous.': 'Check your email to activate your account, then sign in.',
+    'Inscription impossible. Vérifiez votre pseudo ou réessayez.': 'Sign-up failed. Check your username or try again.',
     'ACCUEIL': 'HOME',
     'MA COLLECTION': 'MY COLLECTION',
     'BOUTIQUE PACKS': 'BOOSTER SHOP',
@@ -458,6 +462,10 @@ const messages: Record<SiteLanguage, Record<string, string>> = {
     'Achetez et vendez des cartes': 'Buy and sell cards',
   },
   es: {
+    'Pseudo': 'Nombre de usuario',
+    'Le pseudo doit contenir 3 à 24 caractères : lettres, chiffres, _ ou -.': 'El nombre debe tener de 3 a 24 caracteres: letras, números, _ o -.',
+    'Vérifiez votre boîte mail pour activer votre compte, puis connectez-vous.': 'Revisa tu correo para activar la cuenta y después inicia sesión.',
+    'Inscription impossible. Vérifiez votre pseudo ou réessayez.': 'No se pudo crear la cuenta. Revisa el nombre o inténtalo de nuevo.',
     'ACCUEIL': 'INICIO',
     'MA COLLECTION': 'MI COLECCIÓN',
     'BOUTIQUE PACKS': 'TIENDA DE SOBRES',

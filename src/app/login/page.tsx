@@ -1,5 +1,7 @@
 'use client';
 import { useState, Suspense } from 'react';
+import { SiteLanguage, UnitSystem } from '@/lib/preferences';
+import { defaultSignupUsername, isValidSignupUsername, safeInternalRedirect } from '@/lib/signup';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabaseBrowser';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,44 +14,54 @@ function LoginForm() {
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [notice, setNotice] = useState('');
+  const [username, setUsername] = useState('');
+  const [usernameEdited, setUsernameEdited] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get('redirect') || '/dashboard';
+  const redirect = safeInternalRedirect(searchParams.get('redirect'));
+
   const supabase = createClient();
-  const { language, t } = useSitePreferences();
+  const { language, units, saveLanguage, saveUnits, t } = useSitePreferences();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('[LoginForm] Submitting...', { isLogin, email });
     setError('');
+    setNotice('');
+    if (!isLogin && !isValidSignupUsername(username)) {
+      setError(t('Le pseudo doit contenir 3 à 24 caractères : lettres, chiffres, _ ou -.'));
+      return;
+    }
     setLoading(true);
-
     try {
-      const { data, error: authError } = isLogin
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({
-            email,
-            password,
-            options: { data: { language } },
-          });
-
-      console.log('[LoginForm] Auth result:', { data, error: authError });
-
-      if (authError) {
-        setError(authError.message);
+      if (isLogin) {
+        const { error: authError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        if (authError) setError(authError.message);
+        else window.location.assign(redirect);
       } else {
-        console.log('[LoginForm] Redirecting to:', redirect);
-        // Use window.location instead of router.push to force full page reload
-        // This ensures middleware re-checks session with fresh cookies
-        window.location.href = redirect;
+        const { data, error: authError } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: {
+            data: { username: username.trim(), language, unit_preference: units },
+            emailRedirectTo: window.location.origin + '/auth/callback?redirect=' + encodeURIComponent(redirect),
+          },
+        });
+        if (authError) {
+          setError(authError.message.toLowerCase().includes('database error')
+            ? t('Inscription impossible. Vérifiez votre pseudo ou réessayez.')
+            : authError.message);
+        } else if (!data.session) {
+          setNotice(t('Vérifiez votre boîte mail pour activer votre compte, puis connectez-vous.'));
+        } else {
+          window.location.assign(redirect);
+        }
       }
-    } catch (err: any) {
-      console.error('[LoginForm] Unexpected error:', err);
-      setError(t("Une erreur inattendue est survenue."));
+    } catch {
+      setError(t('Une erreur inattendue est survenue.'));
     } finally {
       setLoading(false);
-      console.log('[LoginForm] Loading finished');
     }
   };
 
@@ -81,11 +93,63 @@ function LoginForm() {
                 type="email"
                 placeholder={t('nom@ecurie.com')}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setEmail(value);
+                  if (!usernameEdited) setUsername(defaultSignupUsername(value));
+                }}
                 required
                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-blue-500/50 transition-all placeholder:text-gray-700"
               />
             </div>
+
+            {!isLogin && (
+              <>
+                <div className="space-y-2">
+                  <label htmlFor="signup-username" className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">{t('Pseudo')}</label>
+                  <input
+                    id="signup-username"
+                    type="text"
+                    autoComplete="nickname"
+                    value={username}
+                    maxLength={24}
+                    minLength={3}
+                    pattern="[A-Za-z0-9_-]{3,24}"
+                    required
+                    onChange={(e) => { setUsername(e.target.value); setUsernameEdited(true); }}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-blue-500/50 transition-all"
+                  />
+                  <p className="text-[10px] text-gray-500">{t('Le pseudo doit contenir 3 à 24 caractères : lettres, chiffres, _ ou -.')}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <label htmlFor="signup-language" className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">{t('Langue')}</label>
+                    <select
+                      id="signup-language"
+                      value={language}
+                      onChange={(e) => { void saveLanguage(e.target.value as SiteLanguage); }}
+                      className="w-full bg-[#161b25] border border-white/10 rounded-2xl px-3 py-4 text-sm text-white focus:outline-none focus:border-blue-500/50"
+                    >
+                      <option value="fr">Français</option>
+                      <option value="en">English</option>
+                      <option value="es">Español</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="signup-units" className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">{t('Unités')}</label>
+                    <select
+                      id="signup-units"
+                      value={units}
+                      onChange={(e) => { void saveUnits(e.target.value as UnitSystem); }}
+                      className="w-full bg-[#161b25] border border-white/10 rounded-2xl px-3 py-4 text-sm text-white focus:outline-none focus:border-blue-500/50"
+                    >
+                      <option value="metric">{t('Métriques')}</option>
+                      <option value="imperial">{t('Impériales')}</option>
+                    </select>
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">{t('Mot de passe')}</label>
@@ -100,6 +164,12 @@ function LoginForm() {
             </div>
 
             <AnimatePresence>
+              {notice && (
+                <motion.p role="status" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 p-3 text-sm text-emerald-100">
+                  {notice}
+                </motion.p>
+              )}
               {error && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
@@ -130,7 +200,7 @@ function LoginForm() {
 
           <div className="mt-8 text-center">
             <button
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => { setIsLogin(!isLogin); setError(''); setNotice(''); }}
               className="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors"
             >
               {t(isLogin ? 'Inscrivez-vous' : 'Connectez-vous')}
