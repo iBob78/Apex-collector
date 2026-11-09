@@ -66,6 +66,7 @@ export async function permanentlyDeletePlayerAccount(
     p_expected_username: expectedUsername,
     p_expected_email: expectedEmail,
     p_confirmation: confirmation,
+    p_password: null,
   });
 
   if (error) {
