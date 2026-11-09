@@ -98,7 +98,7 @@ export default function DashboardGiftNotice({ userId }: { userId: string | null 
     const seen = getSeenIds(key);
     notices.forEach(item => seen.add(item.id));
     try {
-      localStorage.setItem(key, JSON.stringify([...seen]));
+      localStorage.setItem(key, JSON.stringify(Array.from(seen)));
     } catch {
       // Local storage can be disabled; the gifts still work.
     }
