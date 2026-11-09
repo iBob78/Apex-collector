@@ -31,3 +31,12 @@
 - Le dashboard annonce les boosters quotidiens et cadeaux en attente via une modale consultable une seule fois par cadeau et par navigateur ; fermer la modale ne consomme pas le booster.
 - Tests après déploiement : première inscription et premier accès à /dashboard, présence d'un quotidien et d'un cadeau distincts, ouverture 10 cartes sans débit AC, plusieurs rafraîchissements, seconde connexion, absence de doublons, essais de consommation d'un cadeau appartenant à un autre joueur.
 - Comme les boosters quotidiens actuels, l'ouverture consomme le droit avant d'enregistrer les cartes dans les possessions. La sauvegarde n'est pas une seule transaction SQL : si le réseau échoue entre ces opérations, une intervention de support peut être nécessaire. Ne pas prétendre à une atomicité absente.
+
+
+## Gestion des comptes — migration 043 (à valider)
+- Admin > Gestion des joueurs : recherche par pseudo/e-mail et suppression d'un autre compte, administrateurs inclus. Protection du propriétaire du site. Confirmation par case et texte SUPPRIMER <pseudo exact>.
+- Réglages > Zone de danger : chacun peut supprimer son propre compte en confirmant avec son mot de passe, une case de compréhension et la phrase requise.
+- Le serveur et les fonctions SQL recontrôlent les droits et les identités. Tout échec entraîne un rollback de la transaction.
+- Nettoyage : compte Auth et profil, cartes possédées, circuits et pilotes, historique de découverte, favoris, boosts quotidiens et cadeaux, progression/contrats, anciennes lignes market/users, rôle admin et sessions. Catalogues communs préservés.
+- Si l'utilisateur détient un objet Storage, aucun effacement ne démarre avant nettoyage des fichiers via l'API Storage. Les sauvegardes Supabase et JWT existants sont soumis à leur propre rétention/expiration.
+- Vérifier avant déploiement : accès propriétaire/autrui, refus délégué, mot de passe erroné, texte incorrect, protection propriétaire, suppression admin délégué, intégrité des catalogues, blocage Storage, disparition des lignes personnelles.
