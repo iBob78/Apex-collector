@@ -69,7 +69,7 @@ export default function MarketplacePage() {
       alert(t('Achat réussi ! La carte a été ajoutée à votre garage.'));
       refreshListings();
       // The database returns the authoritative balance after an atomic trade.
-      if (Number.isFinite(result.balance)) {
+      if (typeof result.balance === 'number' && Number.isFinite(result.balance)) {
         setProfile((current: any) => current ? { ...current, ap: result.balance } : current);
       }
     } else {
