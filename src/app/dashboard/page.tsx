@@ -9,6 +9,7 @@ import { getGarageProgress } from '@/lib/garage-level';
 import Sidebar from '@/components/Sidebar';
 import { ArrowRight, ArrowUpRight, Gauge, Layers3, Lightbulb, ShoppingBag, Trophy, Wallet } from 'lucide-react';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
+import DashboardGiftNotice from '@/components/DashboardGiftNotice';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -69,6 +70,7 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen bg-[#050505] text-white">
       <Sidebar />
+      <DashboardGiftNotice userId={user?.id ?? null} />
       <main className="min-w-0 flex-1">
         <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-7 px-4 py-6 sm:gap-9 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
           {/* Keep AC in a compact, persistent top-right header instead of the statistics grid. */}

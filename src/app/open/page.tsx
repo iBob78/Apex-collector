@@ -20,10 +20,17 @@ function OpenContent() {
   const router = useRouter();
   const requestedPackSlug = searchParams.get('pack') || 'common';
   const dailyBoosterId = searchParams.get('daily_booster');
+  const giftBoosterId = searchParams.get('gift_booster');
+  const [giftBooster, setGiftBooster] = useState<{ packSlug: string; cardCount: number } | null>(null);
+  const [giftBoosterError, setGiftBoosterError] = useState<string | null>(null);
   const [dailyPackSlug, setDailyPackSlug] = useState<string | null>(null);
   const [dailyBoosterError, setDailyBoosterError] = useState<string | null>(null);
-  const packSlug = dailyBoosterId ? dailyPackSlug || 'common' : requestedPackSlug;
+  const packSlug = giftBoosterId ? giftBooster?.packSlug || 'common'
+    : dailyBoosterId ? dailyPackSlug || 'common' : requestedPackSlug;
   const pack = PACKS[packSlug] || PACKS.common;
+  const cardCount = giftBoosterId ? (giftBooster?.cardCount ?? 0) : pack.cardCount;
+  const packDisplayName = giftBoosterId ? t('Booster de bienvenue') : pack.name;
+  const freeBoosterError = giftBoosterError || dailyBoosterError;
 
   const [userId, setUserId] = useState<string | null>(null);
   const [isOpening, setIsOpening] = useState(false);
@@ -64,7 +71,24 @@ function OpenContent() {
           return;
         }
 
-        if (dailyBoosterId) {
+        if (dailyBoosterId && giftBoosterId) {
+          if (active) setGiftBoosterError(t('Un seul booster offert peut être ouvert à la fois.'));
+        } else if (giftBoosterId) {
+          const { data, error } = await supabase
+            .from('user_gift_boosters')
+            .select('pack_slug, card_count')
+            .eq('id', giftBoosterId)
+            .eq('user_id', user.id)
+            .is('opened_at', null)
+            .maybeSingle();
+          if (error) throw error;
+          if (!data || !PACKS[data.pack_slug] || !Number.isInteger(data.card_count)
+            || data.card_count < 1 || data.card_count > 20) {
+            if (active) setGiftBoosterError(t('Ce cadeau est indisponible ou a déjà été ouvert.'));
+          } else if (active) {
+            setGiftBooster({ packSlug: data.pack_slug, cardCount: data.card_count });
+          }
+        } else if (dailyBoosterId) {
           const { data, error } = await supabase
             .from('user_daily_boosters')
             .select('pack_slug')
@@ -87,19 +111,22 @@ function OpenContent() {
       } catch (error) {
         console.error('[OpenBoosterPage] Impossible de charger le booster:', error);
         if (active) {
-          setDailyBoosterError(t('Impossible de vérifier ce booster offert.'));
+          if (giftBoosterId) setGiftBoosterError(t('Impossible de vérifier ce cadeau.'));
+          else setDailyBoosterError(t('Impossible de vérifier ce booster offert.'));
           setLoading(false);
         }
       }
     };
     void loadOpeningContext();
     return () => { active = false; };
-  }, [router, dailyBoosterId, t]);
+  }, [router, dailyBoosterId, giftBoosterId, t]);
 
   // 2. Logic to Open Pack
   const handleOpenPack = async () => {
     if (!userId || isOpening || isPrepared) return;
+    if (dailyBoosterId && giftBoosterId) return;
     if (dailyBoosterId && (!dailyPackSlug || dailyBoosterError)) return;
+    if (giftBoosterId && (!giftBooster || giftBoosterError)) return;
 
     setIsOpening(true);
     setDiscoverySaveError(null);
@@ -128,7 +155,7 @@ function OpenContent() {
         packSlug,
         vehicleCards,
         circuitCards,
-        pack.cardCount,
+        cardCount,
         Math.random,
         driverCards
       );
@@ -157,7 +184,17 @@ function OpenContent() {
         console.warn('[Booster] Impossible de vérifier les premières découvertes.', ownedVehiclesResult.error || ownedCircuitsResult.error || ownedDriversResult.error);
       }
 
-      if (dailyBoosterId) {
+      if (giftBoosterId) {
+        const { data, error } = await supabase.rpc('consume_player_gift_booster', {
+          p_booster_id: giftBoosterId,
+        });
+        if (error || !data?.success || data.pack_slug !== packSlug || data.card_count !== cardCount) {
+          console.error('[Booster] Impossible de consommer le cadeau:', error?.message ?? data?.error);
+          setGiftBoosterError(t('Impossible d’ouvrir ce cadeau.'));
+          setIsOpening(false);
+          return;
+        }
+      } else if (dailyBoosterId) {
         const { data, error } = await supabase.rpc('consume_daily_login_booster', {
           p_booster_id: dailyBoosterId,
         });
@@ -355,7 +392,7 @@ function OpenContent() {
                 <div className="relative w-full h-full">
                   <SafeImage
                     src={pack.imageUrl}
-                    alt={pack.name}
+                    alt={packDisplayName}
                     fill
                     className="object-cover"
                   />
@@ -364,10 +401,10 @@ function OpenContent() {
                   {!isPrepared && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
                       <h2 className="text-3xl font-black tracking-tighter uppercase italic drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                        {pack.name}
+                        {packDisplayName}
                       </h2>
                       <div className="mt-4 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded text-[10px] tracking-[0.3em] font-bold uppercase">
-                        {pack.cardCount} {t('Cartes')}
+                        {cardCount} {t('Cartes')}
                       </div>
                     </div>
                   )}
@@ -433,20 +470,23 @@ function OpenContent() {
 
             {!isPrepared && !isOpening && (
               <>
-                {dailyBoosterId && (
+                {(dailyBoosterId || giftBoosterId) && (
                   <p className="mt-6 max-w-sm text-center text-sm text-cyan-200">
                     {t('Booster offert : aucune dépense d’AC ne sera effectuée.')}
                   </p>
                 )}
-                {dailyBoosterError && (
+                {freeBoosterError && (
                   <p role="alert" className="mt-6 max-w-md rounded-xl border border-red-400/20 bg-red-400/10 p-4 text-sm text-red-200">
-                    {dailyBoosterError}
+                    {freeBoosterError}
                   </p>
                 )}
                 <motion.button
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  disabled={Boolean(dailyBoosterId && (!dailyPackSlug || dailyBoosterError))}
+                  disabled={Boolean(
+                    (dailyBoosterId && (!dailyPackSlug || dailyBoosterError))
+                    || (giftBoosterId && (!giftBooster || giftBoosterError))
+                  )}
                   onClick={handleOpenPack}
                   className="mt-12 rounded-full bg-white px-12 py-4 text-sm font-bold uppercase tracking-widest text-black transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
                 >

@@ -284,3 +284,9 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
 - La monnaie visible est **Apex Crédits (AC)** ; conserver les noms techniques historiques `ap` et `reward_ap`, et les RPC de paiement et de récompense. Ne pas convertir ni créditer les soldes existants.
 - Après application de la migration `041_signup_profile_preferences_and_ac.sql`, les nouveaux profils reçoivent 20 000 AC, et enregistrent e-mail, pseudo choisi, langue (`fr`, `en`, `es`) et unités (`metric`, `imperial`). Le pseudo est unique sans distinction de casse.
 - Les e-mails de confirmation doivent revenir à `/auth/callback` sur le domaine HTTPS réel. Modifier **Site URL** et **Redirect URLs** dans Supabase Auth ; un commit GitHub ne les configure pas. Voir `docs/beta-registration.md`.
+
+
+## Cadeaux de bienvenue et alertes dashboard (migration 042)
+- La migration `042_player_welcome_gift_boosters.sql` ajoute un cadeau de bienvenue unique par nouveau profil `gift_key=welcome_2026`, pack commun 10 cartes. Ne pas réattribuer rétroactivement aux comptes existants sans accord.
+- La disponibilité du cadeau est contrôlée par RLS et la consommation unique `consume_player_gift_booster`; l'ouverture suit le tirage et l'enregistrement existants (circuit garanti, badges NEW, statistiques). Ne jamais exposer un chemin qui évite la consommation du cadeau ou débite des AC pour un cadeau.
+- La modale de `/dashboard` détecte les boosters offerts non ouverts depuis Supabase et mémorise la prise de connaissance, sans les consommer. Les quotidiennes restent séparées des cadeaux de bienvenue.

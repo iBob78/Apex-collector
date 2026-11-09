@@ -2,6 +2,11 @@ import { getPublicImage } from '@/lib/images';
 
 type BoosterRarity = 'Common' | 'Uncommon' | 'Rare' | 'Epic' | 'Legend' | 'Icon';
 
+/** One-time onboarding gift; common rarity odds but ten cards instead of six. */
+export const WELCOME_GIFT_KEY = 'welcome_2026';
+export const WELCOME_GIFT_PACK_SLUG = 'common';
+export const WELCOME_GIFT_CARD_COUNT = 10;
+
 export const DAILY_LOGIN_PACKS = [
     'common',
     'uncommon',

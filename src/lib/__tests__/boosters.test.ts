@@ -1,4 +1,4 @@
-import { drawBoosterCards, PACKS, getPackImageUrl, getFirstTimeBoosterCardIndices, getBoosterCardIdentity, getDailyLoginPackSlug } from '../boosters';
+import { drawBoosterCards, PACKS, getPackImageUrl, getFirstTimeBoosterCardIndices, getBoosterCardIdentity, getDailyLoginPackSlug, WELCOME_GIFT_KEY, WELCOME_GIFT_PACK_SLUG, WELCOME_GIFT_CARD_COUNT } from '../boosters';
 
 describe('Booster pack assets', () => {
   it('assigns increasingly valuable packs across the seven-day login streak', () => {
@@ -234,5 +234,23 @@ describe('First-time booster discoveries', () => {
       [{ circuit_id: 'circuit-owned', count: 1 }],
       [true, true],
     )]).toEqual([1]);
+  });
+});
+
+describe('welcome booster', () => {
+  it('draws ten cards using the existing common pack odds', () => {
+    expect(WELCOME_GIFT_KEY).toBe('welcome_2026');
+    expect(WELCOME_GIFT_PACK_SLUG).toBe('common');
+    expect(WELCOME_GIFT_CARD_COUNT).toBe(10);
+    expect(PACKS.common.cardCount).toBe(6); // Regular pack unchanged.
+    const cards = drawBoosterCards(
+      WELCOME_GIFT_PACK_SLUG,
+      [{ id: 'car1', rarity: 'Common' }],
+      [{ id: 'circuit1', rarity: 'Common', category: 'circuit' }],
+      WELCOME_GIFT_CARD_COUNT,
+      () => 0.1,
+    );
+    expect(cards).toHaveLength(10);
+    expect(cards.some(card => card.category === 'circuit')).toBe(true);
   });
 });
