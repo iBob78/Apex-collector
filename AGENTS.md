@@ -59,6 +59,7 @@ Le créateur du projet n'est pas développeur. Être concret et compréhensible,
 | Ouverture et révélation des cartes des boosters | `src/app/open/page.tsx` |
 | Catalogue et atelier des pilotes | `src/app/admin/drivers/` |
 | Gestion des rôles administrateur | `src/app/admin/access/` |
+| Suppression des comptes (propriétaire) | `src/app/admin/players/` |
 | Suggestions publiques et boîte de réception admin | `src/app/suggestions/` ; `src/app/admin/suggestions/` |
 | Validation et sauvegarde des fiches pilote | `src/app/admin/drivers/actions.ts` |
 | Calcul de l'âge d'une fiche pilote | `src/lib/driverCards.ts` |
@@ -68,6 +69,7 @@ Le créateur du projet n'est pas développeur. Être concret et compréhensible,
 | Images et icônes | `src/lib/images/` ; `src/components/SafeImage.tsx` |
 | Conversions et statistiques véhicules | `src/lib/vehicleStats.ts` |
 | Langues et unités | `src/lib/preferences.ts` ; `src/contexts/SitePreferencesContext.tsx` |
+| Auto-suppression du compte joueur | `src/app/settings/` (`SelfAccountDeletion.tsx`, `actions.ts`) |
 | Autorisation admin | `src/lib/admin.ts` et gardes/permissions des pages/actions admin |
 | Scripts SQL | `supabase/migrations/` |
 
@@ -290,3 +292,51 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
 - La migration `042_player_welcome_gift_boosters.sql` ajoute un cadeau de bienvenue unique par nouveau profil `gift_key=welcome_2026`, pack commun 10 cartes. Ne pas réattribuer rétroactivement aux comptes existants sans accord.
 - La disponibilité du cadeau est contrôlée par RLS et la consommation unique `consume_player_gift_booster`; l'ouverture suit le tirage et l'enregistrement existants (circuit garanti, badges NEW, statistiques). Ne jamais exposer un chemin qui évite la consommation du cadeau ou débite des AC pour un cadeau.
 - La modale de `/dashboard` détecte les boosters offerts non ouverts depuis Supabase et mémorise la prise de connaissance, sans les consommer. Les quotidiennes restent séparées des cadeaux de bienvenue.
+
+
+## Suppression définitive des comptes (migration 043)
+- /admin/players : réservé au propriétaire, recherche par e-mail/pseudo, suppression de tout autre utilisateur, y compris un administrateur délégué.
+- /settings : tout joueur peut supprimer son propre compte après saisie de son mot de passe actuel, phrase de confirmation exacte et case de compréhension. Mot de passe validé via Auth et à nouveau dans la fonction SQL.
+- Le compte propriétaire du site est protégé contre la suppression tant que sa propriété n'a pas été transférée (protection anti-verrouillage).
+- Migration 043_owner_permanent_player_deletion.sql : RPC owner_search_player_accounts (owner only) et permanently_delete_player_account (owner pour autrui, joueur pour soi), contrôles d'autorisation en SECURITY DEFINER, rôles/grants restrictifs. La migration ne supprime aucun utilisateur.
+- Suppression en transaction SQL : confirmation cible Auth ID+pseudo+email, verrouillage Auth, transfert de toute attribution de rôle admin vers le propriétaire, retrait du rôle du compte visé, nettoyage des anciennes tables market/users, suppression de profiles et auth.users avec cascades. Les circuits du catalogue commun sont préservés en détachant leur user_id facultatif.
+- Si le compte possède des fichiers Storage, la suppression entière est refusée jusqu'à un nettoyage via les API Storage (jamais supprimer seulement les métadonnées SQL). Les catalogues partagés sont conservés.
+- Les JWT émis peuvent rester valides jusqu'à expiration ; déconnexion locale après suppression personnelle. Les sauvegardes suivent la rétention Supabase.
+- **Statut vérifié le 9 novembre 2026 : la migration 043 a été appliquée à Supabase et inscrite dans l’historique.** Aucun compte n’a été supprimé lors de son application. Les fonctions sont réservées au rôle `authenticated`, puis vérifient les droits dans leur corps ; `anon` n’a pas EXECUTE.
+- Après le déploiement de l’interface, tester les protections avant toute suppression réelle ; ne jamais déclencher une suppression d’utilisateur sans confirmation explicite dans l’interface. Tout nouveau changement de schéma nécessite une autorisation adaptée.
+
+## Journal consolidé — inscriptions, cadeaux et gestion des comptes (9 novembre 2026)
+
+> Cette section récapitule les changements effectifs de ce fil de travail, les interventions directes sur la base et les étapes de livraison. Les règles ci-dessus restent la référence technique ; ne pas déduire qu'une PR fusionnée configure automatiquement Supabase Auth, SMTP ou Vercel.
+
+### 1. Inscription bêta, compte joueur, 20 000 AC — PR #18 / SQL 041
+- Fichiers principaux : `src/app/login/page.tsx`, `src/app/auth/callback/page.tsx`, `src/lib/signup.ts`, `src/lib/preferences.ts`, `supabase/email-templates/confirmation.html`, `supabase/migrations/041_signup_profile_preferences_and_ac.sql`, `docs/beta-registration.md`, tests et `AGENTS.md`.
+- Le formulaire d'inscription accepte un pseudo modifiable (3 à 24 caractères ASCII, lettres/chiffres/`_`/`-`), la langue FR/EN/ES et les unités métriques/impériales. La confirmation e-mail utilise `/auth/callback` et un retour contrôlé vers la route interne voulue.
+- SQL 041 : valeur par défaut de `public.profiles.ap` portée de 1 000 à **20 000 AC** (nom SQL `ap` conservé) ; trigger `handle_new_user()` créant le profil avec pseudo, e-mail et préférences ; index de pseudo unique indépendamment de la casse ; backfill des e-mails absents et création des profils Auth manquants.
+- La migration n'écrase **pas** les soldes des profils déjà créés. Les URLs de redirection de Supabase Auth, Site URL, le modèle e-mail et le SMTP restent des réglages hébergés à configurer et à tester indépendamment du dépôt.
+- Incident diagnostiqué : un compte Auth confirmé n'avait aucun profil et son dashboard affichait à tort 0 AC. Réparation ciblée en production du profil du compte de test `leav7878` avec **20 000 AC**, e-mail et préférences ; aucun solde d'un autre joueur n'a été changé par cette réparation.
+- Un autre compte de test, `topgerard76`, avait été créé avant SQL 041 avec **1 000 AC** et un pseudo calculé depuis l'e-mail : le passage à SQL 041 ne revalorise pas rétroactivement son solde.
+- **Statut : PR #18 fusionnée dans `main` ; SQL 041 appliquée et enregistrée dans l'historique Supabase le 09/11/2026.**
+
+### 2. Booster quotidien, cadeau de bienvenue de dix cartes et alertes — PR #19 / SQL 042
+- Le booster de connexion quotidienne existait déjà (migration 039, RPC `claim_daily_login_booster`, `consume_daily_login_booster`, `user_daily_boosters`). Vérification des comptes de test : les boosters du jour avaient été attribués et étaient non ouverts ; le souci signalé était l'absence de notification sur le dashboard, pas une absence de crédit de booster.
+- Fichiers touchés : `src/components/DashboardGiftNotice.tsx`, `src/app/dashboard/page.tsx`, `src/app/boosters/page.tsx`, `src/app/open/page.tsx`, `src/lib/boosters.ts`, `src/lib/preferences.ts`, tests, `supabase/migrations/042_player_welcome_gift_boosters.sql` et documentation.
+- SQL 042 : table `user_gift_boosters` sous RLS, unicité `(user_id, gift_key)`, trigger sur insertion du profil, clé `welcome_2026`, pack `common`, **10 cartes**, et RPC authentifiée `consume_player_gift_booster` qui vérifie la propriété et n'autorise qu'une consommation.
+- `/boosters` affiche les cadeaux en attente séparément des quotidiens ; `/open?gift_booster=<uuid>` réutilise le tirage, les probabilités du pack commun et la garantie d'un circuit, avec **10 cartes**, sans dépense d'AC. Les packs payants et quotidiens ne changent pas de quantité.
+- Une modale sur `/dashboard` annonce les cadeaux quotidiens ou de bienvenue non ouverts. La prise de connaissance est stockée par cadeau et par joueur dans le navigateur (`localStorage`) ; fermer la modale **ne consomme jamais** le booster. Le joueur le retrouve dans la boutique ; le composant supporte l'absence temporaire de la table tant que 042 n'est pas déployée.
+- SQL 042 **n'accorde pas rétroactivement** un cadeau aux comptes créés auparavant. L'ouverture du booster et l'enregistrement des cartes **ne sont pas une transaction unique** : une panne entre les deux peut demander une réparation manuelle.
+- **Statut : PR #19 fusionnée dans `main` ; SQL 042 appliquée et enregistrée dans l'historique Supabase le 09/11/2026.**
+
+### 3. Suppression définitive : côté joueur et côté propriétaire — PR #20 / SQL 043
+- Fichiers : `src/app/settings/SelfAccountDeletion.tsx`, `src/app/settings/actions.ts`, `src/app/settings/page.tsx`, `src/app/admin/players/{page.tsx,PlayerAccountManager.tsx,actions.ts}`, `src/lib/admin/playerDeletion.ts`, ses tests, `src/components/Sidebar.tsx`, `src/lib/preferences.ts`, SQL 043 et documentation.
+- Dans Réglages, le joueur peut demander **uniquement sa propre suppression** ; la page exige une case de compréhension, la phrase exacte `SUPPRIMER <pseudo>` et son mot de passe actuel. La session est nettoyée côté navigateur après succès. Le serveur vérifie le mot de passe via Supabase Auth et la fonction SQL le revérifie via `extensions.crypt` pour protéger également l'appel RPC direct.
+- Dans Admin → Gestion des joueurs (menu PC et mobile), **seul le propriétaire du site** peut rechercher par pseudo/e-mail et supprimer **tout autre compte**, y compris un administrateur délégué. Un admin délégué ne peut pas supprimer autrui. Le compte propriétaire n'est pas supprimable tant que la propriété du site n'a pas été transférée.
+- SQL 043 : `owner_search_player_accounts` et `permanently_delete_player_account` sont exécutables par `authenticated` uniquement et recontrôlent l'identité `auth.uid()` et les droits côté base ; `anon` n'a pas EXECUTE. Suppression sur UUID + pseudo + e-mail + phrase de confirmation, verrouillage de la ligne Auth, transaction atomique avec retour arrière sur erreur.
+- Nettoyage : anciens `market` et `users`, rôle administrateur supprimé, réattribution des rôles qu'il avait attribués au propriétaire, puis profil et utilisateur Auth avec cascades de leurs possessions, cartes, pilotes, boosters, cadeaux, découvertes, favoris, progression, statistiques et sessions. Le `user_id` facultatif des circuits du **catalogue partagé** est d'abord mis à NULL pour préserver ces fiches et les cartes des autres joueurs.
+- Si l'utilisateur possède un fichier, bucket ou upload dans Supabase Storage, la fonction refuse **toute suppression** : supprimer les blobs via les API Storage avant de recommencer, jamais seulement les métadonnées SQL. Les JWT déjà délivrés peuvent rester valides jusqu'à expiration et les sauvegardes Supabase suivent leur politique de rétention.
+- **Statut base : SQL 043 appliquée et enregistrée dans l'historique Supabase le 09/11/2026.** Contrôle post-migration : 5 utilisateurs Auth et 5 profils avant/après, 0 profil orphelin, 1 propriétaire reconnu ; aucune suppression déclenchée par l'installation. Les parcours de suppression réels restent à tester avec des comptes de recette.
+
+### 4. Discipline de déploiement et vérifications
+- L'ordre SQL sur la base de production a été **041 → 042 → 043**. Les PR applicatives associées sont **#18 → #19 → #20**. Fusionner un fichier de migration dans GitHub ne le déploie pas automatiquement dans Supabase ; ici, les trois migrations ont été exécutées explicitement via Supabase.
+- PR #18 et #19 : tests et build GitHub réussis avant fusion. PR #20 : tests et build GitHub réussis sur la version contrôlée ; le contrôle externe `Dependency Review` échoue du fait de la configuration du dépôt et doit être distingué des tests applicatifs. Relancer/contrôler la CI si le commit HEAD change.
+- Ne jamais tester une suppression définitive sur un compte réel sans action explicite du propriétaire ou du joueur concerné. Un déploiement Vercel doit être vérifié séparément de l'état GitHub `main`.

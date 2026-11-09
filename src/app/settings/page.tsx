@@ -4,6 +4,7 @@ import Sidebar from '@/components/Sidebar';
 import { useState } from 'react';
 import { SiteLanguage, UnitSystem } from '@/lib/preferences';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
+import SelfAccountDeletion from './SelfAccountDeletion';
 
 export default function SettingsPage() {
   const { language, units, saveLanguage, saveUnits, t } = useSitePreferences();
@@ -74,6 +75,8 @@ export default function SettingsPage() {
             )}
           </div>
         </section>
+
+        <SelfAccountDeletion />
       </main>
     </div>
   );
