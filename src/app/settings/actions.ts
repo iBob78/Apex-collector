@@ -50,6 +50,7 @@ export async function permanentlyDeleteMyAccount(
     p_expected_username: expectedUsername,
     p_expected_email: expectedEmail,
     p_confirmation: confirmation,
+    p_password: password,
   });
   if (error) {
     console.error('[Settings] Erreur suppression du compte:', error.code, error.message);
