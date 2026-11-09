@@ -1,7 +1,8 @@
--- Owner-only permanent deletion of a player account, in one database transaction.
+-- Permanent deletion of a player's own account or owner-managed deletion,
+-- in one database transaction.
 -- Apply this migration only after review/approval. NO USER IS DELETED BY THIS MIGRATION.
--- Deliberately use server-side owner checks within each SECURITY DEFINER function,
--- in addition to the application server's own authorization.
+-- Deliberately use server-side ownership and identity checks in each
+-- SECURITY DEFINER function, in addition to application authorization.
 -- Supabase Auth user deletion may not instantly invalidate an already issued JWT.
 -- Storage-owned objects must be cleaned with the Storage API first: direct SQL
 -- deletion of storage.objects metadata would leave the underlying blobs orphaned.
@@ -43,9 +44,7 @@ BEGIN
     p.ap,
     a.created_at,
     (
-      a.id = (SELECT auth.uid())
-      OR EXISTS (SELECT 1 FROM public.admin_control c WHERE c.owner_user_id = a.id)
-      OR EXISTS (SELECT 1 FROM public.admin_users u WHERE u.user_id = a.id OR u.assigned_by = a.id)
+      EXISTS (SELECT 1 FROM public.admin_control c WHERE c.owner_user_id = a.id)
     ) AS protected
   FROM auth.users a
   LEFT JOIN public.profiles p ON p.id = a.id
@@ -57,7 +56,7 @@ BEGIN
 END;
 $function$;
 
-CREATE OR REPLACE FUNCTION public.owner_permanently_delete_player(
+CREATE OR REPLACE FUNCTION public.permanently_delete_player_account(
   p_user_id UUID,
   p_expected_username TEXT,
   p_expected_email TEXT,
@@ -69,19 +68,31 @@ SET search_path = ''
 AS $function$
 DECLARE
   v_actor UUID := (SELECT auth.uid());
+  v_site_owner UUID;
   v_email TEXT;
   v_username TEXT;
   v_deleted UUID;
 BEGIN
-  IF v_actor IS NULL OR NOT EXISTS (
-    SELECT 1 FROM public.admin_control c
-    WHERE c.singleton IS TRUE AND c.owner_user_id = v_actor
-  ) THEN
-    RAISE EXCEPTION 'Accès réservé au propriétaire.' USING ERRCODE = '42501';
+  IF v_actor IS NULL OR p_user_id IS NULL THEN
+    RAISE EXCEPTION 'Authentification requise.' USING ERRCODE = '42501';
   END IF;
 
-  IF p_user_id IS NULL OR p_user_id = v_actor THEN
-    RAISE EXCEPTION 'Ce compte est protégé et ne peut pas être supprimé.'
+  SELECT c.owner_user_id INTO v_site_owner
+    FROM public.admin_control c WHERE c.singleton IS TRUE;
+  IF v_site_owner IS NULL THEN
+    RAISE EXCEPTION 'Le propriétaire du site est introuvable.'
+      USING ERRCODE = '42501';
+  END IF;
+
+  -- Players can erase only themselves. Only the owner can erase another user.
+  IF v_actor <> p_user_id AND v_actor <> v_site_owner THEN
+    RAISE EXCEPTION 'Seul le propriétaire peut supprimer un autre compte.'
+      USING ERRCODE = '42501';
+  END IF;
+
+  -- Never leave Apex Collector without its configured owner.
+  IF p_user_id = v_site_owner THEN
+    RAISE EXCEPTION 'Transfère la propriété du site avant de supprimer ce compte.'
       USING ERRCODE = '42501';
   END IF;
 
@@ -106,13 +117,13 @@ BEGIN
       USING ERRCODE = '22023';
   END IF;
 
-  -- Never erase the owner, another administrator, or an admin role assigner.
-  IF EXISTS (SELECT 1 FROM public.admin_control WHERE owner_user_id = p_user_id)
-     OR EXISTS (SELECT 1 FROM public.admin_users
-                WHERE user_id = p_user_id OR assigned_by = p_user_id) THEN
-    RAISE EXCEPTION 'Compte administrateur protégé. Retire ses accès avant toute suppression.'
-      USING ERRCODE = '42501';
-  END IF;
+  -- The owner may delete another admin. Preserve grants assigned by that
+  -- admin by transferring their attribution to the site's current owner.
+  -- Remove the target's own role so restrictive foreign keys do not block.
+  UPDATE public.admin_users
+  SET assigned_by = v_site_owner
+  WHERE assigned_by = p_user_id AND user_id <> p_user_id;
+  DELETE FROM public.admin_users WHERE user_id = p_user_id;
 
   -- Supabase Storage files must be removed via the Storage API, not raw SQL.
   -- Fail without modifying anything, rather than leave files or break shared media.
@@ -148,7 +159,7 @@ $function$;
 
 REVOKE ALL ON FUNCTION public.owner_search_player_accounts(TEXT, INT)
   FROM PUBLIC, anon, authenticated;
-REVOKE ALL ON FUNCTION public.owner_permanently_delete_player(UUID, TEXT, TEXT, TEXT)
+REVOKE ALL ON FUNCTION public.permanently_delete_player_account(UUID, TEXT, TEXT, TEXT)
   FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.owner_search_player_accounts(TEXT, INT) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.owner_permanently_delete_player(UUID, TEXT, TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.permanently_delete_player_account(UUID, TEXT, TEXT, TEXT) TO authenticated;
