@@ -284,7 +284,7 @@ export default function ObjectiveStudio({
           </p>
           <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Succès & contrats</h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">
-            Crée et modifie les objectifs, leur progression et leur récompense en AP. Désactive un objectif pour le retirer du jeu sans effacer l’historique des joueurs.
+            Crée et modifie les objectifs, leur progression et leur récompense en AC. Désactive un objectif pour le retirer du jeu sans effacer l’historique des joueurs.
           </p>
         </section>
 
@@ -337,7 +337,7 @@ export default function ObjectiveStudio({
                       {objective.objective_type === 'collection_requirement'
                         ? ` · ${objective.requirements?.length ?? 0} conditions · ${objective.requirement_operator === 'any' ? 'OU' : 'ET'}`
                         : ` · cible ${objective.target_count}`}
-                      {' · '}{objective.reward_ap} AP
+                      {' · '}{objective.reward_ap} AC
                     </span>
                   </button>
                   <button
@@ -517,7 +517,7 @@ export default function ObjectiveStudio({
                 </section>
               )}
               <label className="block">
-                <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Récompense AP</span>
+                <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Récompense AC</span>
                 <input type="number" min={0} max={1000000} step={1} required value={draft.reward_ap} onChange={(event) => updateDraft('reward_ap', event.target.value === '' ? '' : Number(event.target.value))} className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm outline-none focus:border-cyan-400/70" />
               </label>
               <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 sm:col-span-2">

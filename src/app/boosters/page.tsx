@@ -86,7 +86,7 @@ export default function BoostersPage() {
                 </div>
                 <div>
                   <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-0.5">{t('Votre Solde')}</div>
-                  <div className="text-xl font-black italic tracking-tighter">{profile.ap} <span className="text-xs not-italic text-blue-500">AP</span></div>
+                  <div className="text-xl font-black italic tracking-tighter">{profile.ap} <span className="text-xs not-italic text-blue-500">AC</span></div>
                 </div>
               </div>
             )}
@@ -176,9 +176,9 @@ export default function BoostersPage() {
                   <div className="mt-2 sm:mt-8">
                     <div className="mb-2 flex min-w-0 items-center justify-between gap-1 sm:mb-4 sm:px-2">
                       <span className="whitespace-nowrap text-base font-black italic tracking-tighter sm:text-2xl">
-                        <span className="mr-0.5 text-xs not-italic text-blue-500 sm:mr-1 sm:text-base">▲</span>{pack.price}<span className="ml-1 text-[9px] not-italic text-blue-400 sm:hidden">AP</span>
+                        <span className="mr-0.5 text-xs not-italic text-blue-500 sm:mr-1 sm:text-base">▲</span>{pack.price}<span className="ml-1 text-[9px] not-italic text-blue-400 sm:hidden">AC</span>
                       </span>
-                      <span className="hidden text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600 sm:inline">{t('Apex Points')}</span>
+                      <span className="hidden text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600 sm:inline">{t('Apex Crédits')}</span>
                     </div>
 
                     <button

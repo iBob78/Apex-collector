@@ -13,11 +13,11 @@ L'univers visuel s'inspire du sport automobile, de l'esthétique *gentleman driv
 - **Cartes détaillées** : caractéristiques techniques, indice de performance, rareté, badges et effets visuels, ainsi que le pseudo du joueur qui en possède le plus d'exemplaires.
 - **Boosters** : packs permettant d'enrichir sa collection.
 - **Favoris et filtres** : recherche, tri et consultation des cartes possédées.
-- **Amélioration des cartes** : les exemplaires en double débloquent des niveaux achetables en Apex Points (AP).
+- **Amélioration des cartes** : les exemplaires en double débloquent des niveaux achetables en Apex Crédits (AC).
 - **Marketplace** : achat et vente de cartes entre joueurs.
 - **Contrats et succès** : objectifs à accomplir et récompenses à réclamer.
 - **Suggestions de cartes** : formulaire dédié pour proposer des voitures, circuits et pilotes ; les administrateurs peuvent ensuite examiner et traiter les propositions.
-- **Profil et tableau de bord** : consultation du garage, de la progression et du solde AP.
+- **Profil et tableau de bord** : consultation du garage, de la progression et du solde AC.
 - **Niveau d’écurie** : le tableau de bord gagne un niveau par tranche de 10 modèles de véhicules uniques (niveau 1 au départ). Les doublons, circuits, pilotes et succès ne comptent pas. Les titres des niveaux 1, 5, 10, 20 et 50 sont décoratifs et sans récompense.
 - **Showroom joueur** : exposition publique facultative de trois véhicules choisis, statistiques de collection, boosters ouverts depuis l’activation du suivi, véhicules améliorés et succès réclamés.
 - **Classement des joueurs** : classement de tous les joueurs par nombre de cartes ; les showrooms privés ne révèlent pas leurs voitures ni leurs statistiques détaillées.

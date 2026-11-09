@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 
 /**
- * Récupère le profil complet d'un utilisateur, y compris son solde AP.
+ * Récupère le profil complet d'un utilisateur, y compris son solde AC.
  */
 export async function getUserProfile(userId: string) {
     if (!userId) return { data: null, error: 'UserId manquant' };
@@ -21,7 +21,7 @@ export async function getUserProfile(userId: string) {
 }
 
 /**
- * Déduit un montant d'AP du solde de l'utilisateur.
+ * Déduit un montant d'AC du solde de l'utilisateur.
  * Vérifie d'abord si le solde est suffisant.
  */
 export async function deductAP(userId: string, amount: number) {
@@ -38,7 +38,7 @@ export async function deductAP(userId: string, amount: number) {
         const currentAP = profile.ap || 0;
 
         if (currentAP < amount) {
-            return { success: false, error: 'Solde AP insuffisant' };
+            return { success: false, error: 'Solde AC insuffisant' };
         }
 
         // 2. Déduire le montant

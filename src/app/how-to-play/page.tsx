@@ -7,10 +7,10 @@ export default function HowToPlayPage() {
   const { t } = useSitePreferences();
   const steps = [
     { number: '01', title: 'Créez votre compte', description: 'Connectez-vous pour accéder à votre profil et aux actions réservées aux joueurs, comme l’ouverture de boosters, les missions et les transactions du marché.', href: '/login', linkLabel: 'Connexion' },
-    { number: '02', title: 'Ouvrez des boosters', description: 'Choisissez un pack dans la boutique et dépensez les Apex Points (AP) affichés. Chaque pack contient un nombre de cartes aléatoires ; les cartes obtenues sont ajoutées à votre collection.', href: '/boosters', linkLabel: 'Voir les boosters' },
+    { number: '02', title: 'Ouvrez des boosters', description: 'Choisissez un pack dans la boutique et dépensez les Apex Crédits (AC) affichés. Chaque pack contient un nombre de cartes aléatoires ; les cartes obtenues sont ajoutées à votre collection.', href: '/boosters', linkLabel: 'Voir les boosters' },
     { number: '03', title: 'Explorez votre garage', description: 'Le garage rassemble les véhicules et les circuits du catalogue. Recherchez et filtrez les cartes, puis ouvrez une carte pour consulter ses détails et votre nombre d’exemplaires.', href: '/collection', linkLabel: 'Ouvrir le garage' },
-    { number: '04', title: 'Suivez vos missions', description: 'Les missions affichent leur objectif, leur progression et leur récompense. Lorsqu’une mission est terminée, récupérez les AP depuis cette page.', href: '/missions', linkLabel: 'Voir les missions' },
-    { number: '05', title: 'Parcourez le marché', description: 'Consultez les cartes mises en vente par les joueurs, achetez-les avec vos AP ou proposez vos propres cartes à la vente.', href: '/marketplace', linkLabel: 'Visiter le marketplace' },
+    { number: '04', title: 'Suivez vos missions', description: 'Les missions affichent leur objectif, leur progression et leur récompense. Lorsqu’une mission est terminée, récupérez les AC depuis cette page.', href: '/missions', linkLabel: 'Voir les missions' },
+    { number: '05', title: 'Parcourez le marché', description: 'Consultez les cartes mises en vente par les joueurs, achetez-les avec vos AC ou proposez vos propres cartes à la vente.', href: '/marketplace', linkLabel: 'Visiter le marketplace' },
     { number: '06', title: 'Faites progresser votre écurie', description: 'Le niveau écurie augmente d’un niveau tous les 10 modèles de véhicules différents possédés. Vous commencez au niveau 1 ; les doublons, circuits, pilotes et succès ne comptent pas. Les titres des niveaux 1, 5, 10, 20 et 50 sont décoratifs et ne donnent pas de récompense.', href: '/dashboard', linkLabel: 'Voir le tableau de bord' },
   ];
 
@@ -25,7 +25,7 @@ export default function HowToPlayPage() {
             {t('How to play')}
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-400 sm:text-base">
-            {t('Constituez votre collection automobile, suivez vos missions et utilisez les Apex Points pour ouvrir des packs ou échanger des cartes.')}
+            {t('Constituez votre collection automobile, suivez vos missions et utilisez les Apex Crédits pour ouvrir des packs ou échanger des cartes.')}
           </p>
         </header>
 

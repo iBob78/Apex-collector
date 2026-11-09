@@ -593,7 +593,7 @@ export default function Card(props: CardProps) {
               }}
               aria-label={isVehicle
                 ? upgradeAvailable && onUpgrade && upgradePrice !== undefined
-                  ? `${count} ${t('Exemplaires')}, ${t('Niveau')} ${level}. ${t('Acheter le niveau {level} pour {price} AP', { level: level + 1, price: upgradePrice })}`
+                  ? `${count} ${t('Exemplaires')}, ${t('Niveau')} ${level}. ${t('Acheter le niveau {level} pour {price} AC', { level: level + 1, price: upgradePrice })}`
                   : `${count} ${t('Exemplaires')}, ${t('Niveau')} ${level}. ${t('Voir les détails')}`
                 : `${count} ${t('Exemplaires')}. ${t('Voir les détails')}`}
               className={clsx(
@@ -625,7 +625,7 @@ export default function Card(props: CardProps) {
                 onUpgrade();
               }}
               onKeyDown={(event) => event.stopPropagation()}
-              aria-label={t('Acheter le niveau {level} pour {price} AP', {
+              aria-label={t('Acheter le niveau {level} pour {price} AC', {
                 level: level + 1,
                 price: upgradePrice,
               })}
@@ -633,7 +633,7 @@ export default function Card(props: CardProps) {
             >
               {upgradePending
                 ? t('Achat…')
-                : t('Niveau {level} · {price} AP', { level: level + 1, price: upgradePrice })}
+                : t('Niveau {level} · {price} AC', { level: level + 1, price: upgradePrice })}
             </button>
           ) : (
             <span className="rounded-full border border-blue-400/30 bg-blue-600 px-3 py-1 text-[10px] font-bold uppercase tracking-tight text-white shadow-sm">

@@ -226,7 +226,7 @@ export default function LandingPage() {
                 description={t('Achetez, vendez et dominez l’économie')}
                 image="/showcase-marketplace.png"
                 features={[
-                  { icon: <CoinsIcon size={18} />, text: t('Transactions en Apex Points (AP) - Monnaie premium') },
+                  { icon: <CoinsIcon size={18} />, text: t('Transactions en Apex Crédits (AC) - Monnaie premium') },
                   { icon: <TrendingUpIcon size={18} />, text: t('Fixez vos propres prix et stratégies de vente') },
                   { icon: <ShieldCheckIcon size={18} />, text: t('Système anti-fraude et transactions sécurisées') },
                   { icon: <UsersIcon size={18} />, text: t('Marché en temps réel avec autres collectionneurs') }
@@ -243,7 +243,7 @@ export default function LandingPage() {
                 image="/showcase-missions.png"
                 features={[
                   { icon: <TargetIcon size={18} />, text: t('Contrats quotidiens avec objectifs progressifs') },
-                  { icon: <CoinsIcon size={18} />, text: t('Récompenses en AP pour chaque mission complétée') },
+                  { icon: <CoinsIcon size={18} />, text: t('Récompenses en AC pour chaque mission complétée') },
                   { icon: <ZapIcon size={18} />, text: t('Suivi automatique de progression en temps réel') },
                   { icon: <CrownIcon size={18} />, text: t('Défis spéciaux pour débloquer des cartes exclusives') }
                 ]}

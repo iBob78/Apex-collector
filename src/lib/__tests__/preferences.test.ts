@@ -23,8 +23,8 @@ describe('site preference formatters', () => {
   });
 
   it('translates catalog strings and interpolates values', () => {
-    expect(translate('en', 'Voulez-vous acheter cette carte pour {price} AP ?', { price: 250 }))
-      .toBe('Do you want to buy this card for 250 AP?');
+    expect(translate('en', 'Voulez-vous acheter cette carte pour {price} AC ?', { price: 250 }))
+      .toBe('Do you want to buy this card for 250 AC?');
     expect(translate('en', 'Masquer les cartes non déverrouillées')).toBe('Hide locked cards');
     expect(translate('es', 'Masquer les cartes non déverrouillées')).toBe('Ocultar cartas bloqueadas');
     expect(translate('en', 'Courses gagnées')).toBe('Race wins');

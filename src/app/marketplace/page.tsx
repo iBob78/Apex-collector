@@ -54,9 +54,9 @@ export default function MarketplacePage() {
 
   const handleBuy = async (listingId: string, price: number) => {
     if (!user) return alert(t('Veuillez vous connecter pour acheter.'));
-    if (profile && profile.ap < price) return alert(t('Solde AP insuffisant.'));
+    if (profile && profile.ap < price) return alert(t('Solde AC insuffisant.'));
 
-    if (!confirm(t('Voulez-vous acheter cette carte pour {price} AP ?', { price }))) return;
+    if (!confirm(t('Voulez-vous acheter cette carte pour {price} AC ?', { price }))) return;
 
     setProcessingId(listingId);
     const result = await buyListing(user.id, listingId);
@@ -170,7 +170,7 @@ export default function MarketplacePage() {
                   <div className="bg-white/5 rounded-2xl p-4 flex items-center justify-between group-hover:bg-blue-500/10 transition-colors">
                     <div>
                       <div className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">{t('Prix d’achat')}</div>
-                      <div className="text-lg font-black italic tracking-tighter">▲ {item.price} <span className="text-[10px] not-italic text-gray-400">AP</span></div>
+                      <div className="text-lg font-black italic tracking-tighter">▲ {item.price} <span className="text-[10px] not-italic text-gray-400">AC</span></div>
                     </div>
                     <button
                       onClick={() => handleBuy(item.id, item.price)}
@@ -191,7 +191,7 @@ export default function MarketplacePage() {
             <div className="bg-blue-600 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-blue-400/30">
               <CoinsIcon size={24} className="text-blue-100" />
               <div>
-                <div className="text-[10px] uppercase font-black tracking-widest text-blue-200">{t('Balance AP')}</div>
+                <div className="text-[10px] uppercase font-black tracking-widest text-blue-200">{t('Balance AC')}</div>
                 <div className="text-xl font-black italic tracking-tighter text-white">▲ {profile.ap}</div>
               </div>
             </div>
@@ -281,7 +281,7 @@ function SellCardItem({ userCard, onSelect }: { userCard: any, onSelect: (price:
             onChange={(e) => setPrice(parseInt(e.target.value) || 0)}
             className="w-20 bg-black border border-white/10 rounded-lg px-2 py-1 text-center font-mono font-bold"
           />
-          <span className="text-xs font-bold text-gray-500">AP</span>
+          <span className="text-xs font-bold text-gray-500">AC</span>
         </div>
         <div className="flex flex-col gap-2 w-full">
           <button

@@ -69,7 +69,7 @@ export default function ObjectiveBoard({
     setClaimingId(progressId);
     const result = await claimObjectiveReward(userId, progressId);
     if (result.success) {
-      window.alert(`${t('Récompense récupérée')} +${result.reward} AP.`);
+      window.alert(`${t('Récompense récupérée')} +${result.reward} AC.`);
       await fetchObjectives(userId);
     } else {
       window.alert(`${t('Erreur')}: ${result.error}`);
@@ -151,7 +151,7 @@ export default function ObjectiveBoard({
                         </div>
                       </div>
                       <span className="shrink-0 rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1 text-[10px] font-black text-blue-200">
-                        {item.objective.reward_ap} AP
+                        {item.objective.reward_ap} AC
                       </span>
                     </div>
                     {requirements.length > 0 && (

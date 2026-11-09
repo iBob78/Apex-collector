@@ -76,7 +76,7 @@ function validateDraft(draft: ObjectiveDraft) {
     return 'La cible doit être un entier entre 1 et 1 000 000.';
   }
   if (typeof draft.reward_ap !== 'number' || !Number.isInteger(draft.reward_ap) || draft.reward_ap < 0 || draft.reward_ap > 1000000) {
-    return 'La récompense doit être un entier entre 0 et 1 000 000 AP.';
+    return 'La récompense doit être un entier entre 0 et 1 000 000 AC.';
   }
   if (draft.objective_type === 'rarity_card' && !rarities.includes(draft.required_rarity)) {
     return 'Choisis une rareté pour cet objectif.';

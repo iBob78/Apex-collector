@@ -71,7 +71,7 @@ export default function DashboardPage() {
       <Sidebar />
       <main className="min-w-0 flex-1">
         <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-7 px-4 py-6 sm:gap-9 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
-          {/* Keep AP in a compact, persistent top-right header instead of the statistics grid. */}
+          {/* Keep AC in a compact, persistent top-right header instead of the statistics grid. */}
           <header className="sticky top-0 z-40 -mx-4 -mt-6 flex items-start justify-between gap-2 border-b border-white/10 bg-[#050505]/95 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:-mt-8 sm:items-center sm:px-6 sm:py-4 lg:-mx-10 lg:-mt-10 lg:px-10">
             <div className="min-w-0">
               <h1
@@ -87,14 +87,14 @@ export default function DashboardPage() {
 
             <div className="flex shrink-0 items-center gap-2">
               <div
-                aria-label={t('Balance AP')}
+                aria-label={t('Balance AC')}
                 className="flex min-h-9 flex-col justify-center rounded-lg border border-emerald-400/25 bg-[#0e1a17] px-2 py-1 text-right shadow-[0_1px_16px_rgba(0,0,0,0.18)]"
               >
                 <span className="text-[8px] font-bold uppercase leading-tight tracking-normal text-emerald-200/70">
-                  {t('Balance AP')}
+                  {t('Balance AC')}
                 </span>
-                <span className="max-w-[35vw] truncate font-mono text-xs font-black leading-tight tabular-nums text-emerald-200 sm:max-w-[12rem] sm:text-sm" title={formatNumber(apBalance) + ' AP'}>
-                  ▲ {formatNumber(apBalance)} AP
+                <span className="max-w-[35vw] truncate font-mono text-xs font-black leading-tight tabular-nums text-emerald-200 sm:max-w-[12rem] sm:text-sm" title={formatNumber(apBalance) + ' AC'}>
+                  ▲ {formatNumber(apBalance)} AC
                 </span>
               </div>
               {user && (
@@ -111,7 +111,7 @@ export default function DashboardPage() {
             </div>
           </header>
 
-          {/* Smaller cards, more practical numbers, and no duplicate AP balance. */}
+          {/* Smaller cards, more practical numbers, and no duplicate AC balance. */}
           <section aria-label={t('Statistiques du garage')}>
             <div className="mb-4 flex items-center gap-3">
               <span className="h-5 w-1 rounded-full bg-blue-500" aria-hidden="true" />

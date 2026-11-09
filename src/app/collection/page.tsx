@@ -348,7 +348,7 @@ export default function CollectionPage() {
     if (!unlock?.unlocked) return;
 
     const confirmed = window.confirm(
-      t('Acheter le niveau {level} pour {price} AP ?', {
+      t('Acheter le niveau {level} pour {price} AC ?', {
         level: unlock.nextLevel,
         price: unlock.price,
       }),
@@ -364,7 +364,7 @@ export default function CollectionPage() {
       }
 
       setUserCardLevels((current) => ({ ...current, [normalizedId]: result.level }));
-      window.alert(t('Niveau {level} acheté. Solde restant : {balance} AP.', {
+      window.alert(t('Niveau {level} acheté. Solde restant : {balance} AC.', {
         level: result.level,
         balance: result.balance,
       }));
