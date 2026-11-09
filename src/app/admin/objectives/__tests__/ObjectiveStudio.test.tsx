@@ -111,7 +111,7 @@ describe('ObjectiveStudio collection conditions', () => {
     fireEvent.change(targetCount, { target: { value: '300' } });
     expect(targetCount.value).toBe('300');
 
-    const reward = screen.getByLabelText('Récompense AP') as HTMLInputElement;
+    const reward = screen.getByLabelText('Récompense AC') as HTMLInputElement;
     fireEvent.change(reward, { target: { value: '' } });
     expect(reward.value).toBe('');
     fireEvent.change(reward, { target: { value: '300' } });
