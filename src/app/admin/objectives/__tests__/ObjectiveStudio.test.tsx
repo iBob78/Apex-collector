@@ -117,4 +117,46 @@ describe('ObjectiveStudio collection conditions', () => {
     fireEvent.change(reward, { target: { value: '300' } });
     expect(reward.value).toBe('300');
   });
+
+  it('allows awarding AC and a selected booster together', async () => {
+    render(<ObjectiveStudio initialObjectives={[]} catalogs={catalogs} />);
+    fireEvent.change(screen.getByLabelText('Titre'), { target: { value: 'Double gain' } });
+    fireEvent.change(screen.getByLabelText('Type de récompense'), { target: { value: 'both' } });
+    fireEvent.change(screen.getByLabelText('Récompense AC'), { target: { value: '750' } });
+    fireEvent.change(screen.getByLabelText('Type de booster'), { target: { value: 'rare' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Créer l’objectif' }));
+
+    await waitFor(() => expect(createObjective).toHaveBeenCalledWith(expect.objectContaining({
+      reward_mode: 'both',
+      reward_ap: 750,
+      reward_booster_slug: 'rare',
+    })));
+  });
+
+  it('allows awarding a random booster without AC', async () => {
+    render(<ObjectiveStudio initialObjectives={[]} catalogs={catalogs} />);
+    fireEvent.change(screen.getByLabelText('Titre'), { target: { value: 'Booster gratuit' } });
+    fireEvent.change(screen.getByLabelText('Type de récompense'), { target: { value: 'booster' } });
+    expect(screen.queryByLabelText('Récompense AC')).toBeNull();
+    expect((screen.getByLabelText('Type de booster') as HTMLSelectElement).value).toBe('random');
+    fireEvent.click(screen.getByRole('button', { name: 'Créer l’objectif' }));
+
+    await waitFor(() => expect(createObjective).toHaveBeenCalledWith(expect.objectContaining({
+      reward_mode: 'booster',
+      reward_booster_slug: 'random',
+    })));
+  });
+
+  it('allows choosing between AC and booster using OU', async () => {
+    render(<ObjectiveStudio initialObjectives={[]} catalogs={catalogs} />);
+    fireEvent.change(screen.getByLabelText('Titre'), { target: { value: 'Surprise' } });
+    fireEvent.change(screen.getByLabelText('Type de récompense'), { target: { value: 'either' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Créer l’objectif' }));
+
+    await waitFor(() => expect(createObjective).toHaveBeenCalledWith(expect.objectContaining({
+      reward_mode: 'either',
+      reward_ap: 100,
+      reward_booster_slug: 'random',
+    })));
+  });
 });
