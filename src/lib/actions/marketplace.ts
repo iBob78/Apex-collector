@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabaseClient';
+import type { CardCategory } from '@/types/game';
 import { updateQuestProgress } from './objectives';
 
 type MarketActionResult = {
@@ -20,11 +21,8 @@ export async function getMarketplaceListings() {
 /** The seller can view their own active, sold and cancelled listings. */
 export async function getMyMarketplaceListings(sellerId: string) {
   if (!sellerId) return { data: [], error: 'Connexion requise.' };
-  const { data, error } = await supabase
-    .from('marketplace_listings')
-    .select('*, card:cards!inner(*)')
-    .eq('seller_id', sellerId)
-    .order('created_at', { ascending: false });
+  // Only the authenticated seller is returned; the RPC normalizes all card categories.
+  const { data, error } = await supabase.rpc('get_my_marketplace_listings');
 
   if (error) {
     console.error('[getMyMarketplaceListings] Erreur:', error.message);
@@ -37,14 +35,21 @@ export async function getMyMarketplaceListings(sellerId: string) {
  * Ownership, remaining unlisted copies and seller identity are verified by
  * Supabase in one transaction. Never trust an arbitrary sellerId from the UI.
  */
-export async function createListing(sellerId: string, cardId: string, price: number): Promise<MarketActionResult> {
-  if (!sellerId || !cardId || !Number.isSafeInteger(price) || price <= 0) {
+export async function createListing(
+  sellerId: string,
+  cardId: string,
+  price: number,
+  category: CardCategory = 'vehicle',
+): Promise<MarketActionResult> {
+  if (!sellerId || !cardId || !Number.isSafeInteger(price) || price <= 0
+    || !(['vehicle', 'circuit', 'driver'] as const).includes(category)) {
     return { success: false, error: 'Paramètres invalides.' };
   }
 
   const { data, error } = await supabase.rpc('create_market_listing', {
     p_card_id: cardId,
     p_price: price,
+    p_category: category,
   });
 
   if (error) return { success: false, error: error.message };
