@@ -1,20 +1,33 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Sidebar from '@/components/Sidebar';
 import Card from '@/components/Card';
 import { supabase } from '@/lib/supabaseClient';
+import { fetchAllPages } from '@/lib/fetchAllPages';
+import type { CardCategory, Rarity } from '@/types/game';
+import { buildSellInventory, filterSellInventory } from '@/lib/marketSellInventory';
+import type { SellCategory, SellSort, SellInventoryItem } from '@/lib/marketSellInventory';
 import { getMarketplaceListings, getMyMarketplaceListings, buyListing, createListing, cancelListing } from '@/lib/actions/marketplace';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SearchIcon, FilterIcon, TagIcon, GavelIcon, CoinsIcon, Loader2Icon, XIcon, PlusIcon } from 'lucide-react';
+import { SearchIcon, FilterIcon, TagIcon, CoinsIcon, Loader2Icon, XIcon, PlusIcon, StarIcon } from 'lucide-react';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 export default function MarketplacePage() {
   const { t } = useSitePreferences();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
-  const [userCards, setUserCards] = useState<any[]>([]);
+  const [userCards, setUserCards] = useState<SellInventoryItem[]>([]);
+  const [sellInventoryLoading, setSellInventoryLoading] = useState(false);
+  const [sellInventoryError, setSellInventoryError] = useState<string | null>(null);
+  const [sellCategory, setSellCategory] = useState<SellCategory>('all');
+  const [sellSearchQuery, setSellSearchQuery] = useState('');
+  const [sellRarity, setSellRarity] = useState<Rarity | 'All'>('All');
+  const [sellSort, setSellSort] = useState<SellSort>('name');
+  const [sellFavoritesOnly, setSellFavoritesOnly] = useState(false);
+  const [favoriteKeys, setFavoriteKeys] = useState<Set<string>>(() => new Set());
+  const [creatingListing, setCreatingListing] = useState(false);
   const [activeTab, setActiveTab] = useState<'browse' | 'my_listings'>('browse');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -30,17 +43,60 @@ export default function MarketplacePage() {
         setUser(user);
         const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single();
         setProfile(prof);
-
-        // Fetch user cards for selling
-        const { data: uCards } = await supabase
-          .from('user_cards')
-          .select('*, card:cards!inner(*)')
-          .eq('user_id', user.id);
-        if (uCards) setUserCards(uCards.filter((userCard) => userCard.card?.is_active !== false));
       }
     };
     fetchSession();
   }, []);
+
+  const loadSellInventory = async (userId: string) => {
+    setSellInventoryLoading(true);
+    setSellInventoryError(null);
+    try {
+      // All three inventories are paginated, just like the collection.
+      const [vehicles, circuits, drivers, favorites, myListings] = await Promise.all([
+        fetchAllPages((from, to) => supabase.from('user_cards')
+          .select('*, card:cards!inner(*)').eq('user_id', userId).order('id').range(from, to)),
+        fetchAllPages((from, to) => supabase.from('user_circuits')
+          .select('*, card:circuits!inner(*)').eq('user_id', userId).order('id').range(from, to)),
+        fetchAllPages((from, to) => supabase.from('user_drivers')
+          .select('*, card:drivers!inner(*)').eq('user_id', userId).order('id').range(from, to)),
+        fetchAllPages((from, to) => supabase.from('card_favorites')
+          .select('category,card_id').eq('user_id', userId)
+          .order('category').order('card_id').range(from, to))
+          .catch(() => null),
+        getMyMarketplaceListings(userId),
+      ]);
+      if (favorites) {
+        setFavoriteKeys(new Set(favorites.map((item) =>
+          `${item.category}:${String(item.card_id).toLowerCase()}`)));
+      } else {
+        setFavoriteKeys(new Set());
+      }
+      if (myListings.error) throw new Error(myListings.error);
+
+      setUserCards(buildSellInventory(vehicles, circuits, drivers, myListings.data));
+    } catch (error) {
+      setSellInventoryError(error instanceof Error ? error.message : 'Impossible de charger les cartes.');
+      setUserCards([]);
+    } finally {
+      setSellInventoryLoading(false);
+    }
+  };
+
+  const filteredSellCards = useMemo(() => filterSellInventory(userCards, {
+    category: sellCategory,
+    search: sellSearchQuery,
+    rarity: sellRarity,
+    sort: sellSort,
+    favoritesOnly: sellFavoritesOnly,
+  }, favoriteKeys), [
+    userCards, sellCategory, sellSearchQuery, sellRarity, sellSort, sellFavoritesOnly, favoriteKeys,
+  ]);
+
+  const openSellModal = () => {
+    setIsSellModalOpen(true);
+    if (user) void loadSellInventory(user.id);
+  };
 
   const refreshListings = async () => {
     setLoading(true);
@@ -144,7 +200,7 @@ export default function MarketplacePage() {
             </button>
 
             <button
-              onClick={() => setIsSellModalOpen(true)}
+              onClick={openSellModal}
               className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-xl flex items-center gap-3 transition-all shadow-lg shadow-blue-500/20"
             >
               <TagIcon size={18} />
@@ -267,22 +323,98 @@ export default function MarketplacePage() {
               </div>
 
               <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-8">
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-6 md:grid-cols-4">
-                  {userCards.map((uc) => (
-                    <SellCardItem
-                      key={uc.id}
-                      userCard={uc}
-                      onSelect={(price) => {
-                        handleCreateListing(uc.card_id, price);
-                      }}
-                    />
-                  ))}
-                  {userCards.length === 0 && (
-                    <div className="col-span-full py-20 text-center opacity-30">
-                      <p className="font-mono text-sm uppercase tracking-widest">{t('Votre garage est vide')}</p>
-                    </div>
-                  )}
+                {/* Match the collection: category, favorites, search, rarity and sort. */}
+                <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-white/10 bg-[#111] p-3 sm:flex-row sm:flex-wrap sm:items-center sm:p-4">
+                  <div className="grid w-full grid-cols-4 rounded-xl bg-white/5 p-1 sm:flex sm:w-auto">
+                    {(['all', 'vehicle', 'circuit', 'driver'] as const).map((category) => (
+                      <button
+                        type="button"
+                        key={category}
+                        onClick={() => setSellCategory(category)}
+                        aria-pressed={sellCategory === category}
+                        className={`min-h-11 rounded-lg px-1 py-2 text-[9px] font-bold uppercase tracking-wide sm:px-4 sm:text-xs ${sellCategory === category ? 'bg-white text-black' : 'text-gray-400 hover:text-white'}`}
+                      >
+                        {t(category === 'all' ? 'Tous' : category === 'vehicle' ? 'Véhicules' : category === 'circuit' ? 'Circuits' : 'Pilotes')}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    aria-pressed={sellFavoritesOnly}
+                    onClick={() => setSellFavoritesOnly((current) => !current)}
+                    className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-bold ${sellFavoritesOnly ? 'border-amber-400/70 bg-amber-400/20 text-amber-200' : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'}`}
+                  >
+                    <StarIcon size={18} fill={sellFavoritesOnly ? 'currentColor' : 'none'} />
+                    {t('Favoris')}
+                  </button>
+                  <input
+                    type="search"
+                    aria-label={t('Rechercher une carte...')}
+                    placeholder={t('Rechercher une carte...')}
+                    value={sellSearchQuery}
+                    onChange={(event) => setSellSearchQuery(event.target.value)}
+                    className="min-h-11 w-full min-w-0 flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-base focus:border-blue-500/50 focus:outline-none sm:min-w-[200px] sm:text-sm"
+                  />
+                  <select
+                    aria-label={t('Toutes les raretés')}
+                    value={sellRarity}
+                    onChange={(event) => setSellRarity(event.target.value as Rarity | 'All')}
+                    className="min-h-11 w-full min-w-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-base text-white sm:w-auto sm:text-sm [&>option]:bg-[#171717]"
+                  >
+                    <option value="All">{t('Toutes les raretés')}</option>
+                    <option value="Common">{t('Commun')}</option>
+                    <option value="Uncommon">{t('Inhabituel')}</option>
+                    <option value="Rare">{t('Rare')}</option>
+                    <option value="Epic">{t('Épique')}</option>
+                    <option value="Legend">{t('Légendaire')}</option>
+                    <option value="Icon">{t('Icon')}</option>
+                  </select>
+                  <select
+                    aria-label={t('Trier par Nom')}
+                    value={sellSort}
+                    onChange={(event) => setSellSort(event.target.value as SellSort)}
+                    className="min-h-11 w-full min-w-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-base text-white sm:w-auto sm:text-sm [&>option]:bg-[#171717]"
+                  >
+                    <option value="name">{t('Trier par Nom')}</option>
+                    <option value="make-asc">{t('Marques, A à Z')}</option>
+                    <option value="make-desc">{t('Marques, Z à A')}</option>
+                    <option value="ip-desc">{t('IP, décroissant')}</option>
+                    <option value="ip-asc">{t('IP, croissant')}</option>
+                    <option value="level-asc">{t('Niveau, croissant')}</option>
+                    <option value="level-desc">{t('Niveau, décroissant')}</option>
+                    <option value="rarity">{t('Trier par Rareté')}</option>
+                    <option value="newest">{t('Plus récent')}</option>
+                  </select>
                 </div>
+
+                {sellInventoryError && (
+                  <p role="alert" className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">
+                    {sellInventoryError}
+                  </p>
+                )}
+                {sellInventoryLoading ? (
+                  <div className="flex min-h-48 items-center justify-center">
+                    <Loader2Icon size={32} className="animate-spin text-blue-400" />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-6 md:grid-cols-4">
+                    {filteredSellCards.map((item) => (
+                      <SellCardItem
+                        key={item.id}
+                        userCard={item}
+                        disabled={creatingListing}
+                        onSelect={(price) => void handleCreateListing(item.card_id, item.category, price)}
+                      />
+                    ))}
+                    {filteredSellCards.length === 0 && !sellInventoryError && (
+                      <div className="col-span-full py-16 text-center text-sm text-gray-400">
+                        {userCards.length === 0
+                          ? t('Votre garage est vide')
+                          : t('Aucune carte trouvée pour ces critères.')}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>
@@ -291,20 +423,32 @@ export default function MarketplacePage() {
     </div>
   );
 
-  async function handleCreateListing(cardId: string, price: number) {
-    if (!user) return;
-    const res = await createListing(user.id, cardId, price);
-    if (res.success) {
-      alert(t('Annonce créée avec succès !'));
-      setIsSellModalOpen(false);
-      refreshListings();
-    } else {
-      alert(`${t('Erreur')}: ${res.error}`);
+  async function handleCreateListing(cardId: string, category: CardCategory, price: number) {
+    if (!user || creatingListing) return;
+    setCreatingListing(true);
+    try {
+      const res = await createListing(user.id, cardId, price, category);
+      if (res.success) {
+        alert(t('Annonce créée avec succès !'));
+        setIsSellModalOpen(false);
+        void refreshListings();
+      } else {
+        alert(`${t('Erreur')}: ${res.error}`);
+        await loadSellInventory(user.id);
+      }
+    } finally {
+      setCreatingListing(false);
     }
   }
 }
 
-function SellCardItem({ userCard, onSelect }: { userCard: any, onSelect: (price: number) => void }) {
+function SellCardItem({
+  userCard, onSelect, disabled,
+}: {
+  userCard: SellInventoryItem;
+  onSelect: (price: number) => void;
+  disabled: boolean;
+}) {
   const { t } = useSitePreferences();
   const [isSettingPrice, setIsSettingPrice] = useState(false);
   const [price, setPrice] = useState(150);
@@ -317,7 +461,9 @@ function SellCardItem({ userCard, onSelect }: { userCard: any, onSelect: (price:
           <input
             type="number"
             value={price}
-            onChange={(e) => setPrice(parseInt(e.target.value) || 0)}
+            min={1}
+            max={2147483647}
+            onChange={(e) => setPrice(parseInt(e.target.value, 10) || 0)}
             className="w-20 bg-black border border-white/10 rounded-lg px-2 py-1 text-center font-mono font-bold"
           />
           <span className="text-xs font-bold text-gray-500">AC</span>
@@ -325,7 +471,8 @@ function SellCardItem({ userCard, onSelect }: { userCard: any, onSelect: (price:
         <div className="flex flex-col gap-2 w-full">
           <button
             onClick={() => onSelect(price)}
-            className="w-full bg-blue-600 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest"
+            disabled={disabled || !Number.isSafeInteger(price) || price < 1 || price > 2147483647}
+            className="w-full bg-blue-600 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest disabled:opacity-40"
           >
             {t('Confirmer')}
           </button>
@@ -343,11 +490,19 @@ function SellCardItem({ userCard, onSelect }: { userCard: any, onSelect: (price:
   return (
     <div className="group relative">
       <div className="aspect-[63/88] opacity-80 group-hover:opacity-100 transition-opacity">
-        <Card {...userCard.card} owned={true} count={userCard.count} onCardClick={() => setIsSettingPrice(true)} />
+        <Card {...userCard.card} owned={true} count={userCard.count} onCardClick={() => {
+          if (!disabled && userCard.availableCount > 0) setIsSettingPrice(true);
+        }} />
+      </div>
+      <div className="absolute left-1 top-1 rounded bg-black/85 px-2 py-1 text-[10px] font-semibold text-white">
+        {userCard.availableCount} {t('Disponibles')}
       </div>
       <button
+        type="button"
+        aria-label={t('Mettre en vente')}
+        disabled={disabled || userCard.availableCount <= 0}
         onClick={() => setIsSettingPrice(true)}
-        className="absolute inset-0 flex items-center justify-center rounded-lg bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-100 transition-opacity sm:bg-black/60 sm:opacity-0 sm:group-hover:opacity-100"
+        className="absolute inset-0 flex items-center justify-center rounded-lg bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-100 transition-opacity disabled:cursor-not-allowed disabled:opacity-40 sm:bg-black/60 sm:opacity-0 sm:group-hover:opacity-100"
       >
         <div className="bg-white text-black p-3 rounded-2xl shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform">
           <PlusIcon size={24} />

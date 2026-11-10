@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { updateQuestProgress } from '../actions/objectives';
 import {
   getMarketplaceListings,
+  getMyMarketplaceListings,
   createListing,
   buyListing,
   cancelListing,
@@ -29,21 +30,48 @@ describe('marketplace actions', () => {
     expect(result.data).toHaveLength(1);
   });
 
+  it('reads all of a seller\'s categories through the scoped RPC', async () => {
+    rpc.mockResolvedValue({ data: [{ category: 'circuit', status: 'sold' }], error: null });
+    expect(await getMyMarketplaceListings('seller-1')).toMatchObject({
+      data: [{ category: 'circuit', status: 'sold' }], error: null,
+    });
+    expect(rpc).toHaveBeenCalledWith('get_my_marketplace_listings');
+    expect(supabase.from).not.toHaveBeenCalled();
+  });
+
   it('creates a listing through the transaction and records a quest only on success', async () => {
     rpc.mockResolvedValue({ data: { success: true, listing_id: 'listing-1' }, error: null });
     expect(await createListing('seller-1', 'card-1', 150)).toEqual({ success: true });
     expect(rpc).toHaveBeenCalledWith('create_market_listing', {
       p_card_id: 'card-1',
       p_price: 150,
+      p_category: 'vehicle',
     });
     expect(progress).toHaveBeenCalledWith('seller-1', 'marketplace_listing');
     expect(supabase.from).not.toHaveBeenCalled();
   });
 
+  it.each(['circuit', 'driver'] as const)(
+    'sells a %s using its own catalog identifier and the atomic RPC',
+    async (category) => {
+      rpc.mockResolvedValue({ data: { success: true }, error: null });
+      expect(await createListing('seller-1', 'item-1', 275, category))
+        .toEqual({ success: true });
+      expect(rpc).toHaveBeenCalledWith('create_market_listing', {
+        p_card_id: 'item-1',
+        p_price: 275,
+        p_category: category,
+      });
+      expect(progress).toHaveBeenCalledWith('seller-1', 'marketplace_listing');
+    },
+  );
+
   it('rejects invalid prices without a database operation', async () => {
     expect(await createListing('seller-1', 'card-1', NaN)).toMatchObject({ success: false });
     expect(await createListing('seller-1', 'card-1', 1.5)).toMatchObject({ success: false });
     expect(await createListing('seller-1', 'card-1', 0)).toMatchObject({ success: false });
+    expect(await createListing('seller-1', 'card-1', 2147483648)).toMatchObject({ success: false });
+    expect(await createListing('seller-1', 'card-1', 100, 'invalid' as any)).toMatchObject({ success: false });
     expect(rpc).not.toHaveBeenCalled();
   });
 
