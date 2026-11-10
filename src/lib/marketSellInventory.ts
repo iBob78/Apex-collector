@@ -73,7 +73,7 @@ export function buildSellInventory(
   addRows('circuit', circuits);
   addRows('driver', drivers);
 
-  return [...inventory.values()].map((item) => ({
+  return Array.from(inventory.values()).map((item) => ({
     ...item,
     availableCount: Math.max(0, item.count - (reserved.get(item.id) || 0)),
   }));
