@@ -3,12 +3,15 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Check, CircleOff, ClipboardList, Plus, Save, Trophy } from 'lucide-react';
+import { PACKS } from '@/lib/boosters';
 import {
   type ObjectiveCardCategory,
   type ObjectiveCategory,
   type ObjectiveDefinition,
   type ObjectiveRequirementOperator,
   type ObjectiveType,
+  type ObjectiveRewardMode,
+  describeObjectiveReward,
 } from '@/lib/actions/objectives';
 import {
   createObjective,
@@ -27,6 +30,7 @@ const objectiveTypeLabels: Record<ObjectiveType, string> = {
   circuit_collection: 'Collectionner des circuits',
   daily_login: 'Se connecter des jours différents',
   collection_requirement: 'Posséder des cartes selon des conditions',
+  showroom_first: 'Exposer sa première carte dans le showroom',
 };
 export type ObjectiveCatalogs = {
   vehicles: { card_id: string; make: string; model: string; year: number; rarity: string; fuel_type: string | null; transmission: string | null; collection_number: number }[];
@@ -60,6 +64,8 @@ const blankDraft: ObjectiveDraft = {
   requirements: [],
   requirement_operator: 'all',
   reward_ap: 100,
+  reward_mode: 'ac',
+  reward_booster_slug: 'random',
   is_active: true,
 };
 
@@ -74,6 +80,8 @@ function toDraft(objective: ObjectiveDefinition): ObjectiveDraft {
     requirements: objective.requirements ?? [],
     requirement_operator: objective.requirement_operator ?? 'all',
     reward_ap: objective.reward_ap,
+    reward_mode: objective.reward_mode ?? 'ac',
+    reward_booster_slug: objective.reward_booster_slug ?? 'random',
     is_active: objective.is_active,
   };
 }
@@ -337,7 +345,7 @@ export default function ObjectiveStudio({
                       {objective.objective_type === 'collection_requirement'
                         ? ` · ${objective.requirements?.length ?? 0} conditions · ${objective.requirement_operator === 'any' ? 'OU' : 'ET'}`
                         : ` · cible ${objective.target_count}`}
-                      {' · '}{objective.reward_ap} AC
+                      {' · '}{describeObjectiveReward(objective)}
                     </span>
                   </button>
                   <button
@@ -517,9 +525,34 @@ export default function ObjectiveStudio({
                 </section>
               )}
               <label className="block">
-                <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Récompense AC</span>
-                <input type="number" min={0} max={1000000} step={1} required value={draft.reward_ap} onChange={(event) => updateDraft('reward_ap', event.target.value === '' ? '' : Number(event.target.value))} className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm outline-none focus:border-cyan-400/70" />
+                <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Type de récompense</span>
+                <select value={draft.reward_mode} onChange={(event) => updateDraft('reward_mode', event.target.value as ObjectiveRewardMode)} className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm outline-none focus:border-cyan-400/70">
+                  <option value="ac">AC seulement</option>
+                  <option value="booster">Booster seulement</option>
+                  <option value="both">AC ET booster (les deux)</option>
+                  <option value="either">AC OU booster (tirage 50/50)</option>
+                </select>
               </label>
+              {draft.reward_mode !== 'booster' && (
+                <label className="block">
+                  <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Récompense AC</span>
+                  <input type="number" min={draft.reward_mode === 'ac' ? 0 : 1} max={1000000} step={1} required value={draft.reward_ap} onChange={(event) => updateDraft('reward_ap', event.target.value === '' ? '' : Number(event.target.value))} className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm outline-none focus:border-cyan-400/70" />
+                </label>
+              )}
+              {draft.reward_mode !== 'ac' && (
+                <label className="block">
+                  <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Type de booster</span>
+                  <select value={draft.reward_booster_slug} onChange={(event) => updateDraft('reward_booster_slug', event.target.value)} className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm outline-none focus:border-cyan-400/70">
+                    <option value="random">Aléatoire (tous les packs)</option>
+                    {Object.values(PACKS).map((pack) => <option key={pack.slug} value={pack.slug}>{pack.name}</option>)}
+                  </select>
+                </label>
+              )}
+              {draft.reward_mode === 'either' && (
+                <p className="text-xs leading-5 text-slate-400 sm:col-span-2">
+                  OU : la réclamation tire au sort soit les AC, soit un booster (50/50). ET : les deux sont offerts.
+                </p>
+              )}
               <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 sm:col-span-2">
                 <input type="checkbox" checked={draft.is_active} onChange={(event) => updateDraft('is_active', event.target.checked)} className="h-4 w-4 accent-cyan-300" />
                 <span className="text-sm text-slate-200">Publier cet objectif immédiatement</span>
@@ -527,7 +560,7 @@ export default function ObjectiveStudio({
             </div>
 
             <p className="rounded-xl border border-amber-300/15 bg-amber-300/[0.04] p-3 text-xs leading-5 text-amber-100/70">
-              Les nouvelles définitions s’appliquent aux joueurs à partir de leur création. Les conditions de collection sont vérifiées sur l’inventaire actuel, y compris les cartes déjà possédées. Une désactivation conserve les progressions enregistrées ; une récompense ne peut être réclamée qu’une seule fois.
+              Les nouveaux objectifs sont attribués aux joueurs existants et futurs. Les conditions de collection se vérifient sur l’inventaire actuel. Les AC et boosters sont crédités ensemble en mode ET, ou tirés au sort en mode OU. Une récompense ne peut être réclamée qu’une seule fois.
             </p>
             {feedback && (
               <p role={feedback.type === 'error' ? 'alert' : 'status'} className={`rounded-xl border px-4 py-3 text-sm ${feedback.type === 'error' ? 'border-red-400/20 bg-red-400/10 text-red-200' : 'border-emerald-400/20 bg-emerald-400/10 text-emerald-200'}`}>
