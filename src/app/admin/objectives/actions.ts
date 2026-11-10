@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { PACKS } from '@/lib/boosters';
 import { getAdminAccess } from '@/lib/admin';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
 import type {
@@ -9,6 +10,7 @@ import type {
   ObjectiveDefinition,
   ObjectiveRequirement,
   ObjectiveRequirementOperator,
+  ObjectiveRewardMode,
   ObjectiveType,
 } from '@/lib/actions/objectives';
 
@@ -26,6 +28,8 @@ export type ObjectiveDraft = {
   requirements: ObjectiveRequirementDraft[];
   requirement_operator: ObjectiveRequirementOperator;
   reward_ap: number | '';
+  reward_mode: ObjectiveRewardMode;
+  reward_booster_slug: string;
   is_active: boolean;
 };
 
@@ -41,6 +45,7 @@ const objectiveTypes: ObjectiveType[] = [
   'circuit_collection',
   'daily_login',
   'collection_requirement',
+  'showroom_first',
 ];
 const rarities = ['Common', 'Uncommon', 'Atypique', 'Rare', 'Very rare', 'Epic', 'Legend', 'Mythic', 'Icon'];
 const cardCategories: ObjectiveCardCategory[] = ['vehicle', 'circuit', 'driver'];
@@ -77,6 +82,12 @@ function validateDraft(draft: ObjectiveDraft) {
   }
   if (typeof draft.reward_ap !== 'number' || !Number.isInteger(draft.reward_ap) || draft.reward_ap < 0 || draft.reward_ap > 1000000) {
     return 'La récompense doit être un entier entre 0 et 1 000 000 AC.';
+  }
+  if (!['ac', 'booster', 'both', 'either'].includes(draft.reward_mode)) return 'Choisis un mode de récompense valide.';
+  if (draft.reward_mode !== 'ac' && draft.reward_booster_slug !== 'random'
+    && !Object.prototype.hasOwnProperty.call(PACKS, draft.reward_booster_slug)) return 'Choisis un type de booster valide.';
+  if (['both', 'either'].includes(draft.reward_mode) && Number(draft.reward_ap) === 0) {
+    return 'Pour combiner AC et booster, indique une récompense AC supérieure à zéro.';
   }
   if (draft.objective_type === 'rarity_card' && !rarities.includes(draft.required_rarity)) {
     return 'Choisis une rareté pour cet objectif.';
@@ -145,7 +156,9 @@ function toPayload(draft: ObjectiveDraft) {
     required_rarity: draft.objective_type === 'rarity_card' ? draft.required_rarity : null,
     requirements,
     requirement_operator: draft.objective_type === 'collection_requirement' ? draft.requirement_operator : 'all',
-    reward_ap: Number(draft.reward_ap),
+    reward_ap: draft.reward_mode === 'booster' ? 0 : Number(draft.reward_ap),
+    reward_mode: draft.reward_mode,
+    reward_booster_slug: draft.reward_mode === 'ac' ? 'random' : draft.reward_booster_slug,
     is_active: draft.is_active,
   };
 }

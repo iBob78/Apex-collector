@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabaseClient';
+import { PACKS } from '@/lib/boosters';
 
 export type ObjectiveCategory = 'contract' | 'achievement';
 export type ObjectiveType =
@@ -8,11 +9,13 @@ export type ObjectiveType =
   | 'marketplace_listing'
   | 'circuit_collection'
   | 'daily_login'
-  | 'collection_requirement';
+  | 'collection_requirement'
+  | 'showroom_first';
 
+export type ObjectiveRewardMode = 'ac' | 'booster' | 'both' | 'either';
 export type ObjectiveCardCategory = 'vehicle' | 'circuit' | 'driver';
 export type ObjectiveRequirementOperator = 'all' | 'any';
-type ObjectiveEventType = Exclude<ObjectiveType, 'collection_requirement'>;
+type ObjectiveEventType = Exclude<ObjectiveType, 'collection_requirement' | 'showroom_first'>;
 
 export type ObjectiveRequirement = {
   category: ObjectiveCardCategory;
@@ -41,6 +44,8 @@ export type ObjectiveDefinition = {
   requirements: ObjectiveRequirement[];
   requirement_operator: ObjectiveRequirementOperator;
   reward_ap: number;
+  reward_mode: ObjectiveRewardMode;
+  reward_booster_slug: string;
   is_active: boolean;
   created_at: string;
 };
@@ -56,6 +61,22 @@ export type ObjectiveProgress = {
   completed_at: string | null;
   objective: ObjectiveDefinition;
 };
+
+/** En mode OU, l'attribution est aleatoire (50 % AC, 50 % booster). */
+export function describeObjectiveReward(
+  objective: Pick<ObjectiveDefinition, 'reward_ap' | 'reward_mode' | 'reward_booster_slug'>,
+): string {
+  const ac = `${objective.reward_ap} AC`;
+  const booster = objective.reward_booster_slug === 'random'
+    ? 'Booster aléatoire'
+    : PACKS[objective.reward_booster_slug]?.name ?? 'Booster';
+  switch (objective.reward_mode) {
+    case 'booster': return booster;
+    case 'both': return `${ac} + ${booster}`;
+    case 'either': return `${ac} OU ${booster}`;
+    default: return ac;
+  }
+}
 
 export async function getUserObjectives(userId: string, category: ObjectiveCategory) {
   if (!userId) return { data: [] as ObjectiveProgress[], error: 'Non authentifié' };
@@ -134,5 +155,5 @@ export async function claimObjectiveReward(userId: string, progressId: string) {
   if (error) return { success: false as const, error: error.message };
   if (!data?.success) return { success: false as const, error: data?.error ?? 'Récompense non disponible.' };
 
-  return { success: true as const, reward: Number(data.reward) || 0 };
+  return { success: true as const, reward: Number(data.reward) || 0, boosterSlug: typeof data.booster_slug === 'string' ? data.booster_slug : null };
 }
