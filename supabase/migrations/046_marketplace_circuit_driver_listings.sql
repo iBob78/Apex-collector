@@ -37,7 +37,7 @@ AS $$
     'created_at', listing.created_at,
     'card', CASE listing.category
       WHEN 'vehicle' THEN to_jsonb(vehicle)
-      WHEN 'circuit' THEN to_jsonb(circuit)
+      WHEN 'circuit' THEN to_jsonb(circuit) - 'user_id' - 'count'
       WHEN 'driver' THEN to_jsonb(driver)
     END || jsonb_build_object('category', listing.category),
     'seller', jsonb_build_object('username', seller.username)
@@ -79,7 +79,7 @@ AS $$
     'sold_at', listing.sold_at,
     'card', CASE listing.category
       WHEN 'vehicle' THEN to_jsonb(vehicle)
-      WHEN 'circuit' THEN to_jsonb(circuit)
+      WHEN 'circuit' THEN to_jsonb(circuit) - 'user_id' - 'count'
       WHEN 'driver' THEN to_jsonb(driver)
     END || jsonb_build_object('category', listing.category),
     'seller', jsonb_build_object('username', seller.username)
