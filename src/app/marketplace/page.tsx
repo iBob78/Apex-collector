@@ -7,34 +7,12 @@ import Card from '@/components/Card';
 import { supabase } from '@/lib/supabaseClient';
 import { fetchAllPages } from '@/lib/fetchAllPages';
 import type { CardCategory, Rarity } from '@/types/game';
+import { buildSellInventory, filterSellInventory } from '@/lib/marketSellInventory';
+import type { SellCategory, SellSort, SellInventoryItem } from '@/lib/marketSellInventory';
 import { getMarketplaceListings, getMyMarketplaceListings, buyListing, createListing, cancelListing } from '@/lib/actions/marketplace';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SearchIcon, FilterIcon, TagIcon, GavelIcon, CoinsIcon, Loader2Icon, XIcon, PlusIcon, StarIcon } from 'lucide-react';
+import { SearchIcon, FilterIcon, TagIcon, CoinsIcon, Loader2Icon, XIcon, PlusIcon, StarIcon } from 'lucide-react';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
-
-type SellCategory = CardCategory | 'all';
-type SellSort = 'name' | 'make-asc' | 'make-desc' | 'ip-desc' | 'ip-asc' | 'level-asc' | 'level-desc' | 'rarity' | 'newest';
-
-type SellInventoryItem = {
-  id: string;
-  card_id: string;
-  category: CardCategory;
-  card: any;
-  count: number;
-  availableCount: number;
-  upgrade_level: number;
-};
-
-function sellCardName(card: any): string {
-  return `${card.make || ''} ${card.model || card.name || ''}`.trim();
-}
-
-function sellCardIp(card: any): number {
-  const power = Number(card.power_hp) || 0;
-  const rawWeight = Number(card.weight_t) || 0;
-  const weightKg = rawWeight > 50 ? rawWeight : rawWeight * 1000;
-  return power > 0 && weightKg > 0 ? Math.floor((power / weightKg) * 1000) : 0;
-}
 
 export default function MarketplacePage() {
   const { t } = useSitePreferences();
@@ -65,8 +43,6 @@ export default function MarketplacePage() {
         setUser(user);
         const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single();
         setProfile(prof);
-
-
       }
     };
     fetchSession();
@@ -98,47 +74,7 @@ export default function MarketplacePage() {
       }
       if (myListings.error) throw new Error(myListings.error);
 
-      const reserved = new Map<string, number>();
-      for (const listing of myListings.data) {
-        if (listing.status !== 'active') continue;
-        const key = `${listing.category || 'vehicle'}:${String(listing.card_id).toLowerCase()}`;
-        reserved.set(key, (reserved.get(key) || 0) + 1);
-      }
-
-      const inventory = new Map<string, SellInventoryItem>();
-      const addRows = (category: CardCategory, rows: any[]) => {
-        for (const row of rows) {
-          if (!row.card || (category !== 'circuit' && row.card.is_active === false)) continue;
-          const id = category === 'vehicle' ? row.card_id
-            : category === 'circuit' ? row.circuit_id : row.driver_id;
-          const count = Number(row.count ?? 1);
-          if (!id || !Number.isFinite(count) || count <= 0) continue;
-          const key = `${category}:${String(id).toLowerCase()}`;
-          const previous = inventory.get(key);
-          if (previous) {
-            previous.count += count;
-            previous.upgrade_level = Math.max(previous.upgrade_level, Number(row.upgrade_level) || 0);
-          } else {
-            inventory.set(key, {
-              id: key,
-              card_id: String(id),
-              category,
-              card: { ...row.card, category },
-              count,
-              availableCount: 0,
-              upgrade_level: Number(row.upgrade_level) || 0,
-            });
-          }
-        }
-      };
-      addRows('vehicle', vehicles);
-      addRows('circuit', circuits);
-      addRows('driver', drivers);
-
-      setUserCards([...inventory.values()].map((item) => ({
-        ...item,
-        availableCount: Math.max(0, item.count - (reserved.get(item.id) || 0)),
-      })));
+      setUserCards(buildSellInventory(vehicles, circuits, drivers, myListings.data));
     } catch (error) {
       setSellInventoryError(error instanceof Error ? error.message : 'Impossible de charger les cartes.');
       setUserCards([]);
@@ -147,50 +83,15 @@ export default function MarketplacePage() {
     }
   };
 
-  const filteredSellCards = useMemo(() => {
-    const result = userCards.filter((item) => {
-      const card = item.card;
-      if (sellCategory !== 'all' && item.category !== sellCategory) return false;
-      if (sellFavoritesOnly && !favoriteKeys.has(item.id)) return false;
-      if (sellRarity !== 'All' && card.rarity !== sellRarity) return false;
-      if (sellSearchQuery.trim()) {
-        const query = sellSearchQuery.toLowerCase().trim();
-        if (![card.make, card.model, card.country, card.name]
-          .some((value) => String(value || '').toLowerCase().includes(query))) return false;
-      }
-      return true;
-    });
-    result.sort((a, b) => {
-      if (sellSort === 'rarity') {
-        const order: Record<string, number> = {
-          Common: 1, Uncommon: 2, Atypique: 2, Rare: 3,
-          'Very rare': 3, Epic: 4, Legend: 5, Mythic: 6, Icon: 7,
-        };
-        return (order[b.card.rarity] || 0) - (order[a.card.rarity] || 0);
-      }
-      if (sellSort === 'newest') {
-        return (new Date(b.card.created_at || 0).getTime() || 0)
-          - (new Date(a.card.created_at || 0).getTime() || 0);
-      }
-      if (sellSort === 'make-asc' || sellSort === 'make-desc') {
-        if (a.category !== b.category && (a.category === 'vehicle' || b.category === 'vehicle')) {
-          return a.category === 'vehicle' ? -1 : 1;
-        }
-        const getMake = (item: SellInventoryItem) =>
-          item.card.make || item.card.manufacturer || item.card.name || '';
-        const direction = sellSort === 'make-asc' ? 1 : -1;
-        return direction * getMake(a).localeCompare(getMake(b), undefined, { sensitivity: 'base' });
-      }
-      if (sellSort === 'ip-desc' || sellSort === 'ip-asc') {
-        return (sellSort === 'ip-desc' ? -1 : 1) * (sellCardIp(a.card) - sellCardIp(b.card));
-      }
-      if (sellSort === 'level-asc' || sellSort === 'level-desc') {
-        return (sellSort === 'level-asc' ? 1 : -1) * (a.upgrade_level - b.upgrade_level);
-      }
-      return sellCardName(a.card).localeCompare(sellCardName(b.card));
-    });
-    return result;
-  }, [userCards, sellCategory, sellFavoritesOnly, favoriteKeys, sellRarity, sellSearchQuery, sellSort]);
+  const filteredSellCards = useMemo(() => filterSellInventory(userCards, {
+    category: sellCategory,
+    search: sellSearchQuery,
+    rarity: sellRarity,
+    sort: sellSort,
+    favoritesOnly: sellFavoritesOnly,
+  }, favoriteKeys), [
+    userCards, sellCategory, sellSearchQuery, sellRarity, sellSort, sellFavoritesOnly, favoriteKeys,
+  ]);
 
   const openSellModal = () => {
     setIsSellModalOpen(true);
@@ -594,7 +495,7 @@ function SellCardItem({
         }} />
       </div>
       <div className="absolute left-1 top-1 rounded bg-black/85 px-2 py-1 text-[10px] font-semibold text-white">
-        {userCard.availableCount} {t('disponible(s)')}
+        {userCard.availableCount} {t('Disponibles')}
       </div>
       <button
         type="button"
