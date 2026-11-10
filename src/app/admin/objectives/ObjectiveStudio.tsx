@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Check, CircleOff, ClipboardList, Plus, Save, Trophy } from 'lucide-react';
 import { PACKS } from '@/lib/boosters';
+import { describeObjectiveReward } from '@/lib/objective-reward';
 import {
   type ObjectiveCardCategory,
   type ObjectiveCategory,
@@ -11,7 +12,6 @@ import {
   type ObjectiveRequirementOperator,
   type ObjectiveType,
   type ObjectiveRewardMode,
-  describeObjectiveReward,
 } from '@/lib/actions/objectives';
 import {
   createObjective,

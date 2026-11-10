@@ -7,12 +7,12 @@ import Sidebar from '@/components/Sidebar';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 import {
   claimObjectiveReward,
-  describeObjectiveReward,
   getUserObjectives,
   type ObjectiveCategory,
   type ObjectiveProgress,
 } from '@/lib/actions/objectives';
 import { createClient } from '@/lib/supabaseBrowser';
+import { describeObjectiveReward } from '@/lib/objective-reward';
 
 export default function ObjectiveBoard({
   category,

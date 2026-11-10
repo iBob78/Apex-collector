@@ -1,5 +1,4 @@
 import { supabase } from '@/lib/supabaseClient';
-import { PACKS } from '@/lib/boosters';
 
 export type ObjectiveCategory = 'contract' | 'achievement';
 export type ObjectiveType =
@@ -61,22 +60,6 @@ export type ObjectiveProgress = {
   completed_at: string | null;
   objective: ObjectiveDefinition;
 };
-
-/** En mode OU, l'attribution est aleatoire (50 % AC, 50 % booster). */
-export function describeObjectiveReward(
-  objective: Pick<ObjectiveDefinition, 'reward_ap' | 'reward_mode' | 'reward_booster_slug'>,
-): string {
-  const ac = `${objective.reward_ap} AC`;
-  const booster = objective.reward_booster_slug === 'random'
-    ? 'Booster aléatoire'
-    : PACKS[objective.reward_booster_slug]?.name ?? 'Booster';
-  switch (objective.reward_mode) {
-    case 'booster': return booster;
-    case 'both': return `${ac} + ${booster}`;
-    case 'either': return `${ac} OU ${booster}`;
-    default: return ac;
-  }
-}
 
 export async function getUserObjectives(userId: string, category: ObjectiveCategory) {
   if (!userId) return { data: [] as ObjectiveProgress[], error: 'Non authentifié' };
