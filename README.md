@@ -19,7 +19,7 @@ L'univers visuel s'inspire du sport automobile, de l'esthétique *gentleman driv
 - **Suggestions de cartes** : formulaire dédié pour proposer des voitures, circuits et pilotes ; les administrateurs peuvent ensuite examiner et traiter les propositions.
 - **Profil et tableau de bord** : consultation du garage, de la progression et du solde AC.
 - **Niveau d’écurie** : le tableau de bord gagne un niveau par tranche de 10 modèles de véhicules uniques (niveau 1 au départ). Les doublons, circuits, pilotes et succès ne comptent pas. Les titres des niveaux 1, 5, 10, 20 et 50 sont décoratifs et sans récompense.
-- **Showroom joueur** : exposition publique facultative de trois véhicules choisis, statistiques de collection, boosters ouverts depuis l’activation du suivi, véhicules améliorés et succès réclamés.
+- **Showroom joueur** : public par défaut pour les nouveaux joueurs (privatisable depuis le profil), avec trois véhicules choisis, statistiques de collection, boosters ouverts depuis l’activation du suivi, véhicules améliorés et succès réclamés.
 - **Classement des joueurs** : classement de tous les joueurs par nombre de cartes ; les showrooms privés ne révèlent pas leurs voitures ni leurs statistiques détaillées.
 - **Interface responsive** : navigation adaptée au smartphone et à l'ordinateur.
 - **Langues et unités** : français, anglais, espagnol ; système métrique ou impérial.
