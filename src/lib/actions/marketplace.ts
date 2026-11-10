@@ -41,7 +41,7 @@ export async function createListing(
   price: number,
   category: CardCategory = 'vehicle',
 ): Promise<MarketActionResult> {
-  if (!sellerId || !cardId || !Number.isSafeInteger(price) || price <= 0
+  if (!sellerId || !cardId || !Number.isSafeInteger(price) || price <= 0 || price > 2147483647
     || !(['vehicle', 'circuit', 'driver'] as const).includes(category)) {
     return { success: false, error: 'Paramètres invalides.' };
   }
