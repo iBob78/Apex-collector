@@ -18,3 +18,12 @@ export function getGarageProgress(uniqueVehicles: number) {
     tierTitle: tier.title,
   };
 }
+
+/** Le palier de l'écurie doit compter les cartes différentes réellement détenues. */
+export function getUniqueOwnedVehicleCount(
+  rows: readonly { card_id?: string | null; count?: number | null }[],
+): number {
+  return new Set(
+    rows.filter((row) => row.card_id && Number(row.count ?? 0) > 0).map((row) => row.card_id),
+  ).size;
+}

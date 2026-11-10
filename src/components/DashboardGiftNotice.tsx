@@ -77,7 +77,9 @@ export default function DashboardGiftNotice({ userId }: { userId: string | null 
           .filter(item => Boolean(PACKS[item.pack_slug]))
           .map(item => ({
             id: 'welcome:' + item.id,
-            title: t(item.gift_key === 'welcome_2026' ? 'Booster de bienvenue' : 'Cadeau spécial'),
+            title: item.gift_key.startsWith('garage_level_')
+               ? t('Niveau écurie') + ' ' + item.gift_key.slice('garage_level_'.length)
+               : t(item.gift_key.startsWith('objective_') ? 'Booster de contrat ou succès' : item.gift_key === 'welcome_2026' ? 'Booster de bienvenue' : 'Cadeau spécial'),
             cardCount: item.card_count,
             destination: '/open?gift_booster=' + encodeURIComponent(item.id),
           })),

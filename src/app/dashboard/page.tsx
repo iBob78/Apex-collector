@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { fetchAllPages } from '@/lib/fetchAllPages';
-import { getGarageProgress } from '@/lib/garage-level';
+import { getGarageProgress, getUniqueOwnedVehicleCount } from '@/lib/garage-level';
 import Sidebar from '@/components/Sidebar';
 import { ArrowRight, ArrowUpRight, Gauge, Layers3, Lightbulb, ShoppingBag, Trophy, Wallet } from 'lucide-react';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
@@ -32,14 +32,14 @@ export default function DashboardPage() {
     try {
       const data = await fetchAllPages((from, to) => supabase
         .from('user_cards')
-        .select('id, count')
+        .select('id, card_id, count')
         .eq('user_id', userId)
         .order('id')
         .range(from, to));
       const total = data.reduce((acc, curr) => acc + curr.count, 0);
       setStats({
         totalCards: total,
-        uniqueCards: data.length,
+        uniqueCards: getUniqueOwnedVehicleCount(data),
       });
       setStatsError(null);
     } catch (error) {

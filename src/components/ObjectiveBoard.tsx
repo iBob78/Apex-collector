@@ -12,6 +12,7 @@ import {
   type ObjectiveProgress,
 } from '@/lib/actions/objectives';
 import { createClient } from '@/lib/supabaseBrowser';
+import { describeObjectiveReward } from '@/lib/objective-reward';
 
 export default function ObjectiveBoard({
   category,
@@ -69,7 +70,11 @@ export default function ObjectiveBoard({
     setClaimingId(progressId);
     const result = await claimObjectiveReward(userId, progressId);
     if (result.success) {
-      window.alert(`${t('Récompense récupérée')} +${result.reward} AC.`);
+      const gains = [
+        result.reward > 0 ? `${result.reward} AC` : null,
+        result.boosterSlug ? 'Booster offert (voir la boutique)' : null,
+      ].filter(Boolean);
+      window.alert(`${t('Récompense récupérée')} : ${gains.join(' + ') || '0 AC'}.`);
       await fetchObjectives(userId);
     } else {
       window.alert(`${t('Erreur')}: ${result.error}`);
@@ -151,7 +156,7 @@ export default function ObjectiveBoard({
                         </div>
                       </div>
                       <span className="shrink-0 rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1 text-[10px] font-black text-blue-200">
-                        {item.objective.reward_ap} AC
+                        {describeObjectiveReward(item.objective)}
                       </span>
                     </div>
                     {requirements.length > 0 && (
@@ -188,7 +193,7 @@ export default function ObjectiveBoard({
                             requirement.year,
                             requirement.country,
                             requirement.type,
-                            requirement.fuel_type,
+                            ({ EL: 'Électrique', GO: 'Diesel', ES: 'Essence', HY: 'Hybride' } as Record<string, string>)[requirement.fuel_type] ?? requirement.fuel_type,
                             requirement.transmission,
                             requirement.rarity,
                           ].filter(Boolean);

@@ -8,11 +8,13 @@ export type ObjectiveType =
   | 'marketplace_listing'
   | 'circuit_collection'
   | 'daily_login'
-  | 'collection_requirement';
+  | 'collection_requirement'
+  | 'showroom_first';
 
+export type ObjectiveRewardMode = 'ac' | 'booster' | 'both' | 'either';
 export type ObjectiveCardCategory = 'vehicle' | 'circuit' | 'driver';
 export type ObjectiveRequirementOperator = 'all' | 'any';
-type ObjectiveEventType = Exclude<ObjectiveType, 'collection_requirement'>;
+type ObjectiveEventType = Exclude<ObjectiveType, 'collection_requirement' | 'showroom_first'>;
 
 export type ObjectiveRequirement = {
   category: ObjectiveCardCategory;
@@ -41,6 +43,8 @@ export type ObjectiveDefinition = {
   requirements: ObjectiveRequirement[];
   requirement_operator: ObjectiveRequirementOperator;
   reward_ap: number;
+  reward_mode: ObjectiveRewardMode;
+  reward_booster_slug: string;
   is_active: boolean;
   created_at: string;
 };
@@ -134,5 +138,5 @@ export async function claimObjectiveReward(userId: string, progressId: string) {
   if (error) return { success: false as const, error: error.message };
   if (!data?.success) return { success: false as const, error: data?.error ?? 'Récompense non disponible.' };
 
-  return { success: true as const, reward: Number(data.reward) || 0 };
+  return { success: true as const, reward: Number(data.reward) || 0, boosterSlug: typeof data.booster_slug === 'string' ? data.booster_slug : null };
 }

@@ -1,4 +1,4 @@
-import { getGarageProgress } from '@/lib/garage-level';
+import { getGarageProgress, getUniqueOwnedVehicleCount } from '@/lib/garage-level';
 
 describe('getGarageProgress', () => {
   it.each([
@@ -19,5 +19,17 @@ describe('getGarageProgress', () => {
       progress: 0,
       tierTitle: 'Écurie débutante',
     });
+  });
+});
+
+describe('getUniqueOwnedVehicleCount', () => {
+  it('ignores duplicate ownership rows and missing or empty cards', () => {
+    expect(getUniqueOwnedVehicleCount([
+      { card_id: 'a', count: 1 },
+      { card_id: 'a', count: 2 },
+      { card_id: 'b', count: 1 },
+      { card_id: 'c', count: 0 },
+      { card_id: null, count: 1 },
+    ])).toBe(2);
   });
 });
