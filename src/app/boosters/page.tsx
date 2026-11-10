@@ -50,7 +50,7 @@ export default function BoostersPage() {
           .eq('user_id', userId)
           .is('opened_at', null)
           .order('granted_at', { ascending: true })
-          .limit(100),
+          .limit(1000),
       ]);
       if (profileResult.data) setProfile(profileResult.data);
       setDailyBoosterError(null);
@@ -123,7 +123,7 @@ export default function BoostersPage() {
 
           {giftBoosters.length > 0 && (
             <section aria-labelledby="welcome-gifts-heading" className="mb-8 rounded-2xl border border-amber-300/25 bg-amber-300/[0.06] p-4 sm:p-6">
-              <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-amber-300">{t('Cadeaux de bienvenue')}</p>
+              <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-amber-300">{t('Récompenses et cadeaux')}</p>
               <h2 id="welcome-gifts-heading" className="mb-4 text-xl font-black">{t('Vos cadeaux offerts')}</h2>
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {giftBoosters.map((gift) => {
@@ -132,10 +132,12 @@ export default function BoostersPage() {
                   return (
                     <article key={gift.id} className="flex min-w-0 items-center gap-3 rounded-xl border border-amber-300/15 bg-black/30 p-3">
                       <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-lg">
-                        <SafeImage src={pack.imageUrl} alt={t('Booster de bienvenue')} fill className="object-cover" />
+                        <SafeImage src={pack.imageUrl} alt={t('Booster offert')} fill className="object-cover" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="text-sm font-black">{t(gift.gift_key === 'welcome_2026' ? 'Booster de bienvenue' : 'Cadeau spécial')}</h3>
+                        <h3 className="text-sm font-black">{gift.gift_key.startsWith('garage_level_')
+                          ? t('Niveau écurie') + ' ' + gift.gift_key.slice('garage_level_'.length)
+                          : t(gift.gift_key.startsWith('objective_') ? 'Récompense de contrat ou succès' : gift.gift_key === 'welcome_2026' ? 'Booster de bienvenue' : 'Cadeau spécial')}</h3>
                         <p className="mt-1 text-xs text-amber-200">{t('{count} cartes offertes', { count: gift.card_count })}</p>
                         <button type="button"
                           onClick={() => router.push(`/open?gift_booster=${encodeURIComponent(gift.id)}`)}
