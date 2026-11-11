@@ -277,7 +277,7 @@ export default function ApexBattlePage() {
           {authStatus === 'signedOut' && (
             <section className="rounded-2xl border border-blue-300/20 bg-[#111720] p-6">
               <h2 className="text-xl font-black">Connecte-toi pour jouer</h2>
-              <p className="mt-2 text-sm text-gray-400">L'entraînement utilise uniquement les véhicules que tu possèdes.</p>
+              <p className="mt-2 text-sm text-gray-400">L’entraînement utilise uniquement les véhicules que tu possèdes.</p>
               <Link className="mt-4 inline-flex rounded-lg bg-blue-500 px-5 py-3 text-sm font-bold text-white" href="/login">Se connecter</Link>
             </section>
           )}
