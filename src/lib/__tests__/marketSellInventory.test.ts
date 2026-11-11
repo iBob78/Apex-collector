@@ -56,4 +56,15 @@ describe('Market sale selector — three categories', () => {
     expect(filterSellInventory(items, { ...base, sort: 'make-asc' }, new Set())[0].category)
       .toBe('vehicle');
   });
+
+  it('sorts by total copies owned in both directions, including reserved copies', () => {
+    const items = buildSellInventory(vehicles, circuits, drivers, reservations);
+    const base = { category: 'all' as const, search: '', rarity: 'All' as const, sort: 'count-desc' as const, favoritesOnly: false };
+    // Vehicle has 3 copies (only 1 available); driver has 2; circuit has 1 (none available).
+    expect(filterSellInventory(items, base, new Set()).map((item) => [item.category, item.count]))
+      .toEqual([['vehicle', 3], ['driver', 2], ['circuit', 1]]);
+    expect(filterSellInventory(items, { ...base, sort: 'count-asc' }, new Set())
+      .map((item) => [item.category, item.count]))
+      .toEqual([['circuit', 1], ['driver', 2], ['vehicle', 3]]);
+  });
 });
