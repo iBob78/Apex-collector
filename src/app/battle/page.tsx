@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, RotateCcw, Search, ShieldQuestion, Swords, Trophy, Zap } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, RotateCcw, Search, ShieldQuestion, Star, Swords, Trophy, Zap } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import Card from '@/components/Card';
 import { supabase } from '@/lib/supabaseClient';
@@ -15,7 +15,6 @@ import {
   BATTLE_STAT_KEYS,
   type BattleMatchState,
   type BattleStat,
-  type BattleVehicleSource,
   getAvailableBattleStats,
   getBattleScore,
   getNextBattleChooser,
@@ -23,8 +22,15 @@ import {
   playBattleRound,
 } from '@/lib/battle/engine';
 import { chooseTrainingStat, startTrainingMatch } from '@/lib/battle/training';
+import {
+  BATTLE_RARITIES,
+  type BattleSelectionSort,
+  type BattleSelectionVehicle,
+  filterAndSortBattleVehicles,
+  getBattleVehicleName,
+} from '@/lib/battle/selection';
 
-type CatalogVehicle = BattleVehicleSource & {
+type CatalogVehicle = BattleSelectionVehicle & {
   id: string;
   name: string | null;
   make: string | null;
@@ -35,17 +41,19 @@ type CatalogVehicle = BattleVehicleSource & {
   is_active: boolean;
 };
 
-type OwnershipRow = { card_id: string | null; count: number | null };
+type OwnershipRow = { card_id: string | null; count: number | null; upgrade_level?: number | null };
 
 function vehicleTitle(card: CatalogVehicle): string {
-  const name = [card.make, card.model].filter(Boolean).join(' ').trim();
-  return name || card.name || 'Véhicule';
+  return getBattleVehicleName(card);
 }
 
-function BattleCard({ vehicle, concealed = false, onSelect }: {
+function BattleCard({ vehicle, concealed = false, onSelect, mobileGrid = false, level = 0, isFavorite = false }: {
   vehicle?: CatalogVehicle | null;
   concealed?: boolean;
   onSelect?: () => void;
+  mobileGrid?: boolean;
+  level?: number;
+  isFavorite?: boolean;
 }) {
   if (concealed || !vehicle) {
     return (
@@ -61,8 +69,11 @@ function BattleCard({ vehicle, concealed = false, onSelect }: {
   return (
     <Card
       {...({ ...vehicle, year: Number(vehicle.year) || 0, category: 'vehicle' } as unknown as VehicleCard)}
-      compact
-      showLevel={false}
+      compact={!mobileGrid}
+      mobileGrid={mobileGrid}
+      showLevel={mobileGrid}
+      upgradeLevel={mobileGrid ? level : 0}
+      isFavorite={isFavorite}
       onCardClick={onSelect ?? (() => { /* Dans le duel, rester sur la page battle. */ })}
     />
   );
@@ -80,12 +91,21 @@ export default function ApexBattlePage() {
   const [ownedIds, setOwnedIds] = useState<Set<string>>(() => new Set());
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [query, setQuery] = useState('');
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [favoriteCardIds, setFavoriteCardIds] = useState<Set<string>>(() => new Set());
+  const [favoritesError, setFavoritesError] = useState<string | null>(null);
+  const [rarityFilter, setRarityFilter] = useState('All');
+  const [sortBy, setSortBy] = useState<BattleSelectionSort>('name');
+  const [levelsByCardId, setLevelsByCardId] = useState<Record<string, number>>({});
   const [visibleCount, setVisibleCount] = useState(24);
   const [error, setError] = useState<string | null>(null);
   const [match, setMatch] = useState<BattleMatchState | null>(null);
   const [opponentCards, setOpponentCards] = useState<CatalogVehicle[]>([]);
   const [playerCards, setPlayerCards] = useState<CatalogVehicle[]>([]);
   const [revealed, setRevealed] = useState(false);
+
+  // Comme dans la collection, un changement de filtre réinitialise les 24 cartes affichées.
+  useEffect(() => setVisibleCount(24), [query, favoritesOnly, rarityFilter, sortBy]);
 
   useEffect(() => {
     let mounted = true;
@@ -98,14 +118,24 @@ export default function ApexBattlePage() {
           return;
         }
 
-        const [vehicles, ownership] = await Promise.all([
+        const [vehicles, ownership, favorites] = await Promise.all([
           fetchAllPages((from, to) => supabase
             .from('cards')
-            .select('id,card_id,name,make,model,year,rarity,image_url,is_active,variant_of_card_id,power_hp,torque_nm,max_speed_kmh,acceleration_0_100,weight_t')
+            .select('id,card_id,name,make,model,year,rarity,image_url,created_at,is_active,variant_of_card_id,power_hp,torque_nm,max_speed_kmh,acceleration_0_100,weight_t')
             .eq('is_active', true).order('id').range(from, to)),
           fetchAllPages((from, to) => supabase
             .from('user_cards')
-            .select('id,card_id,count').eq('user_id', user.id).order('id').range(from, to)),
+            .select('id,card_id,count,upgrade_level').eq('user_id', user.id).order('id').range(from, to)),
+          fetchAllPages((from, to) => supabase
+            .from('card_favorites')
+            .select('category,card_id')
+            .eq('user_id', user.id)
+            .order('category').order('card_id').range(from, to))
+            .catch((cause) => {
+              console.warn('[ApexBattle] Favoris indisponibles :', cause);
+              if (mounted) setFavoritesError('Impossible de charger les favoris.');
+              return null;
+            }),
         ]);
         if (!mounted) return;
         const usable = (vehicles as CatalogVehicle[]).filter((vehicle) => {
@@ -116,11 +146,23 @@ export default function ApexBattlePage() {
             return false;
           }
         });
-        const owned = new Set((ownership as OwnershipRow[])
-          .filter((item) => Number(item.count) > 0 && item.card_id)
-          .map((item) => String(item.card_id).toLowerCase()));
+        const owned = new Set<string>();
+        const levels: Record<string, number> = {};
+        for (const item of ownership as OwnershipRow[]) {
+          if (Number(item.count) <= 0 || !item.card_id) continue;
+          const id = String(item.card_id).toLowerCase().trim();
+          owned.add(id);
+          levels[id] = Math.max(levels[id] ?? 0, Number(item.upgrade_level) || 0);
+        }
         setCatalog(usable);
         setOwnedIds(owned);
+        setLevelsByCardId(levels);
+        if (favorites !== null) {
+          setFavoriteCardIds(new Set(favorites
+            .filter((item) => item.category === 'vehicle')
+            .map((item) => String(item.card_id).toLowerCase().trim())));
+          setFavoritesError(null);
+        }
         setAuthStatus('ready');
       } catch (cause) {
         if (!mounted) return;
@@ -140,13 +182,14 @@ export default function ApexBattlePage() {
     () => catalog.filter((vehicle) => ownedIds.has(vehicle.card_id.toLowerCase())),
     [catalog, ownedIds],
   );
-  const filteredCars = useMemo(() => {
-    const searched = query.trim().toLowerCase();
-    return ownedCars.filter((card) =>
-      !searched || vehicleTitle(card).toLowerCase().includes(searched) ||
-        String(card.year ?? '').includes(searched),
-    ).sort((a, b) => vehicleTitle(a).localeCompare(vehicleTitle(b), 'fr'));
-  }, [ownedCars, query]);
+  const filteredCars = useMemo(() => filterAndSortBattleVehicles(ownedCars, {
+    query,
+    rarity: rarityFilter,
+    favoritesOnly,
+    favoriteCardIds,
+    sortBy,
+    levelsByCardId,
+  }), [ownedCars, query, rarityFilter, favoritesOnly, favoriteCardIds, sortBy, levelsByCardId]);
   const selectedCards = useMemo(
     () => selectedIds.flatMap((id) => {
       const card = carsById.get(id);
@@ -293,16 +336,61 @@ export default function ApexBattlePage() {
                     </div>
                     <span className="rounded-lg bg-blue-500/15 px-3 py-2 font-mono text-sm font-black text-blue-200">{selectedIds.length} / {BATTLE_DECK_SIZE}</span>
                   </div>
-                  <label className="mb-4 flex min-h-11 items-center gap-3 rounded-xl border border-white/10 bg-black/40 px-3 text-gray-400">
-                    <Search size={18} aria-hidden="true" />
-                    <span className="sr-only">Rechercher un véhicule</span>
-                    <input
-                      value={query}
-                      onChange={(event) => { setQuery(event.target.value); setVisibleCount(24); }}
-                      placeholder="Marque, modèle ou année…"
-                      className="w-full bg-transparent py-3 text-sm text-white outline-none placeholder:text-gray-500"
-                    />
-                  </label>
+                  <div className="mb-4 flex flex-col gap-2 rounded-xl border border-white/10 bg-black/20 p-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 sm:p-3">
+                    <button
+                      type="button"
+                      aria-pressed={favoritesOnly}
+                      onClick={() => setFavoritesOnly((current) => !current)}
+                      className={'flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ' + (favoritesOnly ? 'border-amber-400/70 bg-amber-400/20 text-amber-200' : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10')}
+                    >
+                      <Star size={17} fill={favoritesOnly ? 'currentColor' : 'none'} aria-hidden="true" />
+                      Favoris ({ownedCars.filter((card) => favoriteCardIds.has(card.card_id.toLowerCase())).length})
+                    </button>
+                    <label className="flex min-h-11 w-full min-w-0 flex-1 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 text-gray-300 sm:min-w-[180px]">
+                      <Search size={18} className="shrink-0" aria-hidden="true" />
+                      <span className="sr-only">Rechercher un véhicule</span>
+                      <input
+                        type="search"
+                        value={query}
+                        onChange={(event) => setQuery(event.target.value)}
+                        placeholder="Rechercher une carte..."
+                        className="min-w-0 w-full bg-transparent py-3 text-base text-white outline-none placeholder:text-gray-500 sm:text-sm"
+                      />
+                    </label>
+                    <select
+                      aria-label="Filtrer par rareté"
+                      value={rarityFilter}
+                      onChange={(event) => setRarityFilter(event.target.value)}
+                      className="min-h-11 w-full min-w-0 rounded-xl border border-white/10 bg-[#151b25] px-3 text-base text-white outline-none sm:w-auto sm:text-sm"
+                    >
+                      <option value="All">Toutes les raretés</option>
+                      {BATTLE_RARITIES.map((rarity) => (
+                        <option key={rarity} value={rarity}>{rarity}</option>
+                      ))}
+                    </select>
+                    <select
+                      aria-label="Trier les voitures"
+                      value={sortBy}
+                      onChange={(event) => setSortBy(event.target.value as BattleSelectionSort)}
+                      className="min-h-11 w-full min-w-0 rounded-xl border border-white/10 bg-[#151b25] px-3 text-base text-white outline-none sm:w-auto sm:text-sm"
+                    >
+                      <option value="name">Trier par Nom</option>
+                      <option value="make-asc">Marques, A à Z</option>
+                      <option value="make-desc">Marques, Z à A</option>
+                      <option value="ip-desc">IP, décroissant</option>
+                      <option value="ip-asc">IP, croissant</option>
+                      <option value="level-asc">Niveau, croissant</option>
+                      <option value="level-desc">Niveau, décroissant</option>
+                      <option value="rarity">Trier par Rareté</option>
+                      <option value="newest">Plus récent</option>
+                    </select>
+                  </div>
+                  {favoritesError && (
+                    <p role="alert" className="mb-4 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-200">{favoritesError}</p>
+                  )}
+                  <p className="mb-3 text-xs text-gray-400">
+                    {filteredCars.length} voiture{filteredCars.length > 1 ? 's' : ''} disponible{filteredCars.length > 1 ? 's' : ''} · uniquement les voitures possédées et éligibles
+                  </p>
                   {ownedCars.length < BATTLE_DECK_SIZE && (
                     <div className="mb-4 rounded-lg border border-blue-400/20 bg-blue-500/10 p-3 text-sm text-blue-100">
                       Tu possèdes {ownedCars.length} voitures éligibles. Il faut en avoir dix différentes pour lancer une bataille. <Link href="/collection" className="font-bold underline underline-offset-4">Voir ma collection</Link>
@@ -311,14 +399,20 @@ export default function ApexBattlePage() {
                   {filteredCars.length === 0 ? (
                     <p className="rounded-xl border border-dashed border-white/10 p-6 text-center text-sm text-gray-400">Aucune carte possédée ne correspond à cette recherche.</p>
                   ) : (
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+                    <div className="grid grid-cols-4 gap-x-1.5 gap-y-4 sm:grid-cols-[repeat(auto-fill,minmax(min(100%,14rem),1fr))] sm:gap-x-6 sm:gap-y-8">
                       {filteredCars.slice(0, visibleCount).map((vehicle) => {
                         const chosen = selectedIds.includes(vehicle.card_id.toLowerCase());
                         const position = selectedIds.indexOf(vehicle.card_id.toLowerCase()) + 1;
                         return (
                           <div key={vehicle.card_id} className="relative min-w-0">
                             <div className={chosen ? 'rounded-xl ring-2 ring-emerald-400 ring-offset-2 ring-offset-[#0e1219]' : ''}>
-                              <BattleCard vehicle={vehicle} onSelect={() => toggleCard(vehicle)} />
+                              <BattleCard
+                                vehicle={vehicle}
+                                onSelect={() => toggleCard(vehicle)}
+                                mobileGrid
+                                level={levelsByCardId[vehicle.card_id.toLowerCase()] ?? 0}
+                                isFavorite={favoriteCardIds.has(vehicle.card_id.toLowerCase())}
+                              />
                             </div>
                             <button
                               type="button"
@@ -326,9 +420,11 @@ export default function ApexBattlePage() {
                               aria-pressed={chosen}
                               disabled={!chosen && selectedIds.length === BATTLE_DECK_SIZE}
                               onClick={() => toggleCard(vehicle)}
-                              className={'mt-2 flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border px-2 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-40 ' + (chosen ? 'border-emerald-300/40 bg-emerald-400/15 text-emerald-200' : 'border-white/15 bg-white/[0.04] text-gray-200 hover:bg-blue-500/10')}
+                              className={'mt-1 flex min-h-8 w-full items-center justify-center gap-1 rounded-lg border px-0.5 text-[10px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-40 sm:mt-2 sm:min-h-10 sm:gap-2 sm:px-2 sm:text-xs ' + (chosen ? 'border-emerald-300/40 bg-emerald-400/15 text-emerald-200' : 'border-white/15 bg-white/[0.04] text-gray-200 hover:bg-blue-500/10')}
                             >
-                              {chosen ? <><Check size={14} /> Position {position} · Retirer</> : <>Ajouter <ArrowRight size={14}/></>}
+                              <span className="sm:hidden">{chosen ? `N° ${position}` : 'Ajouter +'}</span>
+                              <span className="hidden sm:inline">{chosen ? `Position ${position} · Retirer` : 'Ajouter'}</span>
+                              {chosen ? <Check size={13} className="hidden shrink-0 sm:block" /> : <ArrowRight size={13} className="hidden shrink-0 sm:block" />}
                             </button>
                           </div>
                         );
