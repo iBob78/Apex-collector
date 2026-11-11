@@ -43,9 +43,10 @@ function vehicleTitle(card: CatalogVehicle): string {
   return name || card.name || 'Véhicule';
 }
 
-function BattleCard({ vehicle, concealed = false }: {
+function BattleCard({ vehicle, concealed = false, onSelect }: {
   vehicle?: CatalogVehicle | null;
   concealed?: boolean;
+  onSelect?: () => void;
 }) {
   if (concealed || !vehicle) {
     return (
@@ -63,7 +64,7 @@ function BattleCard({ vehicle, concealed = false }: {
       {...({ ...vehicle, year: Number(vehicle.year) || 0, category: 'vehicle' } as unknown as VehicleCard)}
       compact
       showLevel={false}
-      onCardClick={() => { /* Pendant la bataille, ne pas quitter vers la collection. */ }}
+      onCardClick={onSelect ?? (() => { /* Dans le duel, rester sur la page battle. */ })}
     />
   );
 }
@@ -319,7 +320,7 @@ export default function ApexBattlePage() {
                         return (
                           <div key={vehicle.card_id} className="relative min-w-0">
                             <div className={chosen ? 'rounded-xl ring-2 ring-emerald-400 ring-offset-2 ring-offset-[#0e1219]' : ''}>
-                              <BattleCard vehicle={vehicle} />
+                              <BattleCard vehicle={vehicle} onSelect={() => toggleCard(vehicle)} />
                             </div>
                             <button
                               type="button"
