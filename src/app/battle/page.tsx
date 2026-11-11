@@ -8,7 +8,6 @@ import Sidebar from '@/components/Sidebar';
 import Card from '@/components/Card';
 import { supabase } from '@/lib/supabaseClient';
 import { fetchAllPages } from '@/lib/fetchAllPages';
-import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 import type { VehicleCard } from '@/types/game';
 import {
   BATTLE_DECK_SIZE,
@@ -75,7 +74,6 @@ function formatBattleValue(value: number, stat: BattleStat): string {
 }
 
 export default function ApexBattlePage() {
-  const { t } = useSitePreferences();
   const reducedMotion = Boolean(useReducedMotion());
   const [authStatus, setAuthStatus] = useState<'loading' | 'signedOut' | 'ready'>('loading');
   const [catalog, setCatalog] = useState<CatalogVehicle[]>([]);
