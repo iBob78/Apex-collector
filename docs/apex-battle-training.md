@@ -34,3 +34,10 @@ npm run build
 Recette sur preview : ouvrir /battle en étant connecté, ajouter puis retirer dix cartes, les ordonner, tenter une variante de modèle, choisir et vérifier les statistiques, observer la carte adverse et le décompte des dix manches, recommencer sur mobile et PC.
 
 Ne pas fusionner dans main ni modifier Supabase sans validation explicite.
+
+## Sélection : parité avec la collection (11 novembre 2026)
+- Sur smartphone, la grille de préparation affiche **quatre cartes par ligne** comme la collection, avec le rendu `Card.mobileGrid`, une touche directe sur la carte et un bouton compact d'ajout/retrait. Les cartes des duels restent au format original.
+- La liste propose les filtres **favoris**, recherche par marque/modèle/nom/année, **rareté** et les tris **nom**, **marque A–Z/Z–A**, **IP croissant/décroissant**, **niveau croissant/décroissant**, **rareté** et **date d'ajout**.
+- Seules les **voitures possédées, actives et éligibles** sont listées : les onglets Circuits/Pilotes et « Masquer les cartes non déverrouillées » n'ont pas de sens dans ce contexte.
+- Les favoris et les niveaux proviennent des tables existantes ; un chargement des favoris en échec n'empêche pas d'afficher la collection. Les tris de niveaux n'affectent jamais les résultats des duels.
+- Tout changement de filtre remet le compteur visuel à 24 cartes, sans réinitialiser les 10 cartes déjà sélectionnées. Tests de logique dans `src/lib/battle/__tests__/selection.test.ts`.
