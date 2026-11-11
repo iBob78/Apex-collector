@@ -49,7 +49,7 @@ Le créateur du projet n'est pas développeur. Être concret et compréhensible,
 | Tableau de bord connecté | `src/app/dashboard/page.tsx` |
 | Sidebar PC et navigation mobile | `src/components/Sidebar.tsx` |
 | Collection, filtres et favoris | `src/app/collection/page.tsx` |
-| Market, ventes et achats | `src/app/marketplace/page.tsx`, `src/lib/actions/marketplace.ts` et SQL 044 (véhicules) et SQL 046 (circuits/pilotes en PR) |
+| Market, ventes et achats | `src/app/marketplace/page.tsx`, `src/lib/actions/marketplace.ts` et SQL 044 (véhicules) et SQL 046 (circuits/pilotes, appliquée) |
 | Rendu des cartes | `src/components/Card.tsx` |
 | Détails d'une carte | `src/components/Collection/CardDetailsModal.tsx` |
 | Badge IP | `src/components/IPBadge.tsx` |
@@ -270,7 +270,8 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
 
 ## Extension du Market aux circuits et pilotes — PR #24 fusionnée / SQL 046 appliquée
 
-- Le sélecteur « Mettre en vente » de `/marketplace` doit proposer les mêmes filtres utiles que la collection : **Tous / Véhicules / Circuits / Pilotes**, favoris, recherche marque/modèle/pays/nom, rareté et tris par nom, marque, IP, niveau, rareté et ancienneté. Les cartes non possédées sont **toujours exclues** du sélecteur ; le filtre « masquer les cartes non déverrouillées » n'a donc pas d'utilité ici.
+- Le sélecteur « Mettre en vente » de `/marketplace` doit proposer les mêmes filtres utiles que la collection : **Tous / Véhicules / Circuits / Pilotes**, favoris, recherche marque/modèle/pays/nom, rareté et tris par nom, marque, IP, niveau, rareté et ancienneté. Il ajoute **« Exemplaires, décroissant / croissant »** : le tri se fait sur `SellInventoryItem.count` (**total possédé** après agrégation des lignes, y compris les exemplaires déjà réservés), et non sur `availableCount` (**libres pour une nouvelle vente**). Les cartes non possédées sont **toujours exclues** du sélecteur ; le filtre « masquer les cartes non déverrouillées » n'a donc pas d'utilité ici.
+- Sur smartphone (`<640px`), la **grille du sélecteur de vente** doit afficher **4 cartes par ligne**, à l'instar de la collection, avec `Card mobileGrid` pour la lisibilité. Le badge « disponibles » est condensé ; l'action `+` est réduite ; la saisie du prix s'étend à **toute la rangée mobile** (`col-span-4`), puis redevient une carte de grille aux tailles `sm+`. Ne pas changer la grille principale du marché ni celle de l'ordinateur.
 - Charger **tous** les exemplaires possédés par pagination, depuis `user_cards`, `user_circuits` et `user_drivers`, et agréger les lignes dupliquées. Déduire les annonces actives pour afficher le nombre d'exemplaires encore disponibles ; ne pas proposer à la vente les cartes déjà toutes réservées.
 - Identifiants à conserver : **véhicule = `cards.card_id`**, **circuit = `circuits.id`** (FK `user_circuits.circuit_id`, **pas** `circuits.circuit_id`) et **pilote = `drivers.driver_id`**. Le composant `Card` reçoit une catégorie explicite, sans changer le rendu de la collection.
 - `supabase/migrations/046_marketplace_circuit_driver_listings.sql` étend `marketplace_listings` et ses RPC de lecture/création/achat. Les annonces véhicules existantes sont préservées via `category='vehicle'` par défaut, avec une contrainte garantissant un seul identifiant de carte par annonce. Les crédits et le transfert d'un exemplaire restent **atomiques** ; réservations par catégorie, annulations, achats concurrents, sécurité `auth.uid()` et découverte `NEW!` doivent être conservés. Le public n'accède pas aux inventaires privés.

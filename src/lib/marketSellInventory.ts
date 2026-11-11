@@ -1,7 +1,7 @@
 import type { CardCategory, Rarity } from '@/types/game';
 
 export type SellCategory = CardCategory | 'all';
-export type SellSort = 'name' | 'make-asc' | 'make-desc' | 'ip-desc' | 'ip-asc' | 'level-asc' | 'level-desc' | 'rarity' | 'newest';
+export type SellSort = 'name' | 'make-asc' | 'make-desc' | 'ip-desc' | 'ip-asc' | 'level-asc' | 'level-desc' | 'rarity' | 'newest' | 'count-asc' | 'count-desc';
 
 export type SellInventoryItem = {
   id: string;
@@ -114,6 +114,11 @@ export function filterSellInventory(
   });
 
   result.sort((a, b) => {
+    if (filters.sort === 'count-asc' || filters.sort === 'count-desc') {
+      // Sort by the total number owned, not the copies left after market reservations.
+      const difference = filters.sort === 'count-asc' ? a.count - b.count : b.count - a.count;
+      return difference || cardName(a.card).localeCompare(cardName(b.card));
+    }
     if (filters.sort === 'rarity') {
       const order: Record<string, number> = {
         Common: 1, Uncommon: 2, Atypique: 2, Rare: 3,
