@@ -382,6 +382,8 @@ export default function MarketplacePage() {
                     <option value="ip-asc">{t('IP, croissant')}</option>
                     <option value="level-asc">{t('Niveau, croissant')}</option>
                     <option value="level-desc">{t('Niveau, décroissant')}</option>
+                    <option value="count-desc">{t('Exemplaires, décroissant')}</option>
+                    <option value="count-asc">{t('Exemplaires, croissant')}</option>
                     <option value="rarity">{t('Trier par Rareté')}</option>
                     <option value="newest">{t('Plus récent')}</option>
                   </select>
@@ -397,7 +399,7 @@ export default function MarketplacePage() {
                     <Loader2Icon size={32} className="animate-spin text-blue-400" />
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-6 md:grid-cols-4">
+                  <div className="grid grid-cols-4 gap-x-1.5 gap-y-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4">
                     {filteredSellCards.map((item) => (
                       <SellCardItem
                         key={item.id}
@@ -455,7 +457,7 @@ function SellCardItem({
 
   if (isSettingPrice) {
     return (
-      <div className="bg-white/5 border border-blue-500/50 rounded-2xl p-4 flex flex-col items-center justify-center gap-4 animate-in fade-in zoom-in duration-200">
+      <div className="col-span-4 flex flex-col items-center justify-center gap-4 rounded-2xl border border-blue-500/50 bg-white/5 p-4 animate-in fade-in zoom-in duration-200 sm:col-span-1">
         <div className="text-[10px] font-black uppercase tracking-widest text-blue-400">{t('Fixer le prix')}</div>
         <div className="flex items-center gap-2">
           <input
@@ -488,24 +490,25 @@ function SellCardItem({
   }
 
   return (
-    <div className="group relative">
+    <div className="group relative min-w-0">
       <div className="aspect-[63/88] opacity-80 group-hover:opacity-100 transition-opacity">
-        <Card {...userCard.card} owned={true} count={userCard.count} onCardClick={() => {
+        <Card {...userCard.card} owned={true} count={userCard.count} mobileGrid onCardClick={() => {
           if (!disabled && userCard.availableCount > 0) setIsSettingPrice(true);
         }} />
       </div>
-      <div className="absolute left-1 top-1 rounded bg-black/85 px-2 py-1 text-[10px] font-semibold text-white">
-        {userCard.availableCount} {t('Disponibles')}
+      <div className="absolute left-1 top-1 z-20 rounded bg-black/85 px-1 py-0.5 text-[8px] font-semibold text-white sm:px-2 sm:py-1 sm:text-[10px]">
+        <span className="sm:hidden" aria-label={t('Disponibles')}>×{userCard.availableCount}</span>
+        <span className="hidden sm:inline">{userCard.availableCount} {t('Disponibles')}</span>
       </div>
       <button
         type="button"
         aria-label={t('Mettre en vente')}
         disabled={disabled || userCard.availableCount <= 0}
         onClick={() => setIsSettingPrice(true)}
-        className="absolute inset-0 flex items-center justify-center rounded-lg bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-100 transition-opacity disabled:cursor-not-allowed disabled:opacity-40 sm:bg-black/60 sm:opacity-0 sm:group-hover:opacity-100"
+        className="absolute inset-0 flex items-end justify-end rounded-lg bg-gradient-to-t from-black/60 via-transparent to-transparent p-1 opacity-100 transition-opacity disabled:cursor-not-allowed disabled:opacity-40 sm:items-center sm:justify-center sm:bg-black/60 sm:p-0 sm:opacity-0 sm:group-hover:opacity-100"
       >
-        <div className="bg-white text-black p-3 rounded-2xl shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform">
-          <PlusIcon size={24} />
+        <div className="rounded-md bg-white p-1.5 text-black shadow-xl transition-transform sm:translate-y-4 sm:rounded-2xl sm:p-3 sm:group-hover:translate-y-0">
+          <PlusIcon size={16} className="sm:h-6 sm:w-6" />
         </div>
       </button>
     </div>
