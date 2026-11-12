@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, RotateCcw, Search, ShieldQuestion, Star, Swords, Trophy, Zap } from 'lucide-react';
@@ -89,6 +89,60 @@ function BattleCard({ vehicle, concealed = false, onSelect, mobileGrid = false, 
       isFavorite={isFavorite}
       onCardClick={onSelect ?? (() => { /* Dans le duel, rester sur la page battle. */ })}
     />
+  );
+}
+
+/**
+ * La carte Collection a des tailles internes fixes (IP, logo, texte).
+ * Sur téléphone, réduire seulement le parent écrase la disposition.
+ * On compose donc la carte à 180 px de large puis on réduit l'ensemble
+ * proportionnellement à la largeur disponible, y compris badges et textes.
+ * Ne modifie pas le composant Card partagé avec la collection.
+ */
+function ScaledDuelCard({
+  vehicle,
+  concealed,
+  snapshot,
+}: {
+  vehicle?: CatalogVehicle | null;
+  concealed?: boolean;
+  snapshot?: BattleVehicleSnapshot;
+}) {
+  const frameRef = useRef<HTMLDivElement>(null);
+  const [availableWidth, setAvailableWidth] = useState<number | null>(null);
+  const referenceWidth = 180;
+
+  useLayoutEffect(() => {
+    const container = frameRef.current;
+    if (!container) return;
+
+    const updateWidth = () => {
+      setAvailableWidth(container.getBoundingClientRect().width);
+    };
+    updateWidth();
+
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  const scale = availableWidth !== null && availableWidth < referenceWidth
+    ? availableWidth / referenceWidth
+    : 1;
+
+  return (
+    <div ref={frameRef} className="relative aspect-[2/3] w-full min-w-0">
+      <div
+        className="absolute left-0 top-0 origin-top-left"
+        style={{
+          width: scale < 1 ? referenceWidth : '100%',
+          transform: scale < 1 ? `scale(${scale})` : undefined,
+          visibility: availableWidth === null ? 'hidden' : 'visible',
+        }}
+      >
+        <BattleCard vehicle={vehicle} concealed={concealed} snapshot={snapshot} />
+      </div>
+    </div>
   );
 }
 
@@ -541,7 +595,7 @@ export default function ApexBattlePage() {
                 <div className="min-w-0">
                   <p className="mb-1 truncate text-center text-[10px] font-black uppercase tracking-wider text-emerald-300 sm:mb-2 sm:text-xs sm:tracking-widest">Ton véhicule</p>
                   <motion.div key={'player-' + cardIndex} initial={reducedMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="mx-auto w-full min-w-0 max-w-[clamp(118px,36vw,148px)] sm:max-w-[260px]">
-                    <BattleCard vehicle={playerCards[cardIndex]} snapshot={match.player1Deck[cardIndex]}/>
+                    <ScaledDuelCard vehicle={playerCards[cardIndex]} snapshot={match.player1Deck[cardIndex]}/>
                   </motion.div>
                 </div>
                 <div className="min-w-0">
@@ -550,7 +604,7 @@ export default function ApexBattlePage() {
                     initial={reducedMotion ? false : { opacity: 0.4, rotateY: revealed ? 75 : 0 }}
                     animate={{ opacity: 1, rotateY: 0 }} transition={{ duration: 0.45 }}
                     className="mx-auto w-full min-w-0 max-w-[clamp(118px,36vw,148px)] sm:max-w-[260px]">
-                    <BattleCard vehicle={opponentCards[cardIndex]} snapshot={match.player2Deck[cardIndex]} concealed={!revealed}/>
+                    <ScaledDuelCard vehicle={opponentCards[cardIndex]} snapshot={match.player2Deck[cardIndex]} concealed={!revealed}/>
                   </motion.div>
                 </div>
               </div>
