@@ -13,7 +13,6 @@ import {
   BATTLE_DECK_SIZE,
   BATTLE_STATS,
   BATTLE_STAT_KEYS,
-  createBattleMatch,
   type BattleMatchState,
   type BattleVehicleSnapshot,
   type BattleStat,
@@ -26,11 +25,12 @@ import {
 import { chooseTrainingStat, startTrainingMatch } from '@/lib/battle/training';
 import { battleCardStats, formatBattleStat } from '@/lib/battle/display';
 import {
+  createHiddenTrainingMatch,
   isMissingTrainingRpc,
   opponentSourcesFromIds,
   parseTrainingStart,
+  reconcileTrainingRound,
   type TrainingReward,
-  verifyTrainingRound,
 } from '@/lib/battle/rewards';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 import {
@@ -180,7 +180,7 @@ export default function ApexBattlePage() {
   const [visibleCount, setVisibleCount] = useState(24);
   const [error, setError] = useState<string | null>(null);
   const [match, setMatch] = useState<BattleMatchState | null>(null);
-  const [opponentCards, setOpponentCards] = useState<CatalogVehicle[]>([]);
+  const [opponentCards, setOpponentCards] = useState<(CatalogVehicle | null)[]>([]);
   const [playerCards, setPlayerCards] = useState<CatalogVehicle[]>([]);
   const [revealed, setRevealed] = useState(false);
   const [serverBattleId, setServerBattleId] = useState<string | null>(null);
@@ -343,7 +343,7 @@ export default function ApexBattlePage() {
       });
 
       let nextMatch: BattleMatchState;
-      let nextOpponent: CatalogVehicle[];
+      let nextOpponent: (CatalogVehicle | null)[];
 
       if (serverError && isMissingTrainingRpc(serverError)) {
         // A PR preview may precede the approved SQL migration.
@@ -361,8 +361,8 @@ export default function ApexBattlePage() {
         throw new Error(serverError.message || 'Impossible de créer la partie sécurisée.');
       } else {
         const approved = parseTrainingStart(data);
-        nextOpponent = opponentSourcesFromIds(approved.opponentIds, catalog);
-        nextMatch = createBattleMatch(selectedCards, nextOpponent, 'player1');
+        nextOpponent = Array.from({ length: BATTLE_DECK_SIZE }, () => null);
+        nextMatch = createHiddenTrainingMatch(selectedCards);
         setServerBattleId(approved.battleId);
         setRewardsMode('active');
         setWinsTotal(approved.winsTotal);
@@ -392,35 +392,27 @@ export default function ApexBattlePage() {
     roundLock.current = true;
     setRoundSubmitting(true);
     try {
-      let stat: BattleStat;
-      let response: unknown = null;
       if (serverBattleId) {
         const { data, error: rpcError } = await supabase.rpc('play_training_battle_round', {
           p_battle_id: serverBattleId,
           p_stat: chooser === 'player1' ? selected : null,
         });
         if (rpcError) throw new Error(rpcError.message);
-        response = data;
-        const responseRound = data && typeof data === 'object' && 'round' in data
-          ? (data as { round?: { stat?: string } }).round : undefined;
-        stat = chooser === 'player2' ? responseRound?.stat as BattleStat : selected as BattleStat;
-      } else {
-        stat = chooser === 'player2' ? chooseTrainingStat(current) : selected as BattleStat;
-      }
-
-      const next = playBattleRound(current, chooser, stat);
-      if (serverBattleId) {
-        const awarded = verifyTrainingRound(
-          response,
-          next.rounds[next.rounds.length - 1],
-          next.rounds.length === BATTLE_DECK_SIZE,
-        );
-        if (awarded) {
-          setRewardSummary(awarded);
-          setWinsTotal(awarded.winsTotal);
+        const confirmed = reconcileTrainingRound(data, current, catalog, chooser, selected);
+        setOpponentCards((existing) => {
+          const next = existing.slice();
+          next[current.rounds.length] = confirmed.opponent;
+          return next;
+        });
+        setMatch(confirmed.match);
+        if (confirmed.reward) {
+          setRewardSummary(confirmed.reward);
+          setWinsTotal(confirmed.reward.winsTotal);
         }
+      } else {
+        const stat = chooser === 'player2' ? chooseTrainingStat(current) : selected as BattleStat;
+        setMatch(playBattleRound(current, chooser, stat));
       }
-      setMatch(next);
       setRevealed(true);
       setError(null);
     } catch (cause) {
