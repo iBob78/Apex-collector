@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation';
 import { Gift, X } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { PACKS } from '@/lib/boosters';
+import SafeImage from '@/components/SafeImage';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 
 type GiftNotice = {
   id: string;
   title: string;
   cardCount: number;
+  imageUrl: string;
   destination: string;
 };
 
@@ -71,6 +73,7 @@ export default function DashboardGiftNotice({ userId }: { userId: string | null 
             id: 'daily:' + item.id,
             title: t('Booster quotidien offert'),
             cardCount: PACKS[item.pack_slug].cardCount,
+            imageUrl: PACKS[item.pack_slug].imageUrl,
             destination: '/open?daily_booster=' + encodeURIComponent(item.id),
           })),
         ...(welcome.data ?? [])
@@ -81,6 +84,7 @@ export default function DashboardGiftNotice({ userId }: { userId: string | null 
                ? t('Niveau écurie') + ' ' + item.gift_key.slice('garage_level_'.length)
                : t(item.gift_key.startsWith('objective_') ? 'Booster de contrat ou succès' : item.gift_key === 'welcome_2026' ? 'Booster de bienvenue' : 'Cadeau spécial'),
             cardCount: item.card_count,
+            imageUrl: PACKS[item.pack_slug].imageUrl,
             destination: '/open?gift_booster=' + encodeURIComponent(item.id),
           })),
       ];
@@ -132,9 +136,14 @@ export default function DashboardGiftNotice({ userId }: { userId: string | null 
         <div className="space-y-3">
           {notices.map(item => (
             <div key={item.id} className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
-              <div className="min-w-0">
-                <p className="text-sm font-bold">{item.title}</p>
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="relative h-16 w-11 shrink-0 overflow-hidden rounded-md border border-amber-200/20">
+                  <SafeImage src={item.imageUrl} alt="" fill className="object-cover" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold">{item.title}</p>
                 <p className="mt-1 text-xs text-amber-200">{t('{count} cartes offertes', { count: item.cardCount })}</p>
+                </div>
               </div>
               <button type="button" onClick={() => open(item.destination)}
                 className="min-h-10 shrink-0 rounded-lg bg-amber-300 px-4 py-2 text-xs font-black text-slate-950 hover:bg-amber-200">

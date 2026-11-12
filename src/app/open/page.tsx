@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { ajouterCarteAuJoueur, ajouterCircuitAuJoueur, ajouterPiloteAuJoueur } from '@/lib/actions/carte';
 import { deductAP } from '@/lib/actions/profile';
-import { drawBoosterCards, getBoosterCardIdentity, getFirstTimeBoosterCardIndices, PACKS } from '@/lib/boosters';
+import { drawBoosterCards, getBoosterCardIdentity, getFirstTimeBoosterCardIndices, isPurchasablePackSlug, PACKS, WELCOME_GIFT_KEY } from '@/lib/boosters';
 import { fetchAllPages } from '@/lib/fetchAllPages';
 import Card from '@/components/Card';
 import SafeImage from '@/components/SafeImage';
@@ -21,7 +21,7 @@ function OpenContent() {
   const requestedPackSlug = searchParams.get('pack') || 'common';
   const dailyBoosterId = searchParams.get('daily_booster');
   const giftBoosterId = searchParams.get('gift_booster');
-  const [giftBooster, setGiftBooster] = useState<{ packSlug: string; cardCount: number } | null>(null);
+  const [giftBooster, setGiftBooster] = useState<{ packSlug: string; cardCount: number; giftKey: string } | null>(null);
   const [giftBoosterError, setGiftBoosterError] = useState<string | null>(null);
   const [dailyPackSlug, setDailyPackSlug] = useState<string | null>(null);
   const [dailyBoosterError, setDailyBoosterError] = useState<string | null>(null);
@@ -29,8 +29,10 @@ function OpenContent() {
     : dailyBoosterId ? dailyPackSlug || 'common' : requestedPackSlug;
   const pack = PACKS[packSlug] || PACKS.common;
   const cardCount = giftBoosterId ? (giftBooster?.cardCount ?? 0) : pack.cardCount;
-  const packDisplayName = giftBoosterId ? t('Booster de bienvenue') : pack.name;
-  const freeBoosterError = giftBoosterError || dailyBoosterError;
+  const packDisplayName = giftBoosterId && giftBooster?.giftKey === WELCOME_GIFT_KEY ? t('Booster de bienvenue') : t(pack.name);
+  const purchaseError = !dailyBoosterId && !giftBoosterId && !isPurchasablePackSlug(requestedPackSlug)
+    ? t('Ce booster est réservé aux cadeaux et ne peut pas être acheté.') : null;
+  const freeBoosterError = giftBoosterError || dailyBoosterError || purchaseError;
 
   const [userId, setUserId] = useState<string | null>(null);
   const [isOpening, setIsOpening] = useState(false);
@@ -76,7 +78,7 @@ function OpenContent() {
         } else if (giftBoosterId) {
           const { data, error } = await supabase
             .from('user_gift_boosters')
-            .select('pack_slug, card_count')
+            .select('gift_key, pack_slug, card_count')
             .eq('id', giftBoosterId)
             .eq('user_id', user.id)
             .is('opened_at', null)
@@ -86,7 +88,7 @@ function OpenContent() {
             || data.card_count < 1 || data.card_count > 20) {
             if (active) setGiftBoosterError(t('Ce cadeau est indisponible ou a déjà été ouvert.'));
           } else if (active) {
-            setGiftBooster({ packSlug: data.pack_slug, cardCount: data.card_count });
+            setGiftBooster({ packSlug: data.pack_slug, cardCount: data.card_count, giftKey: data.gift_key });
           }
         } else if (dailyBoosterId) {
           const { data, error } = await supabase
@@ -127,6 +129,7 @@ function OpenContent() {
     if (dailyBoosterId && giftBoosterId) return;
     if (dailyBoosterId && (!dailyPackSlug || dailyBoosterError)) return;
     if (giftBoosterId && (!giftBooster || giftBoosterError)) return;
+    if (purchaseError) return;
 
     setIsOpening(true);
     setDiscoverySaveError(null);
@@ -486,6 +489,7 @@ function OpenContent() {
                   disabled={Boolean(
                     (dailyBoosterId && (!dailyPackSlug || dailyBoosterError))
                     || (giftBoosterId && (!giftBooster || giftBoosterError))
+                    || purchaseError
                   )}
                   onClick={handleOpenPack}
                   className="mt-12 rounded-full bg-white px-12 py-4 text-sm font-bold uppercase tracking-widest text-black transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
