@@ -1,4 +1,4 @@
-import { drawBoosterCards, PACKS, getPackImageUrl, getFirstTimeBoosterCardIndices, getBoosterCardIdentity, getDailyLoginPackSlug, WELCOME_GIFT_KEY, WELCOME_GIFT_PACK_SLUG, WELCOME_GIFT_CARD_COUNT } from '../boosters';
+import { drawBoosterCards, PACKS, SHOP_PACKS, isPurchasablePackSlug, getPackImageUrl, getFirstTimeBoosterCardIndices, getBoosterCardIdentity, getDailyLoginPackSlug, WELCOME_GIFT_KEY, WELCOME_GIFT_PACK_SLUG, WELCOME_GIFT_CARD_COUNT } from '../boosters';
 
 describe('Booster pack assets', () => {
   it('assigns increasingly valuable packs across the seven-day login streak', () => {
@@ -238,16 +238,25 @@ describe('First-time booster discoveries', () => {
 });
 
 describe('welcome booster', () => {
-  it('draws ten cards using the existing common pack odds', () => {
+  it('uses a distinct gift-only design with exactly ten cards and common rarity odds', () => {
     expect(WELCOME_GIFT_KEY).toBe('welcome_2026');
-    expect(WELCOME_GIFT_PACK_SLUG).toBe('common');
+    expect(WELCOME_GIFT_PACK_SLUG).toBe('welcome');
     expect(WELCOME_GIFT_CARD_COUNT).toBe(10);
+    expect(PACKS.welcome.cardCount).toBe(10);
+    expect(PACKS.welcome.price).toBe(0);
+    expect(PACKS.welcome.imageUrl).toBe('/images/boosters/welcome.svg');
+    expect(getPackImageUrl('welcome')).toBe('/images/boosters/welcome.svg');
+    expect(PACKS.welcome.imageUrl).not.toBe(PACKS.common.imageUrl);
+    expect(PACKS.welcome.probabilities).toEqual(PACKS.common.probabilities);
     expect(PACKS.common.cardCount).toBe(6); // Regular pack unchanged.
+    expect(SHOP_PACKS.map(pack => pack.slug)).not.toContain(WELCOME_GIFT_PACK_SLUG);
+    expect(isPurchasablePackSlug(WELCOME_GIFT_PACK_SLUG)).toBe(false);
+    expect(isPurchasablePackSlug('common')).toBe(true);
     const cards = drawBoosterCards(
       WELCOME_GIFT_PACK_SLUG,
       [{ id: 'car1', rarity: 'Common' }],
       [{ id: 'circuit1', rarity: 'Common', category: 'circuit' }],
-      WELCOME_GIFT_CARD_COUNT,
+      undefined,
       () => 0.1,
     );
     expect(cards).toHaveLength(10);
