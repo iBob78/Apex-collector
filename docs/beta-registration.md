@@ -26,10 +26,12 @@
 
 - Après 041, appliquer `042_player_welcome_gift_boosters.sql` sur la base choisie avec accord explicite.
 - À l'insertion d'un nouveau profil, le trigger ajoute un **booster de bienvenue** (`gift_key='welcome_2026'`) contenant **10 cartes** avec la distribution du pack commun (dont le circuit garanti). Les boosters standards restent à 6 ou 8 cartes.
+- Après la migration **047_dedicated_welcome_booster.sql**, ce cadeau utilise le type dédié `pack_slug='welcome'`, son visuel local `/images/boosters/welcome.svg` et une identité propre. Il conserve les probabilités communes mais n'est ni vendu dans la boutique, ni disponible dans le sélecteur de récompenses des objectifs, ni ouvrable avec `/open?pack=welcome`.
+- La migration 047 convertit uniquement les cadeaux de bienvenue **en attente** (même `gift_key`), sans les dupliquer ni modifier les cadeaux déjà ouverts. Appliquer 047 sur la base Supabase choisie après 042 et 046, avec validation explicite ; le commit seul ne change pas la base hébergée.
 - Le cadeau reste dans la rubrique "Boosters offerts à ouvrir" jusqu'à ouverture. Unicité `(user_id,gift_key)` et RPC propriétaire `consume_player_gift_booster` évitent les cadeaux répétés.
 - Pas de cadeau rétroactif : un compte déjà créé avant l'application de 042, comme les comptes de test, n'en recevra pas automatiquement. Un octroi spécifique doit être validé séparément.
 - Le dashboard annonce les boosters quotidiens et cadeaux en attente via une modale consultable une seule fois par cadeau et par navigateur ; fermer la modale ne consomme pas le booster.
-- Tests après déploiement : première inscription et premier accès à /dashboard, présence d'un quotidien et d'un cadeau distincts, ouverture 10 cartes sans débit AC, plusieurs rafraîchissements, seconde connexion, absence de doublons, essais de consommation d'un cadeau appartenant à un autre joueur.
+- Tests après déploiement : première inscription et premier accès à /dashboard, présence d'un quotidien et d'un cadeau distincts, visuel de bienvenue dédié dans les cadeaux et sur l'écran d'ouverture, ouverture 10 cartes sans débit AC, plusieurs rafraîchissements, seconde connexion, absence de doublons, refus de `/open?pack=welcome` et essais de consommation d'un cadeau appartenant à un autre joueur.
 - Comme les boosters quotidiens actuels, l'ouverture consomme le droit avant d'enregistrer les cartes dans les possessions. La sauvegarde n'est pas une seule transaction SQL : si le réseau échoue entre ces opérations, une intervention de support peut être nécessaire. Ne pas prétendre à une atomicité absente.
 
 
