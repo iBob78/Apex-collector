@@ -69,7 +69,7 @@ Les autres paramètres disponibles sont décrits dans [`.env.example`](.env.exam
 
 La base de données et le stockage Supabase doivent également être préparés. Les scripts SQL sont disponibles dans [`supabase/migrations/`](supabase/migrations/) ; leur application dépend de l'état de votre base.
 
-**Paliers d'écurie :** la migration [`049_garage_level_thresholds.sql`](supabase/migrations/049_garage_level_thresholds.sql) a été appliquée à Supabase le **12 novembre 2026** (version `20261112135853`). L'interface et la fonction serveur utilisent désormais les mêmes seuils, et les boosters attribués sous l'ancien barème sont conservés. Le détail des rangs et des récompenses figure dans [How to Play](/how-to-play).
+**Paliers d'écurie :** la migration [`049_garage_level_thresholds.sql`](supabase/migrations/049_garage_level_thresholds.sql) a été appliquée à Supabase le **12 novembre 2026** (version `20261112135853`). L'interface et la fonction serveur utilisent désormais les mêmes seuils, et les boosters attribués sous l'ancien barème sont conservés. Le détail des rangs et des récompenses figure dans la page [How to Play](src/app/how-to-play/page.tsx) de l'application.
 
 Lancez ensuite le serveur de développement :
 
