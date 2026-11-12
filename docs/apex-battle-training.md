@@ -79,3 +79,8 @@ Aucune migration, aucune modification des profils ou des crédits AC. Vérifier 
 - Badge IP, marque, drapeau, noms et statistiques sont proportionnellement plus petits ; les colonnes de chiffres bénéficient de l'espace de composition à 300 px pour éviter la césure avant le redimensionnement.
 - Le facteur d'échelle est appliqué uniquement sous 640 px de largeur d'écran ; sur ordinateur, `Card` conserve son rendu normal. Le changement de largeur et la rotation de la carte adverse sont gérés sans mesurer les transformations CSS.
 - Tests manuels recommandés sur smartphone : véhicules avec masse à quatre chiffres, badges de carburant, longues marques, affichage pendant et après révélation ; vérifier qu'aucune donnée ne se chevauche et que les six boutons restent accessibles.
+
+## Ajustement fin du zoom des cartes de duel (12 novembre 2026)
+- Retour utilisateur : la première base de 300 px affichait correctement l'intérieur sans chevauchement, mais les détails étaient légèrement trop petits sur smartphone.
+- Base de composition ajustée à **270 px** (au lieu de 300 px), soit environ **11 % de détails visuels en plus**, sans agrandir les cadres ni changer le ratio.
+- Contrôler sur appareil réel la lisibilité des logos, IP, nom et masses à 4 chiffres. Si un retour à la ligne réapparaît, adapter exclusivement le rendu de duel, pas `Card` dans la collection.
