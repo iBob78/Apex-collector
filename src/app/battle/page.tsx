@@ -13,6 +13,7 @@ import {
   BATTLE_DECK_SIZE,
   BATTLE_STATS,
   BATTLE_STAT_KEYS,
+  createBattleMatch,
   type BattleMatchState,
   type BattleVehicleSnapshot,
   type BattleStat,
@@ -24,6 +25,13 @@ import {
 } from '@/lib/battle/engine';
 import { chooseTrainingStat, startTrainingMatch } from '@/lib/battle/training';
 import { battleCardStats, formatBattleStat } from '@/lib/battle/display';
+import {
+  isMissingTrainingRpc,
+  opponentSourcesFromIds,
+  parseTrainingStart,
+  type TrainingReward,
+  verifyTrainingRound,
+} from '@/lib/battle/rewards';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 import {
   BATTLE_RARITIES,
@@ -175,6 +183,14 @@ export default function ApexBattlePage() {
   const [opponentCards, setOpponentCards] = useState<CatalogVehicle[]>([]);
   const [playerCards, setPlayerCards] = useState<CatalogVehicle[]>([]);
   const [revealed, setRevealed] = useState(false);
+  const [serverBattleId, setServerBattleId] = useState<string | null>(null);
+  const [rewardsMode, setRewardsMode] = useState<'unknown' | 'active' | 'pending'>('unknown');
+  const [rewardSummary, setRewardSummary] = useState<TrainingReward | null>(null);
+  const [winsTotal, setWinsTotal] = useState(0);
+  const [starting, setStarting] = useState(false);
+  const [roundSubmitting, setRoundSubmitting] = useState(false);
+  const startLock = useRef(false);
+  const roundLock = useRef(false);
 
   // Comme dans la collection, un changement de filtre réinitialise les 24 cartes affichées.
   useEffect(() => setVisibleCount(24), [query, favoritesOnly, rarityFilter, sortBy]);
@@ -313,54 +329,131 @@ export default function ApexBattlePage() {
     });
   };
 
-  const start = () => {
+  const start = async () => {
+    if (startLock.current) return;
+    startLock.current = true;
+    setStarting(true);
     try {
-      if (selectedCards.length !== BATTLE_DECK_SIZE) throw new Error('Sélectionne dix cartes pour commencer.');
-      const training = startTrainingMatch(selectedCards, catalog);
-      const opponent = training.opponent.map((source) => carsById.get(source.card_id.toLowerCase()));
-      if (opponent.some((vehicle) => !vehicle)) {
-        throw new Error('Impossible de préparer les cartes adverses.');
+      if (selectedCards.length !== BATTLE_DECK_SIZE) {
+        throw new Error('Sélectionne dix cartes pour commencer.');
       }
+
+      const { data, error: serverError } = await supabase.rpc('start_training_battle', {
+        p_card_ids: selectedCards.map((card) => card.card_id),
+      });
+
+      let nextMatch: BattleMatchState;
+      let nextOpponent: CatalogVehicle[];
+
+      if (serverError && isMissingTrainingRpc(serverError)) {
+        // A PR preview may precede the approved SQL migration.
+        // Continue allowing PRACTICE, but never mint/claim rewards locally.
+        const fallback = startTrainingMatch(selectedCards, catalog);
+        nextOpponent = opponentSourcesFromIds(
+          fallback.opponent.map((source) => source.card_id),
+          catalog,
+        );
+        nextMatch = fallback.match;
+        setRewardsMode('pending');
+        setServerBattleId(null);
+        setWinsTotal(0);
+      } else if (serverError) {
+        throw new Error(serverError.message || 'Impossible de créer la partie sécurisée.');
+      } else {
+        const approved = parseTrainingStart(data);
+        nextOpponent = opponentSourcesFromIds(approved.opponentIds, catalog);
+        nextMatch = createBattleMatch(selectedCards, nextOpponent, 'player1');
+        setServerBattleId(approved.battleId);
+        setRewardsMode('active');
+        setWinsTotal(approved.winsTotal);
+      }
+
       setPlayerCards(selectedCards);
-      setOpponentCards(opponent as CatalogVehicle[]);
-      setMatch(training.match);
+      setOpponentCards(nextOpponent);
+      setMatch(nextMatch);
+      setRewardSummary(null);
       setRevealed(false);
       setError(null);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Impossible de lancer la bataille.');
+    } finally {
+      startLock.current = false;
+      setStarting(false);
+    }
+  };
+
+  /**
+   * A victorious client-side match is never evidence of a reward.
+   * Each choice is committed by Supabase against frozen, server-built decks;
+   * only the round-10 database transaction changes credits and grants gifts.
+   */
+  const commitRound = async (current: BattleMatchState, chooser: 'player1' | 'player2', selected?: BattleStat) => {
+    if (roundLock.current) return;
+    roundLock.current = true;
+    setRoundSubmitting(true);
+    try {
+      let stat: BattleStat;
+      let response: unknown = null;
+      if (serverBattleId) {
+        const { data, error: rpcError } = await supabase.rpc('play_training_battle_round', {
+          p_battle_id: serverBattleId,
+          p_stat: chooser === 'player1' ? selected : null,
+        });
+        if (rpcError) throw new Error(rpcError.message);
+        response = data;
+        const responseRound = data && typeof data === 'object' && 'round' in data
+          ? (data as { round?: { stat?: string } }).round : undefined;
+        stat = chooser === 'player2' ? responseRound?.stat as BattleStat : selected as BattleStat;
+      } else {
+        stat = chooser === 'player2' ? chooseTrainingStat(current) : selected as BattleStat;
+      }
+
+      const next = playBattleRound(current, chooser, stat);
+      if (serverBattleId) {
+        const awarded = verifyTrainingRound(
+          response,
+          next.rounds[next.rounds.length - 1],
+          next.rounds.length === BATTLE_DECK_SIZE,
+        );
+        if (awarded) {
+          setRewardSummary(awarded);
+          setWinsTotal(awarded.winsTotal);
+        }
+      }
+      setMatch(next);
+      setRevealed(true);
+      setError(null);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Impossible de valider cette manche.');
+    } finally {
+      roundLock.current = false;
+      setRoundSubmitting(false);
     }
   };
 
   const selectStat = (stat: BattleStat) => {
-    if (!match || revealed || getNextBattleChooser(match) !== 'player1') return;
-    try {
-      setMatch(playBattleRound(match, 'player1', stat));
-      setRevealed(true);
-      setError(null);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Choix invalide.');
-    }
+    if (!match || revealed || roundLock.current || getNextBattleChooser(match) !== 'player1') return;
+    void commitRound(match, 'player1', stat);
   };
 
-  // L'ordinateur utilise uniquement les données de SA carte (pas celles du joueur).
+  // Bot choices are computed server-side in rewarded training.
+  // The client AI is only used for unrewarded preview compatibility.
   useEffect(() => {
-    if (!match || revealed || match.rounds.length >= BATTLE_DECK_SIZE || getNextBattleChooser(match) !== 'player2') return;
+    if (!match || revealed || match.rounds.length >= BATTLE_DECK_SIZE ||
+        getNextBattleChooser(match) !== 'player2') return;
     const timer = window.setTimeout(() => {
-      try {
-        const stat = chooseTrainingStat(match);
-        setMatch(playBattleRound(match, 'player2', stat));
-        setRevealed(true);
-      } catch (cause) {
-        setError(cause instanceof Error ? cause.message : 'Erreur pendant le tour adverse.');
-      }
+      if (!roundLock.current) void commitRound(match, 'player2');
     }, reducedMotion ? 0 : 800);
     return () => window.clearTimeout(timer);
+    // commitRound is intentionally tied to the current match snapshot, not a
+    // reusable function identity that would cause repeated bot actions.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [match, revealed, reducedMotion]);
 
   /** Replay begins a fresh match right away, preserving the same ten cars and their order. */
   const replaySameTeam = () => {
     if (!match || !getBattleScore(match).finished) return;
-    start();
+    void start();
   };
 
   /** Return to deck preparation with the current selection prefilled for editing. */
@@ -370,6 +463,9 @@ export default function ApexBattlePage() {
     setOpponentCards([]);
     setRevealed(false);
     setError(null);
+    setServerBattleId(null);
+    setRewardSummary(null);
+    setRewardsMode('unknown');
   };
 
   return (
@@ -388,7 +484,7 @@ export default function ApexBattlePage() {
 
           <div className={`items-start gap-3 rounded-xl border border-amber-300/20 bg-amber-300/[0.05] px-4 py-3 text-xs text-amber-100 ${isPlaying ? 'hidden sm:flex' : 'flex'}`}>
             <Zap size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
-            <p>Mode d’essai contre l’ordinateur. Les cartes restent dans ton garage, aucune mise ni récompense AC, aucun classement enregistré. Les duels entre joueurs arriveront ensuite.</p>
+            <p>Entraînement contre l’ordinateur : 250 AC par victoire et un booster Common ou Uncommon toutes les 10 victoires, après activation des récompenses côté serveur. Les cartes restent dans ton garage.</p>
           </div>
 
           {error && (
@@ -548,11 +644,11 @@ export default function ApexBattlePage() {
                       );
                     })}
                   </ol>
-                  <button type="button" disabled={selectedCards.length !== BATTLE_DECK_SIZE} onClick={start}
+                  <button type="button" disabled={selectedCards.length !== BATTLE_DECK_SIZE || starting} onClick={() => void start()}
                     className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-500 px-4 text-sm font-black uppercase tracking-wider text-white transition hover:bg-blue-400 disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-400">
-                    <Swords size={18} aria-hidden="true" /> Démarrer la bataille
+                    <Swords size={18} aria-hidden="true" /> {starting ? 'Préparation de la bataille…' : 'Démarrer la bataille'}
                   </button>
-                  <p className="mt-2 text-center text-[11px] text-gray-500">Partie locale sans mise en jeu de cartes ni d’AC</p>
+                  <p className="mt-2 text-center text-[11px] text-gray-500">Aucune mise en jeu de cartes ou d’AC. Les récompenses sont créditées uniquement par Supabase.</p>
                 </aside>
               </section>
             </>
@@ -567,6 +663,30 @@ export default function ApexBattlePage() {
                 <span>{score.player1}</span><span className="text-gray-500">—</span><span>{score.player2}</span>
               </div>
               <p className="text-xs uppercase tracking-wider text-gray-400">Toi <span className="mx-3">·</span> Ordinateur</p>
+              <div role="status" className="mt-6 rounded-xl border border-amber-300/20 bg-black/30 p-4">
+                {rewardsMode === 'active' && score.winner === 'player1' && rewardSummary?.ac === 250 ? (
+                  <>
+                    <p className="text-lg font-black text-emerald-300">+250 AC crédités !</p>
+                    {rewardSummary.boosterSlug && (
+                      <p className="mt-2 font-bold text-amber-200">
+                        Booster {rewardSummary.boosterSlug === 'common' ? 'Common' : 'Uncommon'} offert pour ta {rewardSummary.winsTotal}e victoire !
+                        <Link href="/boosters" className="ml-2 underline underline-offset-4">Voir mes boosters</Link>
+                      </p>
+                    )}
+                    <p className="mt-2 text-xs text-gray-300">
+                      {rewardSummary.winsTotal % 10}/10 victoires vers le prochain booster
+                    </p>
+                  </>
+                ) : rewardsMode === 'active' && rewardSummary ? (
+                  <p className="text-sm text-gray-300">
+                    Pas d’AC pour cette partie. Progression : {rewardSummary.winsTotal % 10}/10 victoires vers le prochain booster.
+                  </p>
+                ) : (
+                  <p className="text-sm text-amber-200">
+                    Récompenses non actives sur cette partie : la migration Supabase doit être installée avant de créditer des AC ou des boosters.
+                  </p>
+                )}
+              </div>
               <div className="mt-7 space-y-2 text-left">
                 {match.rounds.map((round) => (
                   <div key={round.roundNumber} className="flex items-center gap-3 rounded-lg border border-white/10 bg-black/25 px-3 py-2 text-xs">
@@ -661,7 +781,7 @@ export default function ApexBattlePage() {
                           const used = match.rounds.filter((round) => round.selectedBy === 'player1' && round.stat === stat).length;
                           const enabled = nextStats.includes(stat);
                           return (
-                            <button type="button" key={stat} disabled={!enabled} onClick={() => selectStat(stat)}
+                            <button type="button" key={stat} disabled={!enabled || roundSubmitting} onClick={() => selectStat(stat)}
                               className="min-h-[66px] rounded-lg border border-blue-300/20 bg-blue-500/[0.08] p-2 text-left transition sm:min-h-20 sm:rounded-xl sm:p-3 hover:border-blue-300/70 hover:bg-blue-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:cursor-not-allowed disabled:border-white/5 disabled:bg-white/[0.02] disabled:opacity-35">
                               <span className="block text-[10px] font-black uppercase leading-tight sm:text-xs sm:leading-normal">{BATTLE_STATS[stat].label}</span>
                               <span className="mt-0.5 block font-mono text-xs font-bold text-blue-200 sm:mt-1 sm:text-sm">
