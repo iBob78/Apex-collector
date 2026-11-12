@@ -17,10 +17,11 @@ export function formatBattleStat(
   value: number,
   units: UnitSystem,
   language: SiteLanguage,
+  powerKw?: number | null,
 ): string {
   switch (stat) {
     case 'power_hp':
-      return formatPower(value, units, language);
+      return formatPower(value, units, language, powerKw);
     case 'torque_nm':
       return formatTorque(value, units, language);
     case 'max_speed_kmh':
