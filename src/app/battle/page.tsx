@@ -42,6 +42,10 @@ type CatalogVehicle = BattleSelectionVehicle & {
   rarity: string;
   image_url: string | null;
   is_active: boolean;
+  // Matching the Card component's country flag and HP -> CV presentation.
+  country_code?: string | null;
+  country?: string | null;
+  power_kw?: number | string | null;
 };
 
 type OwnershipRow = { card_id: string | null; count: number | null; upgrade_level?: number | null };
