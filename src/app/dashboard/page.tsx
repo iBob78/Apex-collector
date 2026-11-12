@@ -59,8 +59,8 @@ export default function DashboardPage() {
   }, [fetchProfile, fetchStats]);
 
   const garageProgress = getGarageProgress(stats.uniqueCards);
-  const progressCount = garageProgress.progress;
-  const progressPercent = progressCount * 10;
+  const progressPercent = garageProgress.progressTarget > 0
+    ? (garageProgress.progress / garageProgress.progressTarget) * 100 : 100;
   const apBalance = Number(profile?.ap) || 0;
   const duplicateCards = Math.max(0, stats.totalCards - stats.uniqueCards);
   const averageCopies = stats.uniqueCards > 0 ? stats.totalCards / stats.uniqueCards : 0;
@@ -193,20 +193,28 @@ export default function DashboardPage() {
                     {garageProgress.level}
                   </strong>
                 </div>
-                <div className="mt-3 flex items-center justify-between gap-3 text-[11px] text-gray-400">
-                  <span>{t('Vers le prochain niveau')}</span>
-                  <span className="shrink-0 font-mono tabular-nums text-amber-200">{progressCount}/10</span>
-                </div>
-                <div
-                  role="progressbar"
-                  aria-label={t('Vers le prochain niveau')}
-                  aria-valuemin={0}
-                  aria-valuemax={10}
-                  aria-valuenow={progressCount}
-                  className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/10"
-                >
-                  <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-200" style={{ width: progressPercent + '%' }} />
-                </div>
+                {garageProgress.nextThreshold === null ? (
+                  <p className="mt-3 text-xs font-bold text-amber-200">{t('Niveau maximum')}</p>
+                ) : (
+                  <>
+                    <div className="mt-3 flex items-center justify-between gap-3 text-[11px] text-gray-400">
+                      <span>{t('Vers le prochain niveau')}</span>
+                      <span className="shrink-0 font-mono tabular-nums text-amber-200">
+                        {formatNumber(stats.uniqueCards)}/{formatNumber(garageProgress.nextThreshold)}
+                      </span>
+                    </div>
+                    <div
+                      role="progressbar"
+                      aria-label={t('Vers le prochain niveau')}
+                      aria-valuemin={garageProgress.currentThreshold}
+                      aria-valuemax={garageProgress.nextThreshold}
+                      aria-valuenow={stats.uniqueCards}
+                      className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/10"
+                    >
+                      <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-200" style={{ width: progressPercent + '%' }} />
+                    </div>
+                  </>
+                )}
               </article>
             </div>
           </section>
