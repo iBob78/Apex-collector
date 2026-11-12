@@ -65,3 +65,10 @@ Aucune migration, aucune modification des profils ou des crédits AC. Vérifier 
 - L'ouverture d'un duel et le passage d'une manche ou d'un résultat à l'autre réinitialisent le défilement en haut de page : pas de reprise au milieu de la liste de sélection.
 - Les petits écrans ou les préférences de police agrandie peuvent nécessiter un défilement supplémentaire : ne jamais verrouiller la hauteur avec `overflow-hidden`.
 - Recette : sur téléphone, faire défiler la sélection jusqu'en bas, lancer le duel, confirmer que score + deux cartes + six boutons sont visibles sans grand scroll ; choisir une stat, afficher le résultat, passer à la manche suivante, rejouer et changer d'équipe. Vérifier aussi la présentation sur ordinateur.
+
+## Mise à l'échelle des détails internes (12 novembre 2026)
+- Après réduction de la largeur des cartes mobiles à `clamp(118px, 36vw, 148px)`, l'intérieur du composant `Card` gardait ses dimensions fixes (IP, logos, titres, stats), provoquant des chevauchements.
+- `ScaledDuelCard` dans `src/app/battle/page.tsx` mesure la largeur réellement disponible via `ResizeObserver` (avec repli sur l'événement `resize`) et affiche la **carte entière** à une largeur de référence de 180 px, réduite proportionnellement au besoin, avec un emplacement `aspect-[2/3]` pour préserver la mise en page.
+- Les duels reçoivent `Card` avec la typographie de collection (`compact=false` pour les snapshots), puis l'ensemble est réduit : drapeau, logo, IP, texte et icônes conservent leur position relative. Les cartes mystères utilisent la même échelle.
+- Au-delà de 180 px, la carte remplit normalement le conteneur sans zoom. La grille de quatre cartes du sélecteur n'est **pas** modifiée.
+- Vérifier le rendu sur écran étroit, pendant la révélation des cartes et sur ordinateur. Ne pas toucher au composant `Card` partagé.
