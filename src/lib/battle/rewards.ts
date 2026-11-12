@@ -151,6 +151,19 @@ export function reconcileTrainingRound<T extends BattleVehicleSource>(
   };
 }
 
+/** Local non-rewarded preview fallback; never used to choose rewarded opponents. */
+export function opponentSourcesFromIds<T extends BattleVehicleSource>(
+  opponentIds: readonly string[],
+  catalog: readonly T[],
+): T[] {
+  const byId = new Map(catalog.map((card) => [card.card_id.toLowerCase(), card]));
+  const result = opponentIds.map((id) => byId.get(id.toLowerCase()));
+  if (result.some((card) => !card)) {
+    throw new Error('Les cartes adverses ne figurent plus dans le catalogue.');
+  }
+  return result as T[];
+}
+
 export function isMissingTrainingRpc(error: { code?: string } | null): boolean {
   return error?.code === 'PGRST202' || error?.code === '42883';
 }
