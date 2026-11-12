@@ -41,3 +41,12 @@ Ne pas fusionner dans main ni modifier Supabase sans validation explicite.
 - Seules les **voitures possédées, actives et éligibles** sont listées : les onglets Circuits/Pilotes et « Masquer les cartes non déverrouillées » n'ont pas de sens dans ce contexte.
 - Les favoris et les niveaux proviennent des tables existantes ; un chargement des favoris en échec n'empêche pas d'afficher la collection. Les tris de niveaux n'affectent jamais les résultats des duels.
 - Tout changement de filtre remet le compteur visuel à 24 cartes, sans réinitialiser les 10 cartes déjà sélectionnées. Tests de logique dans `src/lib/battle/__tests__/selection.test.ts`.
+
+## Correctifs responsive et fin de partie (12 novembre 2026)
+- Les deux cartes du duel réutilisent le composant de la collection avec le mode responsive `mobileGrid`. Elles restent sur deux colonnes dans l'arène mais se rétractent à la largeur disponible sur smartphone, avec `min-w-0` et `w-full`, sans toucher aux cartes de collection ou aux quatre colonnes de sélection.
+- Le contenu chiffré de ces cartes est construit depuis les `BattleVehicleSnapshot` du match, pas depuis des valeurs recalculées séparément. L'apparence (image, rareté, structure) continue d'utiliser `Card`.
+- **Cause du décalage de puissance** : `cards.power_hp` représente des HP ; `Card` de la collection utilise `formatPower` et affiche des CV métriques. Les choix de caractéristiques utilisaient les HP bruts. `src/lib/battle/display.ts` réutilise les convertisseurs de `src/lib/preferences.ts` pour les choix et résultats, alors que les comparaisons restent sur les valeurs d'origine. Exemple : 740 HP = 750 CV affichés dans le contexte métrique ; les 740 HP restent la référence du moteur, sans changement de puissance ni d'IP.
+- Fin de partie : **Rejouer avec mon équipe** relance directement un nouveau match avec les dix mêmes cartes, dans le même ordre. **Changer d'équipe** retourne à la composition des dix cartes en conservant la sélection pour l'ajuster. Quitter un duel retourne également à la sélection.
+- Tests : `src/lib/battle/__tests__/display.test.ts` vérifie la cohérence HP/CV, poids, couple, 0–100 et IP.
+
+Aucune migration, aucune modification des profils ou des crédits AC. Vérifier les contrôles GitHub et la preview Vercel avant fusion dans main.
