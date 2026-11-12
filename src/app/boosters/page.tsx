@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/lib/supabaseClient';
-import { PACKS } from '@/lib/boosters';
+import { PACKS, SHOP_PACKS, WELCOME_GIFT_KEY } from '@/lib/boosters';
 import { motion } from 'framer-motion';
 import SafeImage from '@/components/SafeImage';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
@@ -137,7 +137,7 @@ export default function BoostersPage() {
                       <div className="min-w-0 flex-1">
                         <h3 className="text-sm font-black">{gift.gift_key.startsWith('garage_level_')
                           ? t('Niveau écurie') + ' ' + gift.gift_key.slice('garage_level_'.length)
-                          : t(gift.gift_key.startsWith('objective_') ? 'Récompense de contrat ou succès' : gift.gift_key === 'welcome_2026' ? 'Booster de bienvenue' : 'Cadeau spécial')}</h3>
+                          : t(gift.gift_key.startsWith('objective_') ? 'Récompense de contrat ou succès' : gift.gift_key === WELCOME_GIFT_KEY ? 'Booster de bienvenue' : 'Cadeau spécial')}</h3>
                         <p className="mt-1 text-xs text-amber-200">{t('{count} cartes offertes', { count: gift.card_count })}</p>
                         <button type="button"
                           onClick={() => router.push(`/open?gift_booster=${encodeURIComponent(gift.id)}`)}
@@ -192,7 +192,7 @@ export default function BoostersPage() {
           )}
 
           <div className="grid grid-cols-2 gap-x-2 gap-y-3 py-3 sm:grid-cols-2 sm:gap-6 sm:py-4 xl:grid-cols-3">
-            {Object.values(PACKS).map((pack, i) => (
+            {SHOP_PACKS.map((pack, i) => (
               <motion.div
                 key={pack.slug}
                 initial={{ opacity: 0, y: 20 }}
