@@ -213,14 +213,13 @@ export default function ApexBattlePage() {
   const cardIndex = match ? Math.min(BATTLE_DECK_SIZE - 1, match.rounds.length - (revealed ? 1 : 0)) : 0;
   const nextStats = match ? getAvailableBattleStats(match) : [];
   const isPlaying = Boolean(match && !finishedScreen);
-  const completedRounds = match?.rounds.length ?? -1;
 
   // Démarrer chaque manche en haut de l'arène, même si l'utilisateur était
   // descendu dans sa collection au moment de lancer l'entraînement.
   useLayoutEffect(() => {
     if (!match) return;
     window.scrollTo({ top: 0, behavior: 'auto' });
-  }, [isPlaying, completedRounds, revealed]);
+  }, [match, revealed]);
 
   const toggleCard = (card: CatalogVehicle) => {
     if (match) return;
