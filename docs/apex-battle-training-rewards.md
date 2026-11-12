@@ -8,7 +8,7 @@
 - Aucune rétroactivité pour les entraînements terminés avant activation.
 
 ## Autorité serveur, confidentialité et anti-doublon
-- Migration en attente : supabase/migrations/048_apex_battle_training_rewards.sql (NE PAS appliquer sans validation).
+- Migration **appliquée** au projet Supabase Apex Collector le 12 novembre 2026, version `20261112084430_apex_battle_training_rewards`. Fichier source : `supabase/migrations/048_apex_battle_training_rewards.sql`. Ne pas rejouer cette migration.
 - battle_training_matches conserve les dix snapshots de chaque équipe, les manches, le vainqueur et les montants. Table RLS sans SELECT/INSERT/UPDATE/DELETE client.
 - start_training_battle(uuid[]) vérifie les dix cartes réellement possédées, la validité des statistiques, l’activité du catalogue et les modèles canoniques distincts. Le serveur prépare l’équipe adverse de façon variable et ne retourne aucun identifiant adverse à la création.
 - play_training_battle_round(uuid,text) contrôle l’identité du joueur, son tour, les usages limités à deux par caractéristique et calcule les points depuis les snapshots figés. Le bot choisit ses critères uniquement à partir de sa carte courante.
@@ -20,8 +20,8 @@
 - Une erreur d’autorisation ou une incohérence de serveur bloque le gain plutôt que de permettre au navigateur de fabriquer un résultat.
 - READY sur Vercel signifie build réussi, pas validation des RPC ou des écritures Supabase.
 
-## Recette après validation explicite de SQL 048
-1. Appliquer la migration selon la procédure existante de gestion des changements Supabase ; contrôler les politiques RLS, droits EXECUTE et index.
+## Recette après application de SQL 048
+1. **Déjà effectué :** migration enregistrée ; table sous RLS ; trois fonctions installées ; RPC interdites à `anon`, permises à `authenticated` pour `start_training_battle` et `play_training_battle_round` ; helper privé ; index présents ; aucun gain rétroactif.
 2. Tester dix cartes possédées et dix manches, choix alternés, bot non divulgué, victoire/défaite/nul, abandon, doublons et stats incomplètes.
 3. Préparer neuf victoires sur un compte de test puis atteindre la dixième : +250 AC une seule fois, cadeau Common ou Uncommon de 6 cartes une seule fois.
 4. Retenter la dernière RPC, en concurrentiel, depuis un autre compte et en anon : aucune attribution supplémentaire.
@@ -31,4 +31,4 @@
 ## Limites
 - Pas de plafond quotidien ajouté : ce besoin n’en mentionne pas. Le farm automatisé de matchs et les gains AC restent un sujet à encadrer avant une ouverture large.
 - L’ouverture des boosters offerts est gérée par le flux existant ; les limites de transaction entre tirage et sauvegarde de cartes ne changent pas.
-- Aucune migration exécutée sur Supabase dans cette PR. Aucun AC existant n’est modifié avant validation et installation.
+- La migration 048 a été exécutée sur Supabase sur demande explicite. Aucun AC ni booster n’a été accordé lors de l’installation (0 match, 0 cadeau Battle après installation). Les essais de victoire sur un compte authentifié, la dixième victoire et les transactions concurrentes restent à faire avant la fusion sur main.
