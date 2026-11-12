@@ -117,7 +117,7 @@ function ScaledDuelCard({
     if (!container) return;
 
     const updateWidth = () => {
-      setAvailableWidth(container.getBoundingClientRect().width);
+      setAvailableWidth(container.clientWidth); // Layout width, unaffected by reveal/flip transforms.
     };
     updateWidth();
 
