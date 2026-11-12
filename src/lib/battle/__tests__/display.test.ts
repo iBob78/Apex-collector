@@ -18,6 +18,15 @@ describe('Apex Battle — affichage conforme aux cartes de la collection', () =>
     expect(formatBattleStat('power_hp', snapshot.stats.power_hp, 'imperial', 'en')).toBe('740 HP');
   });
 
+  it('respecte aussi power_kw lorsque la collection fournit cette précision', () => {
+    const snapshot = normalizeBattleVehicle(source);
+    const preciseKw = 550; // 550 kW -> 748 CV selon le convertisseur de la collection
+    expect(formatBattleStat('power_hp', snapshot.stats.power_hp, 'metric', 'fr', preciseKw)).toBe('748 CV');
+    expect(formatBattleStat('power_hp', snapshot.stats.power_hp, 'imperial', 'en', preciseKw)).toBe('740 HP');
+    // L'affichage peut être alimenté par des kW ; la manche garde l'HP de référence.
+    expect(snapshot.stats.power_hp).toBe(740);
+  });
+
   it('affiche la même masse, le même couple et le même IP que le snapshot', () => {
     const snapshot = normalizeBattleVehicle(source);
     const card = battleCardStats(snapshot);
