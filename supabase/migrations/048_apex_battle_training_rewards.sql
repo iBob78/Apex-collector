@@ -1,5 +1,6 @@
 -- Apex Battle: authoritative training matches and reward settlement.
--- NOT APPLIED TO PRODUCTION. Apply only after owner approves this migration.
+-- Applied on 12 Nov 2026 with explicit owner approval. Supabase migration version:
+-- 20261112084430_apex_battle_training_rewards. Do not reapply.
 -- Requires existing public.cards, user_cards, profiles and user_gift_boosters.
 -- Rules: 250 AC for each victory; every tenth victory adds ONE six-card
 -- common/uncommon gift booster (50/50), delivered to the existing gift inventory.
