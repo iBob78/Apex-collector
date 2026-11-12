@@ -57,3 +57,11 @@ Aucune migration, aucune modification des profils ou des crédits AC. Vérifier 
 - Les statistiques de combat restent issues de `BattleVehicleSnapshot` ; les conversions d'affichage suivent `formatPower` du composant `Card`, y compris le champ `power_kw` lorsqu'il est renseigné. Les valeurs HP utilisées pour comparer les performances sont inchangées.
 - À vérifier en preview sur smartphone : badge IP en haut à gauche, logo constructeur puis drapeau national à droite, superposition avec les éventuels badges, et correspondance CV dans les boutons, sur Ferrari, Lamborghini et Mercedes.
 - Aucune modification de la collection, de la monnaie AC ou du schéma Supabase.
+
+## Duel cadré dans le viewport mobile (12 novembre 2026)
+- Pendant les dix manches uniquement, l'écran mobile masque le grand en-tête et le bloc d'information générale (conservés dans l'écran de composition et sur ordinateur).
+- La barre de manche/score, les deux cartes et les six critères ont des espacements plus compacts. Largeur des cartes mobiles bornée à `clamp(118px,36vw,148px)` ; largeur ordinateur et aspect ratio original inchangés. Les cartes utilisent toujours `Card` en mode normal/compact, avec drapeaux, marques et badge IP.
+- Les six critères restent **visibles et actionnables** ; leurs boutons passent à une hauteur minimale de 66 px sur mobile seulement, en gardant la grille 2 colonnes.
+- L'ouverture d'un duel et le passage d'une manche ou d'un résultat à l'autre réinitialisent le défilement en haut de page : pas de reprise au milieu de la liste de sélection.
+- Les petits écrans ou les préférences de police agrandie peuvent nécessiter un défilement supplémentaire : ne jamais verrouiller la hauteur avec `overflow-hidden`.
+- Recette : sur téléphone, faire défiler la sélection jusqu'en bas, lancer le duel, confirmer que score + deux cartes + six boutons sont visibles sans grand scroll ; choisir une stat, afficher le résultat, passer à la manche suivante, rejouer et changer d'équipe. Vérifier aussi la présentation sur ordinateur.
