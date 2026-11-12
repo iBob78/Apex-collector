@@ -50,3 +50,10 @@ Ne pas fusionner dans main ni modifier Supabase sans validation explicite.
 - Tests : `src/lib/battle/__tests__/display.test.ts` vérifie la cohérence HP/CV, poids, couple, 0–100 et IP.
 
 Aucune migration, aucune modification des profils ou des crédits AC. Vérifier les contrôles GitHub et la preview Vercel avant fusion dans main.
+
+## Rendu des cartes de duel identique à la collection (12 novembre 2026)
+- Le catalogue de véhicules Apex Battle utilise désormais `cards.select('*')` avec `fetchAllPages`, comme la collection : les cartes du duel reçoivent tous les champs visuels de `Card`, notamment `country_code` / `country` pour le drapeau, `fuel_type`, `collection_number`, et `power_kw` pour la valeur CV précise.
+- Le composant `Card` reste commun à la collection et à Apex Battle. **Sélection des dix cartes** : `mobileGrid` (4 colonnes sur téléphone). **Duel** : `compact` sans `mobileGrid` (2 cartes par ligne), pour éviter de rapetisser l'IP et le logo comme s'il s'agissait de mini-cartes. Les deux restent dans une grille responsive `min-w-0` / `w-full`, donc sans débordement voulu.
+- Les statistiques de combat restent issues de `BattleVehicleSnapshot` ; les conversions d'affichage suivent `formatPower` du composant `Card`, y compris le champ `power_kw` lorsqu'il est renseigné. Les valeurs HP utilisées pour comparer les performances sont inchangées.
+- À vérifier en preview sur smartphone : badge IP en haut à gauche, logo constructeur puis drapeau national à droite, superposition avec les éventuels badges, et correspondance CV dans les boutons, sur Ferrari, Lamborghini et Mercedes.
+- Aucune modification de la collection, de la monnaie AC ou du schéma Supabase.
