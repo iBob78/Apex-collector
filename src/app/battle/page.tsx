@@ -14,6 +14,7 @@ import {
   BATTLE_STATS,
   BATTLE_STAT_KEYS,
   type BattleMatchState,
+  type BattleVehicleSnapshot,
   type BattleStat,
   getAvailableBattleStats,
   getBattleScore,
@@ -22,6 +23,8 @@ import {
   playBattleRound,
 } from '@/lib/battle/engine';
 import { chooseTrainingStat, startTrainingMatch } from '@/lib/battle/training';
+import { battleCardStats, formatBattleStat } from '@/lib/battle/display';
+import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 import {
   BATTLE_RARITIES,
   type BattleSelectionSort,
@@ -47,13 +50,14 @@ function vehicleTitle(card: CatalogVehicle): string {
   return getBattleVehicleName(card);
 }
 
-function BattleCard({ vehicle, concealed = false, onSelect, mobileGrid = false, level = 0, isFavorite = false }: {
+function BattleCard({ vehicle, concealed = false, onSelect, mobileGrid = false, level = 0, isFavorite = false, snapshot }: {
   vehicle?: CatalogVehicle | null;
   concealed?: boolean;
   onSelect?: () => void;
   mobileGrid?: boolean;
   level?: number;
   isFavorite?: boolean;
+  snapshot?: BattleVehicleSnapshot;
 }) {
   if (concealed || !vehicle) {
     return (
@@ -68,7 +72,12 @@ function BattleCard({ vehicle, concealed = false, onSelect, mobileGrid = false, 
 
   return (
     <Card
-      {...({ ...vehicle, year: Number(vehicle.year) || 0, category: 'vehicle' } as unknown as VehicleCard)}
+      {...({
+        ...vehicle,
+        ...(snapshot ? battleCardStats(snapshot) : {}),
+        year: Number(vehicle.year) || 0,
+        category: 'vehicle',
+      } as unknown as VehicleCard)}
       compact={!mobileGrid}
       mobileGrid={mobileGrid}
       showLevel={mobileGrid}
@@ -79,12 +88,8 @@ function BattleCard({ vehicle, concealed = false, onSelect, mobileGrid = false, 
   );
 }
 
-function formatBattleValue(value: number, stat: BattleStat): string {
-  const digits = stat === 'acceleration_0_100' ? 2 : Number.isInteger(value) ? 0 : 1;
-  return value.toLocaleString('fr-FR', { maximumFractionDigits: digits });
-}
-
 export default function ApexBattlePage() {
+  const { units, language } = useSitePreferences();
   const reducedMotion = Boolean(useReducedMotion());
   const [authStatus, setAuthStatus] = useState<'loading' | 'signedOut' | 'ready'>('loading');
   const [catalog, setCatalog] = useState<CatalogVehicle[]>([]);
@@ -277,7 +282,14 @@ export default function ApexBattlePage() {
     return () => window.clearTimeout(timer);
   }, [match, revealed, reducedMotion]);
 
-  const restart = () => {
+  /** Replay begins a fresh match right away, preserving the same ten cars and their order. */
+  const replaySameTeam = () => {
+    if (!match || !getBattleScore(match).finished) return;
+    start();
+  };
+
+  /** Return to deck preparation with the current selection prefilled for editing. */
+  const changeTeam = () => {
     setMatch(null);
     setPlayerCards([]);
     setOpponentCards([]);
@@ -492,34 +504,41 @@ export default function ApexBattlePage() {
                   </div>
                 ))}
               </div>
-              <button type="button" onClick={restart} className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-blue-500 px-6 py-3 text-sm font-black uppercase hover:bg-blue-400">
-                <RotateCcw size={18}/> Rejouer avec mon équipe
-              </button>
+              <div className="mt-7 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+                <button type="button" onClick={replaySameTeam}
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-500 px-6 py-3 text-sm font-black uppercase hover:bg-blue-400">
+                  <RotateCcw size={18}/> Rejouer avec mon équipe
+                </button>
+                <button type="button" onClick={changeTeam}
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-6 py-3 text-sm font-black uppercase hover:bg-white/10">
+                  <ArrowLeft size={18}/> Changer d’équipe
+                </button>
+              </div>
             </section>
           )}
 
           {authStatus === 'ready' && match && score && !finishedScreen && (
             <section className="mx-auto w-full max-w-5xl space-y-5">
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#0d111a] p-4">
-                <button type="button" onClick={restart} className="flex min-h-10 items-center gap-2 rounded-lg border border-white/15 px-3 text-xs font-bold text-gray-300 hover:bg-white/10"><ArrowLeft size={16}/> Quitter l’entraînement</button>
+                <button type="button" onClick={changeTeam} className="flex min-h-10 items-center gap-2 rounded-lg border border-white/15 px-3 text-xs font-bold text-gray-300 hover:bg-white/10"><ArrowLeft size={16}/> Quitter l’entraînement</button>
                 <span className="text-xs font-black uppercase tracking-widest text-blue-300">Manche {Math.min(BATTLE_DECK_SIZE, cardIndex + 1)} / {BATTLE_DECK_SIZE}</span>
                 <div className="font-mono text-xl font-black tabular-nums"><span className="text-emerald-300">{score.player1}</span> <span className="text-gray-600">—</span> <span className="text-rose-300">{score.player2}</span></div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:gap-6">
+              <div className="grid min-w-0 grid-cols-2 items-start gap-2 sm:gap-6">
                 <div className="min-w-0">
-                  <p className="mb-2 text-center text-xs font-black uppercase tracking-widest text-emerald-300">Ton véhicule</p>
-                  <motion.div key={'player-' + cardIndex} initial={reducedMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="mx-auto max-w-[260px]">
-                    <BattleCard vehicle={playerCards[cardIndex]}/>
+                  <p className="mb-2 truncate text-center text-[10px] font-black uppercase tracking-wider text-emerald-300 sm:text-xs sm:tracking-widest">Ton véhicule</p>
+                  <motion.div key={'player-' + cardIndex} initial={reducedMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="mx-auto w-full min-w-0 max-w-[260px]">
+                    <BattleCard vehicle={playerCards[cardIndex]} snapshot={match.player1Deck[cardIndex]} mobileGrid/>
                   </motion.div>
                 </div>
                 <div className="min-w-0">
-                  <p className="mb-2 text-center text-xs font-black uppercase tracking-widest text-rose-300">Ordinateur</p>
+                  <p className="mb-2 truncate text-center text-[10px] font-black uppercase tracking-wider text-rose-300 sm:text-xs sm:tracking-widest">Ordinateur</p>
                   <motion.div key={'opponent-' + cardIndex + '-' + String(revealed)}
                     initial={reducedMotion ? false : { opacity: 0.4, rotateY: revealed ? 75 : 0 }}
                     animate={{ opacity: 1, rotateY: 0 }} transition={{ duration: 0.45 }}
-                    className="mx-auto max-w-[260px]">
-                    <BattleCard vehicle={opponentCards[cardIndex]} concealed={!revealed}/>
+                    className="mx-auto w-full min-w-0 max-w-[260px]">
+                    <BattleCard vehicle={opponentCards[cardIndex]} snapshot={match.player2Deck[cardIndex]} concealed={!revealed} mobileGrid/>
                   </motion.div>
                 </div>
               </div>
@@ -529,11 +548,11 @@ export default function ApexBattlePage() {
                   <p className="text-xs font-bold uppercase tracking-wider text-blue-200">Statistique : {BATTLE_STATS[lastRound.stat].label}</p>
                   <div className="mt-3 grid grid-cols-3 items-center gap-2">
                     <p className="font-mono text-xl font-black tabular-nums text-emerald-200 sm:text-3xl">
-                      {formatBattleValue(lastRound.player1Value, lastRound.stat)}
+                      {formatBattleStat(lastRound.stat, lastRound.player1Value, units, language)}
                     </p>
-                    <span className="text-xs text-gray-400">{BATTLE_STATS[lastRound.stat].unit}</span>
+                    <span className="text-xs text-gray-400">VS</span>
                     <p className="font-mono text-xl font-black tabular-nums text-rose-200 sm:text-3xl">
-                      {formatBattleValue(lastRound.player2Value, lastRound.stat)}
+                      {formatBattleStat(lastRound.stat, lastRound.player2Value, units, language)}
                     </p>
                   </div>
                   <h3 className="mt-4 text-xl font-black uppercase">
@@ -559,7 +578,7 @@ export default function ApexBattlePage() {
                               className="min-h-20 rounded-xl border border-blue-300/20 bg-blue-500/[0.08] p-3 text-left transition hover:border-blue-300/70 hover:bg-blue-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:cursor-not-allowed disabled:border-white/5 disabled:bg-white/[0.02] disabled:opacity-35">
                               <span className="block text-xs font-black uppercase">{BATTLE_STATS[stat].label}</span>
                               <span className="mt-1 block font-mono text-sm font-bold text-blue-200">
-                                {match.player1Deck[cardIndex].stats[stat].toLocaleString('fr-FR')} {BATTLE_STATS[stat].unit}
+                                {formatBattleStat(stat, match.player1Deck[cardIndex].stats[stat], units, language)}
                               </span>
                               <span className="mt-1 block text-[10px] text-gray-400">{used}/2 utilisations</span>
                             </button>
