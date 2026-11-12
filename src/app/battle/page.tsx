@@ -93,7 +93,8 @@ function BattleCard({ vehicle, concealed = false, onSelect, mobileGrid = false, 
 }
 
 /**
- * La collection compose ses cartes à une largeur confortable (~300 px).
+ * La collection compose ses cartes à une largeur confortable. Sur mobile,
+ * une base de 270 px agrandit légèrement les détails tout en préservant la lisibilité.
  * Sur smartphone, dessiner la carte à cette taille AVANT de la réduire :
  * les badges, noms, chiffres et colonnes de statistiques gardent ainsi
  * leurs proportions, sans passer à la ligne comme à 180 px.
@@ -110,7 +111,7 @@ function ScaledDuelCard({
 }) {
   const frameRef = useRef<HTMLDivElement>(null);
   const [layout, setLayout] = useState<{ width: number; mobile: boolean } | null>(null);
-  const referenceWidth = 300;
+  const referenceWidth = 270;
 
   useLayoutEffect(() => {
     const container = frameRef.current;
