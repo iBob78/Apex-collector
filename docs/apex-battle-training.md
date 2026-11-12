@@ -72,3 +72,10 @@ Aucune migration, aucune modification des profils ou des crédits AC. Vérifier 
 - Les duels reçoivent `Card` avec la typographie de collection (`compact=false` pour les snapshots), puis l'ensemble est réduit : drapeau, logo, IP, texte et icônes conservent leur position relative. Les cartes mystères utilisent la même échelle.
 - Au-delà de 180 px, la carte remplit normalement le conteneur sans zoom. La grille de quatre cartes du sélecteur n'est **pas** modifiée.
 - Vérifier le rendu sur écran étroit, pendant la révélation des cartes et sur ordinateur. Ne pas toucher au composant `Card` partagé.
+
+## Correction du contenu interne trop grand (12 novembre 2026)
+- Après la première mise à l'échelle, la largeur de composition (180 px) restait trop étroite : les statistiques comme `1 120 kg` se répartissaient sur deux lignes avant même la réduction, et le texte/IP paraissaient toujours trop grands.
+- Désormais, `ScaledDuelCard` compose d'abord **tout le composant Card à 300 px**, puis réduit son rendu complet dans le cadre de la carte du duel (118–148 px sur smartphone). La carte finale garde son ratio 2/3.
+- Badge IP, marque, drapeau, noms et statistiques sont proportionnellement plus petits ; les colonnes de chiffres bénéficient de l'espace de composition à 300 px pour éviter la césure avant le redimensionnement.
+- Le facteur d'échelle est appliqué uniquement sous 640 px de largeur d'écran ; sur ordinateur, `Card` conserve son rendu normal. Le changement de largeur et la rotation de la carte adverse sont gérés sans mesurer les transformations CSS.
+- Tests manuels recommandés sur smartphone : véhicules avec masse à quatre chiffres, badges de carburant, longues marques, affichage pendant et après révélation ; vérifier qu'aucune donnée ne se chevauche et que les six boutons restent accessibles.
