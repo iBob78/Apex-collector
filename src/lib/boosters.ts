@@ -2,9 +2,9 @@ import { getPublicImage } from '@/lib/images';
 
 type BoosterRarity = 'Common' | 'Uncommon' | 'Rare' | 'Epic' | 'Legend' | 'Icon';
 
-/** One-time onboarding gift; common rarity odds but ten cards instead of six. */
+/** Dedicated one-time onboarding gift. Its odds match the common pack, not its identity. */
 export const WELCOME_GIFT_KEY = 'welcome_2026';
-export const WELCOME_GIFT_PACK_SLUG = 'common';
+export const WELCOME_GIFT_PACK_SLUG = 'welcome';
 export const WELCOME_GIFT_CARD_COUNT = 10;
 
 export const DAILY_LOGIN_PACKS = [
@@ -68,6 +68,24 @@ export interface PackConfig {
 }
 
 export const PACKS: Record<string, PackConfig> = {
+    welcome: {
+        slug: WELCOME_GIFT_PACK_SLUG,
+        name: 'Booster de bienvenue',
+        description: 'Édition exclusive offerte une seule fois à l’inscription. Dix cartes pour démarrer votre collection.',
+        price: 0,
+        cardCount: WELCOME_GIFT_CARD_COUNT,
+        circuitDropRate: 0.1,
+        color: 'from-amber-300 via-orange-500 to-rose-600',
+        imageUrl: '/images/boosters/welcome.svg',
+        probabilities: {
+            Common: 0.60,
+            Uncommon: 0.25,
+            Rare: 0.10,
+            Epic: 0.04,
+            Legend: 0.01,
+            Icon: 0,
+        },
+    },
     common: {
         slug: 'common',
         name: 'Pack Commun',
@@ -213,6 +231,13 @@ export const PACKS: Record<string, PackConfig> = {
         }
     }
 };
+
+/** Gift-only pack is intentionally excluded from the shop and objective reward catalogue. */
+export const SHOP_PACKS: PackConfig[] = Object.values(PACKS).filter((pack) => pack.slug !== WELCOME_GIFT_PACK_SLUG);
+
+export function isPurchasablePackSlug(packSlug: string): boolean {
+    return SHOP_PACKS.some((pack) => pack.slug === packSlug);
+}
 
 export function getPackImageUrl(packSlug: string): string {
     const pack = PACKS[packSlug] || PACKS.common;
