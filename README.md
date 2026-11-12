@@ -69,6 +69,8 @@ Les autres paramètres disponibles sont décrits dans [`.env.example`](.env.exam
 
 La base de données et le stockage Supabase doivent également être préparés. Les scripts SQL sont disponibles dans [`supabase/migrations/`](supabase/migrations/) ; leur application dépend de l'état de votre base.
 
+**Paliers d'écurie :** la migration [`049_garage_level_thresholds.sql`](supabase/migrations/049_garage_level_thresholds.sql) doit être appliquée séparément à Supabase avant la mise en production du nouveau barème. Le merge GitHub ne l'applique pas automatiquement. Tant qu'elle n'est pas installée, l'interface utilise les nouveaux rangs, mais la base continue d'attribuer les boosters selon l'ancien calcul. Les cadeaux déjà accordés restent conservés.
+
 Lancez ensuite le serveur de développement :
 
 ```bash
