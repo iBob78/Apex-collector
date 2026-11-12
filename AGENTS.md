@@ -309,7 +309,7 @@ Les vues de collection affichent quantité, niveau, possibilité d'amélioration
 
 
 ## Cadeaux de bienvenue et alertes dashboard (migration 042)
-- La migration `042_player_welcome_gift_boosters.sql` ajoute un cadeau de bienvenue unique par nouveau profil `gift_key=welcome_2026`, pack commun 10 cartes. Ne pas réattribuer rétroactivement aux comptes existants sans accord.
+- La migration `042_player_welcome_gift_boosters.sql` ajoute un cadeau de bienvenue unique par nouveau profil `gift_key=welcome_2026`, originellement sur les probabilités communes avec 10 cartes. La migration `047_dedicated_welcome_booster.sql` lui attribue `pack_slug=welcome`, une illustration locale spécifique `/images/boosters/welcome.svg` et convertit les cadeaux de bienvenue non ouverts. Aucun cadeau rétroactif ou doublon. Le pack dédié reste **hors boutique et hors récompenses d'objectifs** ; ne jamais permettre `/open?pack=welcome` (achat à 0 AC).
 - La disponibilité du cadeau est contrôlée par RLS et la consommation unique `consume_player_gift_booster`; l'ouverture suit le tirage et l'enregistrement existants (circuit garanti, badges NEW, statistiques). Ne jamais exposer un chemin qui évite la consommation du cadeau ou débite des AC pour un cadeau.
 - La modale de `/dashboard` détecte les boosters offerts non ouverts depuis Supabase et mémorise la prise de connaissance, sans les consommer. Les quotidiennes restent séparées des cadeaux de bienvenue.
 
