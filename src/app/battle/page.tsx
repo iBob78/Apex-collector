@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, RotateCcw, Search, ShieldQuestion, Star, Swords, Trophy, Zap } from 'lucide-react';
@@ -212,6 +212,15 @@ export default function ApexBattlePage() {
   const lastRound = match?.rounds[match.rounds.length - 1] ?? null;
   const cardIndex = match ? Math.min(BATTLE_DECK_SIZE - 1, match.rounds.length - (revealed ? 1 : 0)) : 0;
   const nextStats = match ? getAvailableBattleStats(match) : [];
+  const isPlaying = Boolean(match && !finishedScreen);
+  const completedRounds = match?.rounds.length ?? -1;
+
+  // Démarrer chaque manche en haut de l'arène, même si l'utilisateur était
+  // descendu dans sa collection au moment de lancer l'entraînement.
+  useLayoutEffect(() => {
+    if (!match) return;
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [isPlaying, completedRounds, revealed]);
 
   const toggleCard = (card: CatalogVehicle) => {
     if (match) return;
@@ -305,8 +314,8 @@ export default function ApexBattlePage() {
     <div className="flex min-h-screen bg-[#050505] text-white">
       <Sidebar />
       <main className="min-w-0 flex-1 pb-20 md:pb-0">
-        <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6 px-4 py-7 sm:px-7 lg:px-10">
-          <header className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5">
+        <div className={`mx-auto flex w-full max-w-[1480px] flex-col sm:gap-6 sm:px-7 sm:py-7 lg:px-10 ${isPlaying ? 'gap-2 px-3 py-2' : 'gap-6 px-4 py-7'}`}>
+          <header className={`flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5 ${isPlaying ? 'hidden sm:flex' : ''}`}>
             <div>
               <p className="mb-2 text-[11px] font-black uppercase tracking-[0.3em] text-blue-400">Apex Collector / Arena</p>
               <h1 className="text-4xl font-black uppercase italic tracking-tight sm:text-5xl">Apex <span className="text-blue-400">Battle</span></h1>
@@ -315,7 +324,7 @@ export default function ApexBattlePage() {
             <span className="rounded-full border border-blue-300/20 bg-blue-500/10 px-3 py-2 text-xs font-bold uppercase tracking-wider text-blue-200">Entraînement solo</span>
           </header>
 
-          <div className="flex items-start gap-3 rounded-xl border border-amber-300/20 bg-amber-300/[0.05] px-4 py-3 text-xs text-amber-100">
+          <div className={`items-start gap-3 rounded-xl border border-amber-300/20 bg-amber-300/[0.05] px-4 py-3 text-xs text-amber-100 ${isPlaying ? 'hidden sm:flex' : 'flex'}`}>
             <Zap size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
             <p>Mode d’essai contre l’ordinateur. Les cartes restent dans ton garage, aucune mise ni récompense AC, aucun classement enregistré. Les duels entre joueurs arriveront ensuite.</p>
           </div>
@@ -522,26 +531,26 @@ export default function ApexBattlePage() {
           )}
 
           {authStatus === 'ready' && match && score && !finishedScreen && (
-            <section className="mx-auto w-full max-w-5xl space-y-5">
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#0d111a] p-4">
-                <button type="button" onClick={changeTeam} className="flex min-h-10 items-center gap-2 rounded-lg border border-white/15 px-3 text-xs font-bold text-gray-300 hover:bg-white/10"><ArrowLeft size={16}/> Quitter l’entraînement</button>
-                <span className="text-xs font-black uppercase tracking-widest text-blue-300">Manche {Math.min(BATTLE_DECK_SIZE, cardIndex + 1)} / {BATTLE_DECK_SIZE}</span>
-                <div className="font-mono text-xl font-black tabular-nums"><span className="text-emerald-300">{score.player1}</span> <span className="text-gray-600">—</span> <span className="text-rose-300">{score.player2}</span></div>
+            <section className="mx-auto w-full max-w-5xl space-y-2 sm:space-y-5">
+              <div className="flex items-center justify-between gap-2 rounded-xl border border-white/10 bg-[#0d111a] p-2 sm:flex-wrap sm:gap-3 sm:rounded-2xl sm:p-4">
+                <button type="button" onClick={changeTeam} className="flex min-h-9 shrink-0 items-center gap-1 rounded-lg border border-white/15 px-2 text-[10px] font-bold text-gray-300 hover:bg-white/10 sm:min-h-10 sm:gap-2 sm:px-3 sm:text-xs"><ArrowLeft size={15}/> <span className="sm:hidden">Quitter</span><span className="hidden sm:inline">Quitter l’entraînement</span></button>
+                <span className="text-[10px] font-black uppercase tracking-wider text-blue-300 sm:text-xs sm:tracking-widest">Manche {Math.min(BATTLE_DECK_SIZE, cardIndex + 1)} / {BATTLE_DECK_SIZE}</span>
+                <div className="shrink-0 font-mono text-base font-black tabular-nums sm:text-xl"><span className="text-emerald-300">{score.player1}</span> <span className="text-gray-600">—</span> <span className="text-rose-300">{score.player2}</span></div>
               </div>
 
               <div className="grid min-w-0 grid-cols-2 items-start gap-2 sm:gap-6">
                 <div className="min-w-0">
-                  <p className="mb-2 truncate text-center text-[10px] font-black uppercase tracking-wider text-emerald-300 sm:text-xs sm:tracking-widest">Ton véhicule</p>
-                  <motion.div key={'player-' + cardIndex} initial={reducedMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="mx-auto w-full min-w-0 max-w-[260px]">
+                  <p className="mb-1 truncate text-center text-[10px] font-black uppercase tracking-wider text-emerald-300 sm:mb-2 sm:text-xs sm:tracking-widest">Ton véhicule</p>
+                  <motion.div key={'player-' + cardIndex} initial={reducedMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="mx-auto w-full min-w-0 max-w-[clamp(118px,36vw,148px)] sm:max-w-[260px]">
                     <BattleCard vehicle={playerCards[cardIndex]} snapshot={match.player1Deck[cardIndex]}/>
                   </motion.div>
                 </div>
                 <div className="min-w-0">
-                  <p className="mb-2 truncate text-center text-[10px] font-black uppercase tracking-wider text-rose-300 sm:text-xs sm:tracking-widest">Ordinateur</p>
+                  <p className="mb-1 truncate text-center text-[10px] font-black uppercase tracking-wider text-rose-300 sm:mb-2 sm:text-xs sm:tracking-widest">Ordinateur</p>
                   <motion.div key={'opponent-' + cardIndex + '-' + String(revealed)}
                     initial={reducedMotion ? false : { opacity: 0.4, rotateY: revealed ? 75 : 0 }}
                     animate={{ opacity: 1, rotateY: 0 }} transition={{ duration: 0.45 }}
-                    className="mx-auto w-full min-w-0 max-w-[260px]">
+                    className="mx-auto w-full min-w-0 max-w-[clamp(118px,36vw,148px)] sm:max-w-[260px]">
                     <BattleCard vehicle={opponentCards[cardIndex]} snapshot={match.player2Deck[cardIndex]} concealed={!revealed}/>
                   </motion.div>
                 </div>
@@ -580,20 +589,20 @@ export default function ApexBattlePage() {
                   </button>
                 </div>
               ) : (
-                <div className="rounded-2xl border border-white/10 bg-[#0d111a] p-4 sm:p-6">
+                <div className="rounded-xl border border-white/10 bg-[#0d111a] p-3 sm:rounded-2xl sm:p-6">
                   {chooser === 'player1' ? (
                     <>
-                      <h2 className="text-center text-lg font-black uppercase">À toi de choisir la caractéristique</h2>
-                      <p className="mt-1 text-center text-xs text-gray-400">La meilleure valeur l’emporte. Masse et 0–100 : la plus petite valeur gagne.</p>
-                      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      <h2 className="text-center text-sm font-black uppercase sm:text-lg">À toi de choisir la caractéristique</h2>
+                      <p className="mt-1 text-center text-[10px] leading-tight text-gray-400 sm:text-xs sm:leading-normal">La meilleure valeur l’emporte. Masse et 0–100 : la plus petite valeur gagne.</p>
+                      <div className="mt-2 grid grid-cols-2 gap-1.5 sm:mt-4 sm:grid-cols-3 sm:gap-2">
                         {BATTLE_STAT_KEYS.map((stat) => {
                           const used = match.rounds.filter((round) => round.selectedBy === 'player1' && round.stat === stat).length;
                           const enabled = nextStats.includes(stat);
                           return (
                             <button type="button" key={stat} disabled={!enabled} onClick={() => selectStat(stat)}
-                              className="min-h-20 rounded-xl border border-blue-300/20 bg-blue-500/[0.08] p-3 text-left transition hover:border-blue-300/70 hover:bg-blue-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:cursor-not-allowed disabled:border-white/5 disabled:bg-white/[0.02] disabled:opacity-35">
-                              <span className="block text-xs font-black uppercase">{BATTLE_STATS[stat].label}</span>
-                              <span className="mt-1 block font-mono text-sm font-bold text-blue-200">
+                              className="min-h-[66px] rounded-lg border border-blue-300/20 bg-blue-500/[0.08] p-2 text-left transition sm:min-h-20 sm:rounded-xl sm:p-3 hover:border-blue-300/70 hover:bg-blue-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:cursor-not-allowed disabled:border-white/5 disabled:bg-white/[0.02] disabled:opacity-35">
+                              <span className="block text-[10px] font-black uppercase leading-tight sm:text-xs sm:leading-normal">{BATTLE_STATS[stat].label}</span>
+                              <span className="mt-0.5 block font-mono text-xs font-bold text-blue-200 sm:mt-1 sm:text-sm">
                                 {formatBattleStat(
                                   stat,
                                   match.player1Deck[cardIndex].stats[stat],
@@ -602,7 +611,7 @@ export default function ApexBattlePage() {
                                   Number(playerCards[cardIndex]?.power_kw) || undefined,
                                 )}
                               </span>
-                              <span className="mt-1 block text-[10px] text-gray-400">{used}/2 utilisations</span>
+                              <span className="mt-0.5 block text-[9px] text-gray-400 sm:mt-1 sm:text-[10px]">{used}/2 utilisations</span>
                             </button>
                           );
                         })}
