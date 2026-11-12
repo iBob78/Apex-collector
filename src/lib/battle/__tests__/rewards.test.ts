@@ -1,96 +1,121 @@
 import {
+  createHiddenTrainingMatch,
   isMissingTrainingRpc,
-  opponentSourcesFromIds,
   parseTrainingStart,
-  verifyTrainingRound,
+  reconcileTrainingRound,
 } from '../rewards';
-import type { BattleRound } from '../engine';
+import type { BattleRound, BattleStat } from '../engine';
 
-const ids = Array.from({ length: 10 }, (_, index) =>
+const ids = Array.from({ length: 20 }, (_, index) =>
   '00000000-0000-4000-8000-' + String(index + 1).padStart(12, '0'));
-const round: BattleRound = {
-  roundNumber: 10,
-  selectedBy: 'player2',
-  stat: 'torque_nm',
-  player1CardId: ids[0],
-  player2CardId: ids[1],
-  player1Value: 300,
-  player2Value: 350,
-  winner: 'player2',
-  player1Points: 0,
-  player2Points: 1,
-};
+
+function card(id: string, hp = 300) {
+  return {
+    card_id: id, power_hp: hp, torque_nm: hp + 100,
+    max_speed_kmh: hp, acceleration_0_100: 6,
+    weight_t: '1.5', variant_of_card_id: null,
+  };
+}
+const player = ids.slice(0, 10).map((id) => card(id, 300));
+const catalog = ids.slice(10).map((id) => card(id, 250));
+
+function firstRound() {
+  return {
+    roundNumber: 1,
+    selectedBy: 'player1',
+    stat: 'power_hp',
+    player1CardId: ids[0],
+    player2CardId: ids[10],
+    player1Value: 300,
+    player2Value: 250,
+    winner: 'player1',
+    player1Points: 1,
+    player2Points: 0,
+  };
+}
 
 describe('Apex Battle — secure training reward confirmation', () => {
-  it('accepts ten server-selected opponent cards with match id', () => {
+  it('accepts match IDs but never receives the hidden opponent team', () => {
     const response = parseTrainingStart({
-      success: true, battle_id: ids[2], opponent_ids: ids, wins_total: 9,
+      success: true, battle_id: ids[2], wins_total: 9,
     });
-    expect(response.opponentIds).toHaveLength(10);
-    expect(response.winsTotal).toBe(9);
+    expect(response).toEqual({ battleId: ids[2], winsTotal: 9 });
+    const match = createHiddenTrainingMatch(player);
+    expect(match.player2Deck.every((item) => item.cardId.startsWith('hidden-'))).toBe(true);
+    expect(match.rounds).toHaveLength(0);
   });
 
-  it('rejects missing or forged start fields', () => {
-    expect(() => parseTrainingStart({ success: true, battle_id: 'x', opponent_ids: ids })).toThrow();
-    expect(() => parseTrainingStart({ success: true, battle_id: ids[2], opponent_ids: ids.slice(0, 9), wins_total: 0 })).toThrow();
-    expect(() => parseTrainingStart({ success: false, battle_id: ids[2], opponent_ids: ids, wins_total: 0 })).toThrow();
+  it('rejects an incomplete start response', () => {
+    expect(() => parseTrainingStart({ success: true, battle_id: 'x', wins_total: 0 })).toThrow();
+    expect(() => parseTrainingStart({ success: false, battle_id: ids[2], wins_total: 0 })).toThrow();
+    expect(() => parseTrainingStart({ success: true, battle_id: ids[2] })).toThrow();
   });
 
-  it('never silently accepts client-computed score when server values differ', () => {
+  it('accepts and reveals only the bot card from the completed round', () => {
+    const state = createHiddenTrainingMatch(player);
+    const result = reconcileTrainingRound({
+      success: true, round: firstRound(),
+      score: { player1: 1, player2: 0, finished: false, winner: null },
+    }, state, catalog, 'player1', 'power_hp');
+    expect(result.match.rounds).toHaveLength(1);
+    expect(result.match.player2Deck[0].cardId).toBe(ids[10]);
+    expect(result.match.player2Deck[1].cardId).toBe('hidden-1');
+    expect(result.reward).toBeNull();
+  });
+
+  it('rejects manipulated values, unavailable cards, and false winners', () => {
+    const state = createHiddenTrainingMatch(player);
     const base = {
-      success: true,
-      round,
-      score: { player1: 3, player2: 7, finished: true, winner: 'player2' },
-      reward: { ac: 0, booster_slug: null, wins_total: 9, wins_to_next: 1 },
+      success: true, round: firstRound(),
+      score: { player1: 1, player2: 0, finished: false, winner: null },
     };
-    expect(verifyTrainingRound(base, round, true)).toEqual({
-      ac: 0, boosterSlug: null, winsTotal: 9, winsToNext: 1,
-    });
-    expect(() => verifyTrainingRound({
-      ...base, round: { ...round, player1Value: 10000 },
-    }, round, true)).toThrow();
-    expect(() => verifyTrainingRound({
-      ...base, round: { ...round, winner: 'player1' },
-    }, round, true)).toThrow();
-    expect(() => verifyTrainingRound({
-      ...base, reward: { ac: 999999, booster_slug: null, wins_total: 9, wins_to_next: 1 },
-    }, round, true)).toThrow();
+    expect(() => reconcileTrainingRound({
+      ...base, round: { ...firstRound(), player2Value: 1 },
+    }, state, catalog, 'player1', 'power_hp')).toThrow();
+    expect(() => reconcileTrainingRound({
+      ...base, round: { ...firstRound(), winner: 'player2' },
+    }, state, catalog, 'player1', 'power_hp')).toThrow();
+    expect(() => reconcileTrainingRound({
+      ...base, score: { ...base.score, player1: 100 },
+    }, state, catalog, 'player1', 'power_hp')).toThrow();
+    expect(() => reconcileTrainingRound({
+      ...base, round: { ...firstRound(), player2CardId: 'unknown' },
+    }, state, catalog, 'player1', 'power_hp')).toThrow();
   });
 
-  it('accepts exactly a Common/Uncommon 10-win gift and 250 AC', () => {
-    const winRound = { ...round, winner: 'player1', player1Points: 1, player2Points: 0 };
+  it('accepts the 10th victory and a Common/Uncommon six-card gift only from the server', () => {
+    const initial = createHiddenTrainingMatch(player);
+    const old: BattleRound[] = Array.from({ length: 9 }, (_, i) => ({
+      roundNumber: i + 1,
+      selectedBy: i % 2 === 0 ? 'player1' : 'player2',
+      stat: (['power_hp', 'torque_nm', 'max_speed_kmh', 'acceleration_0_100', 'weight_kg'] as BattleStat[])[Math.floor(i / 2)],
+      player1CardId: ids[i], player2CardId: ids[i + 10],
+      player1Value: 300, player2Value: 250,
+      winner: i < 6 ? 'player1' : 'player2',
+      player1Points: i < 6 ? 1 : 0,
+      player2Points: i < 6 ? 0 : 1,
+    }));
+    const state = { ...initial, rounds: old };
     const response = {
       success: true,
-      round: winRound,
-      score: { player1: 6, player2: 4, finished: true, winner: 'player1' },
-      reward: { ac: 250, booster_slug: 'uncommon', wins_total: 10, wins_to_next: 10 },
+      round: {
+        roundNumber: 10, selectedBy: 'player2', stat: 'max_speed_kmh',
+        player1CardId: ids[9], player2CardId: ids[19],
+        player1Value: 300, player2Value: 250,
+        winner: 'player1', player1Points: 1, player2Points: 0,
+      },
+      score: { player1: 7, player2: 3, finished: true, winner: 'player1' },
+      reward: { ac: 250, booster_slug: 'common', wins_total: 10, wins_to_next: 10 },
     };
-    expect(verifyTrainingRound(response, winRound, true)).toEqual({
-      ac: 250, boosterSlug: 'uncommon', winsTotal: 10, winsToNext: 10,
+    expect(reconcileTrainingRound(response, state, catalog, 'player2').reward).toEqual({
+      ac: 250, boosterSlug: 'common', winsTotal: 10, winsToNext: 10,
     });
-    expect(() => verifyTrainingRound({
+    expect(() => reconcileTrainingRound({
       ...response, reward: { ...response.reward, booster_slug: 'mythic' },
-    }, winRound, true)).toThrow();
+    }, state, catalog, 'player2')).toThrow();
   });
 
-  it('uses no rewards for incomplete rounds', () => {
-    expect(verifyTrainingRound({
-      success: true,
-      round: { ...round, roundNumber: 1 },
-      score: { player1: 0, player2: 1, finished: false, winner: null },
-    }, { ...round, roundNumber: 1 }, false)).toBeNull();
-  });
-
-  it('matches catalog opponents and rejects mismatched id sets', () => {
-    const catalog = ids.map((id) => ({
-      card_id: id, power_hp: 250, torque_nm: 300,
-      max_speed_kmh: 240, acceleration_0_100: 6, weight_t: 1.3,
-    }));
-    expect(opponentSourcesFromIds(ids, catalog).map((item) => item.card_id)).toEqual(ids);
-    expect(() => opponentSourcesFromIds([...ids.slice(0, 9), 'unknown'], catalog)).toThrow();
-  });
-
-  it('permits uncredited legacy practice only when the RPC is not yet installed', () => {
+  it('keeps unrewarded practice available only when the RPC is missing', () => {
     expect(isMissingTrainingRpc({ code: 'PGRST202' })).toBe(true);
     expect(isMissingTrainingRpc({ code: '42883' })).toBe(true);
     expect(isMissingTrainingRpc({ code: '42501' })).toBe(false);
