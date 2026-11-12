@@ -126,7 +126,7 @@ export default function ApexBattlePage() {
         const [vehicles, ownership, favorites] = await Promise.all([
           fetchAllPages((from, to) => supabase
             .from('cards')
-            .select('id,card_id,name,make,model,year,rarity,image_url,created_at,is_active,variant_of_card_id,power_hp,torque_nm,max_speed_kmh,acceleration_0_100,weight_t')
+            .select('*')
             .eq('is_active', true).order('id').range(from, to)),
           fetchAllPages((from, to) => supabase
             .from('user_cards')
@@ -529,7 +529,7 @@ export default function ApexBattlePage() {
                 <div className="min-w-0">
                   <p className="mb-2 truncate text-center text-[10px] font-black uppercase tracking-wider text-emerald-300 sm:text-xs sm:tracking-widest">Ton véhicule</p>
                   <motion.div key={'player-' + cardIndex} initial={reducedMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="mx-auto w-full min-w-0 max-w-[260px]">
-                    <BattleCard vehicle={playerCards[cardIndex]} snapshot={match.player1Deck[cardIndex]} mobileGrid/>
+                    <BattleCard vehicle={playerCards[cardIndex]} snapshot={match.player1Deck[cardIndex]}/>
                   </motion.div>
                 </div>
                 <div className="min-w-0">
@@ -538,7 +538,7 @@ export default function ApexBattlePage() {
                     initial={reducedMotion ? false : { opacity: 0.4, rotateY: revealed ? 75 : 0 }}
                     animate={{ opacity: 1, rotateY: 0 }} transition={{ duration: 0.45 }}
                     className="mx-auto w-full min-w-0 max-w-[260px]">
-                    <BattleCard vehicle={opponentCards[cardIndex]} snapshot={match.player2Deck[cardIndex]} concealed={!revealed} mobileGrid/>
+                    <BattleCard vehicle={opponentCards[cardIndex]} snapshot={match.player2Deck[cardIndex]} concealed={!revealed}/>
                   </motion.div>
                 </div>
               </div>
@@ -548,11 +548,23 @@ export default function ApexBattlePage() {
                   <p className="text-xs font-bold uppercase tracking-wider text-blue-200">Statistique : {BATTLE_STATS[lastRound.stat].label}</p>
                   <div className="mt-3 grid grid-cols-3 items-center gap-2">
                     <p className="font-mono text-xl font-black tabular-nums text-emerald-200 sm:text-3xl">
-                      {formatBattleStat(lastRound.stat, lastRound.player1Value, units, language)}
+                      {formatBattleStat(
+                        lastRound.stat,
+                        lastRound.player1Value,
+                        units,
+                        language,
+                        Number(playerCards[lastRound.roundNumber - 1]?.power_kw) || undefined,
+                      )}
                     </p>
                     <span className="text-xs text-gray-400">VS</span>
                     <p className="font-mono text-xl font-black tabular-nums text-rose-200 sm:text-3xl">
-                      {formatBattleStat(lastRound.stat, lastRound.player2Value, units, language)}
+                      {formatBattleStat(
+                        lastRound.stat,
+                        lastRound.player2Value,
+                        units,
+                        language,
+                        Number(opponentCards[lastRound.roundNumber - 1]?.power_kw) || undefined,
+                      )}
                     </p>
                   </div>
                   <h3 className="mt-4 text-xl font-black uppercase">
@@ -578,7 +590,13 @@ export default function ApexBattlePage() {
                               className="min-h-20 rounded-xl border border-blue-300/20 bg-blue-500/[0.08] p-3 text-left transition hover:border-blue-300/70 hover:bg-blue-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:cursor-not-allowed disabled:border-white/5 disabled:bg-white/[0.02] disabled:opacity-35">
                               <span className="block text-xs font-black uppercase">{BATTLE_STATS[stat].label}</span>
                               <span className="mt-1 block font-mono text-sm font-bold text-blue-200">
-                                {formatBattleStat(stat, match.player1Deck[cardIndex].stats[stat], units, language)}
+                                {formatBattleStat(
+                                  stat,
+                                  match.player1Deck[cardIndex].stats[stat],
+                                  units,
+                                  language,
+                                  Number(playerCards[cardIndex]?.power_kw) || undefined,
+                                )}
                               </span>
                               <span className="mt-1 block text-[10px] text-gray-400">{used}/2 utilisations</span>
                             </button>
