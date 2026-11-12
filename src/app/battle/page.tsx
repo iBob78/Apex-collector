@@ -82,7 +82,7 @@ function BattleCard({ vehicle, concealed = false, onSelect, mobileGrid = false, 
         year: Number(vehicle.year) || 0,
         category: 'vehicle',
       } as unknown as VehicleCard)}
-      compact={!mobileGrid}
+      compact={!mobileGrid && !snapshot}
       mobileGrid={mobileGrid}
       showLevel={mobileGrid}
       upgradeLevel={mobileGrid ? level : 0}
@@ -121,6 +121,10 @@ function ScaledDuelCard({
     };
     updateWidth();
 
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', updateWidth);
+      return () => window.removeEventListener('resize', updateWidth);
+    }
     const observer = new ResizeObserver(updateWidth);
     observer.observe(container);
     return () => observer.disconnect();
