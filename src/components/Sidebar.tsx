@@ -24,6 +24,7 @@ import {
   ChevronDownIcon,
   ShieldCheckIcon,
   UsersIcon,
+  SwordsIcon,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabaseBrowser';
@@ -45,6 +46,7 @@ const navItems = [
   { href: '/collection', label: 'MA COLLECTION', icon: Layers3Icon },
   { href: '/boosters', label: 'BOUTIQUE PACKS', icon: ZapIcon },
   { href: '/marketplace', label: 'MARKETPLACE', icon: ShoppingBagIcon },
+  { href: '/battle', label: 'APEX BATTLE', icon: SwordsIcon },
   { href: '/leaderboard', label: 'CLASSEMENT', icon: MedalIcon },
   { href: '/missions', label: 'CONTRATS', icon: TrophyIcon },
   { href: '/achievements', label: 'Succès', icon: StarIcon },
