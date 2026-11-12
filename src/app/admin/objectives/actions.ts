@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { PACKS } from '@/lib/boosters';
+import { isPurchasablePackSlug } from '@/lib/boosters';
 import { getAdminAccess } from '@/lib/admin';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
 import type {
@@ -85,7 +85,7 @@ function validateDraft(draft: ObjectiveDraft) {
   }
   if (!['ac', 'booster', 'both', 'either'].includes(draft.reward_mode)) return 'Choisis un mode de récompense valide.';
   if (draft.reward_mode !== 'ac' && draft.reward_booster_slug !== 'random'
-    && !Object.prototype.hasOwnProperty.call(PACKS, draft.reward_booster_slug)) return 'Choisis un type de booster valide.';
+    && !isPurchasablePackSlug(draft.reward_booster_slug)) return 'Choisis un type de booster valide.';
   if (['both', 'either'].includes(draft.reward_mode) && Number(draft.reward_ap) === 0) {
     return 'Pour combiner AC et booster, indique une récompense AC supérieure à zéro.';
   }
