@@ -1,7 +1,7 @@
 # Apex Battle — entraînement jouable (PR 2)
 
 ## Objectif
-La route /battle ajoute une interface jouable d'Apex Battle. Cette branche repose sur la PR #26 (moteur V1) ; sa preview doit donc inclure les deux étapes.
+La route /battle ajoute une interface jouable d'Apex Battle. Le moteur a été intégré par la PR #26 et la vue d'entraînement par la PR #29 (fusionnée sur `main` le 12 novembre 2026).
 
 ## Parcours
 1. Se connecter et ouvrir Apex Battle depuis le menu PC ou sous Plus sur mobile.
@@ -33,7 +33,7 @@ npm run build
 
 Recette sur preview : ouvrir /battle en étant connecté, ajouter puis retirer dix cartes, les ordonner, tenter une variante de modèle, choisir et vérifier les statistiques, observer la carte adverse et le décompte des dix manches, recommencer sur mobile et PC.
 
-Ne pas fusionner dans main ni modifier Supabase sans validation explicite.
+Historique : fusion de PR #29 autorisée et effectuée le 12 novembre 2026 ; migration Supabase 048 appliquée séparément à la demande du propriétaire. Les tests fonctionnels de récompense réelle restent à réaliser.
 
 ## Sélection : parité avec la collection (11 novembre 2026)
 - Sur smartphone, la grille de préparation affiche **quatre cartes par ligne** comme la collection, avec le rendu `Card.mobileGrid`, une touche directe sur la carte et un bouton compact d'ajout/retrait. Les cartes des duels restent au format original.
