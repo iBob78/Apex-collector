@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Check, CircleOff, ClipboardList, Plus, Save, Trophy } from 'lucide-react';
-import { PACKS } from '@/lib/boosters';
+import { SHOP_PACKS } from '@/lib/boosters';
 import { describeObjectiveReward } from '@/lib/objective-reward';
 import {
   type ObjectiveCardCategory,
@@ -544,7 +544,7 @@ export default function ObjectiveStudio({
                   <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">Type de booster</span>
                   <select value={draft.reward_booster_slug} onChange={(event) => updateDraft('reward_booster_slug', event.target.value)} className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm outline-none focus:border-cyan-400/70">
                     <option value="random">Aléatoire (tous les packs)</option>
-                    {Object.values(PACKS).map((pack) => <option key={pack.slug} value={pack.slug}>{pack.name}</option>)}
+                    {SHOP_PACKS.map((pack) => <option key={pack.slug} value={pack.slug}>{pack.name}</option>)}
                   </select>
                 </label>
               )}
