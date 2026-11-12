@@ -137,7 +137,9 @@ export default function BoostersPage() {
                       <div className="min-w-0 flex-1">
                         <h3 className="text-sm font-black">{gift.gift_key.startsWith('garage_level_')
                           ? t('Niveau écurie') + ' ' + gift.gift_key.slice('garage_level_'.length)
-                          : t(gift.gift_key.startsWith('objective_') ? 'Récompense de contrat ou succès' : gift.gift_key === 'welcome_2026' ? 'Booster de bienvenue' : 'Cadeau spécial')}</h3>
+                          : gift.gift_key.startsWith('battle_training_10_')
+                            ? 'Apex Battle · 10 victoires'
+                            : t(gift.gift_key.startsWith('objective_') ? 'Récompense de contrat ou succès' : gift.gift_key === 'welcome_2026' ? 'Booster de bienvenue' : 'Cadeau spécial')}</h3>
                         <p className="mt-1 text-xs text-amber-200">{t('{count} cartes offertes', { count: gift.card_count })}</p>
                         <button type="button"
                           onClick={() => router.push(`/open?gift_booster=${encodeURIComponent(gift.id)}`)}
