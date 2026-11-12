@@ -1,4 +1,4 @@
-import type { BattleMatchState, BattleRound, BattleStat, BattleVehicleSource } from './engine';
+import type { BattleRound, BattleVehicleSource } from './engine';
 
 export type TrainingReward = {
   ac: number;
@@ -55,7 +55,10 @@ export function verifyTrainingRound(
       Math.abs(Number(serverRound.player2Value) - expected.player2Value) > 0.001 ||
       serverRound.player1Points !== expected.player1Points ||
       serverRound.player2Points !== expected.player2Points ||
-      serverScore.finished !== isFinal) {
+      serverScore.finished !== isFinal ||
+      (isFinal && serverScore.winner !==
+        (serverScore.player1 === serverScore.player2 ? 'tie'
+          : Number(serverScore.player1) > Number(serverScore.player2) ? 'player1' : 'player2'))) {
     throw new Error('Le serveur a renvoyé un résultat différent. Recommence une partie pour préserver les AC.');
   }
 
