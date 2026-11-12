@@ -33,6 +33,10 @@ CREATE TABLE IF NOT EXISTS public.battle_training_matches (
 CREATE INDEX IF NOT EXISTS battle_training_wins_idx
   ON public.battle_training_matches (user_id, finished_at)
   WHERE status = 'finished' AND winner = 'player1';
+-- Avoid two active rewarded matches for the same account, even under concurrency.
+CREATE UNIQUE INDEX IF NOT EXISTS battle_training_one_active_user_idx
+  ON public.battle_training_matches (user_id)
+  WHERE status = 'active';
 
 -- Nobody can directly read opponent snapshots or forge match rows/rewards.
 ALTER TABLE public.battle_training_matches ENABLE ROW LEVEL SECURITY;
