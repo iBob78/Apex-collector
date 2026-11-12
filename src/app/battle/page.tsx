@@ -93,11 +93,11 @@ function BattleCard({ vehicle, concealed = false, onSelect, mobileGrid = false, 
 }
 
 /**
- * La carte Collection a des tailles internes fixes (IP, logo, texte).
- * Sur téléphone, réduire seulement le parent écrase la disposition.
- * On compose donc la carte à 180 px de large puis on réduit l'ensemble
- * proportionnellement à la largeur disponible, y compris badges et textes.
- * Ne modifie pas le composant Card partagé avec la collection.
+ * La collection compose ses cartes à une largeur confortable (~300 px).
+ * Sur smartphone, dessiner la carte à cette taille AVANT de la réduire :
+ * les badges, noms, chiffres et colonnes de statistiques gardent ainsi
+ * leurs proportions, sans passer à la ligne comme à 180 px.
+ * Le mode ordinateur garde le rendu Card normal sans changement d'échelle.
  */
 function ScaledDuelCard({
   vehicle,
@@ -109,39 +109,43 @@ function ScaledDuelCard({
   snapshot?: BattleVehicleSnapshot;
 }) {
   const frameRef = useRef<HTMLDivElement>(null);
-  const [availableWidth, setAvailableWidth] = useState<number | null>(null);
-  const referenceWidth = 180;
+  const [layout, setLayout] = useState<{ width: number; mobile: boolean } | null>(null);
+  const referenceWidth = 300;
 
   useLayoutEffect(() => {
     const container = frameRef.current;
     if (!container) return;
 
-    const updateWidth = () => {
-      setAvailableWidth(container.clientWidth); // Layout width, unaffected by reveal/flip transforms.
-    };
-    updateWidth();
-
+    // clientWidth, contrairement à getBoundingClientRect, ignore les rotations
+    // de la révélation et empêche les variations de taille pendant le retournement.
+    const updateLayout = () => setLayout({
+      width: container.clientWidth,
+      mobile: window.innerWidth < 640,
+    });
+    updateLayout();
+    window.addEventListener('resize', updateLayout);
     if (typeof ResizeObserver === 'undefined') {
-      window.addEventListener('resize', updateWidth);
-      return () => window.removeEventListener('resize', updateWidth);
+      return () => window.removeEventListener('resize', updateLayout);
     }
-    const observer = new ResizeObserver(updateWidth);
+    const observer = new ResizeObserver(updateLayout);
     observer.observe(container);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateLayout);
+    };
   }, []);
 
-  const scale = availableWidth !== null && availableWidth < referenceWidth
-    ? availableWidth / referenceWidth
-    : 1;
+  const scaled = layout !== null && layout.mobile && layout.width < referenceWidth;
+  const scale = scaled ? layout.width / referenceWidth : 1;
 
   return (
     <div ref={frameRef} className="relative aspect-[2/3] w-full min-w-0">
       <div
         className="absolute left-0 top-0 origin-top-left"
         style={{
-          width: scale < 1 ? referenceWidth : '100%',
-          transform: scale < 1 ? `scale(${scale})` : undefined,
-          visibility: availableWidth === null ? 'hidden' : 'visible',
+          width: scaled ? referenceWidth : '100%',
+          transform: scaled ? `scale(${scale})` : undefined,
+          visibility: layout === null ? 'hidden' : 'visible',
         }}
       >
         <BattleCard vehicle={vehicle} concealed={concealed} snapshot={snapshot} />
