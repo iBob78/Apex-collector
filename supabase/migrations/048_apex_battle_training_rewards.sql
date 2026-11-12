@@ -96,6 +96,8 @@ REVOKE ALL ON FUNCTION public.battle_training_vehicle_stats(public.cards)
 
 -- Starts a match only with ten distinct *owned* and active cards.
 -- The server chooses the ten bot cards, normalizes and freezes both decks.
+-- Bot identities are NOT returned at match creation; the client sees only the
+-- current opponent after its statistic has been irrevocably chosen.
 -- Every new match abandons the previous unfinished match without rewards.
 CREATE OR REPLACE FUNCTION public.start_training_battle(p_card_ids UUID[])
 RETURNS JSONB
@@ -117,7 +119,6 @@ DECLARE
   v_index INTEGER := 0;
   v_match_id UUID;
   v_wins INTEGER;
-  v_bot_ids JSONB;
 BEGIN
   IF v_user IS NULL THEN RAISE EXCEPTION 'Connexion requise.'; END IF;
   IF p_card_ids IS NULL OR cardinality(p_card_ids) <> 10 THEN
@@ -148,7 +149,8 @@ BEGIN
   -- The bot's deck is derived in the database, never from client-provided cars.
   FOR v_index IN 0..9 LOOP
     v_target_ip := (v_player->v_index->'stats'->>'ip')::numeric;
-    v_offset := (v_index * 7 + 3) % 10;
+    -- Unpredictable within the ten nearest eligible models.
+    v_offset := FLOOR(RANDOM() * 10)::integer;
     SELECT card.* INTO v_bot_card
     FROM public.cards AS card
     WHERE card.is_active = TRUE
@@ -179,13 +181,9 @@ BEGIN
   SELECT COUNT(*)::integer INTO v_wins FROM public.battle_training_matches
   WHERE user_id = v_user AND status = 'finished' AND winner = 'player1';
 
-  SELECT COALESCE(jsonb_agg(item.value->>'cardId' ORDER BY item.ordinality), '[]'::jsonb)
-  INTO v_bot_ids
-  FROM jsonb_array_elements(v_bot) WITH ORDINALITY AS item(value, ordinality);
-
+  -- No opponent IDs/stats are returned before a round is committed.
   RETURN jsonb_build_object(
-    'success', true, 'battle_id', v_match_id,
-    'opponent_ids', v_bot_ids, 'wins_total', v_wins
+    'success', true, 'battle_id', v_match_id, 'wins_total', v_wins
   );
 END;
 $$;
