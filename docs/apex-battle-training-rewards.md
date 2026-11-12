@@ -1,4 +1,4 @@
-# Apex Battle — Récompenses d’entraînement (PR #27)
+# Apex Battle — Récompenses d’entraînement (intégration PR #29)
 
 ## Règles
 - Victoire contre ordinateur : +250 AC dans profiles.ap.
@@ -26,9 +26,14 @@
 3. Préparer neuf victoires sur un compte de test puis atteindre la dixième : +250 AC une seule fois, cadeau Common ou Uncommon de 6 cartes une seule fois.
 4. Retenter la dernière RPC, en concurrentiel, depuis un autre compte et en anon : aucune attribution supplémentaire.
 5. Vérifier le cadeau dans Boosters et son ouverture, puis le prochain palier à vingt victoires ; contrôler le solde et le compteur après reconnexion.
-6. Tester sur smartphone et PC avant toute fusion sur main.
+6. Code fusionné sur `main` via PR #29. Effectuer un contrôle post-fusion sur PC/smartphone et tester les gains réels sur un compte de test.
 
 ## Limites
 - Pas de plafond quotidien ajouté : ce besoin n’en mentionne pas. Le farm automatisé de matchs et les gains AC restent un sujet à encadrer avant une ouverture large.
 - L’ouverture des boosters offerts est gérée par le flux existant ; les limites de transaction entre tirage et sauvegarde de cartes ne changent pas.
-- La migration 048 a été exécutée sur Supabase sur demande explicite. Aucun AC ni booster n’a été accordé lors de l’installation (0 match, 0 cadeau Battle après installation). Les essais de victoire sur un compte authentifié, la dixième victoire et les transactions concurrentes restent à faire avant la fusion sur main.
+- La migration 048 a été exécutée sur Supabase sur demande explicite. Aucun AC ni booster n’a été accordé lors de l’installation (0 match, 0 cadeau Battle après installation). Les essais de victoire sur un compte authentifié, la dixième victoire et les transactions concurrentes restent à faire **après fusion**, avant de considérer les récompenses entièrement validées.
+
+## Intégration GitHub (12 novembre 2026)
+- Moteur : PR #26 fusionnée, commit `c80dbf53`.
+- Interface, protections, récompenses, documentation : PR #29 fusionnée, commit `8429a6fa` ; la PR #27 a été remplacée à cause de conflits avec `main`.
+- Build de la branche de PR #29 validé sur Vercel (`READY`). Les tests Jest officiels et une victoire donnant effectivement des AC ou un cadeau ne sont pas encore confirmés.
