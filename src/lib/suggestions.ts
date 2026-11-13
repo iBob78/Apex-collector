@@ -1,3 +1,4 @@
+import { boostTypes } from '@/lib/boost';
 import { drivetrainLayoutDescriptions, drivetrainLayouts } from '@/lib/drivetrain';
 
 export const SUGGESTION_CATEGORIES = ['vehicle', 'circuit', 'driver'] as const;
@@ -50,7 +51,7 @@ export const SUGGESTION_FIELDS: Record<SuggestionCategory, SuggestionField[]> = 
     { name: 'acceleration_0_100', label: '0 à 100 km/h (secondes)', type: 'number' },
     { name: 'engine_size', label: 'Motorisation', hint: 'Ex. : V8 4.0 L biturbo' },
     { name: 'cylinder', label: 'Architecture moteur', hint: 'Ex. : V8, flat-six' },
-    { name: 'boost', label: 'Suralimentation' },
+    { name: 'boost', label: 'Suralimentation', type: 'select', options: boostTypes.map((value) => ({ value, label: value })) },
     { name: 'country_code', label: 'Code pays', hint: 'Ex. : FR, DE, JP' },
     {
       name: 'transmission',
