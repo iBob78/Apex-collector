@@ -19,6 +19,7 @@ import {
   X,
 } from 'lucide-react';
 import Card from '@/components/Card';
+import { boostTypes } from '@/lib/boost';
 import { drivetrainLayoutDescriptions, drivetrainLayouts } from '@/lib/drivetrain';
 import { getRarityColor } from '@/lib/rarity';
 import { getIncompleteVehicleCardFields } from '@/lib/card-completeness';
@@ -534,7 +535,22 @@ export default function CardStudio({
                   <TextField label="Poids" value={draft.weight_t} onChange={(value) => setField('weight_t', value)} type="number" min="0" step="any" placeholder="1.45" hint="Tonnes" />
                   <TextField label="Motorisation" value={draft.engine_size} onChange={(value) => setField('engine_size', value)} placeholder="4.0L flat-six" />
                   <TextField label="Cylindres" value={draft.cylinder} onChange={(value) => setField('cylinder', value)} placeholder="6" />
-                  <TextField label="Suralimentation" value={draft.boost} onChange={(value) => setField('boost', value)} placeholder="Atmosphérique" />
+                  <label className="block min-w-0">
+                    <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Suralimentation</span>
+                    <select
+                      value={draft.boost}
+                      onChange={(event) => setField('boost', event.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-[#090c11] px-3.5 py-3 text-sm text-white outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/10"
+                    >
+                      <option value="">Non renseignée</option>
+                      {draft.boost && !boostTypes.some((type) => type === draft.boost) && (
+                        <option value={draft.boost}>Ancienne valeur : {draft.boost}</option>
+                      )}
+                      {boostTypes.map((type) => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  </label>
                   <label className="block min-w-0">
                     <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Position moteur / transmission</span>
                     <select
