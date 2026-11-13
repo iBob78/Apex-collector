@@ -1,5 +1,6 @@
 -- Apex Battle V1 pilot palmares.
--- Prepared for review. Do not apply to production without owner approval.
+-- Applied with explicit owner approval on 13 Nov 2026.
+-- Supabase migration: 20261113122535_battle_pilot_palmares. Do not reapply.
 -- Existing authoritative source: 048_apex_battle_training_rewards.sql.
 -- No history backfill: only finished, server-recorded training matches count.
 -- IMPORTANT: no direct SELECT grants on battle_training_matches.
