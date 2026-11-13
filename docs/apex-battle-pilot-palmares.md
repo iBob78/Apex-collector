@@ -14,7 +14,7 @@ Intégrer une carrière de joueur dans `/profile` et le showroom public `/showro
 
 ## Données et confidentialité
 
-- SQL proposé : `supabase/migrations/051_battle_pilot_palmares.sql`.
+- SQL **appliqué** : `supabase/migrations/051_battle_pilot_palmares.sql`, migration Supabase `20261113122535_battle_pilot_palmares` (13 novembre 2026). Ne pas réappliquer.
 - RPC `get_battle_pilot_palmares(p_username TEXT DEFAULT NULL)`, uniquement `authenticated`, avec `auth.uid()` et `search_path=''`. `p_username=NULL` retourne les données privées du joueur connecté. Un pseudo non privé retourne les agrégats publics seulement, sans dernier match, cartes adverses ou solde AC. Le pseudo d'un showroom privé renvoie `{available:false}`.
 - Pas de `GRANT SELECT` sur `battle_training_matches`. Les agrégations sont calculées côté PostgreSQL avec `SECURITY DEFINER`, et l'historique est limité à 20 en SQL.
 - Le nombre de boosters compte les cadeaux offerts via les victoires gagnantes (`awarded_booster_slug`), même si déjà ouverts.
@@ -24,9 +24,9 @@ Intégrer une carrière de joueur dans `/profile` et le showroom public `/showro
 ## Compatibilité et déploiement
 
 - L'interface affiche un message si la RPC n'existe pas encore (migration 051 absente) ; ne pas afficher des zéros trompeurs.
-- **Migration non appliquée** : le SQL a été **compilé/testé en transaction PostgreSQL puis annulé par `ROLLBACK`** ; une vérification confirme que la RPC n'a pas été installée. Les comptes et soldes AC sont inchangés.
-- Installer la migration uniquement après accord explicite du propriétaire, puis vérifier RLS/droits, flux public et personnel, taux de victoire, détails des manches et événements sans historique.
-- Vérifier la preview sur smartphone et PC (badges, top voitures, 20 lignes ouvrables) avant fusion.
+- **Migration appliquée sur Supabase** avec accord explicite. Avant installation, le SQL avait été vérifié dans une transaction `ROLLBACK`. Après installation : RPC présente, droits `authenticated` accordés, droits `anon` refusés, aucune lecture directe de `battle_training_matches`, RLS conservée. Aucun AC, booster ou match n'a été modifié par cette migration de lecture.
+- Tests SQL après application : sur un compte ayant déjà une bataille validée, retour de **1 victoire, 250 AC cumulés**, historique des dix manches et deux voitures record. Pour un autre utilisateur consultant un showroom public, aucun historique privé ni AC remporté n'est renvoyé. Un showroom privé retourne `available:false`. Fonction `SECURITY DEFINER` volontairement exposée seulement aux joueurs authentifiés, sous contrôle de `auth.uid()` et de la visibilité du showroom.
+- La preview Vercel du commit `b6c272b` a été vérifiée `READY`, et les workflows CI, Tests, Pull Request Checks ont réussi. Le workflow externe Dependency Review/Snyk était en échec et reste à examiner indépendamment. Le contrôle visuel réel sur smartphone et PC (badges, voitures record, historique) reste à faire après fusion.
 - Tests : `src/lib/battle/__tests__/palmares.test.ts` couvre les six trophées, la sélection de 20 matchs, la séparation public/privé et l'état sans historique.
 
 ## Points de recette
