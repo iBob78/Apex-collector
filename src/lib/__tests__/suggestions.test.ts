@@ -1,3 +1,4 @@
+import { boostTypes } from '../boost';
 import { parseSuggestionDraft } from '../suggestions';
 
 describe('parseSuggestionDraft', () => {
@@ -20,6 +21,27 @@ describe('parseSuggestionDraft', () => {
       },
       title: 'Porsche 911 GT3',
     });
+  });
+
+  it('accepts all six suralimentation choices and rejects arbitrary values', () => {
+    for (const boost of boostTypes) {
+      const result = parseSuggestionDraft({
+        category: 'vehicle',
+        details: { make: 'Apex', model: 'GT', year: '2025', boost },
+        submitterName: '',
+        sourceUrl: '',
+        message: '',
+      });
+      expect('data' in result && result.data.details.boost).toBe(boost);
+    }
+
+    expect(parseSuggestionDraft({
+      category: 'vehicle',
+      details: { make: 'Apex', model: 'GT', year: '2025', boost: 'Nitro' },
+      submitterName: '',
+      sourceUrl: '',
+      message: '',
+    })).toEqual({ error: 'La valeur du champ « Suralimentation » est invalide.' });
   });
 
   it('rejects missing required fields, malformed numbers, and unknown fields', () => {
