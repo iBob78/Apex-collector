@@ -177,7 +177,7 @@ export default function ClassicBoosterOpening({
       <div className={styles.ambient} aria-hidden="true" />
       <div className={styles.container}>
         <header className={styles.topbar}>
-          <button type="button" className={styles.back} onClick={onBack}>
+          <button type="button" className={styles.back} onClick={onBack} disabled={isOpening || (isPrepared && !revealed)}>
             <ArrowLeft size={16} aria-hidden="true" /> {t('Retour à la boutique')}
           </button>
           <div className={styles.brand}>
@@ -238,9 +238,6 @@ export default function ClassicBoosterOpening({
                 <span className={styles.ridgeTop} aria-hidden="true" />
                 <span className={styles.ridgeBottom} aria-hidden="true" />
                 <span className={styles.foilShine} aria-hidden="true" />
-                <div className={styles.flap} aria-hidden="true">
-                  <span className={styles.flapRidge} />
-                </div>
                 {ready && (
                   <div className={styles.tearControl}>
                     <div className={styles.tearPerforation} aria-hidden="true" />
@@ -266,6 +263,9 @@ export default function ClassicBoosterOpening({
                     </button>
                   </div>
                 )}
+              </div>
+              <div className={styles.flap} aria-hidden="true">
+                <span className={styles.flapRidge} />
               </div>
             </div>
 
