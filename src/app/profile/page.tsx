@@ -20,6 +20,7 @@ import { calculateCollectorLevel } from '@/lib/collector-level';
 import { useSitePreferences } from '@/contexts/SitePreferencesContext';
 import Sidebar from '@/components/Sidebar';
 import Card from '@/components/Card';
+import BattlePilotPalmares from '@/components/battle/BattlePilotPalmares';
 import type { VehicleCard } from '@/types/game';
 
 type Achievement = {
@@ -379,6 +380,8 @@ export default function ProfilePage() {
             <StatCard language={language} label={t('Constructeurs collectionnés')} value={stats.manufacturers} icon={<Users size={18} />} />
             <StatCard language={language} label={t('AC disponibles')} value={Number(profile?.ap) || 0} icon={<Wallet size={18} />} />
           </section>
+
+          <BattlePilotPalmares />
 
           <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)]">
             <article className="rounded-3xl border border-blue-400/15 bg-gradient-to-br from-[#101a28] via-[#0b0d12] to-[#090909] p-5 sm:p-7">

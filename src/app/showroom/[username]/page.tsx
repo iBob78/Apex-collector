@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { ArrowLeft, ArrowRight, CarFront, LockKeyhole, Medal, Users } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import Card from '@/components/Card';
+import BattlePilotPalmares from '@/components/battle/BattlePilotPalmares';
 import SafeImage from '@/components/SafeImage';
 import { supabase } from '@/lib/supabaseClient';
 import { resolveCardImage } from '@/lib/images';
@@ -194,6 +195,12 @@ export default function ShowroomPage() {
               ) : (
                 <div className="rounded-3xl border border-dashed border-white/15 bg-[#0a0a0a] p-10 text-center text-sm text-gray-400">
                   {t('Aucune voiture n’est actuellement exposée.')}
+                </div>
+              )}
+
+              {showroom.isPublic && (
+                <div className="mt-7">
+                  <BattlePilotPalmares username={showroom.username} />
                 </div>
               )}
 
