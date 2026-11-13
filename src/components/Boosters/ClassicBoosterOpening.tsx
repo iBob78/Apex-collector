@@ -367,6 +367,7 @@ export default function ClassicBoosterOpening({
                           mobileGrid={useCompactPhoneCards}
                           boosterReveal
                           className="h-full"
+                          onCardClick={() => undefined}
                         />
                         {firstTimeCardIndices.has(index) && <span className={styles.newBadge} aria-label={t('Nouvelle Carte')}>NEW!</span>}
                         {isSpecial(rarity) && <span className={styles.prism} aria-hidden="true" />}
