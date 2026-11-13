@@ -37,3 +37,10 @@ Intégrer une carrière de joueur dans `/profile` et le showroom public `/showro
 4. Basculer le showroom en privé : visiteurs ne doivent plus accéder à son palmarès via la RPC ni la page showroom.
 5. Matchs nuls/défaites : fin de série ; un 10–0 débloque Imbattable. Aucun trophée ne rajoute des AC.
 6. Envisager de tester le palmarès sous charge si l'historique atteint plusieurs milliers de parties ; le RPC agrège des données historiques sans matérialisation.
+
+## Fusion dans main (13 novembre 2026)
+
+- La PR [#35](https://github.com/iBob78/Apex-collector/pull/35) a été **fusionnée sur `main`** après autorisation explicite, commit `cb8c463ae7d80af20892282347f7f95dba3f0c3c`.
+- Build de la branche sur le dernier commit `3904a7e` : Vercel `READY`, workflows GitHub **CI**, **Tests**, **Pull Request Checks** réussis. Le contrôle externe Dependency Review/Snyk reste en échec ; vérifier les rapports de sécurité indépendamment.
+- Backend Supabase migration 051 : **déjà appliqué**, version `20261113122535_battle_pilot_palmares`. **Ne pas rejouer**. Les contrôles propriétaire/public/privé et permissions sont réussis, sans changement des soldes.
+- Il reste un contrôle visuel sur un véritable smartphone et sur le déploiement final de `main` ; aucune vérification d'interface sur appareil réel n'est revendiquée.
