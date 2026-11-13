@@ -27,7 +27,8 @@
   background: #101824aa; border: 1px solid #a0c6fd22; border-radius: 11px;
   padding: 10px 12px; min-height: 40px; cursor: pointer; transition: background .2s,border-color .2s;
 }
-.back:hover,.sound:hover { color: #fff; background: #152641; border-color: #92bafd5d; }
+.back:hover:not(:disabled),.sound:hover { color: #fff; background: #152641; border-color: #92bafd5d; }
+.back:disabled { opacity: .38; cursor: not-allowed; }
 .sound { width: 42px; height: 42px; padding: 0; flex: 0 0 auto; }
 .brand { display: inline-flex; align-items: center; gap: 13px; white-space: nowrap; min-width: 0; }
 .brandIcon {
@@ -98,6 +99,7 @@
 .tearTrack:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .packFloat.tearing { transform: rotate(3deg) translateY(11px) scale(1.035); }
 .tearing .flap,.burst .flap { transform: translate(36px,-80px) rotate(28deg); opacity: 0; }
+.tearing .ridgeTop,.burst .ridgeTop { opacity: 0; }
 .packFloat.burst { transform: translateY(98px) rotate(-12deg) scale(.7); opacity: 0; }
 .flyCards { position: absolute; z-index: 4; top: 31%; left: 50%; width: 220px; height: 240px; transform: translateX(-50%); pointer-events: none; }
 .flyCards span { position: absolute; left: 50%; top: 17%; width: 84px; height: 127px; display: grid; place-items: center; border-radius: 10px; background: linear-gradient(130deg,#284775,#0a1021 65%,#121f3f); border: 2px solid #9bc4fa; color: #eef5ff; font-size: 35px; font-style: italic; font-weight: 1000; box-shadow: 0 13px 25px #000a; opacity: 0; animation: cardsFan .78s cubic-bezier(.2,.85,.2,1) both; animation-delay: calc(var(--i) * 42ms); }
